@@ -1,0 +1,14 @@
+.title {
+    text-align: center;
+    font-size: 50px;
+}
+.headers {
+    border-style:solid;
+}
+.normFont {
+    font-weight: normal;
+}
+
+.fade:not(.show) {
+    opacity: 1 !important;
+}

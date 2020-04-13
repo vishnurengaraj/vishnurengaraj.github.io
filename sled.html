@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <title>Sledding in Ann Arbor</title>
+    <link rel="stylesheet" href="intro.css">
+    <link rel="stylesheet" href="leaderboard.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+        integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+    <!-- Add Bootstrap and Bootstrap-Vue CSS to the <head> section -->
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
+    <!-- Add Vue and Bootstrap-Vue JS just before the closing </body> tag -->
+    <script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+</head>
+<style>
+    html,
+    body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden
+    }
+
+    #mapMountainButton {
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+        background-color: #73e8ff;
+        border: 0px;
+        padding: 8px;
+        border-radius: 24px;
+        outline: 0px;
+        transition: all 0.32s cubic-bezier(.25, .8, .25, 1);
+        position: absolute;
+        top: 500px;
+        left: 50%;
+        z-index: 98;
+    }
+
+    #mapMountainButton:hover {
+        transform: translate(0, 2px);
+        box-shadow: 0 7px 14px rgba(0, 0, 0, 0.12), 0 5px 5px rgba(0, 0, 0, 0.24);
+    }
+
+    #mapMountainButton:active {
+        transform: translate(0, 5px);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    }
+
+    #backMapButton {
+        background-color: #d32f2f;
+        color: white;
+        width: 50%;
+        margin: 0px;
+        border: 0px;
+        padding: 6px;
+        outline: 0px;
+        transition: all 0.6s cubic-bezier(.25, .8, .25, 1);
+        font-size: 15px;
+
+
+    }
+
+    #backMapButton:hover,
+    #backMapButton:active {
+        background-color: #9a0007;
+        transition: all 0.6s cubic-bezier(.25, .8, .25, 1);
+
+
+    }
+
+    #cancelReviewButton {
+        background-color: #d32f2f;
+        color: white;
+        width: 150px;
+        margin: 0px;
+        border: 0px;
+        padding: 6px;
+        outline: 0px;
+        transition: all 0.6s cubic-bezier(.25, .8, .25, 1);
+        font-size: 15px;
+        border-radius: 17px;
+        box-shadow: 0 7px 14px rgba(0, 0, 0, 0.12), 0 5px 5px rgba(0, 0, 0, 0.24);
+
+
+    }
+
+    #cancelReviewButton:hover,
+    #cancelReviewButton:active {
+        background-color: #9a0007;
+        transition: all 0.6s cubic-bezier(.25, .8, .25, 1);
+
+
+    }
+
+    #submitReviewButton {
+        background-color: #ffea00;
+        width: 150px;
+        margin: 0px;
+        border: 0px;
+        padding: 6px;
+        outline: 0px;
+        transition: all 0.6s cubic-bezier(.25, .8, .25, 1);
+        font-size: 15px;
+        border-radius: 17px;
+        box-shadow: 0 7px 14px rgba(0, 0, 0, 0.12), 0 5px 5px rgba(0, 0, 0, 0.24);
+
+
+    }
+
+    #submitReviewButton:hover,
+    #submitReviewButton:active {
+        background-color: #ffff72;
+        transition: all 0.6s cubic-bezier(.25, .8, .25, 1);
+
+    }
+
+    #writeReviewButton {
+        background-color: #ffea00;
+        width: 50%;
+        margin: 0px;
+        border: 0px;
+        padding: 6px;
+        outline: 0px;
+        transition: all 0.6s cubic-bezier(.25, .8, .25, 1);
+        font-size: 15px;
+
+
+    }
+
+    #writeReviewButton:hover,
+    #writeReviewButton:active {
+        background-color: #ffff72;
+        transition: all 0.6s cubic-bezier(.25, .8, .25, 1);
+
+    }
+
+    .card {
+        transition: 0.2s;
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+        border-radius: 30px;
+        margin: 0 auto;
+        max-width: 800px;
+        z-index: 99;
+        font-size: 11px;
+        border: 0px;
+        position: fixed;
+        top: 150%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+
+    .card-text {
+        height: 400px;
+        overflow: auto;
+    }
+
+    .card-title {
+        font-size: 24px;
+        font-weight: 500;
+    }
+
+    .card-subtitle {
+        font-size: 16px;
+        font-weight: 400;
+    }
+
+    .picHill {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    #review {
+        background-color: white;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 99999999;
+        animation-name: swipe-up;
+        animation-duration: 0.6s;
+        overflow: hidden;
+    }
+
+    #intro {
+        animation-name: swipe-down;
+        animation-duration: 1s;
+    }
+
+    #leaderboard {
+        animation-name: swipe-down;
+        animation-duration: 0.6s;
+    }
+
+
+
+    @keyframes swipe-up {
+        from {
+            transform: translateY(100%);
+        }
+
+        to {
+            transform: translateY(0px);
+        }
+    }
+
+    @keyframes swipe-down {
+        from {
+            transform: translateY(-100%);
+        }
+
+        to {
+            transform: translateY(0px);
+        }
+    }
+
+    @keyframes swipe-left {
+        from {
+            transform: translateX(100%);
+        }
+
+        to {
+            transform: translateX(0px);
+        }
+    }
+
+    @keyframes swipe-right {
+        from {
+            transform: translateX(-100%);
+        }
+
+        to {
+            transform: translateX(0px);
+        }
+    }
+</style>
+
+<body>
+    <div id="app">
+        <review-form v-for="(hill, index) in hills" v-show="hill.toggle_reviews" v:bind:hill="hill" v-bind:key="hill.id"
+            v-bind:name="hill.name" v-bind:rating="hill.rating" v-bind:reviews="hill.reviews"
+            v-bind:num_of_ratings="hill.num_of_ratings" v-bind:toggle_reviews="hill.toggle_reviews"></review-form>
+
+        <div id='info'>
+            <div v-if="show_screen === 'map'" id="map" style="text-align: center;">
+                <h1 style="text-align: center;"> Hey there {{firstName}}, lets find sledding areas near you. </h1>
+                <div style="display: inline;">
+                    <button id="to-leaderboard" @click="view('leaderboard')">View Leaderboard</button>
+                
+                    <button id="to-leaderboard" style="margin:2px" v-on:click="view('addHill')">Add Hill</button>
+                </div>
+
+                <br />
+                <div style="text-align: left;">
+                    <br />
+                    <img  style="  display: block; margin-left: auto; margin-right: auto;" id="mapImage" src="img/map.png">
+                    <hill-card v-for="(hill, index) in hills" v:bind:hill="hill" v-bind:key="hill.id"
+                        v-bind:name="hill.name" v-bind:cardy="hill.cardy" v-bind:rating="hill.rating"
+                        v-bind:img="hill.img" v-bind:body="hill.body" v-bind:xpos="hill.xpos" v-bind:ypos="hill.ypos"
+                        v-bind:reviews="hill.reviews" v-bind:num_of_ratings="hill.num_of_ratings"
+                        v-bing:showing="hill.showing">
+                    </hill-card>
+                </div>
+            </div>
+
+            <div class="container" id="intro" v-else-if="show_screen === 'addHill'">
+                <div style="font-size: 16px;"> <strong>Hill Name: </strong>
+                    <input class="input" size="80" type="text" v-model="newHillName"
+                        placeholder="enter name of the hill">
+                </div>
+                <div style="font-size: 16px;"> <strong>Hill Img URL: </strong>
+                    <input class="input" size="80" type="text" v-model="newHillImgURL"
+                        placeholder="enter image of the hill">
+                </div>
+                <div style="font-size: 16px;"> <strong>Hill x position: </strong>
+                    <input class="input" size="80" type="text" v-model="newHillXPos"
+                        placeholder="enter a number between -350 and 350">
+                </div>
+                <div style="font-size: 16px;"> <strong>Hill y position: </strong>
+                    <input class="input" size="80" type="text" v-model="newHillYPos"
+                        placeholder="enter a number between -350 and 350">
+                </div>
+                <div style="font-size: 16px;"> <strong>Hill Description: </strong>
+                    <input class="input" size="80" type="text" v-model="newHillBody"
+                        placeholder="enter a description of the hill">
+                </div>
+                <button id="to-leaderboard" @click="submitHill">Submit Hill Information</button>
+            </div>
+
+            <div class="container" id="intro" v-else-if="show_screen === 'intro'">
+                <div style="text-align: center;">
+                    <h1><strong>Ned's Declassified Sled Survival Guide</strong></h1>
+                    <br>
+                    <div id="form">
+                        <h2>Enter your credentials</h2>
+                        <input type="text" class="input" v-model="firstName" placeholder="First Name"
+                            style="width: 60%;"><br>
+                        <input type="text" class="input" v-model="lastName" placeholder="Second Name"
+                            style="width: 60%;"><br>
+                        <img src="img/front_page.jpg" id="image" style="width: 75%; margin: 10px;">
+                        <button id="submit-intro" class="btn input" @click="view('map')"
+                            style="width: 100%; padding: 0px; "><strong>Go to Map</strong> </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="container" id='leaderboard' v-else-if="show_screen === 'leaderboard'">
+                <div class="row">
+                    <div class="title">
+                        Hill Leaderboards
+                    </div>
+                </div>
+                <div style="font-size: 16px;" class="row content">
+                    <div class="col">
+                        <ul class="nav nav-tabs">
+                            <li class="active" id="topCharts"><a data-toggle="tab" href="#top">Top Charts</a></li>
+                            <li id="trendingCharts"><a data-toggle="tab" href="#trending">Trending</a></li>
+                            <li id="newCharts"><a data-toggle="tab" href="#new">New Additions</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade in active" id="top">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Hill Name</th>
+                                            <th scope="col">Rating</th>
+                                            <th scope="col">Number of Reviews</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(hill, index) in bestHills" class="normFont">
+                                            <td scope="row">{{ hill.name }}</td>
+                                            <td>{{ hill.rating }}</td>
+                                            <td>{{ hill.num_of_ratings }}</td>
+                                        </tr>
+                                </table>
+                            </div>
+                            <div class="tab-pane fade" id="trending">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Hill Name</th>
+                                            <th scope="col">Rating</th>
+                                            <th scope="col">Number of Reviews</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(hill, index) in trendingHills" class="normFont">
+                                            <td scope="row">{{ hill.name }}</td>
+                                            <td>{{ hill.rating }}</td>
+                                            <td>{{ hill.num_of_ratings }}</td>
+                                        </tr>
+                                </table>
+                            </div>
+                            <div class="tab-pane fade" id="new">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Hill Name</th>
+                                            <th scope="col">Rating</th>
+                                            <th scope="col">Number of Reviews</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(hill, index) in newHills" class="normFont">
+                                            <td scope="row">{{ hill.name }}</td>
+                                            <td>{{ hill.rating }}</td>
+                                            <td>{{ hill.num_of_ratings }}</td>
+                                        </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="cancelReviewButton" style="height: 34px;" value="Back to map"
+                    @click="view('map')"><strong>Back to Map</strong></button>
+            </div>
+
+        </div>
+    </div>
+    <script src="sled.js"></script>
+</body>
+
+</html>
