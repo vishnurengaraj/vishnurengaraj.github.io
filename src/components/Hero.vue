@@ -128,12 +128,10 @@ onUnmounted(() => {
       </li>
     </ul>
     <button class="learn" type="button" @click="scrollTo('about')">
-      <span>learn more</span>
-      <span class="learn-ring" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="28" height="28">
-          <path fill="currentColor" d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
-        </svg>
-      </span>
+      <span>Learn more</span>
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path fill="currentColor" d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
+      </svg>
     </button>
   </div>
 </template>
@@ -215,41 +213,64 @@ onUnmounted(() => {
   position: absolute;
   left: 50%;
   bottom: 28px;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
+  isolation: isolate;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-width: 48px;
+  gap: 6px;
   min-height: 48px;
-  background: none;
+  padding: 0 18px 0 20px;
   border: 0;
-  color: #fff;
+  border-radius: 999px;
+  background: #ffb020;
+  color: #1f1f1f;
   cursor: pointer;
-  font-family: "Roboto Mono", ui-monospace, monospace;
-  font-size: 13px;
-  letter-spacing: 0.22em;
-  text-transform: lowercase;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.65);
-  padding: 8px;
+  font-family: "Roboto", "Segoe UI", sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  letter-spacing: 0.01em;
+  box-shadow: var(--shadow-rest);
+  transform: translateX(-50%);
+  animation: learn-hint 2.4s ease-in-out infinite;
 }
 
-.learn-ring {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(255, 255, 255, 0.9);
-  display: grid;
-  place-items: center;
-  background: rgba(0, 0, 0, 0.28);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
-  transition: transform 0.2s ease, background 0.2s ease;
+.learn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #1f1f1f;
+  opacity: 0;
+  pointer-events: none;
 }
 
-.learn:hover .learn-ring {
-  transform: translateY(4px);
-  background: rgba(0, 0, 0, 0.45);
+.learn:hover {
+  animation-play-state: paused;
+  box-shadow: var(--shadow-hover);
+}
+
+.learn:hover::before {
+  opacity: 0.08;
+}
+
+.learn:active::before {
+  opacity: 0.12;
+}
+
+.learn:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+}
+
+@keyframes learn-hint {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(6px);
+  }
 }
 
 @media (max-width: 700px) {
@@ -260,13 +281,6 @@ onUnmounted(() => {
 
   .learn {
     bottom: 16px;
-    letter-spacing: 0.12em;
-    font-size: 12px;
-  }
-
-  .learn-ring {
-    width: 48px;
-    height: 48px;
   }
 }
 
@@ -288,17 +302,17 @@ onUnmounted(() => {
   .learn {
     bottom: 8px;
   }
-
-  .learn-ring {
-    width: 48px;
-    height: 48px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .caret {
     animation: none;
     display: none;
+  }
+
+  .learn {
+    animation: none;
+    transform: translateX(-50%);
   }
 }
 </style>

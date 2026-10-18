@@ -87,20 +87,29 @@
   transform: translateZ(50px);
 }
 
-/* Hard-edged sunrise stripes between the title and the white content.
-   Same idea as the 2023 l8 color slab: a solid bar in the scroll, not a
-   gradient. Padding clears the parallax treeline so the bars start once
-   the mountains have left the title screen. */
+/* Hard-edged sunrise stripes. They start at the bottom of the hero and
+   sit above the mountain layers, so the grey filtered treeline cannot
+   show as stray bars and the black page background cannot show through.
+   Each band overlaps the next by 2px so 125% and 150% scaling cannot
+   open a device-pixel crack between them. */
 .sunrise {
   position: relative;
   z-index: 12;
-  padding-top: 42vh;
+  /* Cover the dark fringe under the treeline and any subpixel crack
+     before the first band. The hero text stays above this (z-index 20). */
+  margin-top: -28px;
+  background: #2d1d7a;
 }
 
 .band {
   display: block;
-  height: 16vh;
-  min-height: 64px;
+  height: calc(16vh + 4px);
+  min-height: 68px;
+  margin-bottom: -4px;
+}
+
+.band-white {
+  margin-bottom: 0;
 }
 
 .band-night { background: #2d1d7a; }
@@ -223,7 +232,7 @@
   }
 
   .sunrise {
-    padding-top: 18dvh;
+    margin-top: -28px;
   }
 
   .l2-bg,

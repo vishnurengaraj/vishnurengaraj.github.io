@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { nextTick, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import BulletTree from "./BulletTree.vue";
 import MediaFrame from "./MediaFrame.vue";
@@ -23,13 +23,89 @@ const tabs = [
 
 const route = useRoute();
 const router = useRouter();
-const current = computed(() =>
-  tabs.some((tab) => tab.id === route.params.tab) ? route.params.tab : "experience",
+const tabIds = tabs.map((tab) => tab.id);
+
+function tabFromRoute() {
+  return tabIds.includes(route.params.tab) ? route.params.tab : "experience";
+}
+
+const current = ref(route.name === "resume" ? tabFromRoute() : "experience");
+const stage = ref(null);
+const stageMin = ref(0);
+const leaving = ref(null);
+const dir = ref("forward");
+let leaveTimer = 0;
+let swipeX = 0;
+let swipeY = 0;
+
+watch(
+  () => route.fullPath,
+  () => {
+    if (route.name !== "resume") return;
+    const next = tabFromRoute();
+    if (next !== current.value) current.value = next;
+  },
 );
 
-function select(id) {
-  router.push(id === "experience" ? "/resume" : `/resume/${id}`);
+watch(current, async (next, prev) => {
+  if (!prev || next === prev) return;
+  dir.value = tabIds.indexOf(next) > tabIds.indexOf(prev) ? "forward" : "back";
+  window.clearTimeout(leaveTimer);
+  if (stage.value) stageMin.value = stage.value.offsetHeight;
+  leaving.value = prev;
+  await nextTick();
+  stage.value?.querySelectorAll(".is-active, .is-out").forEach((el) => {
+    el.style.animation = "none";
+    void el.offsetWidth;
+    el.style.animation = "";
+  });
+  leaveTimer = window.setTimeout(endLeave, 420);
+});
+
+function endLeave() {
+  window.clearTimeout(leaveTimer);
+  if (!leaving.value) {
+    stageMin.value = 0;
+    return;
+  }
+  const active = stage.value?.querySelector(".panel-block.is-active");
+  stageMin.value = active?.offsetHeight || 0;
+  leaving.value = null;
+  requestAnimationFrame(() => {
+    if (!leaving.value) stageMin.value = 0;
+  });
 }
+
+function onAnimEnd(event) {
+  if (event.target?.classList?.contains("is-out")) endLeave();
+}
+
+function select(id) {
+  if (!tabIds.includes(id) || id === current.value) return;
+  current.value = id;
+  const path = id === "experience" ? "/resume" : `/resume/${id}`;
+  if (route.path !== path) router.push(path);
+}
+
+function onSwipeStart(event) {
+  const touch = event.touches?.[0];
+  if (!touch) return;
+  swipeX = touch.clientX;
+  swipeY = touch.clientY;
+}
+
+function onSwipeEnd(event) {
+  const touch = event.changedTouches?.[0];
+  if (!touch) return;
+  const dx = touch.clientX - swipeX;
+  const dy = touch.clientY - swipeY;
+  if (Math.abs(dx) < 64 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+  const index = tabIds.indexOf(current.value);
+  if (dx < 0 && index < tabIds.length - 1) select(tabIds[index + 1]);
+  else if (dx > 0 && index > 0) select(tabIds[index - 1]);
+}
+
+onUnmounted(() => window.clearTimeout(leaveTimer));
 
 function onKeydown(event) {
   const ids = tabs.map((tab) => tab.id);
@@ -54,7 +130,9 @@ function onKeydown(event) {
       <li v-for="skill in skills" :key="skill">{{ skill }}</li>
     </ul>
 
-    <div class="tablist" role="tablist" aria-label="Resume sections" @keydown="onKeydown">
+    <div class="tablist-wrap">
+      <div class="tablist-shell">
+        <div class="tablist" role="tablist" aria-label="Resume sections" @keydown="onKeydown">
       <button
         v-for="tab in tabs"
         :id="`tab-${tab.id}`"
@@ -68,12 +146,25 @@ function onKeydown(event) {
       >
         {{ tab.label }}
       </button>
+        </div>
+      </div>
     </div>
 
     <div
+      ref="stage"
+      class="panel-stage"
+      :class="{ 'is-anim': leaving }"
+      :data-dir="dir"
+      :style="stageMin ? { minHeight: `${stageMin}px` } : undefined"
+      @animationend="onAnimEnd"
+      @touchstart.passive="onSwipeStart"
+      @touchend.passive="onSwipeEnd"
+    >
+    <div
       id="panel-experience"
       class="panel-block"
-      :class="{ 'is-active': current === 'experience' }"
+      :class="{ 'is-active': current === 'experience', 'is-out': leaving === 'experience' }"
+      :aria-hidden="leaving === 'experience' ? 'true' : undefined"
       role="tabpanel"
       aria-labelledby="tab-experience"
       tabindex="0"
@@ -100,7 +191,8 @@ function onKeydown(event) {
     <div
       id="panel-education"
       class="panel-block"
-      :class="{ 'is-active': current === 'education' }"
+      :class="{ 'is-active': current === 'education', 'is-out': leaving === 'education' }"
+      :aria-hidden="leaving === 'education' ? 'true' : undefined"
       role="tabpanel"
       aria-labelledby="tab-education"
       tabindex="0"
@@ -164,7 +256,8 @@ function onKeydown(event) {
     <div
       id="panel-clubs"
       class="panel-block"
-      :class="{ 'is-active': current === 'clubs' }"
+      :class="{ 'is-active': current === 'clubs', 'is-out': leaving === 'clubs' }"
+      :aria-hidden="leaving === 'clubs' ? 'true' : undefined"
       role="tabpanel"
       aria-labelledby="tab-clubs"
       tabindex="0"
@@ -193,7 +286,8 @@ function onKeydown(event) {
     <div
       id="panel-awards"
       class="panel-block"
-      :class="{ 'is-active': current === 'awards' }"
+      :class="{ 'is-active': current === 'awards', 'is-out': leaving === 'awards' }"
+      :aria-hidden="leaving === 'awards' ? 'true' : undefined"
       role="tabpanel"
       aria-labelledby="tab-awards"
       tabindex="0"
@@ -215,6 +309,7 @@ function onKeydown(event) {
           <span class="sr-only"> (opens in a new tab)</span>
         </a>
       </article>
+    </div>
     </div>
   </section>
 </template>

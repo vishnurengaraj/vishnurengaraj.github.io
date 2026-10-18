@@ -146,13 +146,27 @@ export const projects = [
 ];
 
 export const skills = [
-  "HyperWorks/Ansys",
-  "OptiStruct/RADIOSS/Nastran/Abaqus/LS-DYNA",
+  "HyperWorks",
+  "Ansys",
+  "OptiStruct",
+  "RADIOSS",
+  "Nastran",
+  "Abaqus",
+  "LS-DYNA",
   "GD&T (FT&A)",
-  "Siemens NX/CATIA V5",
-  "CNC Mill/Lathe",
-  "C/C++/Python/MATLAB",
-  "PyTorch/TensorFlow/NumPy/OpenCV/SciPy",
+  "Siemens NX",
+  "CATIA V5",
+  "CNC Mill",
+  "CNC Lathe",
+  "C",
+  "C++",
+  "Python",
+  "MATLAB",
+  "PyTorch",
+  "TensorFlow",
+  "NumPy",
+  "OpenCV",
+  "SciPy",
 ];
 
 export const experience = [
