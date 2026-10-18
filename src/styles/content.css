@@ -27,206 +27,198 @@
   z-index: 30;
   background: transparent;
   box-shadow: none;
+  padding: 8px 10px 10px;
+  pointer-events: none;
 }
 
+/* Stacked dock (phones, and any width where the pills do not fit side
+   by side): one card. The resume row grows inside it. */
 .nav-cluster {
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 22px;
+  box-shadow: var(--shadow-rest);
+  overflow: hidden;
+  pointer-events: auto;
 }
 
 .nav-inner {
   position: relative;
   z-index: 2;
-  background: #ffffff;
-  box-shadow: var(--shadow-rest);
+  background: transparent;
+  box-shadow: none;
 }
 
 .nav-dock {
   display: grid;
   grid-template-rows: 0fr;
-  justify-items: center;
-  z-index: 0;
+  z-index: 1;
   min-height: 0;
-  margin-top: 0;
+  min-width: 0;
   pointer-events: none;
-  transition:
-    grid-template-rows 250ms var(--md-sys-motion-easing-standard),
-    grid-template-columns 250ms var(--md-sys-motion-easing-standard),
-    max-height 250ms var(--md-sys-motion-easing-standard),
-    margin-top 250ms var(--md-sys-motion-easing-standard),
-    margin-left 250ms var(--md-sys-motion-easing-standard);
+  transition: grid-template-rows 280ms var(--md-sys-motion-easing-standard);
 }
 
 .nav-dock > .tablist-shell {
   min-width: 0;
   min-height: 0;
-  max-width: calc(100% - 24px);
+  width: 100%;
+  max-width: none;
   overflow: hidden;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
 }
 
 .section-nav.is-open .nav-dock {
   grid-template-rows: 1fr;
-  margin-top: -18px;
   pointer-events: auto;
 }
 
 .section-nav.is-open .nav-dock > .tablist-shell {
+  background:
+    linear-gradient(rgba(31, 31, 31, 0.14), rgba(31, 31, 31, 0.14)) top / 100% 1px no-repeat,
+    color-mix(in srgb, #1f1f1f 3.5%, #ffffff);
+}
+
+.section-nav .tablist {
+  width: 100%;
+  max-width: 100%;
+  justify-content: center;
+  padding: 3px 4px 4px;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
   overflow: visible;
 }
 
-.section-nav.is-docked .tablist {
-  padding-top: 22px;
+.section-nav .tablist button {
+  min-height: 44px;
+  padding: 0 10px;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
 }
 
 @media (min-width: 720px) {
   .section-nav {
     top: 16px;
-    pointer-events: none;
     padding: 0 24px 8px;
   }
 
-  .nav-cluster {
+  /* Undocked, the main links stay a floating pill. */
+  .section-nav:not(.is-open) .nav-cluster {
     align-items: center;
     width: fit-content;
     max-width: 100%;
     margin: 0 auto;
-  }
-
-  .section-nav .nav-inner {
-    pointer-events: auto;
-    width: fit-content;
-    margin: 0;
-    padding: 4px;
-    border-radius: var(--md-sys-shape-corner-full);
-  }
-}
-
-@media (min-width: 880px) {
-  .section-nav {
-    top: 16px;
-    pointer-events: none;
-    padding: 0 24px 8px;
-  }
-
-  .nav-cluster {
-    flex-direction: row;
-    align-items: center;
-    width: fit-content;
-    max-width: 100%;
-    margin: 0 auto;
-  }
-
-  .section-nav .nav-inner {
-    pointer-events: auto;
-    width: fit-content;
-    max-width: none;
-    margin: 0;
-    padding: 4px;
-    border-radius: var(--md-sys-shape-corner-full);
-  }
-
-  .nav-dock {
-    grid-template-rows: none;
-    grid-template-columns: 0fr;
-    margin-top: 0;
-    margin-left: 0;
-    transition:
-      grid-template-columns 250ms var(--md-sys-motion-easing-standard),
-      margin-left 250ms var(--md-sys-motion-easing-standard);
-  }
-
-  .section-nav.is-open .nav-dock {
-    grid-template-columns: 1fr;
-    margin-top: 0;
-    margin-left: -36px;
-  }
-
-  .section-nav.is-open .nav-dock > .tablist-shell {
-    max-width: none;
-    min-width: max-content;
-    overflow: visible;
-  }
-
-  .section-nav.is-docked .tablist {
-    padding-top: 4px;
-    padding-left: 48px;
-    max-width: none;
-    width: max-content;
-    overflow: visible;
-  }
-}
-
-/* Below the side-by-side breakpoint the tabs are a second row under the
-   main pill or bar. max-height avoids the 1fr row collapsing in a
-   shrink-wrapped column. */
-@media (max-width: 879px) {
-  .nav-dock {
-    display: flex;
-    justify-content: center;
-    grid-template-rows: none;
-    max-height: 0;
-    overflow: hidden;
-  }
-
-  .nav-dock > .tablist-shell {
-    overflow: visible;
-    min-height: auto;
-    height: auto;
-    max-width: calc(100vw - 32px);
-  }
-
-  .section-nav.is-open .nav-dock {
-    grid-template-rows: none;
-    grid-template-columns: none;
-    max-height: 96px;
-    margin-top: -16px;
-    margin-left: 0;
-    overflow: visible;
-  }
-
-  /* The shell is the pill. Its rectangular backing sits behind the
-     curve so page text cannot show in the corner cutouts. The tablist
-     is only the scroller: a radius on it, with overflow, clips the
-     selected tab into a lopsided blob. */
-  .section-nav.is-open .nav-dock > .tablist-shell {
-    position: relative;
-    z-index: 1;
-    isolation: isolate;
-    border-radius: var(--md-sys-shape-corner-full);
-    background: #ffffff;
-    overflow: visible;
-    box-shadow: var(--shadow-rest);
-  }
-
-  .section-nav.is-open .nav-dock > .tablist-shell::before {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    left: -2px;
-    right: -2px;
-    top: -28px;
-    bottom: -2px;
-    background: var(--md-sys-color-surface);
-    border-radius: 0;
-  }
-
-  .section-nav.is-open .nav-dock > .tablist-shell::after {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    left: 0;
-    right: 0;
-    top: -28px;
-    height: 42px;
-    background: #ffffff;
-    border-radius: 0;
-  }
-
-  .section-nav.is-docked .tablist {
-    border-radius: 0;
     background: transparent;
     box-shadow: none;
+    overflow: visible;
+    border-radius: 0;
+  }
+
+  .section-nav:not(.is-open) .nav-inner {
+    width: fit-content;
+    background: #ffffff;
+    box-shadow: var(--shadow-rest);
+    border-radius: var(--md-sys-shape-corner-full);
+    padding: 8px 4px;
+  }
+}
+
+/* Side-by-side only when the resume row fits without clipping. The sub
+   bar is shorter, centered, and tucked under the main pill. */
+.section-nav.is-beside .nav-cluster {
+  flex-direction: row;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+  border-radius: 0;
+}
+
+.section-nav.is-beside .nav-inner {
+  width: fit-content;
+  background: #ffffff;
+  box-shadow: var(--shadow-rest);
+  border-radius: var(--md-sys-shape-corner-full);
+  padding: 8px 4px;
+}
+
+.section-nav.is-beside .nav-dock {
+  grid-template-rows: none;
+  grid-template-columns: 0fr;
+  margin-left: 0;
+  transition:
+    grid-template-columns 280ms var(--md-sys-motion-easing-standard),
+    margin-left 280ms var(--md-sys-motion-easing-standard);
+}
+
+.section-nav.is-beside.is-open .nav-dock {
+  grid-template-columns: 1fr;
+  grid-template-rows: none;
+  margin-left: -46px;
+}
+
+.section-nav.is-beside .nav-dock > .tablist-shell {
+  position: relative;
+  width: auto;
+  min-width: 0;
+  background: #ffffff;
+  border-radius: var(--md-sys-shape-corner-full);
+  box-shadow: var(--shadow-rest);
+}
+
+/* Fills the wedge beside the main pill's curve so the shorter sub bar
+   does not leave a notch of page color. */
+.section-nav.is-beside .nav-dock > .tablist-shell::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: 8px;
+  width: 78px;
+  top: -22px;
+  bottom: -22px;
+  background: #ffffff;
+  border-radius: 0;
+}
+
+.section-nav.is-beside .tablist {
+  position: relative;
+  z-index: 1;
+}
+
+.section-nav.is-beside.is-open .nav-dock > .tablist-shell {
+  overflow: visible;
+  background: #ffffff;
+  min-width: max-content;
+}
+
+.section-nav.is-beside .tablist {
+  width: max-content;
+  max-width: none;
+  padding: 4px 8px 4px 56px;
+  overflow: visible;
+  background: transparent;
+  border-radius: inherit;
+}
+
+.section-nav.is-beside .tablist button {
+  min-height: 44px;
+  padding: 0 12px;
+  font-size: 0.8125rem;
+}
+
+@media (max-width: 380px) {
+  .section-nav:not(.is-beside) .tablist button {
+    padding: 0 7px;
+    font-size: 0.75rem;
   }
 }
 
@@ -626,6 +618,7 @@ video {
   list-style: none;
   margin: 0 0 1.25rem;
   padding: 1rem 1.1rem;
+  border-left: 4px solid var(--md-sys-color-primary-container);
 }
 
 .skills li {

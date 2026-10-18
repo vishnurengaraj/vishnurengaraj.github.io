@@ -18,6 +18,25 @@ const route = useRoute();
 const router = useRouter();
 const scroller = ref(null);
 const ready = ref(false);
+const navBeside = ref(false);
+const layerSizes = "(max-width: 800px) 1600px, 120vw";
+const layerWidths = [960, 1600, 2400, 3200];
+const ridgeLayers = [
+  ["l1", 14058, 4277],
+  ["l2", 4686, 1689],
+  ["l3", 4686, 1692],
+  ["l4", 4686, 1704],
+  ["l5", 4685, 1704],
+  ["l6", 4685, 1707],
+  ["l7", 4685, 2019],
+].map(([id, w, h]) => ({
+  id,
+  w,
+  h,
+  fallback: `/media/layers/${id}-1600.webp`,
+  srcAvif: layerWidths.map((n) => `/media/layers/${id}-${n}.avif ${n}w`).join(", "),
+  srcWebp: layerWidths.map((n) => `/media/layers/${id}-${n}.webp ${n}w`).join(", "),
+}));
 
 useHead({
   link: [
@@ -77,14 +96,32 @@ function anchorFor(id) {
   return document.getElementById(`${id}-heading`) || document.getElementById(id);
 }
 
+let followNative = false;
+let followTimer = 0;
+
+function beginNativeScroll() {
+  followNative = true;
+  window.clearTimeout(followTimer);
+  followTimer = window.setTimeout(() => {
+    followNative = false;
+  }, 2500);
+}
+
+function endNativeScroll() {
+  followNative = false;
+  window.clearTimeout(followTimer);
+}
+
 function scrollToEl(id, behavior) {
   const root = scroller.value;
   if (!root || typeof document === "undefined") return;
   const mode = behavior || (prefersReduced() ? "auto" : "smooth");
   const landed = () => {
+    endNativeScroll();
     updateDock();
     applySpy();
   };
+  beginNativeScroll();
   if (id === "top") {
     root.scrollTo({ top: 0, behavior: mode });
     document.getElementById("top")?.focus({ preventScroll: true });
@@ -316,7 +353,27 @@ provide(dockKey, dockState);
 
 let closeDockTimer = 0;
 
+function besideFits() {
+  const root = scroller.value;
+  if (!root) return false;
+  const nav = root.querySelector(".section-nav");
+  const inner = nav?.querySelector(".nav-inner");
+  const shell = document.querySelector(".tablist-shell");
+  if (!nav || !inner || !shell) return false;
+  const links = [...inner.querySelectorAll("a")];
+  const buttons = [...shell.querySelectorAll('[role="tab"]')];
+  if (!links.length || !buttons.length) return false;
+  const widthOf = (els) => els.reduce((sum, el) => sum + el.getBoundingClientRect().width, 0);
+  const dockedShell = !!shell.closest("#nav-tab-slot");
+  const main = widthOf(links) + 4 * (links.length - 1) + 8;
+  const sub = widthOf(buttons) + 4 * (buttons.length - 1) + 68 - (dockedShell ? 0 : 36);
+  const styles = getComputedStyle(nav);
+  const available = nav.clientWidth - parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight);
+  return main + sub - 46 + 20 <= available;
+}
+
 function setDock(next) {
+  if (next !== dockState.docked) navBeside.value = next ? besideFits() : false;
   if (prefersReduced()) {
     window.clearTimeout(closeDockTimer);
     dockState.docked = next;
@@ -371,11 +428,19 @@ let armedDown = true;
 let armedUp = false;
 let wasInReturn = false;
 let animating = false;
+let tweenDir = 0;
 let raf = 0;
 let suppressUntil = 0;
 let touchStartY = 0;
 let touchStartScroll = 0;
 let touchIgnored = false;
+let drivingScroll = false;
+let lastProgrammatic = 0;
+let lastScrollY = 0;
+let cachedAbout = 0;
+let heroLimit = 0;
+let parallaxHeld = false;
+let chromeFrame = 0;
 
 /* Native smooth scroll of the title (about 2168px) measured at ~880ms.
    The cinematic tween is twice that, on cubic-bezier(0.42, 0, 0.58, 1). */
@@ -411,11 +476,19 @@ function aboutAnchor() {
   return Math.max(0, el.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - navH - 4);
 }
 
+function measureStatic() {
+  const root = scroller.value;
+  if (!root) return;
+  heroLimit = root.clientHeight;
+  cachedAbout = aboutAnchor();
+}
+
 function inReturnZone() {
   const root = scroller.value;
   if (!root) return false;
   const y = root.scrollTop;
-  return y > 48 && y <= aboutAnchor() + 80;
+  const end = cachedAbout || aboutAnchor();
+  return y > 48 && y <= end + 80;
 }
 
 function canAuto() {
@@ -425,6 +498,7 @@ function canAuto() {
 function cancelTween() {
   if (raf) cancelAnimationFrame(raf);
   raf = 0;
+  tweenDir = 0;
   if (!animating) return;
   animating = false;
   const root = scroller.value;
@@ -439,6 +513,7 @@ function tweenTo(target, done) {
   const start = root.scrollTop;
   const dist = target - start;
   if (Math.abs(dist) < 1) {
+    tweenDir = 0;
     done?.();
     return;
   }
@@ -448,12 +523,16 @@ function tweenTo(target, done) {
   const frame = (now) => {
     if (!animating) return;
     const p = Math.min(1, (now - t0) / INTRO_MS);
-    root.scrollTop = start + dist * easeInOut(p);
+    const next = start + dist * easeInOut(p);
+    lastProgrammatic = next;
+    drivingScroll = true;
+    root.scrollTop = next;
     if (p < 1) {
       raf = requestAnimationFrame(frame);
       return;
     }
     animating = false;
+    tweenDir = 0;
     raf = 0;
     root.style.scrollBehavior = "";
     done?.();
@@ -463,17 +542,23 @@ function tweenTo(target, done) {
 
 function playDown() {
   if (!canAuto()) return;
+  endNativeScroll();
   armedDown = false;
-  tweenTo(aboutAnchor(), () => {
+  tweenDir = 1;
+  measureStatic();
+  tweenTo(cachedAbout || aboutAnchor(), () => {
     armedUp = true;
     wasInReturn = true;
+    measureStatic();
     document.getElementById("about")?.focus({ preventScroll: true });
   });
 }
 
 function playUp() {
   if (!canAuto()) return;
+  endNativeScroll();
   armedUp = false;
+  tweenDir = -1;
   tweenTo(0, () => {
     armedDown = true;
     wasInReturn = false;
@@ -481,65 +566,146 @@ function playUp() {
   });
 }
 
+function sameDirection(delta) {
+  return (delta > 0 && tweenDir > 0) || (delta < 0 && tweenDir < 0);
+}
+
 function onIntroWheel(event) {
   if (prefersReduced()) return;
+  const dy = event.deltaY;
+  if (!dy) return;
   if (animating) {
+    if (sameDirection(dy)) {
+      event.preventDefault();
+      return;
+    }
     cancelTween();
-    return;
+    suppressUntil = 0;
   }
   if (!canAuto()) return;
-  if (event.deltaY > 0) {
+  if (dy > 0) {
     if (!armedDown || !inTitleZone()) return;
     event.preventDefault();
     playDown();
     return;
   }
-  if (event.deltaY < 0 && armedUp && inReturnZone()) {
+  if (armedUp && inReturnZone()) {
     event.preventDefault();
     playUp();
   }
 }
 
-let parallaxY = -1;
+let parallaxY = "";
 function syncParallax(root) {
-  const dpr = window.devicePixelRatio || 1;
-  const y = Math.round(root.scrollTop * dpr) / dpr;
-  if (y === parallaxY) return;
-  parallaxY = y;
-  root.style.setProperty("--scroll", `${y}px`);
-}
-
-function onIntroScroll() {
-  const root = scroller.value;
-  if (!root) return;
-  syncParallax(root);
-  updateDock();
-  if (!spyLock) applySpy();
-  const y = root.scrollTop;
-  if (y <= 2 && !animating) {
-    armedDown = true;
-    armedUp = false;
-    wasInReturn = false;
-    window.clearTimeout(spySettle);
-    if (spyLock) {
-      spyLock = null;
-      if (activeSection.value !== null) {
-        activeSection.value = null;
-        syncSpyUrl(null);
-      }
+  if (prefersReduced()) {
+    parallaxHeld = true;
+    root.classList.remove("is-parallax");
+    if (parallaxY !== "0") {
+      parallaxY = "0";
+      root.style.setProperty("--scroll", "0px");
     }
     return;
   }
-  if (!animating) {
+  const y = root.scrollTop;
+  const limit = heroLimit || root.clientHeight;
+  if (limit && y > limit) {
+    if (!parallaxHeld) {
+      parallaxHeld = true;
+      root.classList.remove("is-parallax");
+      const held = String(Math.round(limit));
+      parallaxY = held;
+      root.style.setProperty("--scroll", `${held}px`);
+    }
+    return;
+  }
+  parallaxHeld = false;
+  root.classList.add("is-parallax");
+  const next = String(Math.round(y));
+  if (next === parallaxY) return;
+  parallaxY = next;
+  root.style.setProperty("--scroll", `${next}px`);
+}
+
+function scheduleChrome() {
+  if (chromeFrame) return;
+  chromeFrame = requestAnimationFrame(() => {
+    chromeFrame = 0;
+    updateDock();
+    if (!spyLock) applySpy();
+    const root = scroller.value;
+    if (!root || animating) return;
+    const y = root.scrollTop;
+    if (y <= 2) {
+      armedDown = true;
+      armedUp = false;
+      wasInReturn = false;
+      window.clearTimeout(spySettle);
+      if (spyLock) {
+        spyLock = null;
+        if (activeSection.value !== null) {
+          activeSection.value = null;
+          syncSpyUrl(null);
+        }
+      }
+      return;
+    }
     const zone = inReturnZone();
     if (zone && !wasInReturn) armedUp = true;
-    if (!zone && y > aboutAnchor() + 120) armedUp = false;
+    if (!zone && y > (cachedAbout || 0) + 120) armedUp = false;
     wasInReturn = zone;
     if (spyLock) {
       window.clearTimeout(spySettle);
       spySettle = window.setTimeout(releaseSpyLock, 700);
     }
+  });
+}
+
+function onIntroScroll() {
+  const root = scroller.value;
+  if (!root) return;
+  const y = root.scrollTop;
+  if (drivingScroll) {
+    drivingScroll = false;
+    lastScrollY = y;
+    syncParallax(root);
+    scheduleChrome();
+    return;
   }
+  if (animating) {
+    const delta = y - lastProgrammatic;
+    if ((tweenDir > 0 && delta < -36) || (tweenDir < 0 && delta > 36)) {
+      cancelTween();
+      lastScrollY = y;
+    } else if (Math.abs(delta) > 1) {
+      drivingScroll = true;
+      root.scrollTop = lastProgrammatic;
+      return;
+    }
+    syncParallax(root);
+    scheduleChrome();
+    return;
+  }
+  if (!followNative && !prefersReduced()) {
+    if (armedDown && lastScrollY <= 32 && y > 32) {
+      root.style.scrollBehavior = "auto";
+      drivingScroll = true;
+      root.scrollTop = lastScrollY;
+      playDown();
+      return;
+    }
+    if (armedUp && lastScrollY > 80 && y < lastScrollY - 24) {
+      const back = lastScrollY;
+      root.style.scrollBehavior = "auto";
+      drivingScroll = true;
+      root.scrollTop = back;
+      lastScrollY = back;
+      playUp();
+      return;
+    }
+  }
+  lastScrollY = y;
+  syncParallax(root);
+  scheduleChrome();
 }
 
 function onTouchStart(event) {
@@ -554,7 +720,14 @@ function onTouchMove(event) {
   const y = event.touches[0]?.clientY ?? touchStartY;
   const dy = touchStartY - y;
   if (animating) {
-    if (Math.abs(dy) > 8) cancelTween();
+    if (sameDirection(dy)) {
+      if (Math.abs(dy) > 8) event.preventDefault();
+      return;
+    }
+    if (Math.abs(dy) > 28) {
+      cancelTween();
+      suppressUntil = 0;
+    }
     return;
   }
   if (!canAuto()) return;
@@ -563,7 +736,7 @@ function onTouchMove(event) {
     playDown();
     return;
   }
-  if (dy < -12 && armedUp && touchStartScroll > 48 && touchStartScroll <= aboutAnchor() + 80) {
+  if (dy < -12 && armedUp && touchStartScroll > 48 && touchStartScroll <= (cachedAbout || aboutAnchor()) + 80) {
     event.preventDefault();
     playUp();
   }
@@ -579,8 +752,12 @@ function onIntroKey(event) {
   if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || active?.isContentEditable) return;
   if (event.key === " " && (tag === "BUTTON" || tag === "A")) return;
   if (animating) {
+    if ((down && tweenDir > 0) || (up && tweenDir < 0)) {
+      event.preventDefault();
+      return;
+    }
     cancelTween();
-    return;
+    suppressUntil = 0;
   }
   if (!canAuto()) return;
   if (down && armedDown && inTitleZone()) {
@@ -594,6 +771,12 @@ function onIntroKey(event) {
   }
 }
 
+function onResize() {
+  measureStatic();
+  if (dockState.docked) navBeside.value = besideFits();
+  updateDock();
+}
+
 onMounted(async () => {
   await nextTick();
   ready.value = true;
@@ -601,13 +784,17 @@ onMounted(async () => {
   else lastKey = "home::top";
   const root = scroller.value;
   if (!root) return;
+  measureStatic();
   syncParallax(root);
   root.addEventListener("wheel", onIntroWheel, { passive: false });
   root.addEventListener("scroll", onIntroScroll, { passive: true });
   root.addEventListener("touchstart", onTouchStart, { passive: true });
   root.addEventListener("touchmove", onTouchMove, { passive: false });
   window.addEventListener("keydown", onIntroKey);
-  window.addEventListener("resize", updateDock);
+  window.addEventListener("resize", onResize);
+  document.fonts?.ready.then(() => {
+    if (dockState.docked) navBeside.value = besideFits();
+  });
   updateDock();
   spyObserver = new IntersectionObserver(onSpy, {
     root,
@@ -631,7 +818,8 @@ onUnmounted(() => {
   root?.removeEventListener("touchstart", onTouchStart);
   root?.removeEventListener("touchmove", onTouchMove);
   window.removeEventListener("keydown", onIntroKey);
-  window.removeEventListener("resize", updateDock);
+  window.removeEventListener("resize", onResize);
+  window.clearTimeout(followTimer);
 });
 
 watch(
@@ -657,13 +845,26 @@ watch(
   <div class="prlx" ref="scroller">
     <Hero />
     <div class="mountain-bg sky-grad" aria-hidden="true"></div>
-    <div class="mountain-bg l1-bg" aria-hidden="true"></div>
-    <div class="mountain-bg l2-bg" aria-hidden="true"></div>
-    <div class="mountain-bg l3-bg" aria-hidden="true"></div>
-    <div class="mountain-bg l4-bg" aria-hidden="true"></div>
-    <div class="mountain-bg l5-bg" aria-hidden="true"></div>
-    <div class="mountain-bg l6-bg" aria-hidden="true"></div>
-    <div class="mountain-bg l7-bg" aria-hidden="true"></div>
+    <div
+      v-for="layer in ridgeLayers"
+      :key="layer.id"
+      class="mountain-bg"
+      :class="`${layer.id}-bg`"
+      aria-hidden="true"
+    >
+      <picture>
+        <source type="image/avif" :srcset="layer.srcAvif" :sizes="layerSizes" />
+        <img
+          :src="layer.fallback"
+          :srcset="layer.srcWebp"
+          :sizes="layerSizes"
+          alt=""
+          decoding="async"
+          :width="layer.w"
+          :height="layer.h"
+        />
+      </picture>
+    </div>
     <div class="ridge-ground" aria-hidden="true"></div>
     <div class="sunrise" aria-hidden="true">
       <div class="band band-night"></div>
@@ -677,7 +878,7 @@ watch(
       <div class="band band-white"></div>
     </div>
     <main class="sheet">
-      <nav class="section-nav" :class="{ 'is-docked': dockState.docked, 'is-open': dockState.open }" aria-label="Sections">
+      <nav class="section-nav" :class="{ 'is-docked': dockState.docked, 'is-open': dockState.open, 'is-beside': navBeside }" aria-label="Sections">
         <div class="nav-cluster">
           <div class="nav-inner">
             <a href="/about" :aria-current="activeSection === 'about' ? 'page' : undefined" @click="onNav($event, 'about')">About</a>

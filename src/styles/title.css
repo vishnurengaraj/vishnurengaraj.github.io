@@ -9,26 +9,18 @@
   overflow-x: hidden;
   overscroll-behavior-x: none;
   touch-action: pan-y;
-  /* No perspective. translateZ() was scaling each layer by
-     S = 100/(100-z) on the compositor after Chrome had already
-     rasterized it, which is what kept the ridges soft on desktop. */
   position: relative;
   z-index: 1;
   scroll-behavior: smooth;
+  --band: 52vh;
 }
 
 .mountain-bg {
   display: block;
   margin: 0;
-  height: 165vh;
   position: absolute;
-  left: 0;
-  top: 0;
   pointer-events: none;
-  background-color: transparent;
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center center;
+  background: none;
 }
 
 .center {
@@ -67,9 +59,10 @@
 
 .sky-grad {
   width: 100%;
-  height: 165vh;
+  height: 100dvh;
   z-index: 1;
-  /* The night sky is the page background behind this transparent layer. */
+  top: 0;
+  left: 0;
   background: transparent;
 }
 
@@ -107,61 +100,17 @@
 .band-bright { background: #fbe1be; }
 .band-white { background: #f7f7f8; }
 
-/* The 2023 scene used perspective: 100px and translateZ(z), which draws a
-   layer at S = 100/(100-z). A later scale(1/S) was meant to rasterize
-   bigger, but the perspective matrix still enlarged the texture on the
-   GPU. These boxes are the measured post-projection rects, so each SVG
-   is painted at the pixels it covers. --scroll (px) is the scroller's
-   scrollTop; the extra translate is scrollTop * (1-S), which is the
-   same differential the perspective used to add on top of normal scroll. */
-.l1-bg {
-  --k: 60;
-  --w: 150;
-  z-index: 10;
-  background-image: url("/media/layers/l1.svg");
-}
-
-.l2-bg {
-  --k: 70;
-  --w: 100;
-  z-index: 9;
-  background-image: url("/media/layers/l2.svg");
-}
-
-.l3-bg {
-  --k: 75;
-  --w: 115;
-  z-index: 8;
-  background-image: url("/media/layers/l3.svg");
-}
-
-.l4-bg {
-  --k: 85;
-  --w: 110;
-  z-index: 7;
-  background-image: url("/media/layers/l4.svg");
-}
-
-.l5-bg {
-  --k: 90;
-  --w: 100;
-  z-index: 6;
-  background-image: url("/media/layers/l5.svg");
-}
-
-.l6-bg {
-  --k: 92;
-  --w: 130;
-  z-index: 5;
-  background-image: url("/media/layers/l6.svg");
-}
-
-.l7-bg {
-  --k: 96;
-  --w: 130;
-  z-index: 4;
-  background-image: url("/media/layers/l7.svg");
-}
+/* Each ridge keeps its own aspect ratio. The box is at least as wide as
+   the viewport, so a tall or narrow window crops the sides instead of
+   stretching the art or leaving a hard vertical edge. --scroll is the
+   scroller's scrollTop; only transform moves on scroll. */
+.l1-bg { --aspect: 3.2866; --scale: 0.9; --rate: -0.62; z-index: 10; }
+.l2-bg { --aspect: 2.7744; --scale: 0.94; --rate: -0.4; z-index: 9; }
+.l3-bg { --aspect: 2.7695; --scale: 0.97; --rate: -0.32; z-index: 8; }
+.l4-bg { --aspect: 2.75; --scale: 1; --rate: -0.18; z-index: 7; }
+.l5-bg { --aspect: 2.7494; --scale: 1.02; --rate: -0.12; z-index: 6; }
+.l6-bg { --aspect: 2.7446; --scale: 1.04; --rate: -0.08; z-index: 5; }
+.l7-bg { --aspect: 2.3205; --scale: 1.08; --rate: -0.04; z-index: 4; }
 
 .l1-bg,
 .l2-bg,
@@ -170,144 +119,55 @@
 .l5-bg,
 .l6-bg,
 .l7-bg {
-  width: calc(var(--w) * 1% * 100 / var(--k));
-  height: calc(165vh * 100 / var(--k));
-  /* The projected boxes leave a sub-percent gap at the left edge.
-     Shift every layer by the same amount so the silhouette covers
-     the viewport and the layers stay registered with each other. */
-  left: calc(
-    50% * (var(--k) - 100) / var(--k) + (var(--w) * 0.5%) * (100 - var(--k)) / var(--k) * 100 / var(--k) - 0.8%
-  );
-  top: calc(50vh * (var(--k) - 100) / var(--k) + 82.5vh * (100 - var(--k)) / var(--k) * 100 / var(--k));
-  transform: translate3d(0, calc(var(--scroll, 0px) * (var(--k) - 100) / var(--k)), 0);
+  left: 50%;
+  top: 0;
+  width: max(114vw, calc(var(--band) * var(--scale) * var(--aspect)));
+  aspect-ratio: var(--aspect);
+  height: auto;
+  transform: translate3d(-50%, calc(100dvh - 100% + (var(--scroll, 0px) * var(--rate))), 0);
+  will-change: auto;
 }
 
-/* l4 and l6's projected boxes start inset, so a lighter layer shows as a
-   vertical strip. Pull just those two to the viewport edge. */
-.l4-bg {
-  left: calc(
-    50% * (var(--k) - 100) / var(--k) + (var(--w) * 0.5%) * (100 - var(--k)) / var(--k) * 100 / var(--k) - 2.8%
-  );
+.prlx.is-parallax .l1-bg,
+.prlx.is-parallax .l2-bg,
+.prlx.is-parallax .l3-bg,
+.prlx.is-parallax .l4-bg,
+.prlx.is-parallax .l5-bg,
+.prlx.is-parallax .l6-bg,
+.prlx.is-parallax .l7-bg {
+  will-change: transform;
 }
 
-.l6-bg {
-  left: calc(
-    50% * (var(--k) - 100) / var(--k) + (var(--w) * 0.5%) * (100 - var(--k)) / var(--k) * 100 / var(--k) - 2%
-  );
+.mountain-bg picture,
+.mountain-bg img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.mountain-bg img {
+  object-fit: fill;
 }
 
 .ridge-ground {
   display: none;
 }
 
-/* Coarse pointers, reduced motion, and slow devices flatten the parallax.
-   Wide screens keep a contained ridge. Portrait phones get their own
-   framing in the block below, which wins on small viewports. */
-@media (hover: none) and (pointer: coarse), (prefers-reduced-motion: reduce), (update: slow) {
+@media (max-width: 700px) and (min-height: 640px) {
+  .prlx {
+    --band: 42vh;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .prlx {
+    --band: 30vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce), (update: slow) {
   .prlx {
     -webkit-overflow-scrolling: touch;
-  }
-
-  .mountain-bg {
-    transform: none;
-    left: 0;
-    top: auto;
-    bottom: 0;
-    width: 100%;
-    height: 78dvh;
-    background-size: contain;
-    background-position: center bottom;
-  }
-
-  .sky-grad {
-    width: 100%;
-    height: 78dvh;
-    top: auto;
-    bottom: 0;
-  }
-
-  .sunrise {
-    margin-top: 0;
-  }
-
-  .l2-bg,
-  .l3-bg,
-  .l5-bg,
-  .l6-bg {
-    display: none;
-  }
-}
-
-/* Portrait: show the whole ridge, not a cover-crop. Each SVG keeps its
-   own aspect (background-size 100% 100% on a matching box). Far layers
-   sit higher. A ground plate continues the foreground color to the
-   bottom of the hero so the fill does not stop short. */
-@media (max-width: 700px) {
-  .ridge-ground {
-    display: block;
-    position: absolute;
-    z-index: 3;
-    left: 0;
-    width: 100%;
-    top: 64dvh;
-    height: 36dvh;
-    background: #3c3454;
-    pointer-events: none;
-  }
-
-  .mountain-bg {
-    transform: none;
-    left: -8%;
-    width: 116%;
-    top: auto;
-    background-size: 100% 100%;
-    background-position: center bottom;
-    background-repeat: no-repeat;
-  }
-
-  .l7-bg { height: calc(116vw / 2.32); bottom: 28%; }
-  .l6-bg { height: calc(116vw / 2.744); bottom: 24%; display: block; }
-  .l5-bg { height: calc(116vw / 2.749); bottom: 21%; display: block; }
-  .l4-bg { height: calc(116vw / 2.75); bottom: 18%; }
-  .l3-bg { height: calc(116vw / 2.769); bottom: 15%; display: block; }
-  .l2-bg { height: calc(116vw / 2.774); bottom: 12%; display: block; }
-  .l1-bg { height: calc(116vw / 3.287); bottom: 7%; }
-
-  .sky-grad {
-    display: none;
-  }
-}
-
-/* Short landscape (a phone on its side). The desktop parallax boxes are
-   sized in vh and cover the type. Keep the sky for the name and put a
-   full-width slice of each ridge along the bottom. */
-@media (max-height: 520px) and (orientation: landscape) {
-  /* No ground plate here. Its top edge was a straight lighter band
-     behind the far ridge. The layers themselves cover the bottom. */
-  .ridge-ground {
-    display: none;
-  }
-
-  .mountain-bg {
-    transform: none;
-    left: 0;
-    width: 100%;
-    top: auto;
-    background-size: 100% auto;
-    background-position: center top;
-    background-repeat: no-repeat;
-  }
-
-  .l7-bg { height: 42dvh; bottom: 4%; display: block; }
-  .l6-bg { height: 36dvh; bottom: 3%; display: block; }
-  .l5-bg { height: 33dvh; bottom: 2%; display: block; }
-  .l4-bg { height: 30dvh; bottom: 1%; display: block; }
-  .l3-bg { height: 27dvh; bottom: 0; display: block; }
-  .l2-bg { height: 24dvh; bottom: 0; display: block; }
-  .l1-bg { height: 22dvh; bottom: 0; display: block; }
-
-  .sky-grad {
-    display: none;
   }
 }
 

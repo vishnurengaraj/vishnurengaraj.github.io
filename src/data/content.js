@@ -40,7 +40,7 @@ export const bio = [
   { text: "Hey there! My name is " },
   { text: "Vishnu Rengaraj", strong: true },
   { text: ". I'm a " },
-  { text: "Development Test Engineer II", strong: true },
+  { text: "Sr. Development Test Engineer", strong: true },
   { text: " at " },
   { text: "SpaceX", strong: true },
   {
@@ -64,7 +64,7 @@ export const timeline = [
     category: "Full time",
     tone: "work",
     description:
-      "Development Test Engineer II. Design novel test equipment for quick and accurate aerospace qualification.",
+      "Sr. Development Test Engineer. Design novel test equipment for quick and accurate aerospace qualification.",
   },
   {
     datetime: "2020-09",
@@ -173,7 +173,7 @@ export const experience = [
   {
     title: "SpaceX",
     date: "June 2020 – Present",
-    subtitle: "Development Test Engineer II · Hawthorne, California",
+    subtitle: "Sr. Development Test Engineer · Hawthorne, California",
     about:
       "SpaceX designs, manufactures and launches advanced rockets and spacecraft. The company was founded in 2002 to revolutionize space technology, with the ultimate goal of enabling people to live on other planets.",
     link: "https://www.spacex.com/",
@@ -181,7 +181,7 @@ export const experience = [
     bullets: [
       {
         strong: true,
-        text: "Development Test Engineer II: design novel test equipment for quick and accurate aerospace qualification",
+        text: "Design novel test equipment for quick and accurate aerospace qualification",
         children: [
           {
             strong: true,
@@ -249,7 +249,7 @@ export const experience = [
     bullets: [
       {
         strong: true,
-        text: "Body Design & Safety Structures Intern: design, validate, and manage structural body components through their lifecycle",
+        text: "Design, validate, and manage structural body components through their lifecycle",
         children: [
           "Implemented part reduction measures on Model S estimated to save $30,000 yearly",
           "Introduced Model 3 rear tow solution to meet deflection, homologation, crash, and fascia requirements",
@@ -277,7 +277,7 @@ export const experience = [
     bullets: [
       {
         strong: true,
-        text: "Modeling/Visualization Intern: coding engineering software to tailor it to customer’s (GM, Apple, Google etc.) needs",
+        text: "Coding engineering software to tailor it to customer’s (GM, Apple, Google etc.) needs",
         children: [
           "Developed software packages for customers to automate repetitive tasks and interface with data files",
           "Optimized sorting algorithms for lower runtimes; reduced automatic file creation runtime by 8x",
@@ -312,7 +312,7 @@ export const experience = [
     bullets: [
       {
         strong: true,
-        text: "Computer Aided Engineering Intern: analysis and optimization of spring links, trailing arms, and other suspension parts",
+        text: "Analysis and optimization of spring links, trailing arms, and other suspension parts",
         children: [
           "Analyzed suspension components to validate structural integrity in various virtual testing scenarios",
           "Optimized suspension components resulting in mass reduction of more than 300 grams (8% mass reduction)",
