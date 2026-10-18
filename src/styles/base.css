@@ -41,9 +41,10 @@
   src: url("@fontsource/roboto-mono/files/roboto-mono-latin-700-normal.woff2") format("woff2");
 }
 
-/*    Light content theme. The title screen stays night black. After the white
-   sunrise band, About, Projects, and Resume sit on #f7f7f8 so the white
-   cards read. Text itself is on those white cards.
+/*    Light content theme. The title screen is night purple (#1a1033 at the
+   top, #221445 at the horizon). The sunrise ends on #f7f7f8, the same
+   sheet color About, Projects, and Resume sit on, so the white cards read.
+   Text itself is on those white cards.
    Accent roles, all AA (normal text) on the surfaces they are painted on:
    - primary #c2410c on #ffffff is 5.18:1 (links and accent text)
    - primary-container #ffb020 with on-primary-container #1f1f1f is 9.01:1
@@ -112,8 +113,12 @@ body,
   height: 100%;
   height: 100dvh;
   margin: 0;
-  background: #000;
+  background: #1a1033;
   overflow-x: clip;
+}
+
+#app {
+  background: linear-gradient(to bottom, #1a1033 0%, #1a1033 46%, #221445 100%);
 }
 
 body {

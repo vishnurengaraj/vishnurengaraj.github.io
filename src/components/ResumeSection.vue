@@ -1,6 +1,7 @@
 <script setup>
-import { nextTick, onUnmounted, ref, watch } from "vue";
+import { inject, nextTick, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { dockKey } from "../scroll.js";
 import BulletTree from "./BulletTree.vue";
 import MediaFrame from "./MediaFrame.vue";
 import ResponsiveImg from "./ResponsiveImg.vue";
@@ -11,7 +12,6 @@ import {
   earlierEducation,
   education,
   experience,
-  skills,
 } from "../data/content.js";
 
 const tabs = [
@@ -23,6 +23,7 @@ const tabs = [
 
 const route = useRoute();
 const router = useRouter();
+const dock = inject(dockKey);
 const tabIds = tabs.map((tab) => tab.id);
 
 function tabFromRoute() {
@@ -125,12 +126,9 @@ function onKeydown(event) {
 <template>
   <section id="resume" class="section" tabindex="-1" aria-labelledby="resume-heading">
     <h2 id="resume-heading" class="section-title">Resume</h2>
-    <h3 class="section-label">Skills</h3>
-    <ul class="skills">
-      <li v-for="skill in skills" :key="skill">{{ skill }}</li>
-    </ul>
-
-    <div class="tablist-wrap">
+    <div id="resume-tabs-sentinel" class="tab-sentinel" aria-hidden="true"></div>
+    <div id="resume-tab-slot" class="tablist-wrap"></div>
+    <Teleport defer :to="dock.docked ? '#nav-tab-slot' : '#resume-tab-slot'">
       <div class="tablist-shell">
         <div class="tablist" role="tablist" aria-label="Resume sections" @keydown="onKeydown">
       <button
@@ -148,7 +146,7 @@ function onKeydown(event) {
       </button>
         </div>
       </div>
-    </div>
+    </Teleport>
 
     <div
       ref="stage"

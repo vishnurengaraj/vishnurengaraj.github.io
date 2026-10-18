@@ -198,9 +198,19 @@ onUnmounted(() => {
   text-decoration: none;
 }
 
-.icon-link:hover {
-  color: #fd8046;
-  border-color: #fd8046;
+@media (hover: hover) {
+  .icon-link:hover {
+    color: #fd8046;
+    border-color: #fd8046;
+  }
+
+  .learn:hover {
+    animation-play-state: paused;
+  }
+
+  .learn:hover::before {
+    opacity: 0.08;
+  }
 }
 
 .icon-link svg {
@@ -243,15 +253,6 @@ onUnmounted(() => {
   background: #1f1f1f;
   opacity: 0;
   pointer-events: none;
-}
-
-.learn:hover {
-  animation-play-state: paused;
-  box-shadow: var(--shadow-hover);
-}
-
-.learn:hover::before {
-  opacity: 0.08;
 }
 
 .learn:active::before {

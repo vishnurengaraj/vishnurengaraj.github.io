@@ -187,22 +187,8 @@ for (const [key, [file, widths]] of Object.entries(photos)) {
 process.stdout.write("gif\n");
 manifest.img.bajaCrash = await animatedWebp(path.join(srcDir, "baja_crash.gif"), "baja-crash", 480);
 
-const layers = [
-  ["wt_l1_high-af19ac73.png", "l1", 2200],
-  ["wt_l1_high-af19ac73.png", "l1-sm", 1100],
-  ["wt_l2-c9ef9470.png", "l2", 1600],
-  ["wt_l3-217224f3.png", "l3", 1600],
-  ["wt_l4-9e8983bb.png", "l4", 1600],
-  ["wt_l4-9e8983bb.png", "l4-sm", 1000],
-  ["wt_l5-0c8e1f03.png", "l5", 1600],
-  ["wt_l6-3ba705ea.png", "l6", 1600],
-  ["wt_l7-4e8ecf18.png", "l7", 1600],
-  ["wt_l7-4e8ecf18.png", "l7-sm", 1000],
-];
-for (const [file, name, width] of layers) {
-  process.stdout.write(`layer ${name}\n`);
-  await layer(path.join(srcDir, file), name, width);
-}
+// Mountain layers are detailed SVG traces of the original full-resolution
+// PNGs, committed in public/media/layers. Do not recompress them here.
 
 process.stdout.write("video altair\n");
 manifest.video.altair = await video(path.join(srcDir, "altair_spin.mp4"), "altair");

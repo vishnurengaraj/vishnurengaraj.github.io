@@ -10,17 +10,25 @@ const scrollTo = inject(scrollKey);
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-id">
-        <svg class="scope" viewBox="0 0 72 64" width="56" height="50" aria-hidden="true" focusable="false">
-          <circle class="scope-star star-a" cx="14" cy="12" r="1.5" fill="#ffb020" />
-          <circle class="scope-star star-b" cx="60" cy="8" r="1.15" fill="#ffffff" />
-          <g fill="none" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round">
-            <path d="M36 38 L16 60" />
-            <path d="M36 38 L56 60" />
-            <path d="M36 38 L36 60" />
+        <svg class="scope" viewBox="0 0 96 56" aria-hidden="true" focusable="false">
+          <circle class="scope-star star-a" cx="10" cy="10" r="1.15" fill="#ffffff" />
+          <path class="scope-star star-b" fill="#ffb020" d="M24 4.2 L24.7 7.3 L27.8 8 L24.7 8.7 L24 11.8 L23.3 8.7 L20.2 8 L23.3 7.3 Z" />
+          <circle class="scope-star star-c" cx="40" cy="7" r="0.85" fill="#ffffff" />
+          <circle class="scope-star star-d" cx="8" cy="20" r="0.7" fill="#ffb020" />
+          <path class="scope-star star-e" fill="#ffffff" d="M52 5 L52.55 7.2 L54.8 7.75 L52.55 8.3 L52 10.5 L51.45 8.3 L49.2 7.75 L51.45 7.2 Z" />
+          <circle class="scope-star star-f" cx="66" cy="12" r="0.8" fill="#ffffff" />
+          <path class="scope-star star-g" fill="#ffb020" d="M78 6.5 L78.45 8.2 L80.2 8.65 L78.45 9.1 L78 10.8 L77.55 9.1 L75.8 8.65 L77.55 8.2 Z" />
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35">
+            <path d="M2 46 L16 30 L30 46" stroke="#ffffff" />
+            <path d="M18 48 L36 20 L54 48" stroke="#ffb020" />
+            <path d="M40 46 L56 32 L72 46" stroke="#ffffff" />
           </g>
-          <g class="scope-tube" fill="none" stroke-linecap="round">
-            <path d="M36 38 L54 20" stroke="#ffb020" stroke-width="2.4" />
-            <circle cx="56" cy="18" r="4.2" stroke="#ffffff" stroke-width="1.7" />
+          <g fill="none" stroke-linecap="round">
+            <path d="M70 36 L56 52" stroke="#ffffff" stroke-width="1.5" />
+            <path d="M70 36 L84 52" stroke="#ffffff" stroke-width="1.5" />
+            <path d="M70 36 L70 52" stroke="#ffffff" stroke-width="1.5" />
+            <path d="M70 36 L82 22" stroke="#ffb020" stroke-width="2.1" />
+            <circle cx="84" cy="20" r="3.5" stroke="#ffffff" stroke-width="1.5" />
           </g>
         </svg>
         <div>

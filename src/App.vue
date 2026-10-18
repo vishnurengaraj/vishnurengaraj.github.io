@@ -1,5 +1,5 @@
 <script setup>
-import { nextTick, onMounted, onUnmounted, provide, ref, watch } from "vue";
+import { nextTick, onMounted, onUnmounted, provide, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useHead } from "@unhead/vue";
 import monoBold from "@fontsource/roboto-mono/files/roboto-mono-latin-700-normal.woff2?url";
@@ -10,7 +10,8 @@ import AboutSection from "./components/AboutSection.vue";
 import ProjectsSection from "./components/ProjectsSection.vue";
 import ResumeSection from "./components/ResumeSection.vue";
 import SiteFooter from "./components/SiteFooter.vue";
-import { scrollKey } from "./scroll.js";
+import { skills } from "./data/content.js";
+import { dockKey, scrollKey } from "./scroll.js";
 
 const ORIGIN = "https://vishnu.rengaraj.com";
 const route = useRoute();
@@ -164,6 +165,11 @@ function onSpy(entries) {
 }
 
 function go(id) {
+  cancelTween();
+  if (id === "about" && inTitleZone() && !prefersReduced()) {
+    playDown();
+    return;
+  }
   if (id === "top" || sectionIds.includes(id)) {
     activeSection.value = id === "top" ? null : id;
   }
@@ -189,55 +195,194 @@ function onNav(event, id) {
 
 provide(scrollKey, go);
 
-let armed = true;
+const dockState = reactive({ docked: false, open: false });
+provide(dockKey, dockState);
+
+let closeDockTimer = 0;
+
+function setDock(next) {
+  if (prefersReduced()) {
+    window.clearTimeout(closeDockTimer);
+    dockState.docked = next;
+    dockState.open = next;
+    return;
+  }
+  if (next) {
+    window.clearTimeout(closeDockTimer);
+    if (!dockState.docked) {
+      dockState.docked = true;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          dockState.open = true;
+        });
+      });
+    } else {
+      dockState.open = true;
+    }
+    return;
+  }
+  if (!dockState.open && !dockState.docked) return;
+  dockState.open = false;
+  window.clearTimeout(closeDockTimer);
+  closeDockTimer = window.setTimeout(() => {
+    if (!dockState.open) dockState.docked = false;
+  }, 260);
+}
+
+function updateDock() {
+  const root = scroller.value;
+  const sent = document.getElementById("resume-tabs-sentinel");
+  const resume = document.getElementById("resume");
+  const bar = root?.querySelector(".nav-inner");
+  if (!root || !sent || !resume || !bar) return;
+  const barBottom = bar.getBoundingClientRect().bottom;
+  const sentTop = sent.getBoundingClientRect().top;
+  const resumeBottom = resume.getBoundingClientRect().bottom;
+  setDock(sentTop <= barBottom + 1 && resumeBottom > barBottom + 48);
+}
+
+let armedDown = true;
+let armedUp = false;
+let wasInReturn = false;
 let animating = false;
-let settleTimer = 0;
+let raf = 0;
+let suppressUntil = 0;
 let touchStartY = 0;
 let touchStartScroll = 0;
 let touchIgnored = false;
+
+/* Native smooth scroll of the title (about 2168px) measured at ~880ms.
+   The cinematic tween is twice that, on cubic-bezier(0.42, 0, 0.58, 1). */
+const INTRO_MS = 1760;
+
+function easeInOut(x) {
+  const cx = 1.26;
+  const bx = -0.78;
+  const ax = 0.52;
+  const sampleX = (t) => ((ax * t + bx) * t + cx) * t;
+  const sampleY = (t) => ((-2 * t + 3) * t) * t;
+  const sampleDX = (t) => (3 * ax * t + 2 * bx) * t + cx;
+  let t = x;
+  for (let i = 0; i < 8; i++) {
+    const dx = sampleDX(t);
+    if (Math.abs(dx) < 1e-6) break;
+    t = Math.min(1, Math.max(0, t - (sampleX(t) - x) / dx));
+  }
+  return sampleY(Math.min(1, Math.max(0, t)));
+}
 
 function inTitleZone() {
   const root = scroller.value;
   return !!root && root.scrollTop <= 32;
 }
 
-function playIntro() {
-  if (prefersReduced() || animating) return;
-  animating = true;
-  armed = false;
-  go("about");
+function aboutAnchor() {
+  const root = scroller.value;
+  const el = document.getElementById("about");
+  if (!root || !el) return 0;
+  const nav = root.querySelector(".section-nav");
+  const navH = nav ? nav.getBoundingClientRect().height : 0;
+  return Math.max(0, el.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - navH - 4);
 }
 
-function stopIntro() {
+function inReturnZone() {
   const root = scroller.value;
-  if (!root || !animating) return;
+  if (!root) return false;
+  const y = root.scrollTop;
+  return y > 48 && y <= aboutAnchor() + 80;
+}
+
+function canAuto() {
+  return !animating && performance.now() > suppressUntil && !prefersReduced();
+}
+
+function cancelTween() {
+  if (raf) cancelAnimationFrame(raf);
+  raf = 0;
+  if (!animating) return;
   animating = false;
-  const top = root.scrollTop;
-  root.scrollTo({ top, behavior: "auto" });
+  const root = scroller.value;
+  if (root) root.style.scrollBehavior = "";
+  suppressUntil = performance.now() + 400;
   releaseSpyLock();
+}
+
+function tweenTo(target, done) {
+  const root = scroller.value;
+  if (!root) return;
+  const start = root.scrollTop;
+  const dist = target - start;
+  if (Math.abs(dist) < 1) {
+    done?.();
+    return;
+  }
+  animating = true;
+  root.style.scrollBehavior = "auto";
+  const t0 = performance.now();
+  const frame = (now) => {
+    if (!animating) return;
+    const p = Math.min(1, (now - t0) / INTRO_MS);
+    root.scrollTop = start + dist * easeInOut(p);
+    if (p < 1) {
+      raf = requestAnimationFrame(frame);
+      return;
+    }
+    animating = false;
+    raf = 0;
+    root.style.scrollBehavior = "";
+    done?.();
+  };
+  raf = requestAnimationFrame(frame);
+}
+
+function playDown() {
+  if (!canAuto()) return;
+  armedDown = false;
+  tweenTo(aboutAnchor(), () => {
+    armedUp = true;
+    wasInReturn = true;
+    document.getElementById("about")?.focus({ preventScroll: true });
+  });
+}
+
+function playUp() {
+  if (!canAuto()) return;
+  armedUp = false;
+  tweenTo(0, () => {
+    armedDown = true;
+    wasInReturn = false;
+    document.getElementById("top")?.focus({ preventScroll: true });
+  });
 }
 
 function onIntroWheel(event) {
   if (prefersReduced()) return;
-  if (event.deltaY < 0) {
-    stopIntro();
-    return;
-  }
   if (animating) {
-    event.preventDefault();
+    cancelTween();
     return;
   }
-  if (!armed || !inTitleZone()) return;
-  event.preventDefault();
-  playIntro();
+  if (!canAuto()) return;
+  if (event.deltaY > 0) {
+    if (!armedDown || !inTitleZone()) return;
+    event.preventDefault();
+    playDown();
+    return;
+  }
+  if (event.deltaY < 0 && armedUp && inReturnZone()) {
+    event.preventDefault();
+    playUp();
+  }
 }
 
 function onIntroScroll() {
   const root = scroller.value;
   if (!root) return;
-  if (root.scrollTop <= 2) {
-    armed = true;
-    animating = false;
+  updateDock();
+  const y = root.scrollTop;
+  if (y <= 2 && !animating) {
+    armedDown = true;
+    armedUp = false;
+    wasInReturn = false;
     window.clearTimeout(spySettle);
     if (spyLock) {
       spyLock = null;
@@ -248,16 +393,15 @@ function onIntroScroll() {
     }
     return;
   }
-  if (animating) {
-    window.clearTimeout(settleTimer);
-    settleTimer = window.setTimeout(() => {
-      animating = false;
-    }, 160);
-    return;
-  }
-  if (spyLock) {
-    window.clearTimeout(spySettle);
-    spySettle = window.setTimeout(releaseSpyLock, 700);
+  if (!animating) {
+    const zone = inReturnZone();
+    if (zone && !wasInReturn) armedUp = true;
+    if (!zone && y > aboutAnchor() + 120) armedUp = false;
+    wasInReturn = zone;
+    if (spyLock) {
+      window.clearTimeout(spySettle);
+      spySettle = window.setTimeout(releaseSpyLock, 700);
+    }
   }
 }
 
@@ -272,17 +416,20 @@ function onTouchMove(event) {
   if (prefersReduced() || touchIgnored) return;
   const y = event.touches[0]?.clientY ?? touchStartY;
   const dy = touchStartY - y;
-  if (dy < 10) {
-    if (dy < -10) stopIntro();
-    return;
-  }
   if (animating) {
-    event.preventDefault();
+    if (Math.abs(dy) > 8) cancelTween();
     return;
   }
-  if (!armed || touchStartScroll > 32) return;
-  event.preventDefault();
-  playIntro();
+  if (!canAuto()) return;
+  if (dy > 12 && armedDown && touchStartScroll <= 32) {
+    event.preventDefault();
+    playDown();
+    return;
+  }
+  if (dy < -12 && armedUp && touchStartScroll > 48 && touchStartScroll <= aboutAnchor() + 80) {
+    event.preventDefault();
+    playUp();
+  }
 }
 
 function onIntroKey(event) {
@@ -294,17 +441,20 @@ function onIntroKey(event) {
   const tag = active?.tagName;
   if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || active?.isContentEditable) return;
   if (event.key === " " && (tag === "BUTTON" || tag === "A")) return;
-  if (up) {
-    stopIntro();
-    return;
-  }
   if (animating) {
-    event.preventDefault();
+    cancelTween();
     return;
   }
-  if (!armed || !inTitleZone()) return;
-  event.preventDefault();
-  playIntro();
+  if (!canAuto()) return;
+  if (down && armedDown && inTitleZone()) {
+    event.preventDefault();
+    playDown();
+    return;
+  }
+  if (up && armedUp && inReturnZone()) {
+    event.preventDefault();
+    playUp();
+  }
 }
 
 onMounted(async () => {
@@ -319,6 +469,8 @@ onMounted(async () => {
   root.addEventListener("touchstart", onTouchStart, { passive: true });
   root.addEventListener("touchmove", onTouchMove, { passive: false });
   window.addEventListener("keydown", onIntroKey);
+  window.addEventListener("resize", updateDock);
+  updateDock();
   spyObserver = new IntersectionObserver(onSpy, {
     root,
     rootMargin: "-12% 0px -70% 0px",
@@ -332,14 +484,16 @@ onMounted(async () => {
 
 onUnmounted(() => {
   const root = scroller.value;
-  window.clearTimeout(settleTimer);
   window.clearTimeout(spySettle);
+  window.clearTimeout(closeDockTimer);
+  if (raf) cancelAnimationFrame(raf);
   spyObserver?.disconnect();
   root?.removeEventListener("wheel", onIntroWheel);
   root?.removeEventListener("scroll", onIntroScroll);
   root?.removeEventListener("touchstart", onTouchStart);
   root?.removeEventListener("touchmove", onTouchMove);
   window.removeEventListener("keydown", onIntroKey);
+  window.removeEventListener("resize", updateDock);
 });
 
 watch(
@@ -384,17 +538,26 @@ watch(
       <div class="band band-white"></div>
     </div>
     <main class="sheet">
-      <nav class="section-nav" aria-label="Sections">
-        <div class="center-col nav-inner measure">
-          <a href="/about" :aria-current="activeSection === 'about' ? 'page' : undefined" @click="onNav($event, 'about')">About</a>
-          <a href="/projects" :aria-current="activeSection === 'projects' ? 'page' : undefined" @click="onNav($event, 'projects')">Projects</a>
-          <a href="/resume" :aria-current="activeSection === 'resume' ? 'page' : undefined" @click="onNav($event, 'resume')">Resume</a>
+      <nav class="section-nav" :class="{ 'is-docked': dockState.docked, 'is-open': dockState.open }" aria-label="Sections">
+        <div class="nav-cluster">
+          <div class="nav-inner">
+            <a href="/about" :aria-current="activeSection === 'about' ? 'page' : undefined" @click="onNav($event, 'about')">About</a>
+            <a href="/projects" :aria-current="activeSection === 'projects' ? 'page' : undefined" @click="onNav($event, 'projects')">Projects</a>
+            <a href="/resume" :aria-current="activeSection === 'resume' ? 'page' : undefined" @click="onNav($event, 'resume')">Resume</a>
+          </div>
+          <div id="nav-tab-slot" class="nav-dock"></div>
         </div>
       </nav>
       <div class="center-col measure">
         <AboutSection />
         <ProjectsSection />
         <ResumeSection />
+        <section id="skills" class="section" aria-labelledby="skills-heading">
+          <h2 id="skills-heading" class="section-title">Skills</h2>
+          <ul class="skills">
+            <li v-for="skill in skills" :key="skill">{{ skill }}</li>
+          </ul>
+        </section>
       </div>
       <SiteFooter />
     </main>
