@@ -374,9 +374,19 @@ function onIntroWheel(event) {
   }
 }
 
+let parallaxY = -1;
+function syncParallax(root) {
+  const dpr = window.devicePixelRatio || 1;
+  const y = Math.round(root.scrollTop * dpr) / dpr;
+  if (y === parallaxY) return;
+  parallaxY = y;
+  root.style.setProperty("--scroll", `${y}px`);
+}
+
 function onIntroScroll() {
   const root = scroller.value;
   if (!root) return;
+  syncParallax(root);
   updateDock();
   const y = root.scrollTop;
   if (y <= 2 && !animating) {
@@ -464,6 +474,7 @@ onMounted(async () => {
   else lastKey = "home::top";
   const root = scroller.value;
   if (!root) return;
+  syncParallax(root);
   root.addEventListener("wheel", onIntroWheel, { passive: false });
   root.addEventListener("scroll", onIntroScroll, { passive: true });
   root.addEventListener("touchstart", onTouchStart, { passive: true });

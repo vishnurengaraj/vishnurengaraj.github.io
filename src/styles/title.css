@@ -9,8 +9,9 @@
   overflow-x: hidden;
   overscroll-behavior-x: none;
   touch-action: pan-y;
-  perspective: 100px;
-  transform-style: preserve-3d;
+  /* No perspective. translateZ() was scaling each layer by
+     S = 100/(100-z) on the compositor after Chrome had already
+     rasterized it, which is what kept the ridges soft on desktop. */
   position: relative;
   z-index: 1;
   scroll-behavior: smooth;
@@ -70,17 +71,17 @@
   z-index: 1;
   /* The night sky is the page background behind this transparent layer. */
   background: transparent;
-  transform: translateZ(50px);
 }
 
-/* Hard-edged sunrise stripes. They start at the bottom of the hero and
-   sit above the mountain layers. The first band matches the sky horizon.
-   The last band matches the content sheet. Each band overlaps the next
-   by 2px so 125% and 150% scaling cannot open a crack between them. */
+/* Hard-edged sunrise stripes. They start exactly at the bottom of the
+   hero so none of the horizon band shows inside the title viewport.
+   The first band matches the sky horizon. The last band matches the
+   content sheet. Each band overlaps the next by 2px so 125% and 150%
+   scaling cannot open a crack between them. */
 .sunrise {
   position: relative;
   z-index: 12;
-  margin-top: -28px;
+  margin-top: 0;
   background: #221445;
 }
 
@@ -106,78 +107,92 @@
 .band-bright { background: #fbe1be; }
 .band-white { background: #f7f7f8; }
 
-/* perspective: 100px. translateZ(z) scales a layer by S = 100/(100-z).
-   The layout box is drawn at S times the 2023 size and then scale(1/S)
-   brings the visual size back, so the SVG is rasterized at the pixels
-   it actually covers instead of being enlarged by the compositor. */
+/* The 2023 scene used perspective: 100px and translateZ(z), which draws a
+   layer at S = 100/(100-z). A later scale(1/S) was meant to rasterize
+   bigger, but the perspective matrix still enlarged the texture on the
+   GPU. These boxes are the measured post-projection rects, so each SVG
+   is painted at the pixels it covers. --scroll (px) is the scroller's
+   scrollTop; the extra translate is scrollTop * (1-S), which is the
+   same differential the perspective used to add on top of normal scroll. */
 .l1-bg {
-  width: calc(150% * 100 / 60);
-  height: calc(165vh * 100 / 60);
+  --k: 60;
+  --w: 150;
   z-index: 10;
   background-image: url("/media/layers/l1.svg");
-  transform: translateZ(40px) scale(0.6);
 }
 
 .l2-bg {
-  width: calc(100% * 100 / 70);
-  height: calc(165vh * 100 / 70);
+  --k: 70;
+  --w: 100;
   z-index: 9;
   background-image: url("/media/layers/l2.svg");
-  transform: translateZ(30px) scale(0.7);
 }
 
 .l3-bg {
-  width: calc(115% * 100 / 75);
-  height: calc(165vh * 100 / 75);
+  --k: 75;
+  --w: 115;
   z-index: 8;
   background-image: url("/media/layers/l3.svg");
-  transform: translateZ(25px) scale(0.75);
 }
 
 .l4-bg {
-  width: calc(110% * 100 / 85);
-  height: calc(165vh * 100 / 85);
+  --k: 85;
+  --w: 110;
   z-index: 7;
   background-image: url("/media/layers/l4.svg");
-  transform: translateZ(15px) scale(0.85);
 }
 
 .l5-bg {
-  width: calc(100% * 100 / 90);
-  height: calc(165vh * 100 / 90);
+  --k: 90;
+  --w: 100;
   z-index: 6;
   background-image: url("/media/layers/l5.svg");
-  transform: translateZ(10px) scale(0.9);
 }
 
 .l6-bg {
-  width: calc(130% * 100 / 92);
-  height: calc(165vh * 100 / 92);
+  --k: 92;
+  --w: 130;
   z-index: 5;
   background-image: url("/media/layers/l6.svg");
-  transform: translateZ(8px) scale(0.92);
 }
 
 .l7-bg {
-  width: calc(130% * 100 / 96);
-  height: calc(165vh * 100 / 96);
+  --k: 96;
+  --w: 130;
   z-index: 4;
   background-image: url("/media/layers/l7.svg");
-  transform: translateZ(4px) scale(0.96);
 }
 
-/* Phones and reduced motion: drop 3D perspective (iOS scroll bugs, GPU cost)
-   and keep three silhouette layers at 1x. Desktop widths with a fine pointer
-   keep the translateZ stack above. */
+.l1-bg,
+.l2-bg,
+.l3-bg,
+.l4-bg,
+.l5-bg,
+.l6-bg,
+.l7-bg {
+  width: calc(var(--w) * 1% * 100 / var(--k));
+  height: calc(165vh * 100 / var(--k));
+  /* The projected boxes leave a sub-percent gap at the left edge.
+     Shift every layer by the same amount so the silhouette covers
+     the viewport and the layers stay registered with each other. */
+  left: calc(
+    50% * (var(--k) - 100) / var(--k) + (var(--w) * 0.5%) * (100 - var(--k)) / var(--k) * 100 / var(--k) - 0.8%
+  );
+  top: calc(50vh * (var(--k) - 100) / var(--k) + 82.5vh * (100 - var(--k)) / var(--k) * 100 / var(--k));
+  transform: translate3d(0, calc(var(--scroll, 0px) * (var(--k) - 100) / var(--k)), 0);
+}
+
+/* Phones and reduced motion: three silhouette layers, no parallax shift.
+   Desktop widths with a fine pointer keep the scroll-linked stack above. */
 @media (max-width: 700px), (hover: none) and (pointer: coarse), (prefers-reduced-motion: reduce), (update: slow) {
   .prlx {
-    perspective: none;
-    transform-style: flat;
     -webkit-overflow-scrolling: touch;
   }
 
   .mountain-bg {
     transform: none;
+    left: 0;
+    top: 0;
     width: 100%;
     height: 120dvh;
     background-size: cover;
@@ -187,11 +202,10 @@
   .sky-grad {
     width: 100%;
     height: 120dvh;
-    transform: none;
   }
 
   .sunrise {
-    margin-top: -28px;
+    margin-top: 0;
   }
 
   .l2-bg,

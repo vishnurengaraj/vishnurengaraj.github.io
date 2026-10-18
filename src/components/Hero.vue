@@ -127,9 +127,8 @@ onUnmounted(() => {
         </a>
       </li>
     </ul>
-    <button class="learn" type="button" @click="scrollTo('about')">
-      <span>Learn more</span>
-      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+    <button class="learn" type="button" aria-label="Learn more" @click="scrollTo('about')">
+      <svg viewBox="5 7.5 14 10" aria-hidden="true">
         <path fill="currentColor" d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
       </svg>
     </button>
@@ -224,25 +223,25 @@ onUnmounted(() => {
   left: 50%;
   bottom: 28px;
   isolation: isolate;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-height: 48px;
-  padding: 0 18px 0 20px;
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  padding: 0;
   border: 0;
-  border-radius: 999px;
+  border-radius: 50%;
   background: #ffb020;
   color: #1f1f1f;
   cursor: pointer;
-  font-family: "Roboto", "Segoe UI", sans-serif;
-  font-weight: 700;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  letter-spacing: 0.01em;
   box-shadow: var(--shadow-rest);
   transform: translateX(-50%);
   animation: learn-hint 2.4s ease-in-out infinite;
+}
+
+.learn svg {
+  width: 36px;
+  height: 26px;
+  display: block;
 }
 
 .learn::before {
