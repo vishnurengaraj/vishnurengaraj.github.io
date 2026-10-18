@@ -19,6 +19,7 @@ const router = useRouter();
 const scroller = ref(null);
 const ready = ref(false);
 const navBeside = ref(false);
+const titleLocked = ref(false);
 const layerSizes = "(max-width: 360px) 900px, (max-width: 800px) 1500px, 1800px";
 const layerWidths = [960, 1600, 2400, 3200];
 const ridgeLayers = [
@@ -93,7 +94,20 @@ function barClearance(targetId) {
 }
 
 function anchorFor(id) {
+  if (id === "about") {
+    return (
+      document.querySelector(".home-return") ||
+      document.getElementById("about-heading") ||
+      document.getElementById("about")
+    );
+  }
   return document.getElementById(`${id}-heading`) || document.getElementById(id);
+}
+
+function syncTitleLock() {
+  const on = window.matchMedia("(max-width: 900px) and (orientation: portrait)").matches;
+  titleLocked.value = on;
+  scroller.value?.classList.toggle("is-title-lock", on);
 }
 
 let followNative = false;
@@ -115,7 +129,8 @@ function endNativeScroll() {
 function scrollToEl(id, behavior) {
   const root = scroller.value;
   if (!root || typeof document === "undefined") return;
-  const mode = behavior || (prefersReduced() ? "auto" : "smooth");
+  const jumpTitle = titleLocked.value && root.scrollTop <= 32;
+  const mode = behavior || (prefersReduced() || jumpTitle ? "auto" : "smooth");
   const landed = () => {
     endNativeScroll();
     const end = Math.max(0, root.scrollHeight - root.clientHeight);
@@ -237,6 +252,7 @@ let resumePath = route.name === "resume" ? route.path : "/resume";
 let spyLock = null;
 let passedSection = null;
 let urlFromSpy = false;
+let routeFromTween = false;
 let spySettle = 0;
 let spyObserver;
 
@@ -328,6 +344,21 @@ function onSpy(entries) {
 
 function go(id) {
   cancelTween();
+  if (id === "home") {
+    activeSection.value = null;
+    const y = scroller.value?.scrollTop || 0;
+    if (!prefersReduced() && y > 2) {
+      if (route.path !== "/") {
+        routeFromTween = true;
+        router.push("/");
+      }
+      playUp();
+      return;
+    }
+    if (route.path !== "/") router.push("/");
+    else scrollToEl("top", "auto");
+    return;
+  }
   if (id === "about" && inTitleZone() && !prefersReduced()) {
     playDown();
     return;
@@ -357,7 +388,7 @@ function onNav(event, id) {
 
 provide(scrollKey, go);
 
-const dockState = reactive({ docked: false, open: false });
+const dockState = reactive({ docked: false, open: false, hold: 0 });
 provide(dockKey, dockState);
 
 let closeDockTimer = 0;
@@ -388,17 +419,52 @@ function wantsBeside() {
   return besideFits();
 }
 
+function measureTabHold() {
+  const shell = document.querySelector("#resume-tab-slot .tablist-shell");
+  if (!shell) return;
+  const height = Math.ceil(shell.getBoundingClientRect().height);
+  if (height > 0) dockState.hold = height;
+}
+
+/* A dock change must not move the page. Layout is kept stable; this
+   only corrects a browser scroll-anchoring jump larger than a gesture. */
+function guardScroll() {
+  const root = scroller.value;
+  if (!root) return;
+  const y = root.scrollTop;
+  const previous = root.style.scrollBehavior;
+  root.style.scrollBehavior = "auto";
+  const fix = () => {
+    const el = scroller.value;
+    if (!el || animating) return;
+    if (el.scrollTop < y - 80) {
+      drivingScroll = true;
+      el.scrollTop = y;
+      lastScrollY = y;
+    }
+  };
+  requestAnimationFrame(() => {
+    fix();
+    requestAnimationFrame(() => {
+      fix();
+      const el = scroller.value;
+      if (el && !animating) el.style.scrollBehavior = previous;
+    });
+  });
+}
+
 function setDock(next) {
-  if (next) navBeside.value = wantsBeside();
-  if (prefersReduced()) {
-    window.clearTimeout(closeDockTimer);
-    dockState.docked = next;
-    dockState.open = next;
-    if (!next) navBeside.value = false;
-    return;
-  }
   if (next) {
+    if (dockState.docked && dockState.open) return;
+    if (!dockState.docked) measureTabHold();
+    guardScroll();
+    navBeside.value = wantsBeside();
     window.clearTimeout(closeDockTimer);
+    if (prefersReduced()) {
+      dockState.docked = true;
+      dockState.open = true;
+      return;
+    }
     if (!dockState.docked) {
       dockState.docked = true;
       requestAnimationFrame(() => {
@@ -411,15 +477,23 @@ function setDock(next) {
     }
     return;
   }
-  if (!dockState.open && !dockState.docked) return;
+  if (!dockState.docked || !dockState.open) return;
+  guardScroll();
+  if (prefersReduced()) {
+    dockState.open = false;
+    dockState.docked = false;
+    navBeside.value = false;
+    return;
+  }
   dockState.open = false;
   window.clearTimeout(closeDockTimer);
   closeDockTimer = window.setTimeout(() => {
     if (!dockState.open) {
+      guardScroll();
       dockState.docked = false;
       navBeside.value = false;
     }
-  }, 260);
+  }, 320);
 }
 
 function updateDock() {
@@ -546,13 +620,16 @@ function tweenTo(target, done) {
     const p = Math.min(1, (now - t0) / INTRO_MS);
     const next = start + dist * easeInOut(p);
     lastProgrammatic = next;
-    drivingScroll = true;
-    root.scrollTop = next;
+    if (root.scrollTop !== next) {
+      drivingScroll = true;
+      root.scrollTop = next;
+    }
     if (p < 1) {
       raf = requestAnimationFrame(frame);
       return;
     }
     animating = false;
+    drivingScroll = false;
     tweenDir = 0;
     raf = 0;
     root.style.scrollBehavior = "";
@@ -591,7 +668,33 @@ function sameDirection(delta) {
   return (delta > 0 && tweenDir > 0) || (delta < 0 && tweenDir < 0);
 }
 
+function clampTitleLock(root) {
+  if (!titleLocked.value || animating || drivingScroll || followNative) return false;
+  const about = cachedAbout || aboutAnchor();
+  if (!about) return false;
+  const y = root.scrollTop;
+  if (y > 1 && y < about - 1) {
+    const dest = lastScrollY >= about - 1 ? about : 0;
+    root.style.scrollBehavior = "auto";
+    drivingScroll = true;
+    root.scrollTop = dest;
+    lastScrollY = dest;
+    return true;
+  }
+  return false;
+}
+
 function onIntroWheel(event) {
+  if (titleLocked.value) {
+    const root = scroller.value;
+    if (!root) return;
+    const about = cachedAbout || aboutAnchor();
+    const y = root.scrollTop;
+    if (y < about - 1 || (event.deltaY < 0 && y <= about + 2)) {
+      event.preventDefault();
+    }
+    return;
+  }
   if (prefersReduced()) return;
   const dy = event.deltaY;
   if (!dy) return;
@@ -694,6 +797,11 @@ function onIntroScroll() {
   }
   if (animating) {
     const delta = y - lastProgrammatic;
+    if (titleLocked.value) {
+      drivingScroll = true;
+      root.scrollTop = lastProgrammatic;
+      return;
+    }
     if ((tweenDir > 0 && delta < -36) || (tweenDir < 0 && delta > 36)) {
       cancelTween();
       lastScrollY = y;
@@ -706,6 +814,7 @@ function onIntroScroll() {
     scheduleChrome();
     return;
   }
+  if (clampTitleLock(root)) return;
   /* Scroll position alone is not a gesture. Route jumps, reload
      restoration, and find-in-page all move scrollTop without a wheel,
      touch, key, or scrollbar pointer. Those stay native. */
@@ -738,9 +847,22 @@ function onTouchStart(event) {
 }
 
 function onTouchMove(event) {
-  if (prefersReduced() || touchIgnored) return;
   const y = event.touches[0]?.clientY ?? touchStartY;
   const dy = touchStartY - y;
+  const root = scroller.value;
+  const about = cachedAbout || aboutAnchor();
+  if (titleLocked.value && root) {
+    const block = animating || touchStartScroll < about - 1 || (dy < -8 && touchStartScroll <= about + 2);
+    if (block && !(touchIgnored && Math.abs(dy) < 12)) event.preventDefault();
+    return;
+  }
+  /* A finger on the title must not drag the page into a half sunrise.
+     The button (and, on a desktop, the wheel) plays the full tween. */
+  if (!touchIgnored && touchStartScroll <= 32 && dy > 8) {
+    event.preventDefault();
+    return;
+  }
+  if (prefersReduced() || touchIgnored) return;
   if (animating) {
     if (sameDirection(dy)) {
       if (Math.abs(dy) > 8) event.preventDefault();
@@ -753,22 +875,29 @@ function onTouchMove(event) {
     return;
   }
   if (!canAuto()) return;
-  if (dy > 12 && armedDown && touchStartScroll <= 32) {
-    event.preventDefault();
-    playDown();
-    return;
-  }
-  if (dy < -12 && armedUp && touchStartScroll > 48 && touchStartScroll <= (cachedAbout || aboutAnchor()) + 80) {
+  if (dy < -12 && armedUp && touchStartScroll > 48 && touchStartScroll <= about + 80) {
     event.preventDefault();
     playUp();
   }
 }
 
 function onIntroKey(event) {
-  if (prefersReduced() || event.metaKey || event.ctrlKey || event.altKey) return;
+  if (event.metaKey || event.ctrlKey || event.altKey) return;
   const down = event.key === "ArrowDown" || event.key === "PageDown" || (event.key === " " && !event.shiftKey);
   const up = event.key === "ArrowUp" || event.key === "PageUp" || (event.key === " " && event.shiftKey);
   if (!down && !up) return;
+  if (titleLocked.value) {
+    const root = scroller.value;
+    const about = cachedAbout || aboutAnchor();
+    const y = root?.scrollTop ?? 0;
+    const typing = document.activeElement;
+    const typingTag = typing?.tagName;
+    if (typingTag === "INPUT" || typingTag === "TEXTAREA" || typingTag === "SELECT" || typing?.isContentEditable) return;
+    if (event.key === " " && (typingTag === "BUTTON" || typingTag === "A")) return;
+    if (y < about - 1 || (up && y <= about + 8)) event.preventDefault();
+    return;
+  }
+  if (prefersReduced()) return;
   const active = document.activeElement;
   const tag = active?.tagName;
   if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || active?.isContentEditable) return;
@@ -794,6 +923,7 @@ function onIntroKey(event) {
 }
 
 function onScrollbarPointerDown(event) {
+  if (titleLocked.value) return;
   if (event.pointerType === "touch" || event.button !== 0) return;
   const root = scroller.value;
   if (!root) return;
@@ -810,6 +940,7 @@ function onScrollbarPointerUp() {
 
 function onResize() {
   measureStatic();
+  syncTitleLock();
   if (dockState.docked) navBeside.value = wantsBeside();
   updateDock();
 }
@@ -822,8 +953,10 @@ onMounted(async () => {
   const root = scroller.value;
   if (!root) return;
   measureStatic();
+  syncTitleLock();
   lastScrollY = root.scrollTop;
   syncParallax(root);
+  clampTitleLock(root);
   root.addEventListener("wheel", onIntroWheel, { passive: false });
   root.addEventListener("scroll", onIntroScroll, { passive: true });
   root.addEventListener("pointerdown", onScrollbarPointerDown);
@@ -871,8 +1004,9 @@ watch(
   () => {
     if (route.name === "resume") resumePath = route.path;
     if (!ready.value) return;
-    if (urlFromSpy) {
+    if (urlFromSpy || routeFromTween) {
       urlFromSpy = false;
+      routeFromTween = false;
       lastKey = `${route.name}:${route.params.tab || ""}:${targetForRoute()}`;
       return;
     }

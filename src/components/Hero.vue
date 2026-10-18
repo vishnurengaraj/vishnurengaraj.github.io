@@ -317,6 +317,22 @@ onUnmounted(() => {
   }
 }
 
+@media (max-width: 900px) and (orientation: portrait) {
+  .learn {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    min-height: calc(56px + env(safe-area-inset-bottom, 0px));
+    padding: 0 0 env(safe-area-inset-bottom, 0px);
+    box-sizing: border-box;
+    border-radius: 0;
+    transform: none;
+    animation: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .caret {
     animation: none;
@@ -325,7 +341,6 @@ onUnmounted(() => {
 
   .learn {
     animation: none;
-    transform: translateX(-50%);
   }
 }
 </style>

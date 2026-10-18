@@ -127,7 +127,9 @@ function onKeydown(event) {
   <section id="resume" class="section" tabindex="-1" aria-labelledby="resume-heading">
     <h2 id="resume-heading" class="section-title">Resume</h2>
     <div id="resume-tabs-sentinel" class="tab-sentinel" aria-hidden="true"></div>
-    <div id="resume-tab-slot" class="tablist-wrap"></div>
+    <div id="resume-tab-slot" class="tablist-wrap">
+      <div v-if="dock.docked" class="tab-hold" :style="{ height: `${dock.hold}px` }" aria-hidden="true"></div>
+    </div>
     <Teleport defer :to="dock.docked ? '#nav-tab-slot' : '#resume-tab-slot'">
       <div class="tablist-shell">
         <div class="tablist" role="tablist" aria-label="Resume sections" @keydown="onKeydown">

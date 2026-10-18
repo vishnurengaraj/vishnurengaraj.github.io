@@ -7,6 +7,7 @@
   height: 100dvh;
   overflow-y: auto;
   overflow-x: hidden;
+  overflow-anchor: none;
   overscroll-behavior-x: none;
   touch-action: pan-y;
   position: relative;
@@ -136,6 +137,18 @@
   height: auto;
   transform: translate3d(-50%, calc(var(--scroll, 0px) * var(--rate)), 0);
   will-change: auto;
+}
+
+.prlx.is-title-lock {
+  overscroll-behavior-y: none;
+}
+
+.prlx.is-title-lock #top {
+  touch-action: none;
+}
+
+.prlx.is-title-lock #top .learn {
+  touch-action: manipulation;
 }
 
 .prlx.is-parallax .l1-bg,
