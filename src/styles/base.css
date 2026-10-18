@@ -1,0 +1,207 @@
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("@fontsource/roboto/files/roboto-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("@fontsource/roboto/files/roboto-latin-700-normal.woff2") format("woff2");
+}
+
+/* Roboto Black, subset to the section-title glyphs (About Me / Projects / Resume).
+   4848 bytes. Full Latin 900 is ~22KB, over the 8KB budget. */
+@font-face {
+  font-family: "Roboto Heading";
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("../fonts/roboto-900-headings.woff2") format("woff2");
+  unicode-range: U+0020, U+0041, U+004D, U+0050, U+0052, U+0062-0063, U+0065, U+006A, U+006D, U+006F, U+0072-0075;
+}
+
+@font-face {
+  font-family: "Roboto Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("@fontsource/roboto-mono/files/roboto-mono-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Roboto Mono";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("@fontsource/roboto-mono/files/roboto-mono-latin-700-normal.woff2") format("woff2");
+}
+
+/*    Light content theme. The title screen is night purple (#1a1033 at the
+   top, #221445 at the horizon). The sunrise ends on #f7f7f8, the same
+   sheet color About, Projects, and Resume sit on, so the white cards read.
+   Text itself is on those white cards.
+   Accent roles, all AA (normal text) on the surfaces they are painted on:
+   - primary #c2410c on #ffffff is 5.18:1 (links and accent text)
+   - primary-container #ffb020 with on-primary-container #1f1f1f is 9.01:1
+     (chips, timeline, filled buttons)
+   - tertiary #2d1d7a on #ffffff is 13.39:1 (headings, hover, school chips)
+   - #ffffff on #2d1d7a is 13.39:1
+   - on-surface #1f1f1f on #ffffff is 16.48:1
+   - on-surface-variant #3f3834 on #ffffff is 11.50:1 and on #f6efe8 is 10.09:1
+   - #2d1d7a on #f3eef8 is 11.73:1 (nav current, intern chips)
+   Burnt orange on gold is 2.83:1, so link color is never placed on a gold fill.
+   Focus rings use night purple, which is 13.39:1 on white and 7.32:1 on gold. */
+:root {
+  color-scheme: light;
+  --md-sys-color-primary: #c2410c;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #ffb020;
+  --md-sys-color-on-primary-container: #1f1f1f;
+  --md-sys-color-secondary: #2d1d7a;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #f3eef8;
+  --md-sys-color-on-secondary-container: #2d1d7a;
+  --md-sys-color-tertiary: #2d1d7a;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #2d1d7a;
+  --md-sys-color-on-tertiary-container: #ffffff;
+  --md-sys-color-error: #b3261e;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-background: #f7f7f8;
+  --md-sys-color-on-background: #1f1f1f;
+  --md-sys-color-surface: #f7f7f8;
+  --md-sys-color-on-surface: #1f1f1f;
+  --md-sys-color-surface-variant: #f6efe8;
+  --md-sys-color-on-surface-variant: #3f3834;
+  --md-sys-color-surface-container-low: #fffdfb;
+  --md-sys-color-surface-container: #ffffff;
+  --md-sys-color-surface-container-high: #ffffff;
+  --md-sys-color-surface-container-highest: #f6efe8;
+  --md-sys-color-outline: #7a6558;
+  --md-sys-color-outline-variant: #e7d9ce;
+  --md-sys-color-inverse-surface: #ffffff;
+  --md-sys-color-inverse-on-surface: #1f1f1f;
+  --md-sys-color-inverse-primary: #ffb020;
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-extra-large: 28px;
+  --md-sys-shape-corner-full: 999px;
+  --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-duration-short: 200ms;
+  --card-radius: 18px;
+  --shadow-rest: 0 1px 3px rgba(0, 0, 0, 0.12), 0 2px 3px rgba(0, 0, 0, 0.24);
+  --shadow-raised: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  --shadow-hover: 0 14px 28px rgba(0, 0, 0, 0.25), 0 5px 5px rgba(0, 0, 0, 0.22);
+  --font: "Roboto", "Segoe UI", sans-serif;
+  --mono: "Roboto Mono", ui-monospace, monospace;
+  --nav-offset: 64px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  height: 100dvh;
+  margin: 0;
+  background: #1a1033;
+  overflow-x: clip;
+}
+
+#app {
+  background: linear-gradient(to bottom, #1a1033 0%, #1a1033 46%, #221445 100%);
+}
+
+body {
+  overflow: hidden;
+  font-family: var(--font);
+  color: var(--md-sys-color-on-surface);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--md-sys-color-tertiary);
+  outline-offset: 3px;
+}
+
+/* Landmarks are focused after in-page navigation. The ring stays on links
+   and buttons, not on the section box. */
+.section:focus,
+.section:focus-visible,
+.panel-block:focus,
+.panel-block:focus-visible,
+#top:focus,
+#top:focus-visible {
+  outline: none;
+}
+
+::selection {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip {
+  position: fixed;
+  left: 12px;
+  top: -80px;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  text-decoration: none;
+  padding: 0 16px;
+  border-radius: var(--md-sys-shape-corner-full);
+}
+
+.skip:focus {
+  top: 12px;
+}
+
+.noscript {
+  color: #fafafa;
+  font-family: var(--font);
+  padding: 2rem;
+  max-width: 40rem;
+}
+
+.noscript a {
+  color: #ff9566;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prlx {
+    scroll-behavior: auto;
+  }
+}
