@@ -282,16 +282,10 @@
    sized in vh and cover the type. Keep the sky for the name and put a
    full-width slice of each ridge along the bottom. */
 @media (max-height: 520px) and (orientation: landscape) {
+  /* No ground plate here. Its top edge was a straight lighter band
+     behind the far ridge. The layers themselves cover the bottom. */
   .ridge-ground {
-    display: block;
-    position: absolute;
-    z-index: 3;
-    left: 0;
-    width: 100%;
-    top: 62dvh;
-    height: 38dvh;
-    background: #3c3454;
-    pointer-events: none;
+    display: none;
   }
 
   .mountain-bg {

@@ -128,20 +128,11 @@ function syncScroll(behavior) {
     !window.matchMedia("(max-width: 719px)").matches;
   lastKey = key;
   pinGen += 1;
+  /* Tab changes stay on Resume. Same path as the phone: put the heading
+     just under the docked bars instead of leaving a deep scroll in place. */
   if (sameResume) {
-    /* Already in Resume. Nudge only when the heading is under the bars. */
-    const root = scroller.value;
-    const heading = document.getElementById("resume-heading");
-    if (root && heading) {
-      const top = heading.getBoundingClientRect().top - root.getBoundingClientRect().top;
-      const clearance = barClearance("resume");
-      if (top < clearance && top > -heading.offsetHeight) {
-        root.scrollTo({
-          top: root.scrollTop + top - clearance,
-          behavior: behavior || (prefersReduced() ? "auto" : "smooth"),
-        });
-      }
-    }
+    markScrollTarget("resume");
+    scrollToEl("resume", behavior);
     return;
   }
   const target = targetForRoute();
@@ -203,10 +194,14 @@ function skillsInView() {
 function spyPick() {
   let next = null;
   for (const id of sectionIds) {
+    if (id === "skills") continue;
     if (spySeen.has(id)) next = id;
   }
-  if (!next && passedSection) next = passedSection;
-  if (skillsInView()) next = "skills";
+  if (!next && passedSection && passedSection !== "skills") next = passedSection;
+  /* Highlight and the resume dock share this test. The section can
+     enter the spy band while its heading is still low on the screen. */
+  if (skillsInView()) return "skills";
+  if (!next && (spySeen.has("skills") || passedSection === "skills")) return "resume";
   return next;
 }
 

@@ -1118,10 +1118,12 @@ html.js .panel-block.is-out {
   }
 
   /* Awards cards are short and uneven. Columns let the next card rise
-     instead of leaving a blank row under the shorter neighbor. */
-  #panel-awards,
+     instead of leaving a blank row under the shorter neighbor.
+     A bare #panel-awards would beat the hidden-panel rule and leave
+     Awards painted on top of every other tab. */
   html.js #panel-awards.is-active,
-  html.js #panel-awards.is-out {
+  html.js #panel-awards.is-out,
+  html:not(.js) #panel-awards {
     display: block;
     columns: 2;
     column-gap: 1rem;
