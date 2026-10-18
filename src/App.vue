@@ -19,7 +19,7 @@ const router = useRouter();
 const scroller = ref(null);
 const ready = ref(false);
 const navBeside = ref(false);
-const layerSizes = "(max-width: 800px) 1600px, 120vw";
+const layerSizes = "(max-width: 360px) 900px, (max-width: 800px) 1500px, 1800px";
 const layerWidths = [960, 1600, 2400, 3200];
 const ridgeLayers = [
   ["l1", 14058, 4277],
@@ -118,6 +118,12 @@ function scrollToEl(id, behavior) {
   const mode = behavior || (prefersReduced() ? "auto" : "smooth");
   const landed = () => {
     endNativeScroll();
+    const end = Math.max(0, root.scrollHeight - root.clientHeight);
+    if (end - root.scrollTop <= 32 && end - root.scrollTop > 1) {
+      root.style.scrollBehavior = "auto";
+      drivingScroll = true;
+      root.scrollTop = end;
+    }
     updateDock();
     applySpy();
   };
@@ -131,10 +137,14 @@ function scrollToEl(id, behavior) {
   }
   const el = anchorFor(id);
   if (!el) return;
-  const top = Math.max(
+  const max = Math.max(0, root.scrollHeight - root.clientHeight);
+  let top = Math.max(
     0,
     el.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - barClearance(id),
   );
+  /* A target a few pixels short of the end never quite becomes the last
+     section. Land on the end instead. */
+  if (max - top <= 32) top = max;
   if (Math.abs(root.scrollTop - top) < 2) {
     landed();
   } else {
@@ -236,11 +246,10 @@ function skillsInView() {
   if (!root || !heading) return false;
   const top = heading.getBoundingClientRect().top - root.getBoundingClientRect().top;
   const onScreen = top < root.clientHeight - 8 && top > -heading.offsetHeight - 48;
-  /* The footer is shorter than a desktop viewport, so Skills can sit in
-     view at the end of the scroll without its heading ever reaching the
-     top spy band. Treat that as the section the reader is on. */
-  const atEnd = root.scrollTop + root.clientHeight >= root.scrollHeight - 8;
-  if (atEnd && onScreen) return true;
+  /* Within a few pixels of the end, Skills is the section on screen
+     even when its heading never reaches the top spy band. */
+  const atEnd = root.scrollTop + root.clientHeight >= root.scrollHeight - 32;
+  if (atEnd) return true;
   return top < root.clientHeight * 0.55 && onScreen;
 }
 
@@ -372,12 +381,20 @@ function besideFits() {
   return main + sub - 46 + 20 <= available;
 }
 
+function wantsBeside() {
+  /* Desktop keeps the side-by-side bar. Measuring while a tab switch
+     restacks the row was flipping 1024 and 1440 into the phone layout. */
+  if (window.matchMedia("(min-width: 880px)").matches) return true;
+  return besideFits();
+}
+
 function setDock(next) {
-  if (next !== dockState.docked) navBeside.value = next ? besideFits() : false;
+  if (next) navBeside.value = wantsBeside();
   if (prefersReduced()) {
     window.clearTimeout(closeDockTimer);
     dockState.docked = next;
     dockState.open = next;
+    if (!next) navBeside.value = false;
     return;
   }
   if (next) {
@@ -398,7 +415,10 @@ function setDock(next) {
   dockState.open = false;
   window.clearTimeout(closeDockTimer);
   closeDockTimer = window.setTimeout(() => {
-    if (!dockState.open) dockState.docked = false;
+    if (!dockState.open) {
+      dockState.docked = false;
+      navBeside.value = false;
+    }
   }, 260);
 }
 
@@ -431,6 +451,7 @@ let animating = false;
 let tweenDir = 0;
 let raf = 0;
 let suppressUntil = 0;
+let scrollbarArmed = null;
 let touchStartY = 0;
 let touchStartScroll = 0;
 let touchIgnored = false;
@@ -685,21 +706,22 @@ function onIntroScroll() {
     scheduleChrome();
     return;
   }
-  if (!followNative && !prefersReduced()) {
-    if (armedDown && lastScrollY <= 32 && y > 32) {
-      root.style.scrollBehavior = "auto";
-      drivingScroll = true;
-      root.scrollTop = lastScrollY;
-      playDown();
-      return;
-    }
-    if (armedUp && lastScrollY > 80 && y < lastScrollY - 24) {
+  /* Scroll position alone is not a gesture. Route jumps, reload
+     restoration, and find-in-page all move scrollTop without a wheel,
+     touch, key, or scrollbar pointer. Those stay native. */
+  if (scrollbarArmed && !prefersReduced() && !followNative) {
+    const dir = scrollbarArmed;
+    const movedDown = y > lastScrollY + 4;
+    const movedUp = y < lastScrollY - 4;
+    if ((dir === "down" && movedDown) || (dir === "up" && movedUp)) {
+      scrollbarArmed = null;
       const back = lastScrollY;
       root.style.scrollBehavior = "auto";
       drivingScroll = true;
       root.scrollTop = back;
       lastScrollY = back;
-      playUp();
+      if (dir === "down") playDown();
+      else playUp();
       return;
     }
   }
@@ -771,9 +793,24 @@ function onIntroKey(event) {
   }
 }
 
+function onScrollbarPointerDown(event) {
+  if (event.pointerType === "touch" || event.button !== 0) return;
+  const root = scroller.value;
+  if (!root) return;
+  const rect = root.getBoundingClientRect();
+  const gutter = Math.max(root.offsetWidth - root.clientWidth, 14);
+  if (event.clientX < rect.right - gutter) return;
+  if (inTitleZone()) scrollbarArmed = "down";
+  else if (inReturnZone()) scrollbarArmed = "up";
+}
+
+function onScrollbarPointerUp() {
+  scrollbarArmed = null;
+}
+
 function onResize() {
   measureStatic();
-  if (dockState.docked) navBeside.value = besideFits();
+  if (dockState.docked) navBeside.value = wantsBeside();
   updateDock();
 }
 
@@ -785,15 +822,19 @@ onMounted(async () => {
   const root = scroller.value;
   if (!root) return;
   measureStatic();
+  lastScrollY = root.scrollTop;
   syncParallax(root);
   root.addEventListener("wheel", onIntroWheel, { passive: false });
   root.addEventListener("scroll", onIntroScroll, { passive: true });
+  root.addEventListener("pointerdown", onScrollbarPointerDown);
+  root.addEventListener("pointerup", onScrollbarPointerUp);
+  root.addEventListener("pointercancel", onScrollbarPointerUp);
   root.addEventListener("touchstart", onTouchStart, { passive: true });
   root.addEventListener("touchmove", onTouchMove, { passive: false });
   window.addEventListener("keydown", onIntroKey);
   window.addEventListener("resize", onResize);
   document.fonts?.ready.then(() => {
-    if (dockState.docked) navBeside.value = besideFits();
+    if (dockState.docked) navBeside.value = wantsBeside();
   });
   updateDock();
   spyObserver = new IntersectionObserver(onSpy, {
@@ -815,6 +856,9 @@ onUnmounted(() => {
   spyObserver?.disconnect();
   root?.removeEventListener("wheel", onIntroWheel);
   root?.removeEventListener("scroll", onIntroScroll);
+  root?.removeEventListener("pointerdown", onScrollbarPointerDown);
+  root?.removeEventListener("pointerup", onScrollbarPointerUp);
+  root?.removeEventListener("pointercancel", onScrollbarPointerUp);
   root?.removeEventListener("touchstart", onTouchStart);
   root?.removeEventListener("touchmove", onTouchMove);
   window.removeEventListener("keydown", onIntroKey);

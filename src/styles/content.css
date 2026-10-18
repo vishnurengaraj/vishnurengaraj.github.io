@@ -175,18 +175,19 @@
   box-shadow: var(--shadow-rest);
 }
 
-/* Fills the wedge beside the main pill's curve so the shorter sub bar
-   does not leave a notch of page color. */
+/* Covers the page-color wedge inside the sub bar, and stays inside the
+   pill. A box that extends past the bar reads as a white slab. */
 .section-nav.is-beside .nav-dock > .tablist-shell::before {
   content: "";
   position: absolute;
   z-index: 0;
-  left: 8px;
-  width: 78px;
-  top: -22px;
-  bottom: -22px;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 72px;
   background: #ffffff;
-  border-radius: 0;
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .section-nav.is-beside .tablist {
@@ -195,7 +196,7 @@
 }
 
 .section-nav.is-beside.is-open .nav-dock > .tablist-shell {
-  overflow: visible;
+  overflow: hidden;
   background: #ffffff;
   min-width: max-content;
 }
@@ -481,7 +482,9 @@ picture {
   max-width: 100%;
 }
 
-picture img,
+/* Content photos only. The title ridges are transparent pictures outside
+   .sheet; this rule must not paint them opaque. */
+.sheet picture img,
 .photo,
 video {
   display: block;

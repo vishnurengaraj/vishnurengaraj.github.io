@@ -12,7 +12,11 @@
   position: relative;
   z-index: 1;
   scroll-behavior: smooth;
-  --band: 52vh;
+  /* Leave the name, subtitle, and icons on the night sky, then let the
+     ridge use the rest, up to about 62% of the viewport. Wide screens
+     would otherwise grow with 100vw and shove the peaks off the top. */
+  --ridge-cap: min(62vh, max(36vh, 93dvh - 360px));
+  --ridge-ideal: min(44vh, var(--ridge-cap));
 }
 
 .mountain-bg {
@@ -100,17 +104,17 @@
 .band-bright { background: #fbe1be; }
 .band-white { background: #f7f7f8; }
 
-/* Each ridge keeps its own aspect ratio. The box is at least as wide as
-   the viewport, so a tall or narrow window crops the sides instead of
-   stretching the art or leaving a hard vertical edge. --scroll is the
-   scroller's scrollTop; only transform moves on scroll. */
+/* Bottom-anchored, native aspect. Width is max(100vw, the width that
+   reaches --ridge-ideal), unless that would make the art taller than
+   --ridge-cap — then the cap wins and the sides stay night sky.
+   --scroll is the scroller's scrollTop; only transform moves on scroll. */
 .l1-bg { --aspect: 3.2866; --scale: 0.9; --rate: -0.62; z-index: 10; }
-.l2-bg { --aspect: 2.7744; --scale: 0.94; --rate: -0.4; z-index: 9; }
-.l3-bg { --aspect: 2.7695; --scale: 0.97; --rate: -0.32; z-index: 8; }
-.l4-bg { --aspect: 2.75; --scale: 1; --rate: -0.18; z-index: 7; }
-.l5-bg { --aspect: 2.7494; --scale: 1.02; --rate: -0.12; z-index: 6; }
-.l6-bg { --aspect: 2.7446; --scale: 1.04; --rate: -0.08; z-index: 5; }
-.l7-bg { --aspect: 2.3205; --scale: 1.08; --rate: -0.04; z-index: 4; }
+.l2-bg { --aspect: 2.7744; --scale: 0.93; --rate: -0.4; z-index: 9; }
+.l3-bg { --aspect: 2.7695; --scale: 0.95; --rate: -0.32; z-index: 8; }
+.l4-bg { --aspect: 2.75; --scale: 0.97; --rate: -0.18; z-index: 7; }
+.l5-bg { --aspect: 2.7494; --scale: 0.98; --rate: -0.12; z-index: 6; }
+.l6-bg { --aspect: 2.7446; --scale: 0.99; --rate: -0.08; z-index: 5; }
+.l7-bg { --aspect: 2.3205; --scale: 1; --rate: -0.04; z-index: 4; }
 
 .l1-bg,
 .l2-bg,
@@ -120,11 +124,15 @@
 .l6-bg,
 .l7-bg {
   left: 50%;
-  top: 0;
-  width: max(114vw, calc(var(--band) * var(--scale) * var(--aspect)));
+  top: auto;
+  bottom: 0;
+  height: min(
+    var(--ridge-cap),
+    max(calc(100vw / var(--aspect)), calc(var(--ridge-ideal) * var(--scale)))
+  );
+  width: auto;
   aspect-ratio: var(--aspect);
-  height: auto;
-  transform: translate3d(-50%, calc(100dvh - 100% + (var(--scroll, 0px) * var(--rate))), 0);
+  transform: translate3d(-50%, calc(var(--scroll, 0px) * var(--rate)), 0);
   will-change: auto;
 }
 
@@ -147,21 +155,31 @@
 
 .mountain-bg img {
   object-fit: fill;
+  height: 100%;
+  max-width: none;
+  background: none;
+  border-radius: 0;
 }
 
 .ridge-ground {
   display: none;
 }
 
-@media (max-width: 700px) and (min-height: 640px) {
+/* Tall phones have room under the name, so the ridge can sit higher
+   and still leave the type on the night sky. */
+@media (max-width: 800px) and (min-height: 640px) {
   .prlx {
-    --band: 42vh;
+    --ridge-cap: 56vh;
+    --ridge-ideal: 50vh;
   }
 }
 
+/* Short landscape: a 100vw-wide layer is taller than the sky under the
+   name. Keep the peaks below the icons. */
 @media (max-height: 520px) and (orientation: landscape) {
   .prlx {
-    --band: 30vh;
+    --ridge-cap: 42vh;
+    --ridge-ideal: 36vh;
   }
 }
 
