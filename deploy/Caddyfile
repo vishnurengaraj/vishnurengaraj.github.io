@@ -1,0 +1,20 @@
+# Alternative to nginx. Bind localhost and let cloudflared reach it.
+#   caddy run --config deploy/Caddyfile
+
+http://127.0.0.1:80 {
+	@apex host rengaraj.com www.rengaraj.com
+	redir @apex https://vishnu.rengaraj.com{uri} 301
+
+	@site host vishnu.rengaraj.com
+	handle @site {
+		root * /var/www/rengaraj
+		encode gzip
+		try_files {path} {path}.html {path}/index.html /index.html
+		file_server
+		header {
+			X-Content-Type-Options nosniff
+			Referrer-Policy strict-origin-when-cross-origin
+			X-Frame-Options SAMEORIGIN
+		}
+	}
+}

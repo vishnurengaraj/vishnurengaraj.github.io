@@ -1,0 +1,110 @@
+{
+  "img": {
+    "audio": {
+      "w": 640,
+      "h": 480,
+      "avif": "/media/img/audio-480.avif 480w, /media/img/audio-640.avif 640w",
+      "webp": "/media/img/audio-480.webp 480w, /media/img/audio-640.webp 640w",
+      "fallback": "/media/img/audio-640.jpg"
+    },
+    "fea": {
+      "w": 1096,
+      "h": 737,
+      "avif": "/media/img/fea-480.avif 480w, /media/img/fea-800.avif 800w, /media/img/fea-1096.avif 1096w",
+      "webp": "/media/img/fea-480.webp 480w, /media/img/fea-800.webp 800w, /media/img/fea-1096.webp 1096w",
+      "fallback": "/media/img/fea-1096.jpg"
+    },
+    "baja": {
+      "w": 1920,
+      "h": 1250,
+      "avif": "/media/img/baja-480.avif 480w, /media/img/baja-960.avif 960w, /media/img/baja-1440.avif 1440w, /media/img/baja-1920.avif 1920w",
+      "webp": "/media/img/baja-480.webp 480w, /media/img/baja-960.webp 960w, /media/img/baja-1440.webp 1440w, /media/img/baja-1920.webp 1920w",
+      "fallback": "/media/img/baja-1920.jpg"
+    },
+    "altair": {
+      "w": 918,
+      "h": 400,
+      "avif": "/media/img/altair-480.avif 480w, /media/img/altair-918.avif 918w",
+      "webp": "/media/img/altair-480.webp 480w, /media/img/altair-918.webp 918w",
+      "fallback": "/media/img/altair-918.jpg"
+    },
+    "tesla": {
+      "w": 2270,
+      "h": 1264,
+      "avif": "/media/img/tesla-480.avif 480w, /media/img/tesla-840.avif 840w, /media/img/tesla-2270.avif 2270w",
+      "webp": "/media/img/tesla-480.webp 480w, /media/img/tesla-840.webp 840w, /media/img/tesla-2270.webp 2270w",
+      "fallback": "/media/img/tesla-2270.jpg"
+    },
+    "teslaExtra": {
+      "w": 1119,
+      "h": 582,
+      "avif": "/media/img/teslaExtra-480.avif 480w, /media/img/teslaExtra-960.avif 960w, /media/img/teslaExtra-1119.avif 1119w",
+      "webp": "/media/img/teslaExtra-480.webp 480w, /media/img/teslaExtra-960.webp 960w, /media/img/teslaExtra-1119.webp 1119w",
+      "fallback": "/media/img/teslaExtra-1119.jpg"
+    },
+    "iroqouis": {
+      "w": 1150,
+      "h": 660,
+      "avif": "/media/img/iroqouis-480.avif 480w, /media/img/iroqouis-960.avif 960w, /media/img/iroqouis-1150.avif 1150w",
+      "webp": "/media/img/iroqouis-480.webp 480w, /media/img/iroqouis-960.webp 960w, /media/img/iroqouis-1150.webp 1150w",
+      "fallback": "/media/img/iroqouis-1150.jpg"
+    },
+    "umichGrad": {
+      "w": 1619,
+      "h": 1080,
+      "avif": "/media/img/umichGrad-480.avif 480w, /media/img/umichGrad-960.avif 960w, /media/img/umichGrad-1400.avif 1400w, /media/img/umichGrad-1619.avif 1619w",
+      "webp": "/media/img/umichGrad-480.webp 480w, /media/img/umichGrad-960.webp 960w, /media/img/umichGrad-1400.webp 1400w, /media/img/umichGrad-1619.webp 1619w",
+      "fallback": "/media/img/umichGrad-1619.jpg"
+    },
+    "umichUndergrad": {
+      "w": 1920,
+      "h": 1198,
+      "avif": "/media/img/umichUndergrad-480.avif 480w, /media/img/umichUndergrad-960.avif 960w, /media/img/umichUndergrad-1400.avif 1400w, /media/img/umichUndergrad-1920.avif 1920w",
+      "webp": "/media/img/umichUndergrad-480.webp 480w, /media/img/umichUndergrad-960.webp 960w, /media/img/umichUndergrad-1400.webp 1400w, /media/img/umichUndergrad-1920.webp 1920w",
+      "fallback": "/media/img/umichUndergrad-1920.jpg"
+    },
+    "oakland": {
+      "w": 728,
+      "h": 200,
+      "avif": "/media/img/oakland-480.avif 480w, /media/img/oakland-728.avif 728w",
+      "webp": "/media/img/oakland-480.webp 480w, /media/img/oakland-728.webp 728w",
+      "fallback": "/media/img/oakland-728.jpg"
+    },
+    "robotics": {
+      "w": 1000,
+      "h": 667,
+      "avif": "/media/img/robotics-480.avif 480w, /media/img/robotics-800.avif 800w, /media/img/robotics-1000.avif 1000w",
+      "webp": "/media/img/robotics-480.webp 480w, /media/img/robotics-800.webp 800w, /media/img/robotics-1000.webp 1000w",
+      "fallback": "/media/img/robotics-1000.jpg"
+    },
+    "spacex": {
+      "w": 3000,
+      "h": 818,
+      "avif": "/media/img/spacex-420.avif 420w, /media/img/spacex-840.avif 840w, /media/img/spacex-3000.avif 3000w",
+      "webp": "/media/img/spacex-420.webp 420w, /media/img/spacex-840.webp 840w, /media/img/spacex-3000.webp 3000w",
+      "fallback": "/media/img/spacex-3000.jpg"
+    },
+    "bajaCrash": {
+      "w": 480,
+      "h": 262,
+      "animated": "/media/img/baja-crash.webp",
+      "fallback": "/media/img/baja-crash.jpg"
+    }
+  },
+  "video": {
+    "altair": {
+      "mp4": "/media/video/altair.mp4",
+      "webm": "/media/video/altair.webm",
+      "poster": "/media/video/altair.webp",
+      "w": 720,
+      "h": 356
+    },
+    "iroqouis": {
+      "mp4": "/media/video/iroqouis.mp4",
+      "webm": "/media/video/iroqouis.webm",
+      "poster": "/media/video/iroqouis.webp",
+      "w": 720,
+      "h": 436
+    }
+  }
+}
