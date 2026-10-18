@@ -31,9 +31,8 @@
   pointer-events: none;
 }
 
-/* The resume row is taken out of flow so opening it never recenters the
-   main labels or changes the document height (that height change was
-   flinging the scroll position on the way back up). */
+/* One card at every width. The resume row is out of flow, so opening it
+   does not recenter the main labels or change the document height. */
 .nav-cluster {
   position: relative;
   display: flex;
@@ -45,6 +44,10 @@
   box-shadow: var(--shadow-rest);
   overflow: visible;
   pointer-events: auto;
+}
+
+.section-nav.is-docked .nav-cluster {
+  min-width: min(var(--nav-tabs, 0px), 100%);
 }
 
 .nav-inner {
@@ -59,8 +62,14 @@
   border-radius: 22px;
 }
 
-.section-nav.is-open:not(.is-beside) .nav-inner {
+.section-nav.is-open .nav-inner {
   border-radius: 22px 22px 0 0;
+}
+
+.section-nav.is-open .nav-cluster {
+  border-radius: 22px 22px 0 0;
+  box-shadow: none;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.12)) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.24));
 }
 
 .nav-dock {
@@ -89,11 +98,11 @@
   min-height: 0;
   width: 100%;
   max-width: none;
-  overflow: hidden;
+  overflow: visible;
   background:
     linear-gradient(rgba(31, 31, 31, 0.14), rgba(31, 31, 31, 0.14)) top / 100% 1px no-repeat,
     #ffffff;
-  box-shadow: var(--shadow-rest);
+  box-shadow: none;
   border-radius: 0 0 22px 22px;
 }
 
@@ -110,9 +119,10 @@
 
 .section-nav .tablist button {
   min-height: 44px;
-  padding: 0 10px;
-  font-size: 0.8125rem;
+  padding: 0 clamp(6px, 1.4vw, 12px);
+  font-size: clamp(0.75rem, 0.68rem + 0.35vw, 0.8125rem);
   line-height: 1.125rem;
+  white-space: nowrap;
 }
 
 @media (min-width: 720px) {
@@ -121,124 +131,27 @@
     padding: 0 24px 8px;
   }
 
-  /* The main links are always this same pill. Docking must not change
-     its padding, width, or centering, or the labels shift. */
+  /* Same card as the phone, kept to the links' own width and centered.
+     Padding on the link row does not change when the tabs open. */
   .nav-cluster {
-    align-items: center;
     width: fit-content;
     max-width: 100%;
-    margin: 0 auto;
-    background: transparent;
-    box-shadow: none;
-    border-radius: 0;
+    margin-inline: auto;
+    border-radius: var(--md-sys-shape-corner-full);
   }
 
   .nav-inner {
-    width: fit-content;
-    margin-inline: auto;
-    background: #ffffff;
-    box-shadow: var(--shadow-rest);
     border-radius: var(--md-sys-shape-corner-full);
     padding: 8px 4px;
   }
 
-  .section-nav.is-open:not(.is-beside) .nav-cluster {
-    width: 100%;
+  .section-nav.is-open .nav-cluster,
+  .section-nav.is-open .nav-inner {
+    border-radius: 26px 26px 0 0;
   }
-}
 
-/* Side-by-side only when the resume row fits without clipping. The sub
-   bar is shorter, centered, and tucked under the main pill. */
-.section-nav.is-beside .nav-cluster {
-  flex-direction: row;
-  align-items: center;
-  width: fit-content;
-  max-width: 100%;
-  margin: 0 auto;
-  background: transparent;
-  box-shadow: none;
-  overflow: visible;
-  border-radius: 0;
-}
-
-.section-nav.is-beside .nav-inner {
-  width: fit-content;
-  background: #ffffff;
-  box-shadow: var(--shadow-rest);
-  border-radius: var(--md-sys-shape-corner-full);
-  padding: 8px 4px;
-}
-
-.section-nav.is-beside .nav-dock {
-  left: calc(100% - 46px);
-  right: auto;
-  top: 50%;
-  width: max-content;
-  opacity: 0;
-  transform: translateY(-50%) translateX(calc(-100% + 46px));
-}
-
-.section-nav.is-beside.is-open .nav-dock {
-  top: 50%;
-  opacity: 1;
-  transform: translateY(-50%) translateX(0);
-  pointer-events: auto;
-}
-
-.section-nav.is-beside .nav-dock > .tablist-shell {
-  position: relative;
-  width: auto;
-  min-width: max-content;
-  background: #ffffff;
-  border-radius: var(--md-sys-shape-corner-full);
-  box-shadow: var(--shadow-rest);
-}
-
-/* Covers the page-color wedge inside the sub bar, and stays inside the
-   pill. A box that extends past the bar reads as a white slab. */
-.section-nav.is-beside .nav-dock > .tablist-shell::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 72px;
-  background: #ffffff;
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-.section-nav.is-beside .tablist {
-  position: relative;
-  z-index: 1;
-}
-
-.section-nav.is-beside.is-open .nav-dock > .tablist-shell {
-  overflow: hidden;
-  background: #ffffff;
-  min-width: max-content;
-}
-
-.section-nav.is-beside .tablist {
-  width: max-content;
-  max-width: none;
-  padding: 4px 8px 4px 56px;
-  overflow: visible;
-  background: transparent;
-  border-radius: inherit;
-}
-
-.section-nav.is-beside .tablist button {
-  min-height: 44px;
-  padding: 0 12px;
-  font-size: 0.8125rem;
-}
-
-@media (max-width: 380px) {
-  .section-nav:not(.is-beside) .tablist button {
-    padding: 0 7px;
-    font-size: 0.75rem;
+  .section-nav.is-open .nav-dock > .tablist-shell {
+    border-radius: 0 0 26px 26px;
   }
 }
 

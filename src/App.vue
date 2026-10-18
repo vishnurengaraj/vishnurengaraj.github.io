@@ -18,7 +18,6 @@ const route = useRoute();
 const router = useRouter();
 const scroller = ref(null);
 const ready = ref(false);
-const navBeside = ref(false);
 const titleLocked = ref(false);
 const layerSizes = "(max-width: 360px) 900px, (max-width: 800px) 1500px, 1800px";
 const layerWidths = [960, 1600, 2400, 3200];
@@ -388,42 +387,19 @@ function onNav(event, id) {
 
 provide(scrollKey, go);
 
-const dockState = reactive({ docked: false, open: false, hold: 0 });
+const dockState = reactive({ docked: false, open: false, hold: 0, tabWidth: 0 });
 provide(dockKey, dockState);
 
 let closeDockTimer = 0;
-
-function besideFits() {
-  const root = scroller.value;
-  if (!root) return false;
-  const nav = root.querySelector(".section-nav");
-  const inner = nav?.querySelector(".nav-inner");
-  const shell = document.querySelector(".tablist-shell");
-  if (!nav || !inner || !shell) return false;
-  const links = [...inner.querySelectorAll("a")];
-  const buttons = [...shell.querySelectorAll('[role="tab"]')];
-  if (!links.length || !buttons.length) return false;
-  const widthOf = (els) => els.reduce((sum, el) => sum + el.getBoundingClientRect().width, 0);
-  const dockedShell = !!shell.closest("#nav-tab-slot");
-  const main = widthOf(links) + 4 * (links.length - 1) + 8;
-  const sub = widthOf(buttons) + 4 * (buttons.length - 1) + 68 - (dockedShell ? 0 : 36);
-  const styles = getComputedStyle(nav);
-  const available = nav.clientWidth - parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight);
-  return main + sub - 46 + 20 <= available;
-}
-
-function wantsBeside() {
-  /* Desktop keeps the side-by-side bar. Measuring while a tab switch
-     restacks the row was flipping 1024 and 1440 into the phone layout. */
-  if (window.matchMedia("(min-width: 880px)").matches) return true;
-  return besideFits();
-}
 
 function measureTabHold() {
   const shell = document.querySelector("#resume-tab-slot .tablist-shell");
   if (!shell) return;
   const height = Math.ceil(shell.getBoundingClientRect().height);
   if (height > 0) dockState.hold = height;
+  const list = shell.querySelector(".tablist");
+  const width = Math.ceil((list || shell).scrollWidth);
+  if (width > 0) dockState.tabWidth = width + 8;
 }
 
 /* A dock change must not move the page. Layout is kept stable; this
@@ -458,7 +434,6 @@ function setDock(next) {
     if (dockState.docked && dockState.open) return;
     if (!dockState.docked) measureTabHold();
     guardScroll();
-    navBeside.value = wantsBeside();
     window.clearTimeout(closeDockTimer);
     if (prefersReduced()) {
       dockState.docked = true;
@@ -482,7 +457,6 @@ function setDock(next) {
   if (prefersReduced()) {
     dockState.open = false;
     dockState.docked = false;
-    navBeside.value = false;
     return;
   }
   dockState.open = false;
@@ -491,7 +465,6 @@ function setDock(next) {
     if (!dockState.open) {
       guardScroll();
       dockState.docked = false;
-      navBeside.value = false;
     }
   }, 320);
 }
@@ -941,7 +914,6 @@ function onScrollbarPointerUp() {
 function onResize() {
   measureStatic();
   syncTitleLock();
-  if (dockState.docked) navBeside.value = wantsBeside();
   updateDock();
 }
 
@@ -966,9 +938,6 @@ onMounted(async () => {
   root.addEventListener("touchmove", onTouchMove, { passive: false });
   window.addEventListener("keydown", onIntroKey);
   window.addEventListener("resize", onResize);
-  document.fonts?.ready.then(() => {
-    if (dockState.docked) navBeside.value = wantsBeside();
-  });
   updateDock();
   spyObserver = new IntersectionObserver(onSpy, {
     root,
@@ -1056,7 +1025,7 @@ watch(
       <div class="band band-white"></div>
     </div>
     <main class="sheet">
-      <nav class="section-nav" :class="{ 'is-docked': dockState.docked, 'is-open': dockState.open, 'is-beside': navBeside }" aria-label="Sections">
+      <nav class="section-nav" :class="{ 'is-docked': dockState.docked, 'is-open': dockState.open }" :style="{ '--nav-tabs': `${dockState.tabWidth}px` }" aria-label="Sections">
         <div class="nav-cluster">
           <div class="nav-inner">
             <a href="/about" :aria-current="activeSection === 'about' ? 'page' : undefined" @click="onNav($event, 'about')">About</a>
