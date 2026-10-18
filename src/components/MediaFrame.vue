@@ -28,9 +28,17 @@ function attachSources(video) {
   video.load();
 }
 
+function hideCaptions(video) {
+  for (const track of video.textTracks) {
+    if (track.mode === "showing") track.mode = "hidden";
+  }
+}
+
 onMounted(() => {
   const video = videoEl.value;
   if (!video) return;
+  hideCaptions(video);
+  video.addEventListener("loadedmetadata", () => hideCaptions(video));
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const root = document.querySelector(".prlx");
   observer = new IntersectionObserver(
@@ -83,7 +91,7 @@ onUnmounted(() => observer?.disconnect());
     :height="item.h"
     :aria-label="item.alt"
   >
-    <track kind="captions" src="/captions/no-speech.vtt" srclang="en" label="English" default />
+    <track kind="captions" src="/captions/no-speech.vtt" srclang="en" label="English" />
   </video>
   <ResponsiveImg
     v-else

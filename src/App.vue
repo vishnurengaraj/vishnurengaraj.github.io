@@ -55,25 +55,57 @@ function prefersReduced() {
   );
 }
 
-function scrollToEl(id) {
+function barClearance(targetId) {
+  const root = scroller.value;
+  if (!root) return 0;
+  const nav = root.querySelector(".section-nav");
+  const inner = nav?.querySelector(".nav-inner");
+  if (!nav || !inner) return 0;
+  const rootTop = root.getBoundingClientRect().top;
+  const stickyTop = Number.parseFloat(getComputedStyle(nav).top) || 0;
+  const navTop = nav.getBoundingClientRect().top - rootTop;
+  /* Before the bar sticks, its viewport bottom is its place in the
+     document (below the title), not the space it covers once pinned. */
+  if (navTop > stickyTop + 2) return stickyTop + inner.offsetHeight + 12;
+  const shell = root.querySelector("#nav-tab-slot .tablist-shell");
+  let bottom = inner.getBoundingClientRect().bottom;
+  if (shell) bottom = Math.max(bottom, shell.getBoundingClientRect().bottom);
+  return bottom - rootTop + 12;
+}
+
+function anchorFor(id) {
+  return document.getElementById(`${id}-heading`) || document.getElementById(id);
+}
+
+function scrollToEl(id, behavior) {
   const root = scroller.value;
   if (!root || typeof document === "undefined") return;
+  const mode = behavior || (prefersReduced() ? "auto" : "smooth");
+  const landed = () => {
+    updateDock();
+    applySpy();
+  };
   if (id === "top") {
-    root.scrollTo({ top: 0, behavior: prefersReduced() ? "auto" : "smooth" });
+    root.scrollTo({ top: 0, behavior: mode });
     document.getElementById("top")?.focus({ preventScroll: true });
+    if (mode === "smooth") root.addEventListener("scrollend", landed, { once: true });
+    else landed();
     return;
   }
-  const el = document.getElementById(id);
+  const el = anchorFor(id);
   if (!el) return;
-  const nav = root.querySelector(".section-nav");
-  const navH = nav ? nav.getBoundingClientRect().height : 0;
-  const top =
-    el.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - navH - 4;
-  root.scrollTo({
-    top: Math.max(0, top),
-    behavior: prefersReduced() ? "auto" : "smooth",
-  });
-  el.focus({ preventScroll: true });
+  const top = Math.max(
+    0,
+    el.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - barClearance(id),
+  );
+  if (Math.abs(root.scrollTop - top) < 2) {
+    landed();
+  } else {
+    root.scrollTo({ top, behavior: mode });
+    if (mode === "smooth") root.addEventListener("scrollend", landed, { once: true });
+    else landed();
+  }
+  document.getElementById(id)?.focus({ preventScroll: true });
 }
 
 function targetForRoute() {
@@ -85,7 +117,8 @@ function targetForRoute() {
 }
 
 let lastKey = "";
-function syncScroll() {
+let pinGen = 0;
+function syncScroll(behavior) {
   const key = `${route.name}:${route.params.tab || ""}:${targetForRoute()}`;
   if (key === lastKey) return;
   const sameResume =
@@ -94,10 +127,53 @@ function syncScroll() {
     typeof window !== "undefined" &&
     !window.matchMedia("(max-width: 719px)").matches;
   lastKey = key;
-  if (sameResume) return;
+  pinGen += 1;
+  if (sameResume) {
+    /* Already in Resume. Nudge only when the heading is under the bars. */
+    const root = scroller.value;
+    const heading = document.getElementById("resume-heading");
+    if (root && heading) {
+      const top = heading.getBoundingClientRect().top - root.getBoundingClientRect().top;
+      const clearance = barClearance("resume");
+      if (top < clearance && top > -heading.offsetHeight) {
+        root.scrollTo({
+          top: root.scrollTop + top - clearance,
+          behavior: behavior || (prefersReduced() ? "auto" : "smooth"),
+        });
+      }
+    }
+    return;
+  }
   const target = targetForRoute();
   markScrollTarget(target);
-  scrollToEl(target);
+  scrollToEl(target, behavior);
+  if (behavior === "instant") settleRoute(target, pinGen);
+}
+
+/* Images and the sticky bar settle a frame or two after first paint.
+   Re-pin a direct load so the spy does not publish a section we only
+   passed through. */
+function settleRoute(id, gen) {
+  if (!id || id === "top") return;
+  const pin = () => {
+    if (gen !== pinGen) return;
+    const root = scroller.value;
+    const el = anchorFor(id);
+    if (!root || !el) return;
+    const top = el.getBoundingClientRect().top - root.getBoundingClientRect().top;
+    const clearance = barClearance(id);
+    const max = root.scrollHeight - root.clientHeight;
+    const atEnd = root.scrollTop >= max - 2;
+    if (atEnd && top < root.clientHeight * 0.75) {
+      updateDock();
+      applySpy();
+      return;
+    }
+    if (Math.abs(top - clearance) <= 2) return;
+    scrollToEl(id, "instant");
+  };
+  requestAnimationFrame(() => requestAnimationFrame(pin));
+  window.addEventListener("load", pin, { once: true });
 }
 
 const sectionIds = ["about", "projects", "resume", "skills"];
@@ -119,9 +195,9 @@ function skillsInView() {
   /* The footer is shorter than a desktop viewport, so Skills can sit in
      view at the end of the scroll without its heading ever reaching the
      top spy band. Treat that as the section the reader is on. */
-  const atEnd = root.scrollTop + root.clientHeight >= root.scrollHeight - 2;
+  const atEnd = root.scrollTop + root.clientHeight >= root.scrollHeight - 8;
   if (atEnd && onScreen) return true;
-  return top < Math.min(root.clientHeight * 0.42, 280) && onScreen;
+  return top < root.clientHeight * 0.55 && onScreen;
 }
 
 function spyPick() {
@@ -267,9 +343,17 @@ function updateDock() {
   const barBottom = bar.getBoundingClientRect().bottom;
   const sentTop = sent.getBoundingClientRect().top;
   const resumeBottom = resume.getBoundingClientRect().bottom;
+  const heading = document.getElementById("resume-heading");
+  const shell = root.querySelector("#nav-tab-slot .tablist-shell");
+  const barEdge = shell ? Math.max(barBottom, shell.getBoundingClientRect().bottom) : barBottom;
+  const headingH = heading ? heading.offsetHeight : 48;
+  /* Once the tabs are docked, keep them while the heading is brought
+     clear of the bar. The sentinel sits under that heading, including
+     its margin, so a one-pixel test would undock and cover it again. */
+  const limit = dockState.docked ? barEdge + headingH + 40 : barBottom + 1;
   /* Stay docked only while the resume section still owns the screen.
      Once the Skills heading is in view, the tabs go back inline. */
-  setDock(sentTop <= barBottom + 1 && resumeBottom > barBottom + 24 && !skillsInView());
+  setDock(sentTop <= limit && resumeBottom > barBottom + 24 && !skillsInView());
 }
 
 let armedDown = true;
@@ -502,7 +586,7 @@ function onIntroKey(event) {
 onMounted(async () => {
   await nextTick();
   ready.value = true;
-  if (route.name !== "home") syncScroll();
+  if (route.name !== "home") syncScroll("instant");
   else lastKey = "home::top";
   const root = scroller.value;
   if (!root) return;
@@ -516,7 +600,7 @@ onMounted(async () => {
   updateDock();
   spyObserver = new IntersectionObserver(onSpy, {
     root,
-    rootMargin: "-12% 0px -70% 0px",
+    rootMargin: "-8% 0px -42% 0px",
     threshold: 0,
   });
   for (const id of sectionIds) {

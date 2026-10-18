@@ -182,6 +182,20 @@
   transform: translate3d(0, calc(var(--scroll, 0px) * (var(--k) - 100) / var(--k)), 0);
 }
 
+/* l4 and l6's projected boxes start inset, so a lighter layer shows as a
+   vertical strip. Pull just those two to the viewport edge. */
+.l4-bg {
+  left: calc(
+    50% * (var(--k) - 100) / var(--k) + (var(--w) * 0.5%) * (100 - var(--k)) / var(--k) * 100 / var(--k) - 2.8%
+  );
+}
+
+.l6-bg {
+  left: calc(
+    50% * (var(--k) - 100) / var(--k) + (var(--w) * 0.5%) * (100 - var(--k)) / var(--k) * 100 / var(--k) - 2%
+  );
+}
+
 .ridge-ground {
   display: none;
 }
@@ -264,9 +278,54 @@
   }
 }
 
+/* Short landscape (a phone on its side). The desktop parallax boxes are
+   sized in vh and cover the type. Keep the sky for the name and put a
+   full-width slice of each ridge along the bottom. */
+@media (max-height: 520px) and (orientation: landscape) {
+  .ridge-ground {
+    display: block;
+    position: absolute;
+    z-index: 3;
+    left: 0;
+    width: 100%;
+    top: 62dvh;
+    height: 38dvh;
+    background: #3c3454;
+    pointer-events: none;
+  }
+
+  .mountain-bg {
+    transform: none;
+    left: 0;
+    width: 100%;
+    top: auto;
+    background-size: 100% auto;
+    background-position: center top;
+    background-repeat: no-repeat;
+  }
+
+  .l7-bg { height: 42dvh; bottom: 4%; display: block; }
+  .l6-bg { height: 36dvh; bottom: 3%; display: block; }
+  .l5-bg { height: 33dvh; bottom: 2%; display: block; }
+  .l4-bg { height: 30dvh; bottom: 1%; display: block; }
+  .l3-bg { height: 27dvh; bottom: 0; display: block; }
+  .l2-bg { height: 24dvh; bottom: 0; display: block; }
+  .l1-bg { height: 22dvh; bottom: 0; display: block; }
+
+  .sky-grad {
+    display: none;
+  }
+}
+
 @media (max-height: 520px) {
   .name {
     font-size: 48px;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .name {
+    font-size: 36px;
   }
 }
 

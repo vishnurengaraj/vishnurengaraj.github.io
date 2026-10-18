@@ -185,16 +185,18 @@
     overflow: visible;
   }
 
-  /* The pill's rounded corners are transparent. A plate in the sheet
-     color sits behind the whole row so scrolling text cannot show in
-     those wedges, and a white band keeps the tuck under the nav solid. */
+  /* The shell is the pill. Its rectangular backing sits behind the
+     curve so page text cannot show in the corner cutouts. The tablist
+     is only the scroller: a radius on it, with overflow, clips the
+     selected tab into a lopsided blob. */
   .section-nav.is-open .nav-dock > .tablist-shell {
     position: relative;
     z-index: 1;
     isolation: isolate;
-    border-radius: 0 0 999px 999px;
+    border-radius: var(--md-sys-shape-corner-full);
     background: #ffffff;
     overflow: visible;
+    box-shadow: var(--shadow-rest);
   }
 
   .section-nav.is-open .nav-dock > .tablist-shell::before {
@@ -222,8 +224,9 @@
   }
 
   .section-nav.is-docked .tablist {
-    border-radius: 0 0 999px 999px;
-    background: #ffffff;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
   }
 }
 
@@ -990,19 +993,19 @@ html.js .panel-block.is-out {
 }
 
 .panel-stage.is-anim[data-dir="forward"] > .is-active {
-  animation: panel-in-right 280ms var(--md-sys-motion-easing-standard) both;
+  animation: panel-in-right 200ms var(--md-sys-motion-easing-standard) 120ms both;
 }
 
 .panel-stage.is-anim[data-dir="forward"] > .is-out {
-  animation: panel-out-left 280ms var(--md-sys-motion-easing-standard) both;
+  animation: panel-out-left 120ms var(--md-sys-motion-easing-standard) both;
 }
 
 .panel-stage.is-anim[data-dir="back"] > .is-active {
-  animation: panel-in-left 280ms var(--md-sys-motion-easing-standard) both;
+  animation: panel-in-left 200ms var(--md-sys-motion-easing-standard) 120ms both;
 }
 
 .panel-stage.is-anim[data-dir="back"] > .is-out {
-  animation: panel-out-right 280ms var(--md-sys-motion-easing-standard) both;
+  animation: panel-out-right 120ms var(--md-sys-motion-easing-standard) both;
 }
 
 @keyframes panel-in-right {
@@ -1112,6 +1115,23 @@ html.js .panel-block.is-out {
 
   .coursework {
     grid-column: 1 / -1;
+  }
+
+  /* Awards cards are short and uneven. Columns let the next card rise
+     instead of leaving a blank row under the shorter neighbor. */
+  #panel-awards,
+  html.js #panel-awards.is-active,
+  html.js #panel-awards.is-out {
+    display: block;
+    columns: 2;
+    column-gap: 1rem;
+  }
+
+  #panel-awards > .card {
+    break-inside: avoid;
+    display: inline-block;
+    width: 100%;
+    margin: 0 0 1rem;
   }
 }
 
