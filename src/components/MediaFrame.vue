@@ -90,6 +90,6 @@ onUnmounted(() => observer?.disconnect());
     class="photo-frame"
     :image="item.image"
     :alt="item.alt"
-    sizes="(max-width: 800px) 92vw, 720px"
+    sizes="(max-width: 960px) 92vw, 480px"
   />
 </template>

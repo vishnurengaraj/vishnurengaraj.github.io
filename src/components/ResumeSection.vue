@@ -117,7 +117,7 @@ function onKeydown(event) {
           class="photo-frame"
           :image="school.image"
           :alt="school.imageAlt"
-          sizes="(max-width: 800px) 92vw, 720px"
+          sizes="(max-width: 960px) 92vw, 480px"
         />
         <a
           v-if="school.link"
@@ -146,7 +146,7 @@ function onKeydown(event) {
           class="photo-frame"
           :image="school.image"
           :alt="school.imageAlt"
-          sizes="(max-width: 800px) 92vw, 720px"
+          sizes="(max-width: 960px) 92vw, 480px"
         />
         <a
           v-if="school.link"

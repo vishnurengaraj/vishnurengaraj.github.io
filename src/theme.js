@@ -55,10 +55,10 @@ function kebab(name) {
 }
 
 /**
- * Dark Material 3 Expressive scheme (2025 color spec).
- * Primary hue is locked to the sunset seed so buttons and links stay orange.
- * Tertiary hue is locked to the night-sky purple. Surfaces, secondary, and
- * the tone mapping come from the expressive variant.
+ * Reference generator only. The shipped content theme is the light palette in
+ * src/styles/base.css: white surfaces, burnt-orange #c2410c links, golden
+ * #ffb020 fills with #1f1f1f text, and night-purple #2d1d7a accents.
+ * This dark scheme is not applied at runtime.
  */
 export function createScheme() {
   const orange = Hct.fromInt(argbFromHex(SEED_ORANGE));

@@ -146,9 +146,20 @@ watch(
     <div class="mountain-bg l5-bg" aria-hidden="true"></div>
     <div class="mountain-bg l6-bg" aria-hidden="true"></div>
     <div class="mountain-bg l7-bg" aria-hidden="true"></div>
+    <div class="sunrise" aria-hidden="true">
+      <div class="band band-night"></div>
+      <div class="band band-mauve"></div>
+      <div class="band band-pink"></div>
+      <div class="band band-coral"></div>
+      <div class="band band-orange"></div>
+      <div class="band band-gold"></div>
+      <div class="band band-yellow"></div>
+      <div class="band band-bright"></div>
+      <div class="band band-white"></div>
+    </div>
     <main class="sheet">
       <nav class="section-nav" aria-label="Sections">
-        <div class="center-col nav-inner">
+        <div class="center-col nav-inner measure">
           <a href="/about" :aria-current="route.name === 'about' ? 'page' : undefined" @click="onNav($event, 'about')">About</a>
           <a href="/projects" :aria-current="route.name === 'projects' ? 'page' : undefined" @click="onNav($event, 'projects')">Projects</a>
           <a href="/resume" :aria-current="route.name === 'resume' ? 'page' : undefined" @click="onNav($event, 'resume')">Resume</a>

@@ -81,19 +81,37 @@
   width: 100%;
   height: 165vh;
   z-index: 1;
-  background: #000;
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.1) 0%,
-    rgba(45, 29, 122, 0.3) 25%,
-    rgba(87, 49, 112, 0.5) 35%,
-    rgba(128, 69, 101, 0.7) 50%,
-    rgba(170, 88, 91, 0.85) 67%,
-    rgb(211, 108, 80) 84%,
-    rgb(253, 128, 70) 100%
-  );
+  /* Transparent so the black page and starfield stay the night sky.
+     The sunrise below is solid bands, not a gradient. */
+  background: transparent;
   transform: translateZ(50px);
 }
+
+/* Hard-edged sunrise stripes between the title and the white content.
+   Same idea as the 2023 l8 color slab: a solid bar in the scroll, not a
+   gradient. Padding clears the parallax treeline so the bars start once
+   the mountains have left the title screen. */
+.sunrise {
+  position: relative;
+  z-index: 12;
+  padding-top: 42vh;
+}
+
+.band {
+  display: block;
+  height: 16vh;
+  min-height: 64px;
+}
+
+.band-night { background: #2d1d7a; }
+.band-mauve { background: #5e3470; }
+.band-pink { background: #c45478; }
+.band-coral { background: #e06a62; }
+.band-orange { background: #fd8046; }
+.band-gold { background: #ffb020; }
+.band-yellow { background: #ffe58a; }
+.band-bright { background: #fff6de; }
+.band-white { background: #ffffff; }
 
 .l1-bg {
   width: 150%;
@@ -202,6 +220,10 @@
     width: 100%;
     height: 120dvh;
     transform: none;
+  }
+
+  .sunrise {
+    padding-top: 18dvh;
   }
 
   .l2-bg,

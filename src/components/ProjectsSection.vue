@@ -40,7 +40,7 @@ const showEraLabels = computed(() => groups.value.length > 1);
           <ResponsiveImg
             :image="project.image"
             :alt="project.imageAlt"
-            sizes="(max-width: 800px) 92vw, 280px"
+            sizes="(max-width: 960px) 92vw, 460px"
           />
         </figure>
       </article>
