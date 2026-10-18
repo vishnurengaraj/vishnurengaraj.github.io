@@ -118,21 +118,37 @@ function targetForRoute() {
 
 let lastKey = "";
 let pinGen = 0;
+
+/* True when the element is on screen in the open area under the sticky
+   nav or the docked tab row. */
+function visibleBelowBars(el) {
+  const root = scroller.value;
+  if (!root || !el) return false;
+  const top = el.getBoundingClientRect().top - root.getBoundingClientRect().top;
+  const bottom = el.getBoundingClientRect().bottom - root.getBoundingClientRect().top;
+  const clearance = barClearance("resume");
+  return bottom > clearance + 1 && top < root.clientHeight - 1;
+}
+
+/* A tab click should move the page only when the heading has gone above
+   or behind the bars and the in-page tab row is gone too. */
+function resumeNeedsRealign() {
+  const heading = document.getElementById("resume-heading");
+  const tabs = document.querySelector("#resume-tab-slot .tablist-shell");
+  return !visibleBelowBars(heading) && !visibleBelowBars(tabs);
+}
+
 function syncScroll(behavior) {
   const key = `${route.name}:${route.params.tab || ""}:${targetForRoute()}`;
   if (key === lastKey) return;
-  const sameResume =
-    route.name === "resume" &&
-    lastKey.startsWith("resume:") &&
-    typeof window !== "undefined" &&
-    !window.matchMedia("(max-width: 719px)").matches;
+  const switchingTabs = route.name === "resume" && lastKey.startsWith("resume:");
   lastKey = key;
   pinGen += 1;
-  /* Tab changes stay on Resume. Same path as the phone: put the heading
-     just under the docked bars instead of leaving a deep scroll in place. */
-  if (sameResume) {
-    markScrollTarget("resume");
-    scrollToEl("resume", behavior);
+  if (switchingTabs) {
+    if (resumeNeedsRealign()) {
+      markScrollTarget("resume");
+      scrollToEl("resume", behavior);
+    }
     return;
   }
   const target = targetForRoute();
