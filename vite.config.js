@@ -40,6 +40,7 @@ export default defineConfig(({ mode }) => {
           "/",
           "/about",
           "/projects",
+          "/skills",
           "/resume",
           "/resume/experience",
           "/resume/education",

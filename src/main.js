@@ -8,6 +8,7 @@ import "./styles/content.css";
 const HASH_TO_PATH = {
   about: "/about",
   projects: "/projects",
+  skills: "/skills",
   resume: "/resume",
   top: "/",
 };

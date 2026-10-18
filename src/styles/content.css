@@ -142,9 +142,18 @@
     margin-left: -36px;
   }
 
+  .section-nav.is-open .nav-dock > .tablist-shell {
+    max-width: none;
+    min-width: max-content;
+    overflow: visible;
+  }
+
   .section-nav.is-docked .tablist {
     padding-top: 4px;
     padding-left: 48px;
+    max-width: none;
+    width: max-content;
+    overflow: visible;
   }
 }
 
@@ -174,6 +183,47 @@
     margin-top: -16px;
     margin-left: 0;
     overflow: visible;
+  }
+
+  /* The pill's rounded corners are transparent. A plate in the sheet
+     color sits behind the whole row so scrolling text cannot show in
+     those wedges, and a white band keeps the tuck under the nav solid. */
+  .section-nav.is-open .nav-dock > .tablist-shell {
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    border-radius: 0 0 999px 999px;
+    background: #ffffff;
+    overflow: visible;
+  }
+
+  .section-nav.is-open .nav-dock > .tablist-shell::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: -2px;
+    right: -2px;
+    top: -28px;
+    bottom: -2px;
+    background: var(--md-sys-color-surface);
+    border-radius: 0;
+  }
+
+  .section-nav.is-open .nav-dock > .tablist-shell::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 0;
+    right: 0;
+    top: -28px;
+    height: 42px;
+    background: #ffffff;
+    border-radius: 0;
+  }
+
+  .section-nav.is-docked .tablist {
+    border-radius: 0 0 999px 999px;
+    background: #ffffff;
   }
 }
 

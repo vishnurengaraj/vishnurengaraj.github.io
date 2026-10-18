@@ -21,7 +21,7 @@ const scrollTo = inject(scrollKey);
           <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35">
             <path d="M2 46 L16 30 L30 46" stroke="#ffffff" />
             <path d="M18 48 L36 20 L54 48" stroke="#ffb020" />
-            <path d="M40 46 L56 32 L72 46" stroke="#ffffff" />
+            <path d="M26 48 L40 36 L52 48" stroke="#ffffff" />
           </g>
           <g fill="none" stroke-linecap="round">
             <path d="M70 36 L56 52" stroke="#ffffff" stroke-width="1.5" />

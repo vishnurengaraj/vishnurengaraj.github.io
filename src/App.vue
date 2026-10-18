@@ -80,6 +80,7 @@ function targetForRoute() {
   if (route.name === "about") return "about";
   if (route.name === "projects") return "projects";
   if (route.name === "resume") return "resume";
+  if (route.name === "skills") return "skills";
   return "top";
 }
 
@@ -99,22 +100,37 @@ function syncScroll() {
   scrollToEl(target);
 }
 
-const sectionIds = ["about", "projects", "resume"];
+const sectionIds = ["about", "projects", "resume", "skills"];
 const activeSection = ref(sectionIds.includes(route.name) ? route.name : null);
 const spySeen = new Set();
 let resumePath = route.name === "resume" ? route.path : "/resume";
 let spyLock = null;
-let resumeAbove = false;
+let passedSection = null;
 let urlFromSpy = false;
 let spySettle = 0;
 let spyObserver;
+
+function skillsInView() {
+  const root = scroller.value;
+  const heading = document.getElementById("skills-heading");
+  if (!root || !heading) return false;
+  const top = heading.getBoundingClientRect().top - root.getBoundingClientRect().top;
+  const onScreen = top < root.clientHeight - 8 && top > -heading.offsetHeight - 48;
+  /* The footer is shorter than a desktop viewport, so Skills can sit in
+     view at the end of the scroll without its heading ever reaching the
+     top spy band. Treat that as the section the reader is on. */
+  const atEnd = root.scrollTop + root.clientHeight >= root.scrollHeight - 2;
+  if (atEnd && onScreen) return true;
+  return top < Math.min(root.clientHeight * 0.42, 280) && onScreen;
+}
 
 function spyPick() {
   let next = null;
   for (const id of sectionIds) {
     if (spySeen.has(id)) next = id;
   }
-  if (!next && resumeAbove) next = "resume";
+  if (!next && passedSection) next = passedSection;
+  if (skillsInView()) next = "skills";
   return next;
 }
 
@@ -128,7 +144,11 @@ function markScrollTarget(id) {
 function syncSpyUrl(section) {
   if (route.name === "resume") resumePath = route.path;
   const path =
-    section === "about" || section === "projects" ? `/${section}` : section === "resume" ? resumePath : "/";
+    section === "about" || section === "projects" || section === "skills"
+      ? `/${section}`
+      : section === "resume"
+        ? resumePath
+        : "/";
   if (route.path === path) return;
   urlFromSpy = true;
   router.replace(path);
@@ -144,15 +164,7 @@ function releaseSpyLock() {
   syncSpyUrl(next);
 }
 
-function onSpy(entries) {
-  for (const entry of entries) {
-    if (entry.isIntersecting) spySeen.add(entry.target.id);
-    else spySeen.delete(entry.target.id);
-    if (entry.target.id === "resume" && entry.rootBounds) {
-      const { top, bottom } = entry.boundingClientRect;
-      resumeAbove = bottom <= entry.rootBounds.top + 1 && top < entry.rootBounds.top;
-    }
-  }
+function applySpy() {
   const next = spyPick();
   if (spyLock) {
     const wanted = spyLock === "top" ? null : spyLock;
@@ -162,6 +174,23 @@ function onSpy(entries) {
   if (activeSection.value === next) return;
   activeSection.value = next;
   syncSpyUrl(next);
+}
+
+function onSpy(entries) {
+  for (const entry of entries) {
+    if (entry.isIntersecting) spySeen.add(entry.target.id);
+    else spySeen.delete(entry.target.id);
+    if (entry.rootBounds && sectionIds.includes(entry.target.id)) {
+      const { top, bottom } = entry.boundingClientRect;
+      const above = bottom <= entry.rootBounds.top + 1 && top < entry.rootBounds.top;
+      if (above) passedSection = entry.target.id;
+      else if (passedSection === entry.target.id && top > entry.rootBounds.top) {
+        const index = sectionIds.indexOf(entry.target.id);
+        passedSection = index > 0 ? sectionIds[index - 1] : null;
+      }
+    }
+  }
+  applySpy();
 }
 
 function go(id) {
@@ -238,7 +267,9 @@ function updateDock() {
   const barBottom = bar.getBoundingClientRect().bottom;
   const sentTop = sent.getBoundingClientRect().top;
   const resumeBottom = resume.getBoundingClientRect().bottom;
-  setDock(sentTop <= barBottom + 1 && resumeBottom > barBottom + 48);
+  /* Stay docked only while the resume section still owns the screen.
+     Once the Skills heading is in view, the tabs go back inline. */
+  setDock(sentTop <= barBottom + 1 && resumeBottom > barBottom + 24 && !skillsInView());
 }
 
 let armedDown = true;
@@ -388,6 +419,7 @@ function onIntroScroll() {
   if (!root) return;
   syncParallax(root);
   updateDock();
+  if (!spyLock) applySpy();
   const y = root.scrollTop;
   if (y <= 2 && !animating) {
     armedDown = true;
@@ -537,6 +569,7 @@ watch(
     <div class="mountain-bg l5-bg" aria-hidden="true"></div>
     <div class="mountain-bg l6-bg" aria-hidden="true"></div>
     <div class="mountain-bg l7-bg" aria-hidden="true"></div>
+    <div class="ridge-ground" aria-hidden="true"></div>
     <div class="sunrise" aria-hidden="true">
       <div class="band band-night"></div>
       <div class="band band-mauve"></div>
@@ -555,6 +588,7 @@ watch(
             <a href="/about" :aria-current="activeSection === 'about' ? 'page' : undefined" @click="onNav($event, 'about')">About</a>
             <a href="/projects" :aria-current="activeSection === 'projects' ? 'page' : undefined" @click="onNav($event, 'projects')">Projects</a>
             <a href="/resume" :aria-current="activeSection === 'resume' ? 'page' : undefined" @click="onNav($event, 'resume')">Resume</a>
+            <a href="/skills" :aria-current="activeSection === 'skills' ? 'page' : undefined" @click="onNav($event, 'skills')">Skills</a>
           </div>
           <div id="nav-tab-slot" class="nav-dock"></div>
         </div>
