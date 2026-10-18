@@ -750,11 +750,11 @@ video {
   margin: 0.4rem 0 1rem;
 }
 
-.logo-plate img {
+.sheet .logo-plate img {
   display: block;
+  width: auto;
   max-width: min(100%, 420px);
   max-height: 84px;
-  width: auto;
   height: auto;
   object-fit: contain;
   background: transparent;

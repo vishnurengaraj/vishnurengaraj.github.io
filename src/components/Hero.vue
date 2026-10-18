@@ -290,17 +290,30 @@ onUnmounted(() => {
   }
 }
 
-@media (max-height: 520px) {
+@media (max-height: 560px) and (orientation: landscape) {
   .hero {
-    padding-top: 12px;
+    padding-top: 6px;
   }
 
   .subtitle {
+    margin-top: 0.2rem;
+    font-size: 15px;
+  }
+
+  .socials {
     margin-top: 0.35rem;
+    gap: 0.45rem;
+  }
+
+  .icon-link {
+    width: 36px;
+    height: 36px;
   }
 
   .learn {
     bottom: 8px;
+    width: 48px;
+    height: 48px;
   }
 }
 
