@@ -143,6 +143,14 @@
   overscroll-behavior-y: none;
 }
 
+/* base.css loads first, so its reduced-motion override lost to the
+   smooth scroll above. Restate it here. */
+@media (prefers-reduced-motion: reduce) {
+  .prlx {
+    scroll-behavior: auto;
+  }
+}
+
 .prlx.is-title-lock #top {
   touch-action: none;
 }

@@ -135,7 +135,9 @@ function scrollToEl(id, behavior) {
   const root = scroller.value;
   if (!root || typeof document === "undefined") return;
   const jumpTitle = titleLocked.value && root.scrollTop <= 32;
-  const mode = behavior || (prefersReduced() || jumpTitle ? "auto" : "smooth");
+  /* "instant", not "auto": auto defers to the CSS smooth scroll on .prlx,
+     so reduced-motion jumps were still animating. */
+  const mode = behavior === "smooth" || (!behavior && !prefersReduced() && !jumpTitle) ? "smooth" : "instant";
   const gen = ++scrollGen;
   /* The page can grow while a smooth scroll is in flight. Re-measure
      so the heading still meets the bar, or the end when it cannot. */
@@ -193,6 +195,13 @@ function scrollToEl(id, behavior) {
   if (Math.abs(root.scrollTop - top) < 2) {
     landed();
   } else {
+    if (mode !== "smooth") {
+      /* An instant jump (reduced motion, or leaving the locked title)
+         is not a finger. Mark it as ours so the title lock does not
+         pull it back to the top. */
+      drivingScroll = true;
+      lastScrollY = top;
+    }
     root.scrollTo({ top, behavior: mode });
     if (mode === "smooth") {
       root.addEventListener(
@@ -657,6 +666,7 @@ function finishCurve(atTo) {
   curveOnTo = null;
   curveOnFrom = null;
   done?.();
+  queueAnchor();
 }
 
 function tweenBetween(from, to, onFrom, onTo) {
@@ -676,6 +686,7 @@ function tweenBetween(from, to, onFrom, onTo) {
   curveOnFrom = onFrom;
   curveOnTo = onTo;
   tweenDir = to >= from ? 1 : -1;
+  lastProgrammatic = from;
   root.style.scrollBehavior = "auto";
   curveClock = performance.now();
   const frame = (now) => {
@@ -890,11 +901,17 @@ function onIntroScroll() {
     lastScrollY = y;
     syncParallax(root);
     scheduleChrome();
+    queueAnchor();
     return;
   }
   if (animating) {
     const delta = y - lastProgrammatic;
     if (titleLocked.value) {
+      drivingScroll = true;
+      root.scrollTop = lastProgrammatic;
+      return;
+    }
+    if (performance.now() < scrollFightUntil) {
       drivingScroll = true;
       root.scrollTop = lastProgrammatic;
       return;
@@ -936,6 +953,7 @@ function onIntroScroll() {
   lastScrollY = y;
   syncParallax(root);
   scheduleChrome();
+  queueAnchor();
 }
 
 function onTouchStart(event) {
@@ -946,7 +964,9 @@ function onTouchStart(event) {
 }
 
 function onTouchEnd() {
-  armGesture(1200);
+  /* A tap on a button or link is not a drag. Arming here let the title
+     lock pull the page back after a reduced-motion Learn more jump. */
+  if (!touchIgnored) armGesture(1200);
 }
 
 function onTouchMove(event) {
@@ -1017,6 +1037,74 @@ function onIntroKey(event) {
   }
 }
 
+/* Tabbing from Learn more into the nav (or Shift+Tab back up to the
+   title) moves focus across the sunrise. The browser's own scroll to
+   the focused element used to leave the page part way, with the sky
+   bands showing. Finish the trip instead, and keep focus where it is. */
+function onFocusIn(event) {
+  const root = scroller.value;
+  const target = event.target;
+  if (!root || !target || animating || target === root) return;
+  const about = cachedAbout || aboutAnchor();
+  if (!about) return;
+  requestAnimationFrame(() => {
+    if (animating) return;
+    /* Use the element that is focused now. WebKit delivers the title
+       button's focus event after Tab has already moved to the nav, and
+       acting on the stale target rewound the trip. */
+    const current = document.activeElement;
+    if (!current || current === root || !root.contains(current)) return;
+    const y = root.scrollTop;
+    const inTitle = !!current.closest?.("#top");
+    let dest = null;
+    if (inTitle && y > 2 && y < about + 2) dest = 0;
+    else if (!inTitle && y < about - 2) dest = about;
+    if (dest === null) return;
+    endNativeScroll();
+    if (prefersReduced()) {
+      root.style.scrollBehavior = "auto";
+      drivingScroll = true;
+      root.scrollTop = dest;
+      lastScrollY = dest;
+      root.style.scrollBehavior = "";
+      armedDown = dest === 0;
+      armedUp = dest !== 0;
+      return;
+    }
+    scrollFightUntil = performance.now() + 700;
+    if (dest === about) {
+      armedDown = false;
+      tweenBetween(
+        y,
+        about,
+        () => {
+          armedDown = true;
+          wasInReturn = false;
+        },
+        () => {
+          armedUp = true;
+          wasInReturn = true;
+          measureStatic();
+        },
+      );
+    } else {
+      armedUp = false;
+      tweenBetween(
+        y,
+        0,
+        () => {
+          armedUp = true;
+          wasInReturn = true;
+        },
+        () => {
+          armedDown = true;
+          wasInReturn = false;
+        },
+      );
+    }
+  });
+}
+
 function onScrollbarPointerDown(event) {
   if (titleLocked.value) return;
   if (event.pointerType === "touch" || event.button !== 0) return;
@@ -1033,9 +1121,95 @@ function onScrollbarPointerUp() {
   scrollbarArmed = null;
 }
 
+/* The scroller has overflow-anchor: none, and Safari has no scroll
+   anchoring at all, so a rotation or window resize kept the raw
+   scrollTop and dropped the reader into another section. Remember what
+   is at the top of the view while idle and put it back after a resize. */
+/* WebKit scrolls a focused nav link on its own for a few frames. That
+   used to look like a wheel the other way and rewind a focus tween. */
+let scrollFightUntil = 0;
+let scrollAnchor = null;
+let anchorTimer = 0;
+let anchorPending = false;
+let lastWidth = 0;
+
+function rememberAnchor() {
+  const root = scroller.value;
+  if (!root || animating) return;
+  const y = root.scrollTop;
+  const about = cachedAbout || aboutAnchor();
+  if (y <= 2) {
+    scrollAnchor = { kind: "top" };
+    return;
+  }
+  if (about && Math.abs(y - about) <= 2) {
+    scrollAnchor = { kind: "about" };
+    return;
+  }
+  const rootTop = root.getBoundingClientRect().top;
+  let best = null;
+  let bestTop = Infinity;
+  for (const el of root.querySelectorAll("main h2, main h3, main .card, main .timeline li, .site-footer")) {
+    const r = el.getBoundingClientRect();
+    if (!r.height) continue;
+    const t = r.top - rootTop;
+    if (t >= 0 && t < bestTop) {
+      best = el;
+      bestTop = t;
+    }
+  }
+  scrollAnchor = best ? { kind: "el", el: best, top: bestTop } : null;
+}
+
+function queueAnchor() {
+  window.clearTimeout(anchorTimer);
+  anchorPending = true;
+  anchorTimer = window.setTimeout(() => {
+    anchorPending = false;
+    rememberAnchor();
+  }, 160);
+}
+
+function restoreAnchor() {
+  const root = scroller.value;
+  const a = scrollAnchor;
+  if (!root || !a) return;
+  let dest = null;
+  if (a.kind === "top") dest = 0;
+  else if (a.kind === "about") dest = cachedAbout || aboutAnchor();
+  else if (a.el?.isConnected) {
+    const r = a.el.getBoundingClientRect();
+    if (r.height) dest = root.scrollTop + (r.top - root.getBoundingClientRect().top) - a.top;
+  }
+  if (dest === null) return;
+  const max = Math.max(0, root.scrollHeight - root.clientHeight);
+  dest = Math.min(max, Math.max(0, Math.round(dest)));
+  if (Math.abs(root.scrollTop - dest) < 1) return;
+  root.style.scrollBehavior = "auto";
+  drivingScroll = true;
+  root.scrollTop = dest;
+  lastScrollY = dest;
+  lastProgrammatic = dest;
+  root.style.scrollBehavior = "";
+}
+
 function onResize() {
+  const oldAbout = cachedAbout;
   measureStatic();
   syncTitleLock();
+  if (animating) {
+    /* The sunrise was aimed at the old About position. Re-aim it. */
+    const nextAbout = cachedAbout;
+    if (oldAbout && nextAbout && oldAbout !== nextAbout) {
+      if (Math.abs(curveTo - oldAbout) < 2) curveTo = nextAbout;
+      if (Math.abs(curveFrom - oldAbout) < 2) curveFrom = nextAbout;
+    }
+  } else if (window.innerWidth !== lastWidth && !anchorPending) {
+    /* Width changes only (rotation, window resize). A height-only change
+       such as a browser bar, or one during a scroll, keeps its place. */
+    restoreAnchor();
+  }
+  lastWidth = window.innerWidth;
   updateDock();
 }
 
@@ -1052,12 +1226,15 @@ onMounted(async () => {
   measureStatic();
   syncTitleLock();
   lastScrollY = root.scrollTop;
+  lastWidth = window.innerWidth;
   syncParallax(root);
+  queueAnchor();
   root.addEventListener("wheel", onIntroWheel, { passive: false });
   root.addEventListener("scroll", onIntroScroll, { passive: true });
   root.addEventListener("pointerdown", onScrollbarPointerDown);
   root.addEventListener("pointerup", onScrollbarPointerUp);
   root.addEventListener("pointercancel", onScrollbarPointerUp);
+  root.addEventListener("focusin", onFocusIn);
   root.addEventListener("touchstart", onTouchStart, { passive: true });
   root.addEventListener("touchmove", onTouchMove, { passive: false });
   root.addEventListener("touchend", onTouchEnd, { passive: true });
@@ -1088,6 +1265,7 @@ onUnmounted(() => {
   root?.removeEventListener("pointerdown", onScrollbarPointerDown);
   root?.removeEventListener("pointerup", onScrollbarPointerUp);
   root?.removeEventListener("pointercancel", onScrollbarPointerUp);
+  root?.removeEventListener("focusin", onFocusIn);
   root?.removeEventListener("touchstart", onTouchStart);
   root?.removeEventListener("touchmove", onTouchMove);
   root?.removeEventListener("touchend", onTouchEnd);

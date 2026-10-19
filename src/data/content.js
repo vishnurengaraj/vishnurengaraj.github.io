@@ -458,13 +458,13 @@ export const awards = [
     title: "William J. Branstrom Freshman Prize",
     subtitle: "Top 5% of first-year students",
     date: "2017",
-    link: "https://umich-regoff.custhelp.com/app/answers/detail/a_id/1303/~/william-j.-branstrom-freshman-prize-criteria",
+    link: "https://teamdynamix.umich.edu/TDClient/152/Portal/KB/ArticleDet?ID=7401",
   },
   {
     title: "James B. Angell Scholar",
     subtitle: "Consecutive semesters of only A’s",
     date: "2018",
-    link: "https://webapps.lsa.umich.edu/academicsrequirements2013/honorsawards/universityhonors/angellscholars/index.html",
+    link: "https://teamdynamix.umich.edu/TDClient/152/Portal/KB/ArticleDet?ID=7400",
   },
   {
     title: "University of Michigan Honors & Dean's List",
