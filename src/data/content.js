@@ -33,6 +33,7 @@ export const profile = {
     "Runner",
     "Backpacker",
     "Banana Lover",
+    "Cat Dad",
   ],
 };
 
