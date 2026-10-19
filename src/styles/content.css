@@ -1175,6 +1175,19 @@ html.js .panel-block.is-out {
   .section-nav a {
     padding: 0 12px;
   }
+
+  /* The in-page row is narrower than the docked one (20px page gutters).
+     Use the docked row's type and tighter padding so all four tabs,
+     Awards included, fit at 320-375px instead of scrolling off. */
+  #resume-tab-slot .tablist {
+    gap: 2px;
+  }
+
+  #resume-tab-slot .tablist button {
+    padding: 0 clamp(6px, 2.4vw, 12px);
+    font-size: clamp(0.75rem, 0.68rem + 0.35vw, 0.8125rem);
+    line-height: 1.125rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
