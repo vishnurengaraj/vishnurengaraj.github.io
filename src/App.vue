@@ -18,7 +18,7 @@ const route = useRoute();
 const router = useRouter();
 const scroller = ref(null);
 const ready = ref(false);
-const navBeside = ref(false);
+const titleLocked = ref(false);
 const layerSizes = "(max-width: 360px) 900px, (max-width: 800px) 1500px, 1800px";
 const layerWidths = [960, 1600, 2400, 3200];
 const ridgeLayers = [
@@ -81,23 +81,42 @@ function barClearance(targetId) {
   const inner = nav?.querySelector(".nav-inner");
   if (!nav || !inner) return 0;
   const rootTop = root.getBoundingClientRect().top;
-  const stickyTop = Number.parseFloat(getComputedStyle(nav).top) || 0;
-  const navTop = nav.getBoundingClientRect().top - rootTop;
-  /* Before the bar sticks, its viewport bottom is its place in the
-     document (below the title), not the space it covers once pinned. */
-  if (navTop > stickyTop + 2) return stickyTop + inner.offsetHeight + 12;
-  const shell = root.querySelector("#nav-tab-slot .tablist-shell");
-  let bottom = inner.getBoundingClientRect().bottom;
-  if (shell) bottom = Math.max(bottom, shell.getBoundingClientRect().bottom);
-  return bottom - rootTop + 12;
+  const style = getComputedStyle(nav);
+  const stickyTop = Number.parseFloat(style.top) || 0;
+  const padTop = Number.parseFloat(style.paddingTop) || 0;
+  /* The gold up control needs a little more air under the pinned pill
+     than a section heading does. Every in-page target is read with the
+     bar pinned, so the gap does not depend on whether it has stuck yet. */
+  const gap = targetId === "about" ? 20 : 12;
+  let cover = stickyTop + padTop + inner.offsetHeight;
+  const shell = nav.classList.contains("is-open") ? nav.querySelector("#nav-tab-slot .tablist-shell") : null;
+  if (shell) {
+    const shellBottom = shell.getBoundingClientRect().bottom - rootTop;
+    if (shellBottom > cover) cover = shellBottom;
+  }
+  return cover + gap;
 }
 
 function anchorFor(id) {
+  if (id === "about") {
+    return (
+      document.querySelector(".home-return") ||
+      document.getElementById("about-heading") ||
+      document.getElementById("about")
+    );
+  }
   return document.getElementById(`${id}-heading`) || document.getElementById(id);
+}
+
+function syncTitleLock() {
+  const on = window.matchMedia("(max-width: 900px) and (orientation: portrait)").matches;
+  titleLocked.value = on;
+  scroller.value?.classList.toggle("is-title-lock", on);
 }
 
 let followNative = false;
 let followTimer = 0;
+let scrollGen = 0;
 
 function beginNativeScroll() {
   followNative = true;
@@ -115,17 +134,43 @@ function endNativeScroll() {
 function scrollToEl(id, behavior) {
   const root = scroller.value;
   if (!root || typeof document === "undefined") return;
-  const mode = behavior || (prefersReduced() ? "auto" : "smooth");
-  const landed = () => {
-    endNativeScroll();
+  const jumpTitle = titleLocked.value && root.scrollTop <= 32;
+  const mode = behavior || (prefersReduced() || jumpTitle ? "auto" : "smooth");
+  const gen = ++scrollGen;
+  /* The page can grow while a smooth scroll is in flight. Re-measure
+     so the heading still meets the bar, or the end when it cannot. */
+  const pinLanding = () => {
+    if (gen !== scrollGen) return;
     const end = Math.max(0, root.scrollHeight - root.clientHeight);
-    if (end - root.scrollTop <= 32 && end - root.scrollTop > 1) {
+    if (id !== "top" && Math.abs(root.scrollTop - top) <= 600) {
+      const anchor = anchorFor(id);
+      if (anchor && root.scrollTop < end - 2) {
+        const anchorTop = anchor.getBoundingClientRect().top - root.getBoundingClientRect().top;
+        const clearance = barClearance(id);
+        if (anchorTop > clearance + 8) {
+          const next = Math.min(end, root.scrollTop + (anchorTop - clearance));
+          if (next > root.scrollTop + 2) {
+            root.style.scrollBehavior = "auto";
+            drivingScroll = true;
+            root.scrollTop = next;
+            root.style.scrollBehavior = "";
+          }
+        }
+      }
+    }
+    const endNow = Math.max(0, root.scrollHeight - root.clientHeight);
+    if (endNow - root.scrollTop <= 32 && endNow - root.scrollTop > 1) {
       root.style.scrollBehavior = "auto";
       drivingScroll = true;
-      root.scrollTop = end;
+      root.scrollTop = endNow;
+      root.style.scrollBehavior = "";
     }
     updateDock();
     applySpy();
+  };
+  const landed = () => {
+    endNativeScroll();
+    pinLanding();
   };
   beginNativeScroll();
   if (id === "top") {
@@ -149,8 +194,17 @@ function scrollToEl(id, behavior) {
     landed();
   } else {
     root.scrollTo({ top, behavior: mode });
-    if (mode === "smooth") root.addEventListener("scrollend", landed, { once: true });
-    else landed();
+    if (mode === "smooth") {
+      root.addEventListener(
+        "scrollend",
+        () => {
+          landed();
+          window.setTimeout(pinLanding, 450);
+        },
+        { once: true },
+      );
+      window.setTimeout(pinLanding, 1600);
+    } else landed();
   }
   document.getElementById(id)?.focus({ preventScroll: true });
 }
@@ -237,6 +291,7 @@ let resumePath = route.name === "resume" ? route.path : "/resume";
 let spyLock = null;
 let passedSection = null;
 let urlFromSpy = false;
+let routeFromTween = false;
 let spySettle = 0;
 let spyObserver;
 
@@ -326,8 +381,31 @@ function onSpy(entries) {
   applySpy();
 }
 
+let navQuietUntil = 0;
+
 function go(id) {
+  /* Learn more and the up control stay no-ops for the whole sunrise,
+     even after the page has left the title. Cancelling there used to
+     snap back to the top. The up control also quiets nav taps, because
+     the bar slides under a finger that is still coming down. */
+  if (id === "home") navQuietUntil = performance.now() + 320;
+  if (animating && (id === "home" || id === "about")) return;
   cancelTween();
+  if (id === "home") {
+    activeSection.value = null;
+    const y = scroller.value?.scrollTop || 0;
+    if (!prefersReduced() && y > 2) {
+      if (route.path !== "/") {
+        routeFromTween = true;
+        router.push("/");
+      }
+      playUp();
+      return;
+    }
+    if (route.path !== "/") router.push("/");
+    else scrollToEl("top", "auto");
+    return;
+  }
   if (id === "about" && inTitleZone() && !prefersReduced()) {
     playDown();
     return;
@@ -351,75 +429,76 @@ function go(id) {
 
 function onNav(event, id) {
   if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+  /* The up tween slides the bar under a finger that is still tapping.
+     Ignore nav clicks until that motion is underway, and for a short
+     beat after the up control itself was pressed. */
+  if (animating || performance.now() < navQuietUntil) {
+    event.preventDefault();
+    return;
+  }
   event.preventDefault();
   go(id);
 }
 
 provide(scrollKey, go);
 
-const dockState = reactive({ docked: false, open: false });
+const dockState = reactive({ docked: false, open: false, joined: false, hold: 0 });
 provide(dockKey, dockState);
 
 let closeDockTimer = 0;
 
-function besideFits() {
-  const root = scroller.value;
-  if (!root) return false;
-  const nav = root.querySelector(".section-nav");
-  const inner = nav?.querySelector(".nav-inner");
-  const shell = document.querySelector(".tablist-shell");
-  if (!nav || !inner || !shell) return false;
-  const links = [...inner.querySelectorAll("a")];
-  const buttons = [...shell.querySelectorAll('[role="tab"]')];
-  if (!links.length || !buttons.length) return false;
-  const widthOf = (els) => els.reduce((sum, el) => sum + el.getBoundingClientRect().width, 0);
-  const dockedShell = !!shell.closest("#nav-tab-slot");
-  const main = widthOf(links) + 4 * (links.length - 1) + 8;
-  const sub = widthOf(buttons) + 4 * (buttons.length - 1) + 68 - (dockedShell ? 0 : 36);
-  const styles = getComputedStyle(nav);
-  const available = nav.clientWidth - parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight);
-  return main + sub - 46 + 20 <= available;
+function measureTabHold() {
+  const shell = document.querySelector("#resume-tab-slot .tablist-shell");
+  if (!shell) return;
+  const height = Math.ceil(shell.getBoundingClientRect().height);
+  if (height > 0) dockState.hold = height;
 }
 
-function wantsBeside() {
-  /* Desktop keeps the side-by-side bar. Measuring while a tab switch
-     restacks the row was flipping 1024 and 1440 into the phone layout. */
-  if (window.matchMedia("(min-width: 880px)").matches) return true;
-  return besideFits();
-}
-
+/* The row is out of flow and a same-height placeholder keeps the
+   document from growing or shrinking, so docking does not move
+   scrollTop. Do not snap scroll position here: a correction also
+   aborts the page's own smooth scrolls and fast wheels. */
 function setDock(next) {
-  if (next) navBeside.value = wantsBeside();
-  if (prefersReduced()) {
-    window.clearTimeout(closeDockTimer);
-    dockState.docked = next;
-    dockState.open = next;
-    if (!next) navBeside.value = false;
-    return;
-  }
   if (next) {
+    if (dockState.docked && dockState.open) return;
+    if (!dockState.docked) measureTabHold();
     window.clearTimeout(closeDockTimer);
+    if (prefersReduced()) {
+      dockState.docked = true;
+      dockState.open = true;
+      dockState.joined = true;
+      return;
+    }
     if (!dockState.docked) {
       dockState.docked = true;
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
+          if (!dockState.docked) return;
           dockState.open = true;
+          dockState.joined = true;
         });
       });
     } else {
       dockState.open = true;
+      dockState.joined = true;
     }
     return;
   }
-  if (!dockState.open && !dockState.docked) return;
+  if (!dockState.docked || !dockState.open) return;
+  if (prefersReduced()) {
+    dockState.open = false;
+    dockState.joined = false;
+    dockState.docked = false;
+    return;
+  }
   dockState.open = false;
   window.clearTimeout(closeDockTimer);
   closeDockTimer = window.setTimeout(() => {
     if (!dockState.open) {
+      dockState.joined = false;
       dockState.docked = false;
-      navBeside.value = false;
     }
-  }, 260);
+  }, 320);
 }
 
 function updateDock() {
@@ -435,10 +514,12 @@ function updateDock() {
   const shell = root.querySelector("#nav-tab-slot .tablist-shell");
   const barEdge = shell ? Math.max(barBottom, shell.getBoundingClientRect().bottom) : barBottom;
   const headingH = heading ? heading.offsetHeight : 48;
-  /* Once the tabs are docked, keep them while the heading is brought
-     clear of the bar. The sentinel sits under that heading, including
-     its margin, so a one-pixel test would undock and cover it again. */
-  const limit = dockState.docked ? barEdge + headingH + 40 : barBottom + 1;
+  const headingTop = heading ? heading.getBoundingClientRect().top : sentTop;
+  /* The heading is in view under the pill, so the tabs belong inline
+     beneath it. Hysteresis only applies while that heading is still
+     up under the bar, or the row would cover the title. */
+  const headingClear = headingTop >= barBottom - 2;
+  const limit = dockState.docked && !headingClear ? barEdge + headingH + 40 : barBottom + 1;
   /* Stay docked only while the resume section still owns the screen.
      Once the Skills heading is in view, the tabs go back inline. */
   setDock(sentTop <= limit && resumeBottom > barBottom + 24 && !skillsInView());
@@ -490,11 +571,12 @@ function inTitleZone() {
 
 function aboutAnchor() {
   const root = scroller.value;
-  const el = document.getElementById("about");
+  const el = anchorFor("about");
   if (!root || !el) return 0;
-  const nav = root.querySelector(".section-nav");
-  const navH = nav ? nav.getBoundingClientRect().height : 0;
-  return Math.max(0, el.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - navH - 4);
+  return Math.max(
+    0,
+    el.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - barClearance("about"),
+  );
 }
 
 function measureStatic() {
@@ -520,6 +602,7 @@ function cancelTween() {
   if (raf) cancelAnimationFrame(raf);
   raf = 0;
   tweenDir = 0;
+  curveDir = 0;
   if (!animating) return;
   animating = false;
   const root = scroller.value;
@@ -528,80 +611,197 @@ function cancelTween() {
   releaseSpyLock();
 }
 
-function tweenTo(target, done) {
+/* The sunrise is one curve from curveFrom at t=0 to curveTo at
+   INTRO_MS. Reversing flips direction on that same curve, so the page
+   keeps its position and speed and returns to the end it left. */
+let curveFrom = 0;
+let curveTo = 0;
+let curveElapsed = 0;
+let curveDir = 1;
+let curveClock = 0;
+let curveOnFrom = null;
+let curveOnTo = null;
+
+function scrollDirection() {
+  const toward = curveDir > 0 ? curveTo - curveFrom : curveFrom - curveTo;
+  return toward >= 0 ? 1 : -1;
+}
+
+function reverseTween() {
+  if (!animating) return;
+  curveDir *= -1;
+  curveClock = performance.now();
+  tweenDir = scrollDirection();
+}
+
+function finishCurve(atTo) {
+  const root = scroller.value;
+  animating = false;
+  drivingScroll = false;
+  tweenDir = 0;
+  curveDir = 0;
+  if (raf) cancelAnimationFrame(raf);
+  raf = 0;
+  if (root) {
+    const y = atTo ? curveTo : curveFrom;
+    root.style.scrollBehavior = "auto";
+    if (Math.abs(root.scrollTop - y) > 0.5) {
+      drivingScroll = true;
+      root.scrollTop = y;
+    }
+    root.style.scrollBehavior = "";
+    lastScrollY = root.scrollTop;
+    lastProgrammatic = root.scrollTop;
+  }
+  const done = atTo ? curveOnTo : curveOnFrom;
+  curveOnTo = null;
+  curveOnFrom = null;
+  done?.();
+}
+
+function tweenBetween(from, to, onFrom, onTo) {
   const root = scroller.value;
   if (!root) return;
-  const start = root.scrollTop;
-  const dist = target - start;
-  if (Math.abs(dist) < 1) {
+  if (Math.abs(to - from) < 1) {
     tweenDir = 0;
-    done?.();
+    onTo?.();
     return;
   }
+  if (raf) cancelAnimationFrame(raf);
   animating = true;
+  curveFrom = from;
+  curveTo = to;
+  curveElapsed = 0;
+  curveDir = 1;
+  curveOnFrom = onFrom;
+  curveOnTo = onTo;
+  tweenDir = to >= from ? 1 : -1;
   root.style.scrollBehavior = "auto";
-  const t0 = performance.now();
+  curveClock = performance.now();
   const frame = (now) => {
     if (!animating) return;
-    const p = Math.min(1, (now - t0) / INTRO_MS);
-    const next = start + dist * easeInOut(p);
-    lastProgrammatic = next;
-    drivingScroll = true;
-    root.scrollTop = next;
-    if (p < 1) {
-      raf = requestAnimationFrame(frame);
+    const dt = Math.min(34, Math.max(0, now - curveClock));
+    curveClock = now;
+    curveElapsed += curveDir * dt;
+    if (curveDir > 0 && curveElapsed >= curveDurationEdge()) {
+      finishCurve(true);
       return;
     }
-    animating = false;
-    tweenDir = 0;
-    raf = 0;
-    root.style.scrollBehavior = "";
-    done?.();
+    if (curveDir < 0 && curveElapsed <= 0) {
+      finishCurve(false);
+      return;
+    }
+    const p = Math.min(1, Math.max(0, curveElapsed / INTRO_MS));
+    const next = curveFrom + (curveTo - curveFrom) * easeInOut(p);
+    lastProgrammatic = next;
+    tweenDir = scrollDirection();
+    if (root.scrollTop !== next) {
+      drivingScroll = true;
+      root.scrollTop = next;
+    }
+    raf = requestAnimationFrame(frame);
   };
   raf = requestAnimationFrame(frame);
+}
+
+function curveDurationEdge() {
+  return INTRO_MS - 0.5;
 }
 
 function playDown() {
   if (!canAuto()) return;
   endNativeScroll();
   armedDown = false;
-  tweenDir = 1;
   measureStatic();
-  tweenTo(cachedAbout || aboutAnchor(), () => {
-    armedUp = true;
-    wasInReturn = true;
-    measureStatic();
-    document.getElementById("about")?.focus({ preventScroll: true });
-  });
+  const dest = cachedAbout || aboutAnchor();
+  const root = scroller.value;
+  tweenBetween(
+    root ? root.scrollTop : 0,
+    dest,
+    () => {
+      armedDown = true;
+      wasInReturn = false;
+      document.getElementById("top")?.focus({ preventScroll: true });
+    },
+    () => {
+      armedUp = true;
+      wasInReturn = true;
+      measureStatic();
+      document.getElementById("about")?.focus({ preventScroll: true });
+    },
+  );
 }
 
 function playUp() {
   if (!canAuto()) return;
   endNativeScroll();
   armedUp = false;
-  tweenDir = -1;
-  tweenTo(0, () => {
-    armedDown = true;
-    wasInReturn = false;
-    document.getElementById("top")?.focus({ preventScroll: true });
-  });
+  const root = scroller.value;
+  tweenBetween(
+    root ? root.scrollTop : 0,
+    0,
+    () => {
+      armedUp = true;
+      wasInReturn = true;
+      measureStatic();
+      document.getElementById("about")?.focus({ preventScroll: true });
+    },
+    () => {
+      armedDown = true;
+      wasInReturn = false;
+      document.getElementById("top")?.focus({ preventScroll: true });
+    },
+  );
 }
 
 function sameDirection(delta) {
   return (delta > 0 && tweenDir > 0) || (delta < 0 && tweenDir < 0);
 }
 
+let gestureUntil = 0;
+
+function armGesture(ms) {
+  gestureUntil = performance.now() + ms;
+}
+
+function clampTitleLock(root) {
+  if (!titleLocked.value || animating || drivingScroll || followNative) return false;
+  /* Find-in-page and other programmatic jumps land where they were
+     sent. Only a recent finger or wheel is pulled back to an end. */
+  if (performance.now() >= gestureUntil) return false;
+  const about = cachedAbout || aboutAnchor();
+  if (!about) return false;
+  const y = root.scrollTop;
+  if (y > 1 && y < about - 1) {
+    const dest = lastScrollY >= about - 1 ? about : 0;
+    root.style.scrollBehavior = "auto";
+    drivingScroll = true;
+    root.scrollTop = dest;
+    lastScrollY = dest;
+    return true;
+  }
+  return false;
+}
+
 function onIntroWheel(event) {
+  if (event.deltaY) armGesture(500);
+  if (titleLocked.value) {
+    const root = scroller.value;
+    if (!root) return;
+    const about = cachedAbout || aboutAnchor();
+    const y = root.scrollTop;
+    if (y < about - 1 || (event.deltaY < 0 && y <= about + 2)) {
+      event.preventDefault();
+    }
+    return;
+  }
   if (prefersReduced()) return;
   const dy = event.deltaY;
   if (!dy) return;
   if (animating) {
-    if (sameDirection(dy)) {
-      event.preventDefault();
-      return;
-    }
-    cancelTween();
-    suppressUntil = 0;
+    event.preventDefault();
+    if (!sameDirection(dy)) reverseTween();
+    return;
   }
   if (!canAuto()) return;
   if (dy > 0) {
@@ -694,9 +894,16 @@ function onIntroScroll() {
   }
   if (animating) {
     const delta = y - lastProgrammatic;
+    if (titleLocked.value) {
+      drivingScroll = true;
+      root.scrollTop = lastProgrammatic;
+      return;
+    }
     if ((tweenDir > 0 && delta < -36) || (tweenDir < 0 && delta > 36)) {
-      cancelTween();
-      lastScrollY = y;
+      reverseTween();
+      drivingScroll = true;
+      root.scrollTop = lastProgrammatic;
+      return;
     } else if (Math.abs(delta) > 1) {
       drivingScroll = true;
       root.scrollTop = lastProgrammatic;
@@ -706,6 +913,7 @@ function onIntroScroll() {
     scheduleChrome();
     return;
   }
+  if (clampTitleLock(root)) return;
   /* Scroll position alone is not a gesture. Route jumps, reload
      restoration, and find-in-page all move scrollTop without a wheel,
      touch, key, or scrollbar pointer. Those stay native. */
@@ -737,49 +945,65 @@ function onTouchStart(event) {
   touchStartScroll = scroller.value?.scrollTop ?? 0;
 }
 
+function onTouchEnd() {
+  armGesture(1200);
+}
+
 function onTouchMove(event) {
-  if (prefersReduced() || touchIgnored) return;
+  armGesture(800);
   const y = event.touches[0]?.clientY ?? touchStartY;
   const dy = touchStartY - y;
+  const root = scroller.value;
+  const about = cachedAbout || aboutAnchor();
+  if (titleLocked.value && root) {
+    const block = animating || touchStartScroll < about - 1 || (dy < -8 && touchStartScroll <= about + 2);
+    if (block && !(touchIgnored && Math.abs(dy) < 12)) event.preventDefault();
+    return;
+  }
+  /* A finger on the title must not drag the page into a half sunrise.
+     The button (and, on a desktop, the wheel) plays the full tween. */
+  if (!touchIgnored && touchStartScroll <= 32 && dy > 8) {
+    event.preventDefault();
+    return;
+  }
+  if (prefersReduced() || touchIgnored) return;
   if (animating) {
-    if (sameDirection(dy)) {
-      if (Math.abs(dy) > 8) event.preventDefault();
-      return;
-    }
-    if (Math.abs(dy) > 28) {
-      cancelTween();
-      suppressUntil = 0;
-    }
+    if (Math.abs(dy) > 8) event.preventDefault();
+    if (Math.abs(dy) > 28 && !sameDirection(dy)) reverseTween();
     return;
   }
   if (!canAuto()) return;
-  if (dy > 12 && armedDown && touchStartScroll <= 32) {
-    event.preventDefault();
-    playDown();
-    return;
-  }
-  if (dy < -12 && armedUp && touchStartScroll > 48 && touchStartScroll <= (cachedAbout || aboutAnchor()) + 80) {
+  if (dy < -12 && armedUp && touchStartScroll > 48 && touchStartScroll <= about + 80) {
     event.preventDefault();
     playUp();
   }
 }
 
 function onIntroKey(event) {
-  if (prefersReduced() || event.metaKey || event.ctrlKey || event.altKey) return;
+  if (event.metaKey || event.ctrlKey || event.altKey) return;
   const down = event.key === "ArrowDown" || event.key === "PageDown" || (event.key === " " && !event.shiftKey);
   const up = event.key === "ArrowUp" || event.key === "PageUp" || (event.key === " " && event.shiftKey);
   if (!down && !up) return;
+  if (titleLocked.value) {
+    const root = scroller.value;
+    const about = cachedAbout || aboutAnchor();
+    const y = root?.scrollTop ?? 0;
+    const typing = document.activeElement;
+    const typingTag = typing?.tagName;
+    if (typingTag === "INPUT" || typingTag === "TEXTAREA" || typingTag === "SELECT" || typing?.isContentEditable) return;
+    if (event.key === " " && (typingTag === "BUTTON" || typingTag === "A")) return;
+    if (y < about - 1 || (up && y <= about + 8)) event.preventDefault();
+    return;
+  }
+  if (prefersReduced()) return;
   const active = document.activeElement;
   const tag = active?.tagName;
   if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || active?.isContentEditable) return;
   if (event.key === " " && (tag === "BUTTON" || tag === "A")) return;
   if (animating) {
-    if ((down && tweenDir > 0) || (up && tweenDir < 0)) {
-      event.preventDefault();
-      return;
-    }
-    cancelTween();
-    suppressUntil = 0;
+    event.preventDefault();
+    if ((down && tweenDir < 0) || (up && tweenDir > 0)) reverseTween();
+    return;
   }
   if (!canAuto()) return;
   if (down && armedDown && inTitleZone()) {
@@ -794,6 +1018,7 @@ function onIntroKey(event) {
 }
 
 function onScrollbarPointerDown(event) {
+  if (titleLocked.value) return;
   if (event.pointerType === "touch" || event.button !== 0) return;
   const root = scroller.value;
   if (!root) return;
@@ -810,11 +1035,14 @@ function onScrollbarPointerUp() {
 
 function onResize() {
   measureStatic();
-  if (dockState.docked) navBeside.value = wantsBeside();
+  syncTitleLock();
   updateDock();
 }
 
 onMounted(async () => {
+  document.documentElement.classList.add("vue-ready");
+  const queued = document.documentElement.dataset.queuedScroll || "";
+  if (queued) delete document.documentElement.dataset.queuedScroll;
   await nextTick();
   ready.value = true;
   if (route.name !== "home") syncScroll("instant");
@@ -822,6 +1050,7 @@ onMounted(async () => {
   const root = scroller.value;
   if (!root) return;
   measureStatic();
+  syncTitleLock();
   lastScrollY = root.scrollTop;
   syncParallax(root);
   root.addEventListener("wheel", onIntroWheel, { passive: false });
@@ -831,12 +1060,12 @@ onMounted(async () => {
   root.addEventListener("pointercancel", onScrollbarPointerUp);
   root.addEventListener("touchstart", onTouchStart, { passive: true });
   root.addEventListener("touchmove", onTouchMove, { passive: false });
+  root.addEventListener("touchend", onTouchEnd, { passive: true });
+  root.addEventListener("touchcancel", onTouchEnd, { passive: true });
   window.addEventListener("keydown", onIntroKey);
   window.addEventListener("resize", onResize);
-  document.fonts?.ready.then(() => {
-    if (dockState.docked) navBeside.value = wantsBeside();
-  });
   updateDock();
+  if (queued === "about" || queued === "home") go(queued);
   spyObserver = new IntersectionObserver(onSpy, {
     root,
     rootMargin: "-8% 0px -42% 0px",
@@ -861,6 +1090,8 @@ onUnmounted(() => {
   root?.removeEventListener("pointercancel", onScrollbarPointerUp);
   root?.removeEventListener("touchstart", onTouchStart);
   root?.removeEventListener("touchmove", onTouchMove);
+  root?.removeEventListener("touchend", onTouchEnd);
+  root?.removeEventListener("touchcancel", onTouchEnd);
   window.removeEventListener("keydown", onIntroKey);
   window.removeEventListener("resize", onResize);
   window.clearTimeout(followTimer);
@@ -871,8 +1102,9 @@ watch(
   () => {
     if (route.name === "resume") resumePath = route.path;
     if (!ready.value) return;
-    if (urlFromSpy) {
+    if (urlFromSpy || routeFromTween) {
       urlFromSpy = false;
+      routeFromTween = false;
       lastKey = `${route.name}:${route.params.tab || ""}:${targetForRoute()}`;
       return;
     }
@@ -922,7 +1154,7 @@ watch(
       <div class="band band-white"></div>
     </div>
     <main class="sheet">
-      <nav class="section-nav" :class="{ 'is-docked': dockState.docked, 'is-open': dockState.open, 'is-beside': navBeside }" aria-label="Sections">
+      <nav class="section-nav" :class="{ 'is-docked': dockState.docked, 'is-open': dockState.open, 'is-joined': dockState.joined }" aria-label="Sections">
         <div class="nav-cluster">
           <div class="nav-inner">
             <a href="/about" :aria-current="activeSection === 'about' ? 'page' : undefined" @click="onNav($event, 'about')">About</a>
@@ -930,7 +1162,9 @@ watch(
             <a href="/resume" :aria-current="activeSection === 'resume' ? 'page' : undefined" @click="onNav($event, 'resume')">Resume</a>
             <a href="/skills" :aria-current="activeSection === 'skills' ? 'page' : undefined" @click="onNav($event, 'skills')">Skills</a>
           </div>
-          <div id="nav-tab-slot" class="nav-dock"></div>
+          <div class="nav-dock-clip">
+            <div id="nav-tab-slot" class="nav-dock"></div>
+          </div>
         </div>
       </nav>
       <div class="center-col measure">

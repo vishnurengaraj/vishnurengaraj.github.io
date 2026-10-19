@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Vishnu Rengaraj</title>
     <meta
       name="description"
@@ -18,6 +18,19 @@
     <meta property="og:type" content="profile" />
     <script>
       document.documentElement.classList.add("js");
+      document.addEventListener(
+        "click",
+        function (event) {
+          if (document.documentElement.classList.contains("vue-ready")) return;
+          var target = event.target;
+          if (!target || !target.closest) return;
+          var learn = target.closest(".learn");
+          var back = target.closest(".home-return");
+          if (!learn && !back) return;
+          document.documentElement.dataset.queuedScroll = back ? "home" : "about";
+        },
+        true,
+      );
     </script>
     <!-- CF_BEACON -->
     <link rel="icon" href="/favicon.ico" sizes="any" />
