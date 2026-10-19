@@ -83,13 +83,16 @@ function barClearance(targetId) {
   const rootTop = root.getBoundingClientRect().top;
   const stickyTop = Number.parseFloat(getComputedStyle(nav).top) || 0;
   const navTop = nav.getBoundingClientRect().top - rootTop;
+  /* The gold up control needs a little more air under the pinned pill
+     than a section heading does. */
+  const gap = targetId === "about" ? 20 : 12;
   /* Before the bar sticks, its viewport bottom is its place in the
      document (below the title), not the space it covers once pinned. */
-  if (navTop > stickyTop + 2) return stickyTop + inner.offsetHeight + 12;
+  if (navTop > stickyTop + 2) return stickyTop + inner.offsetHeight + gap;
   const shell = root.querySelector("#nav-tab-slot .tablist-shell");
   let bottom = inner.getBoundingClientRect().bottom;
   if (shell) bottom = Math.max(bottom, shell.getBoundingClientRect().bottom);
-  return bottom - rootTop + 12;
+  return bottom - rootTop + gap;
 }
 
 function anchorFor(id) {
@@ -111,6 +114,7 @@ function syncTitleLock() {
 
 let followNative = false;
 let followTimer = 0;
+let scrollGen = 0;
 
 function beginNativeScroll() {
   followNative = true;
@@ -130,16 +134,41 @@ function scrollToEl(id, behavior) {
   if (!root || typeof document === "undefined") return;
   const jumpTitle = titleLocked.value && root.scrollTop <= 32;
   const mode = behavior || (prefersReduced() || jumpTitle ? "auto" : "smooth");
-  const landed = () => {
-    endNativeScroll();
+  const gen = ++scrollGen;
+  /* The page can grow while a smooth scroll is in flight. Re-measure
+     so the heading still meets the bar, or the end when it cannot. */
+  const pinLanding = () => {
+    if (gen !== scrollGen) return;
     const end = Math.max(0, root.scrollHeight - root.clientHeight);
-    if (end - root.scrollTop <= 32 && end - root.scrollTop > 1) {
+    if (id !== "top" && Math.abs(root.scrollTop - top) <= 600) {
+      const anchor = anchorFor(id);
+      if (anchor && root.scrollTop < end - 2) {
+        const anchorTop = anchor.getBoundingClientRect().top - root.getBoundingClientRect().top;
+        const clearance = barClearance(id);
+        if (anchorTop > clearance + 8) {
+          const next = Math.min(end, root.scrollTop + (anchorTop - clearance));
+          if (next > root.scrollTop + 2) {
+            root.style.scrollBehavior = "auto";
+            drivingScroll = true;
+            root.scrollTop = next;
+            root.style.scrollBehavior = "";
+          }
+        }
+      }
+    }
+    const endNow = Math.max(0, root.scrollHeight - root.clientHeight);
+    if (endNow - root.scrollTop <= 32 && endNow - root.scrollTop > 1) {
       root.style.scrollBehavior = "auto";
       drivingScroll = true;
-      root.scrollTop = end;
+      root.scrollTop = endNow;
+      root.style.scrollBehavior = "";
     }
     updateDock();
     applySpy();
+  };
+  const landed = () => {
+    endNativeScroll();
+    pinLanding();
   };
   beginNativeScroll();
   if (id === "top") {
@@ -163,8 +192,17 @@ function scrollToEl(id, behavior) {
     landed();
   } else {
     root.scrollTo({ top, behavior: mode });
-    if (mode === "smooth") root.addEventListener("scrollend", landed, { once: true });
-    else landed();
+    if (mode === "smooth") {
+      root.addEventListener(
+        "scrollend",
+        () => {
+          landed();
+          window.setTimeout(pinLanding, 450);
+        },
+        { once: true },
+      );
+      window.setTimeout(pinLanding, 1600);
+    } else landed();
   }
   document.getElementById(id)?.focus({ preventScroll: true });
 }
@@ -342,6 +380,11 @@ function onSpy(entries) {
 }
 
 function go(id) {
+  /* A second tap on Learn more or the up bar must not cancel the
+     sunrise. The ease-in has barely moved, and stopping there leaves
+     the title stuck under the gold bar. */
+  const sunriseTap = id === "home" || (id === "about" && inTitleZone());
+  if (animating && sunriseTap) return;
   cancelTween();
   if (id === "home") {
     activeSection.value = null;
@@ -387,7 +430,7 @@ function onNav(event, id) {
 
 provide(scrollKey, go);
 
-const dockState = reactive({ docked: false, open: false, hold: 0, tabWidth: 0 });
+const dockState = reactive({ docked: false, open: false, joined: false, hold: 0 });
 provide(dockKey, dockState);
 
 let closeDockTimer = 0;
@@ -397,65 +440,42 @@ function measureTabHold() {
   if (!shell) return;
   const height = Math.ceil(shell.getBoundingClientRect().height);
   if (height > 0) dockState.hold = height;
-  const list = shell.querySelector(".tablist");
-  const width = Math.ceil((list || shell).scrollWidth);
-  if (width > 0) dockState.tabWidth = width + 8;
 }
 
-/* A dock change must not move the page. Layout is kept stable; this
-   only corrects a browser scroll-anchoring jump larger than a gesture. */
-function guardScroll() {
-  const root = scroller.value;
-  if (!root) return;
-  const y = root.scrollTop;
-  const previous = root.style.scrollBehavior;
-  root.style.scrollBehavior = "auto";
-  const fix = () => {
-    const el = scroller.value;
-    if (!el || animating) return;
-    if (el.scrollTop < y - 80) {
-      drivingScroll = true;
-      el.scrollTop = y;
-      lastScrollY = y;
-    }
-  };
-  requestAnimationFrame(() => {
-    fix();
-    requestAnimationFrame(() => {
-      fix();
-      const el = scroller.value;
-      if (el && !animating) el.style.scrollBehavior = previous;
-    });
-  });
-}
-
+/* The row is out of flow and a same-height placeholder keeps the
+   document from growing or shrinking, so docking does not move
+   scrollTop. Do not snap scroll position here: a correction also
+   aborts the page's own smooth scrolls and fast wheels. */
 function setDock(next) {
   if (next) {
     if (dockState.docked && dockState.open) return;
     if (!dockState.docked) measureTabHold();
-    guardScroll();
     window.clearTimeout(closeDockTimer);
     if (prefersReduced()) {
       dockState.docked = true;
       dockState.open = true;
+      dockState.joined = true;
       return;
     }
     if (!dockState.docked) {
       dockState.docked = true;
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
+          if (!dockState.docked) return;
           dockState.open = true;
+          dockState.joined = true;
         });
       });
     } else {
       dockState.open = true;
+      dockState.joined = true;
     }
     return;
   }
   if (!dockState.docked || !dockState.open) return;
-  guardScroll();
   if (prefersReduced()) {
     dockState.open = false;
+    dockState.joined = false;
     dockState.docked = false;
     return;
   }
@@ -463,7 +483,7 @@ function setDock(next) {
   window.clearTimeout(closeDockTimer);
   closeDockTimer = window.setTimeout(() => {
     if (!dockState.open) {
-      guardScroll();
+      dockState.joined = false;
       dockState.docked = false;
     }
   }, 320);
@@ -482,10 +502,12 @@ function updateDock() {
   const shell = root.querySelector("#nav-tab-slot .tablist-shell");
   const barEdge = shell ? Math.max(barBottom, shell.getBoundingClientRect().bottom) : barBottom;
   const headingH = heading ? heading.offsetHeight : 48;
-  /* Once the tabs are docked, keep them while the heading is brought
-     clear of the bar. The sentinel sits under that heading, including
-     its margin, so a one-pixel test would undock and cover it again. */
-  const limit = dockState.docked ? barEdge + headingH + 40 : barBottom + 1;
+  const headingTop = heading ? heading.getBoundingClientRect().top : sentTop;
+  /* The heading is in view under the pill, so the tabs belong inline
+     beneath it. Hysteresis only applies while that heading is still
+     up under the bar, or the row would cover the title. */
+  const headingClear = headingTop >= barBottom - 2;
+  const limit = dockState.docked && !headingClear ? barEdge + headingH + 40 : barBottom + 1;
   /* Stay docked only while the resume section still owns the screen.
      Once the Skills heading is in view, the tabs go back inline. */
   setDock(sentTop <= limit && resumeBottom > barBottom + 24 && !skillsInView());
@@ -537,11 +559,12 @@ function inTitleZone() {
 
 function aboutAnchor() {
   const root = scroller.value;
-  const el = document.getElementById("about");
+  const el = anchorFor("about");
   if (!root || !el) return 0;
-  const nav = root.querySelector(".section-nav");
-  const navH = nav ? nav.getBoundingClientRect().height : 0;
-  return Math.max(0, el.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - navH - 4);
+  return Math.max(
+    0,
+    el.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - barClearance("about"),
+  );
 }
 
 function measureStatic() {
@@ -570,7 +593,19 @@ function cancelTween() {
   if (!animating) return;
   animating = false;
   const root = scroller.value;
-  if (root) root.style.scrollBehavior = "";
+  if (root) {
+    const about = cachedAbout || aboutAnchor();
+    const y = root.scrollTop;
+    const dest = about > 0 && y >= about / 2 ? about : 0;
+    root.style.scrollBehavior = "auto";
+    if (root.scrollTop !== dest) {
+      drivingScroll = true;
+      root.scrollTop = dest;
+      lastProgrammatic = dest;
+    }
+    lastScrollY = dest;
+    root.style.scrollBehavior = "";
+  }
   suppressUntil = performance.now() + 400;
   releaseSpyLock();
 }
@@ -641,8 +676,17 @@ function sameDirection(delta) {
   return (delta > 0 && tweenDir > 0) || (delta < 0 && tweenDir < 0);
 }
 
+let gestureUntil = 0;
+
+function armGesture(ms) {
+  gestureUntil = performance.now() + ms;
+}
+
 function clampTitleLock(root) {
   if (!titleLocked.value || animating || drivingScroll || followNative) return false;
+  /* Find-in-page and other programmatic jumps land where they were
+     sent. Only a recent finger or wheel is pulled back to an end. */
+  if (performance.now() >= gestureUntil) return false;
   const about = cachedAbout || aboutAnchor();
   if (!about) return false;
   const y = root.scrollTop;
@@ -658,6 +702,7 @@ function clampTitleLock(root) {
 }
 
 function onIntroWheel(event) {
+  if (event.deltaY) armGesture(500);
   if (titleLocked.value) {
     const root = scroller.value;
     if (!root) return;
@@ -777,7 +822,6 @@ function onIntroScroll() {
     }
     if ((tweenDir > 0 && delta < -36) || (tweenDir < 0 && delta > 36)) {
       cancelTween();
-      lastScrollY = y;
     } else if (Math.abs(delta) > 1) {
       drivingScroll = true;
       root.scrollTop = lastProgrammatic;
@@ -819,7 +863,12 @@ function onTouchStart(event) {
   touchStartScroll = scroller.value?.scrollTop ?? 0;
 }
 
+function onTouchEnd() {
+  armGesture(1200);
+}
+
 function onTouchMove(event) {
+  armGesture(800);
   const y = event.touches[0]?.clientY ?? touchStartY;
   const dy = touchStartY - y;
   const root = scroller.value;
@@ -918,6 +967,9 @@ function onResize() {
 }
 
 onMounted(async () => {
+  document.documentElement.classList.add("vue-ready");
+  const queued = document.documentElement.dataset.queuedScroll || "";
+  if (queued) delete document.documentElement.dataset.queuedScroll;
   await nextTick();
   ready.value = true;
   if (route.name !== "home") syncScroll("instant");
@@ -928,7 +980,6 @@ onMounted(async () => {
   syncTitleLock();
   lastScrollY = root.scrollTop;
   syncParallax(root);
-  clampTitleLock(root);
   root.addEventListener("wheel", onIntroWheel, { passive: false });
   root.addEventListener("scroll", onIntroScroll, { passive: true });
   root.addEventListener("pointerdown", onScrollbarPointerDown);
@@ -936,9 +987,12 @@ onMounted(async () => {
   root.addEventListener("pointercancel", onScrollbarPointerUp);
   root.addEventListener("touchstart", onTouchStart, { passive: true });
   root.addEventListener("touchmove", onTouchMove, { passive: false });
+  root.addEventListener("touchend", onTouchEnd, { passive: true });
+  root.addEventListener("touchcancel", onTouchEnd, { passive: true });
   window.addEventListener("keydown", onIntroKey);
   window.addEventListener("resize", onResize);
   updateDock();
+  if (queued === "about" || queued === "home") go(queued);
   spyObserver = new IntersectionObserver(onSpy, {
     root,
     rootMargin: "-8% 0px -42% 0px",
@@ -963,6 +1017,8 @@ onUnmounted(() => {
   root?.removeEventListener("pointercancel", onScrollbarPointerUp);
   root?.removeEventListener("touchstart", onTouchStart);
   root?.removeEventListener("touchmove", onTouchMove);
+  root?.removeEventListener("touchend", onTouchEnd);
+  root?.removeEventListener("touchcancel", onTouchEnd);
   window.removeEventListener("keydown", onIntroKey);
   window.removeEventListener("resize", onResize);
   window.clearTimeout(followTimer);
@@ -1025,7 +1081,7 @@ watch(
       <div class="band band-white"></div>
     </div>
     <main class="sheet">
-      <nav class="section-nav" :class="{ 'is-docked': dockState.docked, 'is-open': dockState.open }" :style="{ '--nav-tabs': `${dockState.tabWidth}px` }" aria-label="Sections">
+      <nav class="section-nav" :class="{ 'is-docked': dockState.docked, 'is-open': dockState.open, 'is-joined': dockState.joined }" aria-label="Sections">
         <div class="nav-cluster">
           <div class="nav-inner">
             <a href="/about" :aria-current="activeSection === 'about' ? 'page' : undefined" @click="onNav($event, 'about')">About</a>
@@ -1033,7 +1089,9 @@ watch(
             <a href="/resume" :aria-current="activeSection === 'resume' ? 'page' : undefined" @click="onNav($event, 'resume')">Resume</a>
             <a href="/skills" :aria-current="activeSection === 'skills' ? 'page' : undefined" @click="onNav($event, 'skills')">Skills</a>
           </div>
-          <div id="nav-tab-slot" class="nav-dock"></div>
+          <div class="nav-dock-clip">
+            <div id="nav-tab-slot" class="nav-dock"></div>
+          </div>
         </div>
       </nav>
       <div class="center-col measure">

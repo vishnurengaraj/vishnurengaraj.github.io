@@ -34,6 +34,7 @@
 /* One card at every width. The resume row is out of flow, so opening it
    does not recenter the main labels or change the document height. */
 .nav-cluster {
+  --nav-join: 22px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -44,10 +45,6 @@
   box-shadow: var(--shadow-rest);
   overflow: visible;
   pointer-events: auto;
-}
-
-.section-nav.is-docked .nav-cluster {
-  min-width: min(var(--nav-tabs, 0px), 100%);
 }
 
 .nav-inner {
@@ -62,12 +59,18 @@
   border-radius: 22px;
 }
 
-.section-nav.is-open .nav-inner {
-  border-radius: 22px 22px 0 0;
+/* The row stays tucked under the round pill and only the part that
+   slides out is visible, so the card never flashes square corners. */
+.nav-dock-clip {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+  clip-path: inset(0 -40px -140px -40px);
 }
 
-.section-nav.is-open .nav-cluster {
-  border-radius: 22px 22px 0 0;
+.section-nav.is-joined .nav-cluster {
   box-shadow: none;
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.12)) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.24));
 }
@@ -77,7 +80,7 @@
   z-index: 1;
   left: 0;
   right: 0;
-  top: 100%;
+  top: calc(100% - var(--nav-join));
   pointer-events: none;
   opacity: 0;
   transform: translateY(-100%);
@@ -87,7 +90,6 @@
 }
 
 .section-nav.is-open .nav-dock {
-  top: calc(100% - 1px);
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
@@ -99,8 +101,9 @@
   width: 100%;
   max-width: none;
   overflow: visible;
+  padding-top: var(--nav-join);
   background:
-    linear-gradient(rgba(31, 31, 31, 0.14), rgba(31, 31, 31, 0.14)) top / 100% 1px no-repeat,
+    linear-gradient(rgba(31, 31, 31, 0.14), rgba(31, 31, 31, 0.14)) 0 var(--nav-join) / 100% 1px no-repeat,
     #ffffff;
   box-shadow: none;
   border-radius: 0 0 22px 22px;
@@ -134,6 +137,7 @@
   /* Same card as the phone, kept to the links' own width and centered.
      Padding on the link row does not change when the tabs open. */
   .nav-cluster {
+    --nav-join: 32px;
     width: fit-content;
     max-width: 100%;
     margin-inline: auto;
@@ -145,13 +149,23 @@
     padding: 8px 4px;
   }
 
-  .section-nav.is-open .nav-cluster,
-  .section-nav.is-open .nav-inner {
-    border-radius: 26px 26px 0 0;
+  .nav-dock > .tablist-shell {
+    border-radius: 0 0 26px 26px;
   }
 
-  .section-nav.is-open .nav-dock > .tablist-shell {
-    border-radius: 0 0 26px 26px;
+  /* The closed pill stays this wide. Tabs share that width instead of
+     pushing the card out by a frame when the row docks. */
+  .section-nav .tablist {
+    gap: 0;
+    padding: 2px 4px 4px;
+  }
+
+  .section-nav .tablist button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0 4px;
+    font-size: 0.75rem;
+    letter-spacing: 0;
   }
 }
 
@@ -194,6 +208,21 @@
 
 .home-return:active {
   filter: brightness(0.96);
+}
+
+@media (min-width: 720px) {
+  .home-return {
+    width: 60px;
+    height: 60px;
+    min-height: 60px;
+    max-width: 60px;
+    margin: 8px auto 1.5rem;
+    border-radius: 50%;
+  }
+
+  .home-return:focus-visible {
+    outline-offset: 3px;
+  }
 }
 
 .section-nav a,
