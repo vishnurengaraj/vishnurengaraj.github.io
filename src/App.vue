@@ -81,18 +81,20 @@ function barClearance(targetId) {
   const inner = nav?.querySelector(".nav-inner");
   if (!nav || !inner) return 0;
   const rootTop = root.getBoundingClientRect().top;
-  const stickyTop = Number.parseFloat(getComputedStyle(nav).top) || 0;
-  const navTop = nav.getBoundingClientRect().top - rootTop;
+  const style = getComputedStyle(nav);
+  const stickyTop = Number.parseFloat(style.top) || 0;
+  const padTop = Number.parseFloat(style.paddingTop) || 0;
   /* The gold up control needs a little more air under the pinned pill
-     than a section heading does. */
+     than a section heading does. Every in-page target is read with the
+     bar pinned, so the gap does not depend on whether it has stuck yet. */
   const gap = targetId === "about" ? 20 : 12;
-  /* Before the bar sticks, its viewport bottom is its place in the
-     document (below the title), not the space it covers once pinned. */
-  if (navTop > stickyTop + 2) return stickyTop + inner.offsetHeight + gap;
-  const shell = root.querySelector("#nav-tab-slot .tablist-shell");
-  let bottom = inner.getBoundingClientRect().bottom;
-  if (shell) bottom = Math.max(bottom, shell.getBoundingClientRect().bottom);
-  return bottom - rootTop + gap;
+  let cover = stickyTop + padTop + inner.offsetHeight;
+  const shell = nav.classList.contains("is-open") ? nav.querySelector("#nav-tab-slot .tablist-shell") : null;
+  if (shell) {
+    const shellBottom = shell.getBoundingClientRect().bottom - rootTop;
+    if (shellBottom > cover) cover = shellBottom;
+  }
+  return cover + gap;
 }
 
 function anchorFor(id) {
@@ -379,12 +381,15 @@ function onSpy(entries) {
   applySpy();
 }
 
+let navQuietUntil = 0;
+
 function go(id) {
-  /* A second tap on Learn more or the up bar must not cancel the
-     sunrise. The ease-in has barely moved, and stopping there leaves
-     the title stuck under the gold bar. */
-  const sunriseTap = id === "home" || (id === "about" && inTitleZone());
-  if (animating && sunriseTap) return;
+  /* Learn more and the up control stay no-ops for the whole sunrise,
+     even after the page has left the title. Cancelling there used to
+     snap back to the top. The up control also quiets nav taps, because
+     the bar slides under a finger that is still coming down. */
+  if (id === "home") navQuietUntil = performance.now() + 320;
+  if (animating && (id === "home" || id === "about")) return;
   cancelTween();
   if (id === "home") {
     activeSection.value = null;
@@ -424,6 +429,13 @@ function go(id) {
 
 function onNav(event, id) {
   if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+  /* The up tween slides the bar under a finger that is still tapping.
+     Ignore nav clicks until that motion is underway, and for a short
+     beat after the up control itself was pressed. */
+  if (animating || performance.now() < navQuietUntil) {
+    event.preventDefault();
+    return;
+  }
   event.preventDefault();
   go(id);
 }
@@ -590,86 +602,156 @@ function cancelTween() {
   if (raf) cancelAnimationFrame(raf);
   raf = 0;
   tweenDir = 0;
+  curveDir = 0;
   if (!animating) return;
   animating = false;
   const root = scroller.value;
-  if (root) {
-    const about = cachedAbout || aboutAnchor();
-    const y = root.scrollTop;
-    const dest = about > 0 && y >= about / 2 ? about : 0;
-    root.style.scrollBehavior = "auto";
-    if (root.scrollTop !== dest) {
-      drivingScroll = true;
-      root.scrollTop = dest;
-      lastProgrammatic = dest;
-    }
-    lastScrollY = dest;
-    root.style.scrollBehavior = "";
-  }
+  if (root) root.style.scrollBehavior = "";
   suppressUntil = performance.now() + 400;
   releaseSpyLock();
 }
 
-function tweenTo(target, done) {
+/* The sunrise is one curve from curveFrom at t=0 to curveTo at
+   INTRO_MS. Reversing flips direction on that same curve, so the page
+   keeps its position and speed and returns to the end it left. */
+let curveFrom = 0;
+let curveTo = 0;
+let curveElapsed = 0;
+let curveDir = 1;
+let curveClock = 0;
+let curveOnFrom = null;
+let curveOnTo = null;
+
+function scrollDirection() {
+  const toward = curveDir > 0 ? curveTo - curveFrom : curveFrom - curveTo;
+  return toward >= 0 ? 1 : -1;
+}
+
+function reverseTween() {
+  if (!animating) return;
+  curveDir *= -1;
+  curveClock = performance.now();
+  tweenDir = scrollDirection();
+}
+
+function finishCurve(atTo) {
+  const root = scroller.value;
+  animating = false;
+  drivingScroll = false;
+  tweenDir = 0;
+  curveDir = 0;
+  if (raf) cancelAnimationFrame(raf);
+  raf = 0;
+  if (root) {
+    const y = atTo ? curveTo : curveFrom;
+    root.style.scrollBehavior = "auto";
+    if (Math.abs(root.scrollTop - y) > 0.5) {
+      drivingScroll = true;
+      root.scrollTop = y;
+    }
+    root.style.scrollBehavior = "";
+    lastScrollY = root.scrollTop;
+    lastProgrammatic = root.scrollTop;
+  }
+  const done = atTo ? curveOnTo : curveOnFrom;
+  curveOnTo = null;
+  curveOnFrom = null;
+  done?.();
+}
+
+function tweenBetween(from, to, onFrom, onTo) {
   const root = scroller.value;
   if (!root) return;
-  const start = root.scrollTop;
-  const dist = target - start;
-  if (Math.abs(dist) < 1) {
+  if (Math.abs(to - from) < 1) {
     tweenDir = 0;
-    done?.();
+    onTo?.();
     return;
   }
+  if (raf) cancelAnimationFrame(raf);
   animating = true;
+  curveFrom = from;
+  curveTo = to;
+  curveElapsed = 0;
+  curveDir = 1;
+  curveOnFrom = onFrom;
+  curveOnTo = onTo;
+  tweenDir = to >= from ? 1 : -1;
   root.style.scrollBehavior = "auto";
-  const t0 = performance.now();
+  curveClock = performance.now();
   const frame = (now) => {
     if (!animating) return;
-    const p = Math.min(1, (now - t0) / INTRO_MS);
-    const next = start + dist * easeInOut(p);
+    const dt = Math.min(34, Math.max(0, now - curveClock));
+    curveClock = now;
+    curveElapsed += curveDir * dt;
+    if (curveDir > 0 && curveElapsed >= curveDurationEdge()) {
+      finishCurve(true);
+      return;
+    }
+    if (curveDir < 0 && curveElapsed <= 0) {
+      finishCurve(false);
+      return;
+    }
+    const p = Math.min(1, Math.max(0, curveElapsed / INTRO_MS));
+    const next = curveFrom + (curveTo - curveFrom) * easeInOut(p);
     lastProgrammatic = next;
+    tweenDir = scrollDirection();
     if (root.scrollTop !== next) {
       drivingScroll = true;
       root.scrollTop = next;
     }
-    if (p < 1) {
-      raf = requestAnimationFrame(frame);
-      return;
-    }
-    animating = false;
-    drivingScroll = false;
-    tweenDir = 0;
-    raf = 0;
-    root.style.scrollBehavior = "";
-    done?.();
+    raf = requestAnimationFrame(frame);
   };
   raf = requestAnimationFrame(frame);
+}
+
+function curveDurationEdge() {
+  return INTRO_MS - 0.5;
 }
 
 function playDown() {
   if (!canAuto()) return;
   endNativeScroll();
   armedDown = false;
-  tweenDir = 1;
   measureStatic();
-  tweenTo(cachedAbout || aboutAnchor(), () => {
-    armedUp = true;
-    wasInReturn = true;
-    measureStatic();
-    document.getElementById("about")?.focus({ preventScroll: true });
-  });
+  const dest = cachedAbout || aboutAnchor();
+  const root = scroller.value;
+  tweenBetween(
+    root ? root.scrollTop : 0,
+    dest,
+    () => {
+      armedDown = true;
+      wasInReturn = false;
+      document.getElementById("top")?.focus({ preventScroll: true });
+    },
+    () => {
+      armedUp = true;
+      wasInReturn = true;
+      measureStatic();
+      document.getElementById("about")?.focus({ preventScroll: true });
+    },
+  );
 }
 
 function playUp() {
   if (!canAuto()) return;
   endNativeScroll();
   armedUp = false;
-  tweenDir = -1;
-  tweenTo(0, () => {
-    armedDown = true;
-    wasInReturn = false;
-    document.getElementById("top")?.focus({ preventScroll: true });
-  });
+  const root = scroller.value;
+  tweenBetween(
+    root ? root.scrollTop : 0,
+    0,
+    () => {
+      armedUp = true;
+      wasInReturn = true;
+      measureStatic();
+      document.getElementById("about")?.focus({ preventScroll: true });
+    },
+    () => {
+      armedDown = true;
+      wasInReturn = false;
+      document.getElementById("top")?.focus({ preventScroll: true });
+    },
+  );
 }
 
 function sameDirection(delta) {
@@ -717,12 +799,9 @@ function onIntroWheel(event) {
   const dy = event.deltaY;
   if (!dy) return;
   if (animating) {
-    if (sameDirection(dy)) {
-      event.preventDefault();
-      return;
-    }
-    cancelTween();
-    suppressUntil = 0;
+    event.preventDefault();
+    if (!sameDirection(dy)) reverseTween();
+    return;
   }
   if (!canAuto()) return;
   if (dy > 0) {
@@ -821,7 +900,10 @@ function onIntroScroll() {
       return;
     }
     if ((tweenDir > 0 && delta < -36) || (tweenDir < 0 && delta > 36)) {
-      cancelTween();
+      reverseTween();
+      drivingScroll = true;
+      root.scrollTop = lastProgrammatic;
+      return;
     } else if (Math.abs(delta) > 1) {
       drivingScroll = true;
       root.scrollTop = lastProgrammatic;
@@ -886,14 +968,8 @@ function onTouchMove(event) {
   }
   if (prefersReduced() || touchIgnored) return;
   if (animating) {
-    if (sameDirection(dy)) {
-      if (Math.abs(dy) > 8) event.preventDefault();
-      return;
-    }
-    if (Math.abs(dy) > 28) {
-      cancelTween();
-      suppressUntil = 0;
-    }
+    if (Math.abs(dy) > 8) event.preventDefault();
+    if (Math.abs(dy) > 28 && !sameDirection(dy)) reverseTween();
     return;
   }
   if (!canAuto()) return;
@@ -925,12 +1001,9 @@ function onIntroKey(event) {
   if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || active?.isContentEditable) return;
   if (event.key === " " && (tag === "BUTTON" || tag === "A")) return;
   if (animating) {
-    if ((down && tweenDir > 0) || (up && tweenDir < 0)) {
-      event.preventDefault();
-      return;
-    }
-    cancelTween();
-    suppressUntil = 0;
+    event.preventDefault();
+    if ((down && tweenDir < 0) || (up && tweenDir > 0)) reverseTween();
+    return;
   }
   if (!canAuto()) return;
   if (down && armedDown && inTitleZone()) {
