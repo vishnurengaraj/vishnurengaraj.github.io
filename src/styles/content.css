@@ -940,11 +940,19 @@ video {
   .footer-inner,
   .footer-actions {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: flex-end;
   }
 
   .footer-actions {
     width: 100%;
+  }
+
+  .footer-id {
+    text-align: right;
+  }
+
+  .site-footer nav {
+    justify-content: flex-end;
   }
 }
 
