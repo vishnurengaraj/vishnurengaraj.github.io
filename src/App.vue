@@ -1292,13 +1292,11 @@ watch(
 </script>
 
 <template>
-  <ClientOnly>
-    <Stars />
-  </ClientOnly>
   <a class="skip" href="/about" @click="onNav($event, 'about')">Skip to content</a>
   <div class="prlx" ref="scroller">
     <Hero />
     <div class="mountain-bg sky-grad" aria-hidden="true"></div>
+    <Stars />
     <div
       v-for="layer in ridgeLayers"
       :key="layer.id"
