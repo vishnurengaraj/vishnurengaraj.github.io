@@ -57,7 +57,7 @@ const MARKS = [
 
   [6, 43, 2, 0, "a", 0],
   [15, 63, 3, 0, "f", 0],
-  [27, 40, 2, 1, "c", 0],
+  [32, 48, 2, 1, "c", 0],
   [36, 67, 2, 0, "e", 0],
   [51, 36, 3, 0, "b", 0],
   [60, 71, 2, 0, "g", 0],
@@ -80,15 +80,15 @@ const MARKS = [
   [2.2, 66, 2, 0, "c", 0],
   [3.6, 84, 2, 0, "f", 0],
 
-  [49, 10, 2, 0, "d", 0],
-  [59, 14, 3, 0, "a", 0],
-  [52, 21, 2, 1, "f", 0],
-  [64, 19, 2, 0, "c", 0],
-  [47, 27, 2, 0, "e", 0],
-  [58, 29, 3, 0, "b", 0],
+  [73, 15, 2, 0, "d", 0],
+  [88, 13, 3, 0, "a", 0],
+  [69, 26, 2, 1, "f", 0],
+  [97, 18, 2, 0, "c", 0],
+  [74, 47, 2, 0, "e", 0],
+  [92, 42, 3, 0, "b", 0],
 
-  [14, 35, 2, 0, "g", 0],
-  [27, 33, 3, 0, "e", 0],
+  [18, 56, 2, 0, "g", 0],
+  [40, 58, 3, 0, "e", 0],
   [38, 39, 2, 1, "d", 0],
   [48, 36, 2, 0, "a", 0],
   [34, 44, 2, 0, "b", 0],
@@ -126,62 +126,104 @@ const shooter = ref(null);
 
 let timer = 0;
 let observer;
+let introObserver;
 let onVisibility;
 let onReduce;
 let reduceQuery;
-let running = false;
 let shot = 0;
 let gapIndex = 0;
-let generation = 0;
 let heroVisible = true;
+let intro = false;
+let held = false;
+let started = false;
+let reduce = false;
+let armedDelay = 0;
+let armedAt = 0;
+let shotAnim = null;
 
-function queue(delay) {
+function arm(delay) {
+  armedDelay = delay;
+  armedAt = performance.now();
   window.clearTimeout(timer);
-  timer = window.setTimeout(fire, delay);
+  timer = 0;
+  if (!held && !reduce) timer = window.setTimeout(fire, delay);
 }
 
 function fire() {
+  timer = 0;
   const el = shooter.value;
-  if (!running || !el) return;
+  if (held || reduce || !el) return;
   const path = SHOTS[shot % SHOTS.length];
   shot += 1;
-  const gen = ++generation;
-  el.style.setProperty("--x0", path.x0);
-  el.style.setProperty("--y0", path.y0);
-  el.style.setProperty("--x1", path.x1);
-  el.style.setProperty("--y1", path.y1);
   el.style.setProperty("--ang", path.ang);
-  el.style.setProperty("--dur", path.dur);
-  el.classList.remove("is-hot");
-  requestAnimationFrame(() => {
-    if (!running || gen !== generation) return;
-    el.classList.add("is-hot");
-  });
+  shotAnim?.cancel();
+  shotAnim = el.animate(
+    [
+      { opacity: 0, transform: `translate3d(${path.x0}, ${path.y0}, 0)`, offset: 0 },
+      { opacity: 0.85, offset: 0.14 },
+      { opacity: 0.55, offset: 0.72 },
+      { opacity: 0, transform: `translate3d(${path.x1}, ${path.y1}, 0)`, offset: 1 },
+    ],
+    { duration: Math.round(parseFloat(path.dur) * 1000), easing: "linear", fill: "forwards" },
+  );
   const gap = GAPS[gapIndex % GAPS.length];
   gapIndex += 1;
-  queue(gap);
+  arm(gap);
 }
 
-function start() {
-  sky.value?.classList.remove("is-paused");
-  if (running) return;
-  running = true;
-  queue(GAPS[gapIndex % GAPS.length]);
-  gapIndex += 1;
-}
-
-function stop() {
-  running = false;
-  generation += 1;
-  window.clearTimeout(timer);
+function hold() {
+  if (held) return;
+  held = true;
   sky.value?.classList.add("is-paused");
-  shooter.value?.classList.remove("is-hot");
+  if (timer) {
+    armedDelay = Math.max(0, armedDelay - (performance.now() - armedAt));
+    window.clearTimeout(timer);
+    timer = 0;
+  }
+  if (shotAnim && shotAnim.playState === "running") shotAnim.pause();
+}
+
+function release() {
+  if (reduce) return;
+  const wasHeld = held;
+  held = false;
+  sky.value?.classList.remove("is-paused");
+  if (shotAnim && shotAnim.playState === "paused") shotAnim.play();
+  if (wasHeld && armedDelay > 0 && !timer) arm(armedDelay);
+}
+
+function hardStop() {
+  held = false;
+  started = false;
+  window.clearTimeout(timer);
+  timer = 0;
+  armedDelay = 0;
+  shotAnim?.cancel();
+  shotAnim = null;
+  sky.value?.classList.add("is-paused");
 }
 
 function sync() {
-  const reduce = reduceQuery?.matches;
-  if (reduce || document.hidden || !heroVisible) stop();
-  else start();
+  reduce = !!reduceQuery?.matches;
+  if (reduce) {
+    hardStop();
+    return;
+  }
+  const shouldHold = document.hidden || !heroVisible || intro;
+  if (shouldHold) {
+    hold();
+    return;
+  }
+  if (!started) {
+    started = true;
+    held = false;
+    sky.value?.classList.remove("is-paused");
+    const gap = GAPS[gapIndex % GAPS.length];
+    gapIndex += 1;
+    arm(gap);
+    return;
+  }
+  release();
 }
 
 onMounted(() => {
@@ -200,6 +242,14 @@ onMounted(() => {
     );
     observer.observe(hero);
   }
+  if (root) {
+    intro = root.classList.contains("is-intro");
+    introObserver = new MutationObserver(() => {
+      intro = root.classList.contains("is-intro");
+      sync();
+    });
+    introObserver.observe(root, { attributes: true, attributeFilter: ["class"] });
+  }
   onVisibility = () => sync();
   document.addEventListener("visibilitychange", onVisibility);
   sync();
@@ -207,7 +257,9 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.clearTimeout(timer);
+  shotAnim?.cancel();
   observer?.disconnect();
+  introObserver?.disconnect();
   reduceQuery?.removeEventListener("change", onReduce);
   document.removeEventListener("visibilitychange", onVisibility);
 });
@@ -219,7 +271,7 @@ onUnmounted(() => {
       v-for="star in stars"
       :key="star.id"
       class="scope-star hero-star"
-      :class="star.phase === 'a' ? undefined : `star-${star.phase}`"
+      :class="[star.spark ? undefined : 'hero-dot', star.phase === 'a' ? undefined : `star-${star.phase}`]"
       :style="{
         left: `${star.x}%`,
         top: `${star.y}%`,

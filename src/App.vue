@@ -615,6 +615,7 @@ function cancelTween() {
   if (!animating) return;
   animating = false;
   const root = scroller.value;
+  root?.classList.remove("is-intro");
   if (root) root.style.scrollBehavior = "";
   suppressUntil = performance.now() + 400;
   releaseSpyLock();
@@ -646,6 +647,7 @@ function reverseTween() {
 function finishCurve(atTo) {
   const root = scroller.value;
   animating = false;
+  root?.classList.remove("is-intro");
   drivingScroll = false;
   tweenDir = 0;
   curveDir = 0;
@@ -679,6 +681,7 @@ function tweenBetween(from, to, onFrom, onTo) {
   }
   if (raf) cancelAnimationFrame(raf);
   animating = true;
+  root.classList.add("is-intro");
   curveFrom = from;
   curveTo = to;
   curveElapsed = 0;

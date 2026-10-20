@@ -86,19 +86,42 @@
   transform: translate3d(0, var(--scroll, 0px), 0);
 }
 
+.prlx.is-parallax .hero-sky,
+.prlx.is-intro .hero-sky {
+  will-change: transform;
+}
+
 .hero-sky .hero-star {
   position: absolute;
   display: block;
   overflow: visible;
 }
 
-.hero-sky.is-paused .scope-star,
-.hero-sky.is-paused .hero-shooter {
+.hero-sky.is-paused .scope-star {
   animation-play-state: paused;
 }
 
-.hero-sky.is-paused .hero-shooter {
-  opacity: 0;
+/* Dots only fade. Scaling every 2px mark re-rasterised the sky during
+   the sunrise and dropped frames on a phone. */
+.hero-sky .hero-dot {
+  animation-name: hero-dot-twinkle;
+}
+
+@keyframes hero-dot-twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Drop the twinkle layers for the intro tween. The peaks are moving;
+   nobody is watching the stars pulse. */
+.prlx.is-intro .hero-sky .scope-star {
+  animation: none;
+  opacity: 0.7;
 }
 
 .hero-shooter {
@@ -131,30 +154,14 @@
   transform-origin: left center;
 }
 
-.hero-shooter.is-hot {
-  animation: hero-shoot var(--dur, 0.8s) linear forwards;
-}
-
-@keyframes hero-shoot {
-  0% {
-    opacity: 0;
-    transform: translate3d(var(--x0), var(--y0), 0);
-  }
-  14% {
-    opacity: 0.85;
-  }
-  72% {
-    opacity: 0.55;
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(var(--x1), var(--y1), 0);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .hero-shooter {
     display: none;
+  }
+
+  .hero-sky .hero-dot {
+    animation: none;
+    opacity: 0.9;
   }
 }
 
