@@ -199,8 +199,8 @@ onUnmounted(() => {
 
 @media (hover: hover) {
   .icon-link:hover {
-    color: #fd8046;
-    border-color: #fd8046;
+    color: var(--md-sys-color-primary-container);
+    border-color: var(--md-sys-color-primary-container);
   }
 
   .learn:hover {
