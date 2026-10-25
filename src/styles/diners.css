@@ -437,8 +437,10 @@ html:has(.diners) #app {
 
 .diners .cert-pill {
   position: absolute;
-  right: 4px;
-  top: 4px;
+  top: auto;
+  bottom: 22px;
+  left: 4px;
+  right: auto;
   font: 700 7px/1 var(--mono), Roboto, sans-serif;
   letter-spacing: 0.06em;
   text-transform: uppercase;
