@@ -263,9 +263,13 @@ onUnmounted(() => {
                 />
                 <span class="rank">#{{ rankOf(place) }}</span>
                 <span class="demo">VISITED</span>
+                <span v-if="place.certified" class="cert-pill">Certified</span>
               </div>
               <div>
-                <h3>{{ place.name }}</h3>
+                <h3>
+                  {{ place.name }}
+                  <span v-if="place.certified" class="cert-inline" title="Vishnu-certified">Certified</span>
+                </h3>
                 <div class="hood">{{ place.hood }}</div>
                 <div class="mini">
                   <span><b>{{ place.taste }}</b>T</span>
@@ -302,9 +306,13 @@ onUnmounted(() => {
           />
           <span v-if="!photoSrc(shown)" class="demo">PHOTO COMING SOON</span>
           <span v-else-if="shown.photoCredit" class="credit">{{ shown.photoCredit }}</span>
+          <span v-if="shown.certified" class="cert-banner">Certified</span>
         </div>
         <div class="d-in">
-          <h2>{{ shown.name }}</h2>
+          <h2>
+            {{ shown.name }}
+            <span v-if="shown.certified" class="cert-inline" title="Vishnu-certified">Certified</span>
+          </h2>
           <div class="hood">{{ shown.hood }} · Rank #{{ rankOf(shown) }} of {{ DINERS.length }}</div>
           <div class="big">
             <b>{{ shown.weighted.toFixed(2) }}</b>
