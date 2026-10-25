@@ -1,12 +1,16 @@
 # Photo sources for /diners
 
 ## wendys
-- Local: `wendys.jpg`
+- Local: `wendys-v2.jpg`
 - Note: Photo by Vishnu. Breakfast table and Wendy's Place window. Replaces the earlier Restaurant Guru storefront shot.
 
 ## unclebills
-- Local: `unclebills.jpg`
+- Local: `unclebills-v2.jpg`
 - Note: Photo by Vishnu. Patio breakfast spread. Replaces the earlier official-site exterior.
+
+## oceandiner
+- Local: `oceandiner-v2.jpg`
+- Note: Photo by Vishnu.
 
 ## marthas
 - Local: `marthas.jpg`

@@ -1,6 +1,6 @@
 # vishnu.rengaraj.com
 
-Personal site for Vishnu Rengaraj. Vue 3 and Vite, prerendered to static HTML. The title screen keeps the 2023 starfield and parallax treeline. Scrolling down passes hard-edged sunrise bands (night purple through pink, orange, and gold to white). About, Projects, and Resume continue on a light grey field (#f7f7f8) in a light theme: white elevated cards, dark grey text, burnt-orange links, golden fills, and night-purple accents.
+Personal site for Vishnu Rengaraj. Vue 3 and Vite, prerendered to static HTML. The title screen keeps the 2023 starfield and parallax treeline. Scrolling down passes stacked sunrise bands with rounded bottoms and a soft shadow (night purple through pink, orange, and gold to white). About, Projects, and Resume continue on a light grey field (#f7f7f8) in a light theme: white elevated cards, dark grey text, burnt-orange links, golden fills, and night-purple accents.
 
 ```bash
 npm ci
