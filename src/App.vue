@@ -10,6 +10,7 @@ import AboutSection from "./components/AboutSection.vue";
 import ProjectsSection from "./components/ProjectsSection.vue";
 import ResumeSection from "./components/ResumeSection.vue";
 import SiteFooter from "./components/SiteFooter.vue";
+import DinersPage from "./components/DinersPage.vue";
 import { skills } from "./data/content.js";
 import { dockKey, scrollKey } from "./scroll.js";
 
@@ -339,6 +340,7 @@ function markScrollTarget(id) {
 }
 
 function syncSpyUrl(section) {
+  if (route.name === "diners") return;
   if (route.name === "resume") resumePath = route.path;
   const path =
     section === "about" || section === "projects" || section === "skills"
@@ -362,6 +364,7 @@ function releaseSpyLock() {
 }
 
 function applySpy() {
+  if (route.name === "diners") return;
   const next = spyPick();
   if (spyLock) {
     const wanted = spyLock === "top" ? null : spyLock;
@@ -1216,16 +1219,22 @@ function onResize() {
   updateDock();
 }
 
-onMounted(async () => {
-  document.documentElement.classList.add("vue-ready");
+let shellStarted = false;
+
+async function startShell() {
+  if (shellStarted || route.name === "diners") return;
   const queued = document.documentElement.dataset.queuedScroll || "";
   if (queued) delete document.documentElement.dataset.queuedScroll;
   await nextTick();
-  ready.value = true;
-  if (route.name !== "home") syncScroll("instant");
-  else lastKey = "home::top";
+  if (shellStarted || route.name === "diners") return;
   const root = scroller.value;
   if (!root) return;
+  shellStarted = true;
+  ready.value = true;
+  if (route.name !== "home") {
+    lastKey = "";
+    syncScroll("instant");
+  } else lastKey = "home::top";
   measureStatic();
   syncTitleLock();
   lastScrollY = root.scrollTop;
@@ -1255,14 +1264,22 @@ onMounted(async () => {
     const el = document.getElementById(id);
     if (el) spyObserver.observe(el);
   }
-});
+}
 
-onUnmounted(() => {
+function stopShell() {
+  if (!shellStarted) return;
+  shellStarted = false;
   const root = scroller.value;
   window.clearTimeout(spySettle);
   window.clearTimeout(closeDockTimer);
+  window.clearTimeout(followTimer);
+  if (chromeFrame) cancelAnimationFrame(chromeFrame);
+  chromeFrame = 0;
   if (raf) cancelAnimationFrame(raf);
+  raf = 0;
+  animating = false;
   spyObserver?.disconnect();
+  spyObserver = undefined;
   root?.removeEventListener("wheel", onIntroWheel);
   root?.removeEventListener("scroll", onIntroScroll);
   root?.removeEventListener("pointerdown", onScrollbarPointerDown);
@@ -1275,14 +1292,34 @@ onUnmounted(() => {
   root?.removeEventListener("touchcancel", onTouchEnd);
   window.removeEventListener("keydown", onIntroKey);
   window.removeEventListener("resize", onResize);
-  window.clearTimeout(followTimer);
+  ready.value = false;
+}
+
+onMounted(() => {
+  document.documentElement.classList.add("vue-ready");
+  startShell();
 });
+
+onUnmounted(() => {
+  stopShell();
+});
+
+watch(
+  () => route.name,
+  (name, prev) => {
+    if (name === "diners") {
+      lastKey = "diners";
+      stopShell();
+    } else if (prev === "diners") startShell();
+  },
+);
 
 watch(
   () => route.fullPath,
   () => {
+    if (route.name === "diners") return;
     if (route.name === "resume") resumePath = route.path;
-    if (!ready.value) return;
+    if (!ready.value || !scroller.value) return;
     if (urlFromSpy || routeFromTween) {
       urlFromSpy = false;
       routeFromTween = false;
@@ -1295,6 +1332,8 @@ watch(
 </script>
 
 <template>
+  <DinersPage v-if="route.name === 'diners'" />
+  <template v-else>
   <a class="skip" href="/about" @click="onNav($event, 'about')">Skip to content</a>
   <div class="prlx" ref="scroller">
     <Hero />
@@ -1340,6 +1379,7 @@ watch(
             <a href="/projects" :aria-current="activeSection === 'projects' ? 'page' : undefined" @click="onNav($event, 'projects')">Projects</a>
             <a href="/resume" :aria-current="activeSection === 'resume' ? 'page' : undefined" @click="onNav($event, 'resume')">Resume</a>
             <a href="/skills" :aria-current="activeSection === 'skills' ? 'page' : undefined" @click="onNav($event, 'skills')">Skills</a>
+            <a href="/diners">Diners</a>
           </div>
           <div class="nav-dock-clip">
             <div id="nav-tab-slot" class="nav-dock"></div>
@@ -1360,4 +1400,5 @@ watch(
       <SiteFooter />
     </main>
   </div>
+  </template>
 </template>

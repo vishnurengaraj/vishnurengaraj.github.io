@@ -46,6 +46,7 @@ export default defineConfig(({ mode }) => {
           "/resume/education",
           "/resume/clubs",
           "/resume/awards",
+          "/diners",
         ];
       },
     },

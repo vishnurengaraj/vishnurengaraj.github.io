@@ -1,0 +1,836 @@
+/* /diners. Purple is primary. Gold is only a secondary highlight.
+   Scoped so the rest of the site keeps its own gold accents. */
+
+html:has(.diners),
+html:has(.diners) body,
+html:has(.diners) #app {
+  background: #f7f7f8;
+}
+
+.diners {
+  --bg: #f7f7f8;
+  --bg2: #fffdfb;
+  --card: #ffffff;
+  --cream: #f6efe8;
+  --line: #e7d9ce;
+  --gold: #ffb020;
+  --text: #1f1f1f;
+  --muted: #7a6558;
+  --ink: #1f1f1f;
+  --variant: #3f3834;
+  --mono: "Roboto Mono", ui-monospace, monospace;
+  --primary: #2d1d7a;
+  --primary-deep: #1a1033;
+  --primary-soft: #5b47c4;
+  --primary-tint: rgba(45, 29, 122, 0.07);
+  --on-primary: #ffffff;
+  --sec: #ffb020;
+  --sec-text: #c2410c;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background:
+    radial-gradient(1100px 380px at 8% -12%, rgba(255, 176, 32, 0.16), transparent 60%),
+    var(--bg);
+  color: var(--text);
+  font-family: Roboto, system-ui, -apple-system, sans-serif;
+  color-scheme: light;
+}
+
+.diners button {
+  font-family: inherit;
+}
+
+.diners a {
+  color: var(--sec-text);
+}
+
+.diners .top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 22px 32px 16px;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  background: rgba(255, 253, 251, 0.85);
+}
+
+.diners .top::after {
+  content: "";
+  position: absolute;
+  left: 32px;
+  right: 32px;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--primary),
+    var(--primary-soft) 30%,
+    rgba(255, 176, 32, 0.6) 55%,
+    transparent 75%
+  );
+}
+
+.diners .crumb {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.diners .crumb span {
+  color: var(--sec-text);
+}
+
+.diners h1 {
+  margin: 6px 0 2px;
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  color: var(--text);
+}
+
+.diners .badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #1f1f1f;
+  border: 1px solid var(--sec);
+  background: rgba(255, 176, 32, 0.22);
+  padding: 4px 9px;
+  border-radius: 999px;
+}
+
+.diners .sub {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.diners .legend-top {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  padding-bottom: 4px;
+}
+
+.diners .legend-top strong {
+  color: var(--primary);
+}
+
+.diners .stage {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  position: relative;
+}
+
+.diners .mapwrap {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+}
+
+.diners #diners-map {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  background: #eef0f2;
+}
+
+.diners .leaflet-container {
+  font-family: Roboto, sans-serif;
+  background: #eef0f2;
+}
+
+.diners .leaflet-control-zoom a {
+  background: #fff !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+}
+
+.diners .leaflet-tooltip.tt {
+  background: #fff;
+  color: var(--text);
+  border: 1px solid var(--line);
+  font: 700 12px Roboto, sans-serif;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.diners .leaflet-tooltip.tt::before {
+  display: none;
+}
+
+.diners .pin {
+  width: 44px;
+  height: 44px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--primary);
+  border: 2px solid #fff;
+  box-shadow: 0 4px 12px rgba(26, 16, 51, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s;
+}
+
+.diners .pin span {
+  transform: rotate(45deg);
+  font: 700 13px Roboto, sans-serif;
+  color: var(--on-primary);
+}
+
+.diners .pin.mid {
+  background: #7a6cc0;
+}
+
+.diners .pin:hover,
+.diners .pin.sel {
+  transform: rotate(-45deg) scale(1.15);
+  background: var(--primary-deep);
+}
+
+.diners .pin.sel {
+  box-shadow: 0 0 0 4px rgba(255, 176, 32, 0.55), 0 4px 12px rgba(26, 16, 51, 0.35);
+}
+
+.diners .panel {
+  position: relative;
+  z-index: 800;
+  display: flex;
+  background: var(--bg2);
+  border-right: 1px solid var(--line);
+  width: 48px;
+  transition: width 0.25s ease;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 4px 0 18px rgba(30, 35, 41, 0.06);
+}
+
+.diners .panel.open {
+  width: 360px;
+}
+
+.diners .rail {
+  width: 48px;
+  flex-shrink: 0;
+  background: none;
+  border: 0;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 0;
+  font: 700 13px Roboto, sans-serif;
+}
+
+.diners .rail:hover {
+  background: var(--primary-tint);
+}
+
+.diners .rail .chev {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--on-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.diners .rail-lbl {
+  writing-mode: vertical-rl;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--primary);
+  font-family: var(--mono);
+}
+
+.diners .rail-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 7px;
+}
+
+.diners .panel.open .rail {
+  display: none;
+}
+
+.diners .panel-body {
+  width: 360px;
+  flex-shrink: 0;
+  display: none;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.diners .panel.open .panel-body {
+  display: flex;
+}
+
+.diners .panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 16px 10px;
+}
+
+.diners .ph-title {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.diners .ph-sub,
+.diners .card .hood,
+.diners .d-in .hood,
+.diners .meta {
+  color: var(--muted);
+}
+
+.diners .ph-sub {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.diners .collapse {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--primary);
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.diners .collapse:hover {
+  border-color: var(--primary);
+}
+
+.diners .sort {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  color: var(--muted);
+  padding: 0 16px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.diners .sort select {
+  flex: 1;
+  background: #fff;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font: inherit;
+}
+
+.diners .sort select:focus {
+  outline: 2px solid var(--sec);
+  outline-offset: 1px;
+}
+
+.diners .cards {
+  list-style: none;
+  margin: 0;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.diners .card {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  box-shadow: 0 1px 3px rgba(30, 35, 41, 0.06);
+}
+
+.diners .card:hover {
+  border-color: rgba(45, 29, 122, 0.45);
+}
+
+.diners .card.sel {
+  border-color: var(--primary);
+  background: var(--primary-tint);
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+
+.diners .card .thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 9px;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+}
+
+.diners .ph {
+  background-size: cover;
+  background-position: center;
+}
+
+.diners .ph .demo,
+.diners .card .thumb .demo {
+  font-family: var(--mono);
+  background: var(--primary-deep);
+  color: #fff;
+}
+
+.diners .card .thumb .demo {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  top: auto;
+  right: auto;
+  font: 700 8px "Roboto Mono", ui-monospace, monospace;
+  letter-spacing: 0.08em;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.diners .card .rank {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font: 700 11px Roboto, sans-serif;
+  padding: 2px 6px;
+  border-radius: 7px;
+}
+
+.diners .card h3 {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+.diners .card .hood {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.diners .card .mini {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.diners .card .mini b {
+  color: var(--text);
+  font-size: 12px;
+  margin-right: 2px;
+}
+
+.diners .card .score {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font: 700 14px Roboto, sans-serif;
+  color: var(--primary);
+  background: #fff;
+}
+
+.diners .card .score small {
+  font: 700 7px Roboto, sans-serif;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.diners .fab {
+  display: none;
+}
+
+.diners .detail {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 420px;
+  max-width: 100%;
+  background: var(--bg2);
+  border-left: 1px solid var(--line);
+  z-index: 1001;
+  transform: translateX(105%);
+  transition: transform 0.25s ease;
+  overflow-y: auto;
+  box-shadow: -12px 0 32px rgba(30, 35, 41, 0.12);
+}
+
+.diners .detail.open {
+  transform: none;
+}
+
+.diners .scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 35, 41, 0.25);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.diners .scrim.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.diners .close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.diners .detail .ph {
+  height: 220px;
+  position: relative;
+}
+
+.diners .ph .demo {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font: 700 10px "Roboto Mono", ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  padding: 3px 7px;
+  border-radius: 6px;
+}
+
+.diners .detail .ph .demo {
+  left: 12px;
+  right: auto;
+}
+
+.diners .d-in {
+  padding: 20px 22px 28px;
+}
+
+.diners .d-in h2 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.diners .d-in .hood {
+  margin: 4px 0 16px;
+  font-size: 14px;
+}
+
+.diners .big {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 1px solid rgba(45, 29, 122, 0.25);
+  background: var(--cream);
+  border-radius: 12px;
+  box-shadow: inset 0 -3px 0 var(--sec);
+}
+
+.diners .big b {
+  font-size: 38px;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.diners .big span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.diners .bar {
+  margin: 12px 0;
+}
+
+.diners .bar .lbl {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.diners .bar .lbl em {
+  color: var(--muted);
+  font-style: normal;
+  font-size: 11px;
+  margin-left: 6px;
+}
+
+.diners .bar .tr {
+  height: 8px;
+  background: var(--cream);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.diners .bar .fi {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-deep), var(--primary), var(--primary-soft));
+  border-radius: 99px;
+}
+
+.diners .note {
+  margin: 18px 0;
+  color: var(--variant);
+  line-height: 1.55;
+  font-size: 14px;
+  border-left: 2px solid var(--sec);
+  padding-left: 12px;
+}
+
+.diners .meta {
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.diners .meta b {
+  color: var(--text);
+}
+
+.diners .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary);
+  color: var(--on-primary);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 10px;
+}
+
+.diners .btn:hover {
+  background: var(--primary-deep);
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.45);
+}
+
+.diners .foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 32px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--variant);
+  background: var(--bg2);
+}
+
+.diners .foot .muted {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.diners.no-anim .panel,
+.diners.no-anim .detail,
+.diners.no-anim .scrim {
+  transition: none;
+}
+
+@media (min-width: 641px) {
+  .diners .scrim {
+    display: none;
+  }
+
+  .diners .detail {
+    top: auto;
+    bottom: 0;
+    height: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .diners .top {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px 16px 10px;
+  }
+
+  .diners .top::after {
+    left: 16px;
+    right: 16px;
+  }
+
+  .diners h1 {
+    font-size: 26px;
+  }
+
+  .diners .legend-top {
+    font-size: 11px;
+  }
+
+  .diners .panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    border-right: 0;
+    box-shadow: none;
+    z-index: 1100;
+  }
+
+  .diners .panel .rail {
+    display: none;
+  }
+
+  .diners .panel.open {
+    width: calc(100% - 48px);
+    max-width: 360px;
+    border-right: 1px solid var(--line);
+    box-shadow: 12px 0 32px rgba(30, 35, 41, 0.15);
+  }
+
+  .diners .panel-body {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .diners .card {
+    grid-template-columns: 56px 1fr auto;
+    gap: 10px;
+  }
+
+  .diners .card .thumb {
+    width: 56px;
+    height: 56px;
+  }
+
+  .diners .fab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    z-index: 700;
+    background: var(--primary);
+    color: var(--on-primary);
+    border: 0;
+    border-radius: 999px;
+    padding: 10px 16px;
+    font: 700 14px Roboto, sans-serif;
+    box-shadow: 0 4px 14px rgba(26, 16, 51, 0.35);
+    cursor: pointer;
+  }
+
+  .diners .fab span {
+    background: var(--sec);
+    color: #1f1f1f;
+    border-radius: 999px;
+    font-size: 11px;
+    padding: 1px 7px;
+  }
+
+  .diners .panel.open ~ .mapwrap .fab {
+    display: none;
+  }
+
+  .diners .detail {
+    width: 100%;
+    top: auto;
+    bottom: 0;
+    height: 88%;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 18px 18px 0 0;
+    transform: translateY(105%);
+  }
+
+  .diners .detail.open {
+    transform: none;
+  }
+
+  .diners .foot {
+    padding: 10px 16px;
+    font-size: 11px;
+  }
+
+  /* First paint is the desktop list. Keep the phone map clear until
+     the viewport check collapses it, unless the URL asked for the list. */
+  .diners.no-anim:not(.force-open) .panel.open {
+    width: 0;
+    border-right: 0;
+    box-shadow: none;
+  }
+
+  .diners.no-anim:not(.force-open) .panel.open .panel-body {
+    display: none;
+  }
+
+  .diners.no-anim:not(.force-open) .fab {
+    display: flex;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diners .panel,
+  .diners .detail,
+  .diners .scrim,
+  .diners .pin {
+    transition: none;
+  }
+}
