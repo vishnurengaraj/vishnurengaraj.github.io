@@ -165,39 +165,54 @@
   }
 }
 
-/* Hard-edged sunrise stripes. They start exactly at the bottom of the
+/* Stacked sunrise cards. They start exactly at the bottom of the
    hero so none of the horizon band shows inside the title viewport.
    The first band matches the sky horizon. The last band matches the
-   content sheet. Each band overlaps the next by 2px so 125% and 150%
-   scaling cannot open a crack between them. */
+   content sheet. Each band overlaps the next by 12px so its shadow
+   falls on the color below. A gap here would show the night sky as a
+   dark bar. The extra height cancels that overlap, so each stripe
+   still contributes 16vh (64px at the minimum). Bottom corners are
+   rounded; black Material shadows read as ink on the oranges, so the
+   shadow is a soft night-purple tint. */
 .sunrise {
   position: relative;
   z-index: 12;
   margin-top: 0;
-  background: #221445;
+  /* Sheet color in the bottom corner-radius, so the white band's
+     rounded corners meet the content instead of revealing the sky. */
+  background:
+    linear-gradient(#f7f7f8, #f7f7f8) bottom / 100% 14px no-repeat,
+    #221445;
 }
 
 .band {
   display: block;
+  position: relative;
+  height: calc(16vh + 12px);
+  min-height: 76px;
+  margin-bottom: -12px;
+  border-radius: 0 0 14px 14px;
+  box-shadow:
+    0 1px 2px rgba(26, 16, 51, 0.18),
+    0 6px 14px rgba(26, 16, 51, 0.22);
+}
+
+.band-night { z-index: 9; background: #221445; }
+.band-mauve { z-index: 8; background: #5e3470; }
+.band-pink { z-index: 7; background: #c45478; }
+.band-coral { z-index: 6; background: #e06a62; }
+.band-orange { z-index: 5; background: #fd8046; }
+.band-gold { z-index: 4; background: #ffb020; }
+/* Even OKLab steps from gold #ffb020 into the sheet color #f7f7f8. */
+.band-yellow { z-index: 3; background: #fec97f; }
+.band-bright { z-index: 2; background: #fbe1be; }
+.band-white {
+  z-index: 1;
+  margin-bottom: 0;
   height: calc(16vh + 4px);
   min-height: 68px;
-  margin-bottom: -4px;
+  background: #f7f7f8;
 }
-
-.band-white {
-  margin-bottom: 0;
-}
-
-.band-night { background: #221445; }
-.band-mauve { background: #5e3470; }
-.band-pink { background: #c45478; }
-.band-coral { background: #e06a62; }
-.band-orange { background: #fd8046; }
-.band-gold { background: #ffb020; }
-/* Even OKLab steps from gold #ffb020 into the sheet color #f7f7f8. */
-.band-yellow { background: #fec97f; }
-.band-bright { background: #fbe1be; }
-.band-white { background: #f7f7f8; }
 
 /* Full-bleed, native aspect. Every layer is at least the viewport plus
    a little overscan, so a side edge never enters the window. If that
