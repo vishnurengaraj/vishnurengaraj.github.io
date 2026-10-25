@@ -30,7 +30,7 @@ const PLACES = [
     service: 6,
     hue: [205, 30],
     photo: "/media/diners/unclebills.jpg",
-    photoCredit: "Uncle Bill's Pancake House (official site)",
+    photoCredit: "Photo by Vishnu",
   },
   {
     id: "marthas",
