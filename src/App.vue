@@ -30,7 +30,9 @@ function ridgeSizes(masterW, masterH) {
   const aspect = Math.round((masterW / masterH) * 10000) / 10000;
   const scale = (aspect * 2).toFixed(4);
   const painted = `max(108vw, calc((100vh - clamp(132px, 7vh + 360px, 62vh)) * ${scale}))`;
-  return `(max-width: 360px) 900px, (max-width: 800px) 1500px, ${painted}`;
+  // Portrait widths through 820px use the shorter phone frame in title.css,
+  // so they stay on the narrow slot. Landscape under 800px does too.
+  return `(max-width: 360px) 900px, (max-width: 820px) and (orientation: portrait) 1500px, (max-width: 800px) 1500px, ${painted}`;
 }
 
 function ridgeWidths(master) {
@@ -1378,13 +1380,13 @@ watch(
     >
       <picture>
         <source
-          media="(min-width: 801px)"
+          media="(min-width: 821px), (min-width: 801px) and (orientation: landscape)"
           type="image/avif"
           :srcset="layer.srcAvif"
           :sizes="layer.sizes"
         />
         <source
-          media="(min-width: 801px)"
+          media="(min-width: 821px), (min-width: 801px) and (orientation: landscape)"
           type="image/webp"
           :srcset="layer.srcWebp"
           :sizes="layer.sizes"
