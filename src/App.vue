@@ -11,7 +11,6 @@ import ProjectsSection from "./components/ProjectsSection.vue";
 import ResumeSection from "./components/ResumeSection.vue";
 import SiteFooter from "./components/SiteFooter.vue";
 import DinersPage from "./components/DinersPage.vue";
-import { skills } from "./data/content.js";
 import { dockKey, scrollKey } from "./scroll.js";
 
 const ORIGIN = "https://vishnu.rengaraj.com";
@@ -286,7 +285,10 @@ function resumeNeedsRealign() {
 function syncScroll(behavior) {
   const key = `${route.name}:${route.params.tab || ""}:${targetForRoute()}`;
   if (key === lastKey) return;
-  const switchingTabs = route.name === "resume" && lastKey.startsWith("resume:");
+  /* /skills is the card under the tab row. A tab click from there only
+     swaps the panel, same as a click that stays on /resume. */
+  const switchingTabs =
+    route.name === "resume" && (lastKey.startsWith("resume:") || lastKey.startsWith("skills:"));
   lastKey = key;
   pinGen += 1;
   if (switchingTabs) {
@@ -342,17 +344,20 @@ let routeFromTween = false;
 let spySettle = 0;
 let spyObserver;
 
+/* The skills card sits under the resume tabs and sticks with the pill.
+   The anchor is the flow position, so a stuck card does not keep Skills
+   highlighted for the whole resume. Farther down a panel, Resume takes over. */
 function skillsInView() {
   const root = scroller.value;
-  const heading = document.getElementById("skills-heading");
-  if (!root || !heading) return false;
-  const top = heading.getBoundingClientRect().top - root.getBoundingClientRect().top;
-  const onScreen = top < root.clientHeight - 8 && top > -heading.offsetHeight - 48;
-  /* Within a few pixels of the end, Skills is the section on screen
-     even when its heading never reaches the top spy band. */
-  const atEnd = root.scrollTop + root.clientHeight >= root.scrollHeight - 32;
-  if (atEnd) return true;
-  return top < root.clientHeight * 0.55 && onScreen;
+  const mark = document.getElementById("skills");
+  const card = document.querySelector("#resume .skills");
+  if (!root || !mark || !card) return false;
+  const heading = document.getElementById("resume-heading");
+  if (heading && visibleBelowBars(heading)) return false;
+  const top = mark.getBoundingClientRect().top - root.getBoundingClientRect().top;
+  const bottom = top + card.offsetHeight;
+  const clearance = barClearance("skills");
+  return top < root.clientHeight * 0.45 && bottom > clearance + 8;
 }
 
 function spyPick() {
@@ -362,8 +367,8 @@ function spyPick() {
     if (spySeen.has(id)) next = id;
   }
   if (!next && passedSection && passedSection !== "skills") next = passedSection;
-  /* Highlight and the resume dock share this test. The section can
-     enter the spy band while its heading is still low on the screen. */
+  /* The card can sit in the spy band while the Resume heading is still
+     the landmark. skillsInView waits until that heading has cleared. */
   if (skillsInView()) return "skills";
   if (!next && (spySeen.has("skills") || passedSection === "skills")) return "resume";
   return next;
@@ -711,9 +716,9 @@ function updateDock() {
      up under the bar, or the row would cover the title. */
   const headingClear = headingTop >= barBottom - 2;
   const limit = dockState.docked && !headingClear ? barEdge + headingH + 40 : barBottom + 1;
-  /* Stay docked only while the resume section still owns the screen.
-     Once the Skills heading is in view, the tabs go back inline. */
-  setDock(sentTop <= limit && resumeBottom > barBottom + 24 && !skillsInView());
+  /* Stay docked while the resume section still owns the screen. The skills
+     card is under the tab row, so it keeps the pill instead of releasing it. */
+  setDock(sentTop <= limit && resumeBottom > barBottom + 24);
 }
 
 let armedDown = true;
@@ -1623,12 +1628,6 @@ watch(
         <AboutSection />
         <ProjectsSection />
         <ResumeSection />
-        <section id="skills" class="section" aria-labelledby="skills-heading">
-          <h2 id="skills-heading" class="section-title">Skills</h2>
-          <ul class="skills">
-            <li v-for="skill in skills" :key="skill">{{ skill }}</li>
-          </ul>
-        </section>
       </div>
       <SiteFooter />
     </main>
