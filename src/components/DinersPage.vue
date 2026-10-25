@@ -69,13 +69,73 @@ function prefersReduced() {
 }
 
 let map;
+let leafletApi;
 let markers = {};
 let resizeTimer = 0;
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/** Lift or drop a label when two diners sit on the same short stretch of coast. */
+function markerClass(place) {
+  const neighbor = DINERS.find((other) => {
+    if (other.id === place.id) return false;
+    return Math.abs(other.lat - place.lat) < 0.01 && Math.abs(other.lng - place.lng) < 0.02;
+  });
+  if (!neighbor) return "mk";
+  return neighbor.lat < place.lat ? "mk above" : "mk below";
+}
+
+function mapPadding() {
+  const phone = isPhone();
+  let left = phone ? 16 : 84;
+  if (!phone) {
+    const mapRect = mapEl.value?.getBoundingClientRect();
+    const panelRect = pageEl.value?.querySelector("#panel")?.getBoundingClientRect();
+    if (mapRect && panelRect) left = Math.max(64, Math.round(panelRect.right - mapRect.left) + 40);
+  }
+  const right = !phone && detailOpen.value ? 448 : phone ? 18 : 150;
+  return {
+    paddingTopLeft: [left, phone ? 72 : 52],
+    paddingBottomRight: [right, phone ? 36 : 64],
+  };
+}
+
+function fitMap(animate) {
+  if (!map || !leafletApi) return;
+  const pad = mapPadding();
+  map.fitBounds(leafletApi.latLngBounds(DINERS.map((place) => [place.lat, place.lng])), {
+    paddingTopLeft: pad.paddingTopLeft,
+    paddingBottomRight: pad.paddingBottomRight,
+    maxZoom: 14,
+    animate: Boolean(animate) && !prefersReduced(),
+  });
+}
+
+function focusPlace(place) {
+  if (!map || !leafletApi) return;
+  const zoom = Math.max(map.getZoom(), 14);
+  const pad = mapPadding();
+  const size = map.getSize();
+  const viewX = (pad.paddingTopLeft[0] + size.x - pad.paddingBottomRight[0]) / 2;
+  const viewY = (pad.paddingTopLeft[1] + size.y - pad.paddingBottomRight[1]) / 2;
+  const shift = leafletApi.point(size.x / 2 - viewX, size.y / 2 - viewY);
+  const center = map.unproject(map.project([place.lat, place.lng], zoom).add(shift), zoom);
+  map.flyTo(center, zoom, { duration: prefersReduced() ? 0 : 0.6 });
+}
 
 function paintPins() {
   pageEl.value?.querySelectorAll(".pin").forEach((pin) => {
     pin.classList.toggle("sel", pin.dataset.id === selectedId.value);
   });
+  for (const [id, marker] of Object.entries(markers)) {
+    marker.setZIndexOffset(id === selectedId.value ? 800 : 0);
+  }
 }
 
 function applyInitialPanel() {
@@ -92,7 +152,10 @@ function setPanel(isOpen) {
     router.replace({ path: "/diners", query: { ...route.query, list } });
   }
   window.clearTimeout(resizeTimer);
-  resizeTimer = window.setTimeout(() => map?.invalidateSize(), 280);
+  resizeTimer = window.setTimeout(() => {
+    map?.invalidateSize();
+    if (!isPhone()) fitMap(true);
+  }, 280);
 }
 
 function openDetail(place) {
@@ -110,9 +173,13 @@ function closeDetail() {
 
 function select(place) {
   if (isPhone()) setPanel(false);
-  const zoom = map ? Math.max(map.getZoom(), 14) : 14;
-  map?.flyTo([place.lat, place.lng], zoom, { duration: prefersReduced() ? 0 : 0.6 });
   openDetail(place);
+  if (isPhone()) {
+    const zoom = map ? Math.max(map.getZoom(), 14) : 14;
+    map?.flyTo([place.lat, place.lng], zoom, { duration: prefersReduced() ? 0 : 0.6 });
+    return;
+  }
+  focusPlace(place);
 }
 
 function onKey(event) {
@@ -120,6 +187,14 @@ function onKey(event) {
     event.preventDefault();
     closeDetail();
   }
+}
+
+function onResize() {
+  window.clearTimeout(resizeTimer);
+  resizeTimer = window.setTimeout(() => {
+    map?.invalidateSize();
+    if (!isPhone()) fitMap(false);
+  }, 150);
 }
 
 function onCardKey(event, place) {
@@ -131,10 +206,12 @@ watch(selectedId, () => nextTick(paintPins));
 onMounted(async () => {
   applyInitialPanel();
   const leaflet = await import("leaflet");
+  leafletApi = leaflet;
   await nextTick();
   const el = mapEl.value;
   if (!el) return;
   map = leaflet.map(el, { zoomControl: false, scrollWheelZoom: true }).setView([33.89, -118.4], 12);
+  map.attributionControl?.setPosition("bottomright");
   leaflet
     .tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
@@ -153,27 +230,28 @@ onMounted(async () => {
   leaflet.control.zoom({ position: "bottomright" }).addTo(map);
   for (const place of DINERS) {
     const icon = leaflet.divIcon({
-      className: "",
+      className: markerClass(place),
       iconSize: [44, 44],
       iconAnchor: [22, 44],
-      html: `<div class="pin${rankOf(place) === 1 ? "" : " mid"}" data-id="${place.id}"><span>${place.weighted.toFixed(1)}</span></div>`,
+      html: `<div class="pin${rankOf(place) === 1 ? "" : " mid"}" data-id="${place.id}"><span>${place.weighted.toFixed(1)}</span></div><div class="mk-name">${escapeHtml(place.name)}</div>`,
     });
     const marker = leaflet.marker([place.lat, place.lng], { icon, riseOnHover: true }).addTo(map);
-    marker.bindTooltip(place.name, { direction: "top", offset: [0, -46], className: "tt" });
-    marker.on("click", () => openDetail(place));
+    marker.getElement()?.setAttribute("aria-label", place.name);
+    marker.on("click", () => {
+      openDetail(place);
+      if (!isPhone()) focusPlace(place);
+    });
     markers[place.id] = marker;
   }
-  map.fitBounds(
-    leaflet.latLngBounds(DINERS.map((place) => [place.lat, place.lng])),
-    { padding: [70, 70], maxZoom: 14 },
-  );
   map.invalidateSize();
+  fitMap(false);
   const deep = route.query.d;
   if (typeof deep === "string") {
     const place = DINERS.find((item) => item.id === deep);
     if (place) openDetail(place);
   }
   window.addEventListener("keydown", onKey);
+  window.addEventListener("resize", onResize);
   requestAnimationFrame(() => requestAnimationFrame(() => {
     motionOn.value = true;
   }));
@@ -182,6 +260,7 @@ onMounted(async () => {
 onUnmounted(() => {
   window.clearTimeout(resizeTimer);
   window.removeEventListener("keydown", onKey);
+  window.removeEventListener("resize", onResize);
   map?.remove();
   map = null;
   markers = {};
@@ -262,14 +341,10 @@ onUnmounted(() => {
                   @error="onPhotoError(place.id)"
                 />
                 <span class="rank">#{{ rankOf(place) }}</span>
-                <span class="demo">VISITED</span>
                 <span v-if="place.certified" class="cert-pill">Certified</span>
               </div>
               <div>
-                <h3>
-                  {{ place.name }}
-                  <span v-if="place.certified" class="cert-inline" title="Vishnu-certified">Certified</span>
-                </h3>
+                <h3>{{ place.name }}</h3>
                 <div class="hood">{{ place.hood }}</div>
                 <div class="mini">
                   <span><b>{{ place.taste }}</b>T</span>
@@ -309,10 +384,7 @@ onUnmounted(() => {
           <span v-if="shown.certified" class="cert-banner">Certified</span>
         </div>
         <div class="d-in">
-          <h2>
-            {{ shown.name }}
-            <span v-if="shown.certified" class="cert-inline" title="Vishnu-certified">Certified</span>
-          </h2>
+          <h2>{{ shown.name }}</h2>
           <div class="hood">{{ shown.hood }} · Rank #{{ rankOf(shown) }} of {{ DINERS.length }}</div>
           <div class="big">
             <b>{{ shown.weighted.toFixed(2) }}</b>

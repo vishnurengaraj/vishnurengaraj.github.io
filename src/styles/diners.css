@@ -135,15 +135,13 @@ html:has(.diners) #app {
 
 .diners .stage {
   flex: 1;
-  display: flex;
   min-height: 0;
   position: relative;
 }
 
 .diners .mapwrap {
-  flex: 1;
-  position: relative;
-  min-width: 0;
+  position: absolute;
+  inset: 0;
 }
 
 .diners #diners-map {
@@ -164,16 +162,38 @@ html:has(.diners) #app {
   border-color: var(--line) !important;
 }
 
-.diners .leaflet-tooltip.tt {
-  background: #fff;
-  color: var(--text);
-  border: 1px solid var(--line);
-  font: 700 12px Roboto, sans-serif;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+.diners .leaflet-marker-icon.mk {
+  overflow: visible;
+  background: transparent;
+  border: 0;
 }
 
-.diners .leaflet-tooltip.tt::before {
-  display: none;
+.diners .mk-name {
+  position: absolute;
+  left: 46px;
+  top: 8px;
+  white-space: nowrap;
+  background: #fff;
+  color: var(--primary);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 8px;
+  font: 700 12px/1.3 Roboto, sans-serif;
+  letter-spacing: -0.01em;
+  box-shadow: 0 2px 8px rgba(26, 16, 51, 0.16);
+}
+
+.diners .mk.above .mk-name {
+  top: -6px;
+}
+
+.diners .mk.below .mk-name {
+  top: 30px;
+}
+
+.diners .mk:has(.pin.sel) .mk-name {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.5), 0 2px 8px rgba(26, 16, 51, 0.16);
 }
 
 .diners .pin {
@@ -211,7 +231,10 @@ html:has(.diners) #app {
 }
 
 .diners .panel {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
   z-index: 800;
   display: flex;
   background: var(--bg2);
@@ -219,12 +242,12 @@ html:has(.diners) #app {
   width: 48px;
   transition: width 0.25s ease;
   overflow: hidden;
-  flex-shrink: 0;
-  box-shadow: 4px 0 18px rgba(30, 35, 41, 0.06);
+  box-shadow: 4px 0 16px rgba(26, 16, 51, 0.08);
 }
 
 .diners .panel.open {
-  width: 360px;
+  width: clamp(380px, 36vw, 520px);
+  box-shadow: 12px 0 36px rgba(26, 16, 51, 0.18);
 }
 
 .diners .rail {
@@ -281,8 +304,8 @@ html:has(.diners) #app {
 }
 
 .diners .panel-body {
-  width: 360px;
-  flex-shrink: 0;
+  flex: 1;
+  min-width: 0;
   display: none;
   flex-direction: column;
   min-height: 0;
@@ -413,7 +436,6 @@ html:has(.diners) #app {
 }
 
 .diners .card .rank,
-.diners .card .thumb .demo,
 .diners .ph .demo,
 .diners .ph .credit,
 .diners .cert-pill,
@@ -421,26 +443,14 @@ html:has(.diners) #app {
   z-index: 1;
 }
 
-.diners .cert-inline {
-  display: inline-block;
-  margin-left: 6px;
-  vertical-align: middle;
-  font: 700 9px/1 var(--mono), Roboto, sans-serif;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--primary, #2d1d7a);
-  border: 1px solid rgba(45, 29, 122, 0.4);
-  background: linear-gradient(180deg, rgba(255, 176, 32, 0.35), rgba(255, 176, 32, 0.12));
-  padding: 3px 7px;
-  border-radius: 999px;
-}
-
 .diners .cert-pill {
   position: absolute;
   top: auto;
-  bottom: 22px;
+  bottom: 4px;
   left: 4px;
   right: auto;
+  max-width: calc(100% - 8px);
+  white-space: nowrap;
   font: 700 7px/1 var(--mono), Roboto, sans-serif;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -482,34 +492,15 @@ html:has(.diners) #app {
   }
 }
 
-.diners .card h3 .cert-inline {
-  font-size: 8px;
-  padding: 2px 5px;
-  margin-left: 4px;
-}
-
 .diners .ph {
   background-size: cover;
   background-position: center;
 }
 
-.diners .ph .demo,
-.diners .card .thumb .demo {
+.diners .ph .demo {
   font-family: var(--mono);
   background: var(--primary-deep);
   color: #fff;
-}
-
-.diners .card .thumb .demo {
-  position: absolute;
-  left: 4px;
-  bottom: 4px;
-  top: auto;
-  right: auto;
-  font: 700 8px "Roboto Mono", ui-monospace, monospace;
-  letter-spacing: 0.08em;
-  padding: 2px 4px;
-  border-radius: 4px;
 }
 
 .diners .card .rank {
@@ -878,6 +869,11 @@ html:has(.diners) #app {
   .diners .card .thumb {
     width: 56px;
     height: 56px;
+  }
+
+  .diners .mk-name {
+    font-size: 11px;
+    padding: 2px 6px;
   }
 
   .diners .fab {
