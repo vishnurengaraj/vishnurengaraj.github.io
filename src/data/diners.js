@@ -14,6 +14,9 @@ const PLACES = [
     atmosphere: 7.5,
     service: 5,
     hue: [280, 30],
+    /* Replace the file, or clear photo, when a personal shot is ready. */
+    photo: "/media/diners/wendys.jpg",
+    photoCredit: "Wendy's Place storefront",
   },
   {
     id: "unclebills",
@@ -27,6 +30,8 @@ const PLACES = [
     atmosphere: 7.5,
     service: 6,
     hue: [205, 30],
+    photo: "/media/diners/unclebills.jpg",
+    photoCredit: "Uncle Bill's Pancake House (official site)",
   },
   {
     id: "marthas",
@@ -40,6 +45,8 @@ const PLACES = [
     atmosphere: 7.5,
     service: 5,
     hue: [38, 24],
+    photo: "/media/diners/marthas.jpg",
+    photoCredit: "Martha's Hermosa Beach — patio / sign (official site)",
   },
 ];
 
@@ -69,8 +76,8 @@ export function mapsUrl(place) {
   );
 }
 
-/** Plate-and-mountain stand-in until a real photo exists. */
-export function photo(place) {
+/** Plate-and-mountain stand-in used only when a diner has no photo file. */
+export function photoPlaceholder(place) {
   const [h, s] = place.hue;
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 220'>
   <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='hsl(${h},${s + 20}%,88%)'/><stop offset='1' stop-color='hsl(${h + 20},${s + 10}%,74%)'/></linearGradient>

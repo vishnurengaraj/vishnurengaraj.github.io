@@ -1,0 +1,23 @@
+[
+  {
+    "id": "wendys",
+    "file": "wendys.jpg",
+    "sourcePage": "https://restaurantguru.com/Wendys-Place-El-Segundo",
+    "sourceImage": "https://img4.restaurantguru.com/w550/h367/r5bb-Wendys-Place-interior-2026-09.jpg",
+    "credit": "Wendy's Place storefront (El Segundo); review-site photo via Restaurant Guru \u2014 license unclear; replace if Vishnu uploads his own."
+  },
+  {
+    "id": "unclebills",
+    "file": "unclebills.jpg",
+    "sourcePage": "https://www.unclebills.net/",
+    "sourceImage": "https://www.unclebills.net/uploads/3/0/2/0/30209783/background-images/167832268.jpg",
+    "credit": "Uncle Bill's Pancake House exterior; from restaurant's official website."
+  },
+  {
+    "id": "marthas",
+    "file": "marthas.jpg",
+    "sourcePage": "https://marthashermosabeach.com/",
+    "sourceImage": "https://img1.wsimg.com/isteam/ip/9562809f-b873-4e11-b85a-6bf6195424a9/IMG_7644.jpg",
+    "credit": "Martha's Hermosa Beach \u2014 French toast with restaurant sign/patio; from restaurant's official website."
+  }
+]

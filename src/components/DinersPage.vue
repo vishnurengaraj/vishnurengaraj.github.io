@@ -1,8 +1,8 @@
 <script setup>
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useHead } from "@unhead/vue";
-import { DINERS, WEIGHTS, mapsUrl, photo, rankOf } from "../data/diners.js";
+import { DINERS, WEIGHTS, mapsUrl, photoPlaceholder, rankOf } from "../data/diners.js";
 import "leaflet/dist/leaflet.css";
 import "../styles/diners.css";
 
@@ -37,6 +37,17 @@ const sorted = computed(() => {
   const key = sortKey.value;
   return [...DINERS].sort((a, b) => (key === "name" ? a.name.localeCompare(b.name) : b[key] - a[key]));
 });
+
+const photoMissing = reactive({});
+
+function photoSrc(place) {
+  if (!place?.photo || photoMissing[place.id]) return "";
+  return place.photo;
+}
+
+function onPhotoError(id) {
+  photoMissing[id] = true;
+}
 
 const bars = [
   ["Taste", "taste"],
@@ -240,7 +251,16 @@ onUnmounted(() => {
               @click="select(place)"
               @keydown="onCardKey($event, place)"
             >
-              <div class="thumb" :style="{ backgroundImage: photo(place) }">
+              <div
+                class="thumb"
+                :style="photoSrc(place) ? undefined : { backgroundImage: photoPlaceholder(place) }"
+              >
+                <img
+                  v-if="photoSrc(place)"
+                  :src="photoSrc(place)"
+                  alt=""
+                  @error="onPhotoError(place.id)"
+                />
                 <span class="rank">#{{ rankOf(place) }}</span>
                 <span class="demo">VISITED</span>
               </div>
@@ -270,8 +290,18 @@ onUnmounted(() => {
     <aside class="detail" :class="{ open: detailOpen }" :aria-hidden="detailOpen ? 'false' : 'true'" :inert="detailOpen ? undefined : true">
       <button class="close" type="button" aria-label="Close" @click="closeDetail">×</button>
       <div v-if="shown">
-        <div class="ph" :style="{ backgroundImage: photo(shown) }">
-          <span class="demo">PHOTO COMING SOON</span>
+        <div
+          class="ph"
+          :style="photoSrc(shown) ? undefined : { backgroundImage: photoPlaceholder(shown) }"
+        >
+          <img
+            v-if="photoSrc(shown)"
+            :src="photoSrc(shown)"
+            :alt="shown.name"
+            @error="onPhotoError(shown.id)"
+          />
+          <span v-if="!photoSrc(shown)" class="demo">PHOTO COMING SOON</span>
+          <span v-else-if="shown.photoCredit" class="credit">{{ shown.photoCredit }}</span>
         </div>
         <div class="d-in">
           <h2>{{ shown.name }}</h2>
