@@ -983,32 +983,6 @@ video {
   box-shadow: var(--shadow-rest);
 }
 
-/* 8px / 16px match the nav's top padding and sticky offset. 64px is the
-   pill. The card stays 12px under that pill; the 1rem under the tab row
-   is the gap before it sticks. The strip above the card is the sheet
-   color so panel text does not show in that 12px crack. */
-.skills {
-  position: sticky;
-  z-index: 2;
-  top: calc(8px + 64px + 12px);
-}
-
-.skills::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -14px;
-  height: 14px;
-  background: var(--md-sys-color-surface);
-}
-
-@media (min-width: 720px) {
-  .skills {
-    top: calc(16px + 64px + 12px);
-  }
-}
-
 .lead,
 .project {
   box-shadow: var(--shadow-raised);
@@ -1479,24 +1453,5 @@ html.js .panel-block.is-out {
   .project {
     color: #111;
     background: #fff;
-  }
-
-  .skills {
-    position: static;
-  }
-
-  .skills::before {
-    content: none;
-  }
-}
-
-/* Short screens (landscape phones): a parked card would cover most of the view. */
-@media (max-height: 560px) {
-  .skills {
-    position: static;
-  }
-
-  .skills::before {
-    content: none;
   }
 }
