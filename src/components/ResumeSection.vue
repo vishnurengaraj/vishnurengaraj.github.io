@@ -12,6 +12,7 @@ import {
   earlierEducation,
   education,
   experience,
+  skills,
 } from "../data/content.js";
 
 const tabs = [
@@ -149,6 +150,11 @@ function onKeydown(event) {
         </div>
       </div>
     </Teleport>
+
+    <div id="skills" class="skills-anchor" aria-hidden="true"></div>
+    <ul class="skills" aria-label="Skills">
+      <li v-for="skill in skills" :key="skill">{{ skill }}</li>
+    </ul>
 
     <div
       ref="stage"
