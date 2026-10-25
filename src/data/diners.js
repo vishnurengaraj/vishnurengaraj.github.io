@@ -76,6 +76,18 @@ export function mapsUrl(place) {
   );
 }
 
+/** Apple Maps pin at the diner's coordinates, labeled with name and address. */
+export function appleMapsUrl(place) {
+  return (
+    "https://maps.apple.com/?ll=" +
+    place.lat +
+    "," +
+    place.lng +
+    "&q=" +
+    encodeURIComponent(place.name + ", " + place.addr)
+  );
+}
+
 /** Plate-and-mountain stand-in used only when a diner has no photo file. */
 export function photoPlaceholder(place) {
   const [h, s] = place.hue;

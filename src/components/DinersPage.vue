@@ -2,7 +2,7 @@
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useHead } from "@unhead/vue";
-import { DINERS, WEIGHTS, mapsUrl, photoPlaceholder, rankOf } from "../data/diners.js";
+import { DINERS, WEIGHTS, appleMapsUrl, mapsUrl, photoPlaceholder, rankOf } from "../data/diners.js";
 import "leaflet/dist/leaflet.css";
 import "../styles/diners.css";
 
@@ -323,7 +323,10 @@ onUnmounted(() => {
             <template v-if="shown.cost"><b>Spend:</b> {{ shown.cost }}<br></template>
             {{ shown.addr }}
           </div>
-          <a class="btn" :href="mapsUrl(shown)" target="_blank" rel="noopener">📍 Open in Google Maps</a>
+          <div class="btns">
+            <a class="btn" :href="mapsUrl(shown)" target="_blank" rel="noopener">Open in Google Maps</a>
+            <a class="btn btn-secondary" :href="appleMapsUrl(shown)" target="_blank" rel="noopener">Open in Apple Maps</a>
+          </div>
         </div>
       </div>
     </aside>
