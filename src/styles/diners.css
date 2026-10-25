@@ -134,14 +134,21 @@ html:has(.diners) #app {
 }
 
 .diners .stage {
+  --drawer-left: 48px;
+  --drawer-peek: 120px;
   flex: 1;
   min-height: 0;
   position: relative;
 }
 
+.diners .stage:has(.panel.open) {
+  --drawer-left: clamp(380px, 36vw, 520px);
+}
+
 .diners .mapwrap {
   position: absolute;
   inset: 0;
+  z-index: 1;
 }
 
 .diners #diners-map {
@@ -191,9 +198,14 @@ html:has(.diners) #app {
   top: 30px;
 }
 
-.diners .mk:has(.pin.sel) .mk-name {
+.diners .mk:has(.pin.sel) .mk-name,
+.diners .mk:has(.pin.hot) .mk-name {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.5), 0 2px 8px rgba(26, 16, 51, 0.16);
+}
+
+.diners .leaflet-marker-icon {
+  cursor: pointer;
 }
 
 .diners .pin {
@@ -221,6 +233,7 @@ html:has(.diners) #app {
 }
 
 .diners .pin:hover,
+.diners .pin.hot,
 .diners .pin.sel {
   transform: rotate(-45deg) scale(1.15);
   background: var(--primary-deep);
@@ -406,8 +419,13 @@ html:has(.diners) #app {
   box-shadow: 0 1px 3px rgba(30, 35, 41, 0.06);
 }
 
-.diners .card:hover {
+.diners .card:hover,
+.diners .card.hot {
   border-color: rgba(45, 29, 122, 0.45);
+}
+
+.diners .card.hot {
+  box-shadow: inset 3px 0 0 var(--sec);
 }
 
 .diners .card.sel {
@@ -564,24 +582,62 @@ html:has(.diners) #app {
   display: none;
 }
 
+/* Desktop drawer: tucked behind the left rail, a photo sliver on hover,
+   then the full card pulled out over the map. Phone resets this below. */
 .diners .detail {
-  position: fixed;
+  position: absolute;
   top: 0;
-  right: 0;
-  height: 100%;
-  width: 420px;
-  max-width: 100%;
+  bottom: 0;
+  left: var(--drawer-left);
+  width: min(480px, calc(100% - var(--drawer-left) - max(72px, 12vw)));
+  max-width: calc(100% - var(--drawer-left) - 24px);
   background: var(--bg2);
-  border-left: 1px solid var(--line);
-  z-index: 1001;
-  transform: translateX(105%);
-  transition: transform 0.25s ease;
-  overflow-y: auto;
-  box-shadow: -12px 0 32px rgba(30, 35, 41, 0.12);
+  border-right: 2px solid var(--sec);
+  border-radius: 0 18px 18px 0;
+  z-index: 750;
+  transform: translateX(calc(-100% - 72px));
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), left 0.25s ease;
+  overflow: hidden;
+  pointer-events: none;
+  box-shadow: 16px 0 40px rgba(26, 16, 51, 0.16);
+}
+
+.diners .detail.peek,
+.diners .detail.open {
+  pointer-events: auto;
 }
 
 .diners .detail.open {
-  transform: none;
+  transform: translateX(0);
+}
+
+.diners .detail-body {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* While only a sliver is out, shift the card so that sliver is its left edge
+   (photo, name) instead of the right-hand padding. */
+.diners .detail.peek .detail-body {
+  pointer-events: none;
+  overflow: hidden;
+  transform: translateX(calc(100% - var(--drawer-peek)));
+}
+
+.diners .peek-hit {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
 }
 
 .diners .scrim {
@@ -603,7 +659,7 @@ html:has(.diners) #app {
   position: absolute;
   top: 12px;
   right: 12px;
-  z-index: 2;
+  z-index: 6;
   width: 34px;
   height: 34px;
   border-radius: 50%;
@@ -798,6 +854,7 @@ html:has(.diners) #app {
 
 .diners.no-anim .panel,
 .diners.no-anim .detail,
+.diners.no-anim .detail-body,
 .diners.no-anim .scrim {
   transition: none;
 }
@@ -807,10 +864,27 @@ html:has(.diners) #app {
     display: none;
   }
 
-  .diners .detail {
-    top: auto;
-    bottom: 0;
-    height: 100%;
+  .diners .detail.peek {
+    transform: translateX(calc(-100% + var(--drawer-peek)));
+  }
+
+  .diners .detail::before {
+    content: "";
+    position: absolute;
+    top: 82px;
+    right: 14px;
+    z-index: 5;
+    width: 4px;
+    height: 56px;
+    border-radius: 99px;
+    background: var(--primary);
+    box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.55);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .diners .detail.peek::before {
+    opacity: 1;
   }
 }
 
@@ -907,18 +981,29 @@ html:has(.diners) #app {
   }
 
   .diners .detail {
-    width: 100%;
+    position: fixed;
+    left: 0;
+    right: 0;
     top: auto;
     bottom: 0;
+    width: 100%;
+    max-width: none;
     height: 88%;
-    border-left: 0;
+    border-right: 0;
     border-top: 1px solid var(--line);
     border-radius: 18px 18px 0 0;
     transform: translateY(105%);
+    z-index: 1001;
+    box-shadow: 0 -12px 32px rgba(30, 35, 41, 0.18);
   }
 
-  .diners .detail.open {
+  .diners .detail.open,
+  .diners .detail.peek {
     transform: none;
+  }
+
+  .diners .detail:not(.open) {
+    transform: translateY(105%);
   }
 
   .diners .foot {
@@ -926,8 +1011,7 @@ html:has(.diners) #app {
     font-size: 11px;
   }
 
-  /* First paint is the desktop list. Keep the phone map clear until
-     the viewport check collapses it, unless the URL asked for the list. */
+  /* Keep a phone map clear if the list was painted open without ?list=open. */
   .diners.no-anim:not(.force-open) .panel.open {
     width: 0;
     border-right: 0;
@@ -946,8 +1030,10 @@ html:has(.diners) #app {
 @media (prefers-reduced-motion: reduce) {
   .diners .panel,
   .diners .detail,
+  .diners .detail-body,
   .diners .scrim,
-  .diners .pin {
+  .diners .pin,
+  .diners .detail::before {
     transition: none;
   }
 

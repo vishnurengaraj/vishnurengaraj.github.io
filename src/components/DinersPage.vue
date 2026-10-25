@@ -27,10 +27,12 @@ const mapEl = ref(null);
 const pageEl = ref(null);
 const sortKey = ref("weighted");
 const selectedId = ref(null);
+const hoverId = ref(null);
 const shown = ref(null);
 const detailOpen = ref(false);
-const panelOpen = ref(route.query.list !== "closed");
+const panelOpen = ref(route.query.list === "open");
 const motionOn = ref(false);
+const drawerPeek = computed(() => !detailOpen.value && hoverId.value != null && shown.value != null);
 
 const forceOpen = computed(() => route.query.list === "open");
 const sorted = computed(() => {
@@ -72,6 +74,7 @@ let map;
 let leafletApi;
 let markers = {};
 let resizeTimer = 0;
+let hoverTimer = 0;
 
 function escapeHtml(value) {
   return String(value)
@@ -93,16 +96,25 @@ function markerClass(place) {
 
 function mapPadding() {
   const phone = isPhone();
-  let left = phone ? 16 : 84;
-  if (!phone) {
-    const mapRect = mapEl.value?.getBoundingClientRect();
-    const panelRect = pageEl.value?.querySelector("#panel")?.getBoundingClientRect();
-    if (mapRect && panelRect) left = Math.max(64, Math.round(panelRect.right - mapRect.left) + 40);
+  if (phone) {
+    return {
+      paddingTopLeft: [16, 72],
+      paddingBottomRight: [18, 36],
+    };
   }
-  const right = !phone && detailOpen.value ? 448 : phone ? 18 : 150;
+  const stageWidth = pageEl.value?.querySelector(".stage")?.clientWidth || window.innerWidth;
+  const vw = window.innerWidth;
+  let left = panelOpen.value ? Math.min(520, Math.max(380, vw * 0.36)) : 48;
+  if (detailOpen.value) {
+    const gutter = Math.max(72, vw * 0.12);
+    const drawer = Math.min(480, Math.max(0, stageWidth - left - gutter));
+    left += drawer;
+  }
+  const padLeft = Math.round(Math.min(left + 36, stageWidth - 96));
+  const padRight = Math.max(24, Math.min(170, stageWidth - padLeft - 72));
   return {
-    paddingTopLeft: [left, phone ? 72 : 52],
-    paddingBottomRight: [right, phone ? 36 : 64],
+    paddingTopLeft: [padLeft, 52],
+    paddingBottomRight: [padRight, 64],
   };
 }
 
@@ -132,17 +144,20 @@ function focusPlace(place) {
 function paintPins() {
   pageEl.value?.querySelectorAll(".pin").forEach((pin) => {
     pin.classList.toggle("sel", pin.dataset.id === selectedId.value);
+    pin.classList.toggle("hot", pin.dataset.id === hoverId.value);
   });
   for (const [id, marker] of Object.entries(markers)) {
-    marker.setZIndexOffset(id === selectedId.value ? 800 : 0);
+    const rank = id === selectedId.value ? 800 : id === hoverId.value ? 400 : 0;
+    marker.setZIndexOffset(rank);
   }
 }
 
 function applyInitialPanel() {
-  const query = route.query.list;
-  if (query === "open") panelOpen.value = true;
-  else if (query === "closed") panelOpen.value = false;
-  else panelOpen.value = !isPhone();
+  panelOpen.value = route.query.list === "open";
+}
+
+function canPeek() {
+  return !isPhone();
 }
 
 function setPanel(isOpen) {
@@ -159,33 +174,73 @@ function setPanel(isOpen) {
 }
 
 function openDetail(place) {
+  window.clearTimeout(hoverTimer);
+  hoverId.value = null;
   selectedId.value = place.id;
   shown.value = place;
   detailOpen.value = true;
-  nextTick(paintPins);
+  nextTick(() => {
+    const scroller = pageEl.value?.querySelector(".detail-body");
+    if (scroller) scroller.scrollTop = 0;
+    paintPins();
+    if (!isPhone()) focusPlace(place);
+  });
 }
 
 function closeDetail() {
   selectedId.value = null;
   detailOpen.value = false;
   paintPins();
+  if (isPhone()) return;
+  window.clearTimeout(resizeTimer);
+  resizeTimer = window.setTimeout(() => fitMap(true), 320);
 }
 
 function select(place) {
-  if (isPhone()) setPanel(false);
-  openDetail(place);
   if (isPhone()) {
+    setPanel(false);
+    openDetail(place);
     const zoom = map ? Math.max(map.getZoom(), 14) : 14;
     map?.flyTo([place.lat, place.lng], zoom, { duration: prefersReduced() ? 0 : 0.6 });
     return;
   }
-  focusPlace(place);
+  openDetail(place);
+}
+
+function setHover(place) {
+  if (!place || !canPeek() || detailOpen.value) return;
+  window.clearTimeout(hoverTimer);
+  hoverId.value = place.id;
+  shown.value = place;
+}
+
+function clearHover() {
+  if (!canPeek()) return;
+  window.clearTimeout(hoverTimer);
+  hoverTimer = window.setTimeout(() => {
+    hoverId.value = null;
+  }, 220);
+}
+
+function holdHover() {
+  window.clearTimeout(hoverTimer);
+}
+
+function openPeeked() {
+  if (shown.value) select(shown.value);
 }
 
 function onKey(event) {
-  if (event.key === "Escape" && detailOpen.value) {
+  if (event.key !== "Escape") return;
+  if (detailOpen.value) {
     event.preventDefault();
     closeDetail();
+    return;
+  }
+  if (hoverId.value) {
+    event.preventDefault();
+    window.clearTimeout(hoverTimer);
+    hoverId.value = null;
   }
 }
 
@@ -198,10 +253,13 @@ function onResize() {
 }
 
 function onCardKey(event, place) {
-  if (event.key === "Enter") select(place);
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    select(place);
+  }
 }
 
-watch(selectedId, () => nextTick(paintPins));
+watch([selectedId, hoverId], () => nextTick(paintPins));
 
 onMounted(async () => {
   applyInitialPanel();
@@ -237,19 +295,24 @@ onMounted(async () => {
     });
     const marker = leaflet.marker([place.lat, place.lng], { icon, riseOnHover: true }).addTo(map);
     marker.getElement()?.setAttribute("aria-label", place.name);
+    marker.on("mouseover", () => setHover(place));
+    marker.on("mouseout", (event) => {
+      const next = event.originalEvent?.relatedTarget;
+      const el = marker.getElement();
+      if (next instanceof Node && el && (next === el || el.contains(next))) return;
+      clearHover();
+    });
     marker.on("click", () => {
-      openDetail(place);
-      if (!isPhone()) focusPlace(place);
+      if (isPhone()) openDetail(place);
+      else select(place);
     });
     markers[place.id] = marker;
   }
   map.invalidateSize();
-  fitMap(false);
   const deep = route.query.d;
-  if (typeof deep === "string") {
-    const place = DINERS.find((item) => item.id === deep);
-    if (place) openDetail(place);
-  }
+  const deepPlace = typeof deep === "string" ? DINERS.find((item) => item.id === deep) : undefined;
+  if (!deepPlace || isPhone()) fitMap(false);
+  if (deepPlace) openDetail(deepPlace);
   window.addEventListener("keydown", onKey);
   window.addEventListener("resize", onResize);
   requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -259,6 +322,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   window.clearTimeout(resizeTimer);
+  window.clearTimeout(hoverTimer);
   window.removeEventListener("keydown", onKey);
   window.removeEventListener("resize", onResize);
   map?.remove();
@@ -325,10 +389,14 @@ onUnmounted(() => {
               v-for="place in sorted"
               :key="place.id"
               class="card"
-              :class="{ sel: selectedId === place.id }"
+              :class="{ sel: selectedId === place.id, hot: hoverId === place.id && selectedId !== place.id }"
               tabindex="0"
               @click="select(place)"
               @keydown="onCardKey($event, place)"
+              @mouseenter="setHover(place)"
+              @mouseleave="clearHover"
+              @focus="setHover(place)"
+              @blur="clearHover"
             >
               <div
                 class="thumb"
@@ -364,11 +432,26 @@ onUnmounted(() => {
           ☰ List <span>{{ DINERS.length }}</span>
         </button>
       </section>
-    </main>
-
-    <aside class="detail" :class="{ open: detailOpen }" :aria-hidden="detailOpen ? 'false' : 'true'" :inert="detailOpen ? undefined : true">
-      <button class="close" type="button" aria-label="Close" @click="closeDetail">×</button>
-      <div v-if="shown">
+      <aside
+        class="detail"
+        :class="{ open: detailOpen, peek: drawerPeek }"
+        :aria-hidden="detailOpen ? 'false' : 'true'"
+        :inert="detailOpen || drawerPeek ? undefined : true"
+        :aria-label="shown ? shown.name : 'Diner'"
+        @mouseenter="holdHover"
+        @mouseleave="clearHover"
+      >
+        <button
+          v-if="drawerPeek"
+          class="peek-hit"
+          type="button"
+          tabindex="-1"
+          :aria-label="shown ? `Show ${shown.name}` : 'Show diner'"
+          @click.stop="openPeeked"
+        ></button>
+        <button v-show="detailOpen" class="close" type="button" aria-label="Close" @click="closeDetail">×</button>
+        <div class="detail-body" :inert="detailOpen ? undefined : true">
+          <div v-if="shown">
         <div
           class="ph"
           :style="photoSrc(shown) ? undefined : { backgroundImage: photoPlaceholder(shown) }"
@@ -409,7 +492,9 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
-    </aside>
+      </div>
+      </aside>
+    </main>
     <div class="scrim" :class="{ open: detailOpen }" @click="closeDetail"></div>
 
     <footer class="foot">
