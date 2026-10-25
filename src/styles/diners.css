@@ -447,13 +447,15 @@ html:has(.diners) #app {
   border: 1px solid rgba(45, 29, 122, 0.35);
   padding: 2px 4px;
   border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 0 0 0 rgba(255, 176, 32, 0.55);
+  animation: cert-glow 2.4s ease-in-out infinite;
 }
 
 .diners .cert-banner {
   position: absolute;
   top: 12px;
-  right: 12px;
+  left: 12px;
+  right: auto;
   font: 700 11px/1 var(--mono), Roboto, sans-serif;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -462,7 +464,20 @@ html:has(.diners) #app {
   border: 1.5px solid rgba(45, 29, 122, 0.45);
   padding: 6px 10px;
   border-radius: 999px;
-  box-shadow: 0 2px 8px rgba(26, 16, 51, 0.25);
+  box-shadow: 0 2px 8px rgba(26, 16, 51, 0.25), 0 0 0 0 rgba(255, 176, 32, 0.5);
+  animation: cert-glow 2.4s ease-in-out infinite;
+}
+
+@keyframes cert-glow {
+  0%,
+  100% {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 0 0 0 rgba(255, 176, 32, 0.55);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 0 10px 2px rgba(255, 176, 32, 0.65);
+    filter: brightness(1.08);
+  }
 }
 
 .diners .card h3 .cert-inline {
@@ -936,5 +951,10 @@ html:has(.diners) #app {
   .diners .scrim,
   .diners .pin {
     transition: none;
+  }
+
+  .diners .cert-pill,
+  .diners .cert-banner {
+    animation: none;
   }
 }
