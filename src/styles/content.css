@@ -31,101 +31,164 @@
   pointer-events: none;
 }
 
-/* One card at every width. The resume row is out of flow, so opening it
-   does not recenter the main labels or change the document height. */
+/* One row. The pill hugs its labels, so collapsing them (max-width, not
+   display) morphs the width. Height stays fixed: a taller or shorter bar
+   would shift the sticky flow and fling the page. */
 .nav-cluster {
-  --nav-join: 22px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  width: 100%;
-  background: #ffffff;
-  border-radius: 22px;
-  box-shadow: var(--shadow-rest);
-  overflow: visible;
-  pointer-events: auto;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  pointer-events: none;
 }
 
 .nav-inner {
-  position: relative;
-  z-index: 2;
+  --nav-dur: 400ms;
+  --nav-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --nav-pad-y: 8px;
+  --nav-pad-x: 4px;
+  --tab-pad: 16px;
   display: flex;
+  align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 8px 4px;
-  background: #ffffff;
-  box-shadow: none;
-  border-radius: 22px;
-}
-
-/* The row stays tucked under the round pill and only the part that
-   slides out is visible, so the card never flashes square corners. */
-.nav-dock-clip {
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  overflow: visible;
-  pointer-events: none;
-  clip-path: inset(0 -40px -140px -40px);
-}
-
-.section-nav.is-joined .nav-cluster {
-  box-shadow: none;
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.12)) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.24));
-}
-
-.nav-dock {
-  position: absolute;
-  z-index: 1;
-  left: 0;
-  right: 0;
-  top: calc(100% - var(--nav-join));
-  pointer-events: none;
-  opacity: 0;
-  transform: translateY(-100%);
-  transition:
-    transform 280ms var(--md-sys-motion-easing-standard),
-    opacity 280ms var(--md-sys-motion-easing-standard);
-}
-
-.section-nav.is-open .nav-dock {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.nav-dock > .tablist-shell {
-  min-width: 0;
-  min-height: 0;
-  width: 100%;
-  max-width: none;
-  overflow: visible;
-  padding-top: var(--nav-join);
-  background:
-    linear-gradient(rgba(31, 31, 31, 0.14), rgba(31, 31, 31, 0.14)) 0 var(--nav-join) / 100% 1px no-repeat,
-    #ffffff;
-  box-shadow: none;
-  border-radius: 0 0 22px 22px;
-}
-
-.section-nav .tablist {
-  width: 100%;
+  width: fit-content;
   max-width: 100%;
-  justify-content: center;
-  padding: 3px 4px 4px;
+  height: 64px;
+  padding: var(--nav-pad-y) var(--nav-pad-x);
+  overflow: hidden;
+  background: #ffffff;
+  border-radius: 999px;
+  box-shadow: var(--shadow-rest);
+  pointer-events: auto;
+  transition:
+    gap var(--nav-dur) var(--nav-ease),
+    padding var(--nav-dur) var(--nav-ease);
+}
+
+.nav-inner :focus-visible {
+  outline-offset: -3px;
+}
+
+.section-nav.is-open .nav-inner {
+  gap: 0;
+}
+
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  min-width: 0;
+  max-width: 0;
+  margin-right: 0;
+  overflow: hidden;
+  opacity: 0;
+  color: #2d1d7a;
+  transform: translateX(6px);
+  transition:
+    max-width var(--nav-dur) var(--nav-ease),
+    margin-right var(--nav-dur) var(--nav-ease),
+    opacity var(--nav-dur) var(--nav-ease),
+    transform var(--nav-dur) var(--nav-ease);
+}
+
+.nav-back svg {
+  display: block;
+  flex: none;
+}
+
+.section-nav:not(.is-open) .nav-back {
+  transition-delay: calc(var(--nav-dur) * 0.15);
+}
+
+.section-nav.is-open a.nav-resume .nav-back {
+  max-width: 16px;
+  margin-right: 8px;
+  opacity: 1;
+  transform: none;
+}
+
+.nav-divider {
+  flex: none;
+  align-self: stretch;
+  width: 0;
+  margin: 0;
+  background: #e6e1f0;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    width var(--nav-dur) var(--nav-ease),
+    margin var(--nav-dur) var(--nav-ease),
+    opacity var(--nav-dur) var(--nav-ease);
+}
+
+.section-nav.is-open .nav-divider {
+  width: 1px;
+  margin: calc(var(--nav-pad-y) * -1) 8px calc(var(--nav-pad-y) * -1) 0;
+  opacity: 1;
+}
+
+/* Tabs are teleported here. max-width on each button (not display) is what
+   lets the shrink-wrapped pill ease between the two widths. */
+.nav-subs {
+  display: flex;
+  flex: none;
+  min-width: 0;
+}
+
+.nav-subs > .tablist-shell {
+  display: flex;
+  width: max-content;
+  min-width: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.nav-subs .tablist {
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  width: max-content;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
   background: transparent;
   border-radius: 0;
   box-shadow: none;
-  overflow: visible;
+  touch-action: pan-y;
 }
 
-.section-nav .tablist button {
-  min-height: 44px;
-  padding: 0 clamp(6px, 1.4vw, 12px);
-  font-size: clamp(0.75rem, 0.68rem + 0.35vw, 0.8125rem);
-  line-height: 1.125rem;
+.nav-subs .tablist button {
+  flex: none;
+  min-width: 0;
+  min-height: 40px;
+  max-width: 0;
+  padding: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateX(16px);
+  pointer-events: none;
   white-space: nowrap;
+  transition:
+    max-width var(--nav-dur) var(--nav-ease),
+    padding var(--nav-dur) var(--nav-ease),
+    opacity calc(var(--nav-dur) * 0.6) var(--nav-ease),
+    transform var(--nav-dur) var(--nav-ease),
+    background-color var(--nav-dur) var(--nav-ease),
+    color var(--nav-dur) var(--nav-ease);
+}
+
+.section-nav.is-open .nav-subs .tablist button {
+  max-width: var(--tab-max, 9.5rem);
+  padding: 0 var(--tab-pad);
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.section-nav.is-open .nav-subs .tablist button[aria-selected="true"] {
+  box-shadow: inset 0 -2px 0 rgba(253, 128, 70, 0.35);
 }
 
 @media (min-width: 720px) {
@@ -133,39 +196,60 @@
     top: 16px;
     padding: 0 24px 8px;
   }
+}
 
-  /* Same card as the phone, kept to the links' own width and centered.
-     Padding on the link row does not change when the tabs open. */
-  .nav-cluster {
-    --nav-join: 32px;
-    width: fit-content;
-    max-width: 100%;
-    margin-inline: auto;
-    border-radius: var(--md-sys-shape-corner-full);
+@media (max-width: 640px) {
+  .section-nav.is-open a.nav-resume .nav-back {
+    margin-right: 6px;
+  }
+
+  .section-nav.is-open .nav-divider {
+    margin: calc(var(--nav-pad-y) * -1) 4px calc(var(--nav-pad-y) * -1) 0;
   }
 
   .nav-inner {
-    border-radius: var(--md-sys-shape-corner-full);
-    padding: 8px 4px;
+    --tab-pad: 8px;
   }
 
-  .nav-dock > .tablist-shell {
-    border-radius: 0 0 26px 26px;
+  /* Size stays on while the row closes. Gating it on .is-open snapped
+     12px back to 14px and widened the pill under the leaving labels. */
+  .nav-subs .tablist button {
+    font-size: 12px;
   }
 
-  /* The closed pill stays this wide. Tabs share that width instead of
-     pushing the card out by a frame when the row docks. */
-  .section-nav .tablist {
-    gap: 0;
-    padding: 2px 4px 4px;
+  .section-nav.is-open .nav-subs .tablist button {
+    max-width: var(--tab-max, 7.5rem);
+    padding: 0 var(--tab-pad);
+  }
+}
+
+@media (max-width: 360px) {
+  .section-nav {
+    padding-left: 6px;
+    padding-right: 6px;
   }
 
-  .section-nav .tablist button {
-    flex: 1 1 0;
-    min-width: 0;
-    padding: 0 4px;
-    font-size: 0.75rem;
+  .nav-inner {
+    --tab-pad: 4px;
+  }
+
+  .nav-subs .tablist button {
+    font-size: 11px;
     letter-spacing: 0;
+  }
+
+  .section-nav.is-open a.nav-resume .nav-back {
+    margin-right: 4px;
+  }
+
+  .section-nav.is-open .nav-divider {
+    margin-right: 2px;
+  }
+}
+
+@media (hover: hover) {
+  .section-nav.is-open a.nav-resume:hover .nav-back {
+    transform: translateX(-2px);
   }
 }
 
@@ -284,15 +368,95 @@
 .section-nav a {
   display: inline-flex;
   align-items: center;
+  flex: none;
+  min-width: 0;
   min-height: 48px;
+  max-width: 11rem;
   padding: 0 16px;
+  overflow: hidden;
   border-radius: var(--md-sys-shape-corner-full);
   color: var(--md-sys-color-on-surface);
   font-size: 0.875rem;
   font-weight: 700;
   line-height: 1.25rem;
   letter-spacing: 0.006em;
+  white-space: nowrap;
   text-decoration: none;
+  transition:
+    max-width var(--nav-dur, 400ms) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    padding var(--nav-dur, 400ms) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    margin var(--nav-dur, 400ms) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    min-height var(--nav-dur, 400ms) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    opacity calc(var(--nav-dur, 400ms) * 0.6) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    border-radius var(--nav-dur, 400ms) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    transform var(--nav-dur, 400ms) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    background-color var(--md-sys-motion-duration-short) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    color var(--md-sys-motion-duration-short) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+/* Main labels return a beat after the tabs leave, so the two don't overlap
+   and blow the pill wider than the row. Highlight color stays immediate. */
+.section-nav:not(.is-open) a.nav-link {
+  transition-delay:
+    calc(var(--nav-dur, 400ms) * 0.15),
+    calc(var(--nav-dur, 400ms) * 0.15),
+    calc(var(--nav-dur, 400ms) * 0.15),
+    calc(var(--nav-dur, 400ms) * 0.15),
+    calc(var(--nav-dur, 400ms) * 0.15),
+    calc(var(--nav-dur, 400ms) * 0.15),
+    calc(var(--nav-dur, 400ms) * 0.15),
+    0s,
+    0s;
+}
+
+/* Resting max-width matches the label. A loose 11rem stays above the
+   text for most of the ease, so the pill shrinks late and then grows
+   once the tabs arrive. */
+.section-nav a.nav-link:not(.nav-resume) {
+  max-width: var(--label-max, 11rem);
+}
+
+.section-nav a.nav-resume {
+  max-width: 14rem;
+}
+
+.section-nav.is-open a.nav-link:not(.nav-resume) {
+  max-width: 0;
+  min-height: 0;
+  padding-left: 0;
+  padding-right: 0;
+  opacity: 0;
+  transform: scale(0.92);
+  pointer-events: none;
+}
+
+.section-nav.is-open a.nav-resume {
+  align-self: stretch;
+  margin: calc(var(--nav-pad-y, 8px) * -1) 0 calc(var(--nav-pad-y, 8px) * -1) calc(var(--nav-pad-x, 4px) * -1);
+  padding: 0 22px 0 16px;
+  border-radius: 999px 0 0 999px;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+
+@media (max-width: 640px) {
+  .section-nav.is-open a.nav-resume {
+    padding: 0 14px 0 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .section-nav.is-open .nav-inner {
+    padding-right: 10px;
+  }
+
+  .section-nav.is-open a.nav-resume {
+    padding: 0 8px;
+  }
+
+  .section-nav.is-open .nav-subs .tablist button {
+    padding: 0 var(--tab-pad);
+  }
 }
 
 .section-nav a[aria-current="page"] {
@@ -1238,13 +1402,17 @@ html.js .panel-block.is-out {
     animation-timing-function: linear;
   }
 
+  .section-nav a,
   .section-nav a::before,
+  .nav-inner,
+  .nav-back,
+  .nav-divider,
+  .nav-subs .tablist button,
   .pill::before,
   .tablist button::before,
   .to-top::before,
   .site-footer a::before,
   .more::before,
-  .nav-dock,
   .project-body,
   .more .chev,
   .scope-star {

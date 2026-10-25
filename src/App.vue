@@ -20,8 +20,33 @@ const router = useRouter();
 const scroller = ref(null);
 const ready = ref(false);
 const titleLocked = ref(false);
-const layerSizes = "(max-width: 360px) 900px, (max-width: 800px) 1500px, 1800px";
-const layerWidths = [960, 1600, 2400, 3200];
+// Painted width in title.css:
+//   max(100vw * --ridge-overscan, (100dvh - --ridge-top) / --ridge-show * --aspect)
+//   --ridge-overscan: 1.08; --ridge-show: 0.5;
+//   --ridge-top: clamp(132px, 7vh + 360px, 62vh)
+// vh stands in for dvh here; they match on desktop, and the narrow slots
+// below cover phones. Keep in sync with widthsFor() in scripts/render-ridge-layers.mjs.
+function ridgeSizes(masterW, masterH) {
+  const aspect = Math.round((masterW / masterH) * 10000) / 10000;
+  const scale = (aspect * 2).toFixed(4);
+  const painted = `max(108vw, calc((100vh - clamp(132px, 7vh + 360px, 62vh)) * ${scale}))`;
+  // Portrait widths through 820px use the shorter phone frame in title.css,
+  // so they stay on the narrow slot. Landscape under 800px does too.
+  return `(max-width: 360px) 900px, (max-width: 820px) and (orientation: portrait) 1500px, (max-width: 800px) 1500px, ${painted}`;
+}
+
+function ridgeWidths(master) {
+  const widths = [960, 1600, 2400, 3200];
+  if (master >= 4200) widths.push(4200);
+  if (master >= 4800) widths.push(4800);
+  else if (master > 4200) widths.push(master);
+  return widths;
+}
+
+function layerSrcset(id, widths, ext) {
+  return widths.map((n) => `/media/layers/${id}-${n}.${ext} ${n}w`).join(", ");
+}
+
 const ridgeLayers = [
   ["l1", 14058, 4277],
   ["l2", 4686, 1689],
@@ -30,14 +55,21 @@ const ridgeLayers = [
   ["l5", 4685, 1704],
   ["l6", 4685, 1707],
   ["l7", 4685, 2019],
-].map(([id, w, h]) => ({
-  id,
-  w,
-  h,
-  fallback: `/media/layers/${id}-1600.webp`,
-  srcAvif: layerWidths.map((n) => `/media/layers/${id}-${n}.avif ${n}w`).join(", "),
-  srcWebp: layerWidths.map((n) => `/media/layers/${id}-${n}.webp ${n}w`).join(", "),
-}));
+].map(([id, w, h]) => {
+  const widths = ridgeWidths(w);
+  const narrow = widths.filter((n) => n <= 3200);
+  return {
+    id,
+    w,
+    h,
+    sizes: ridgeSizes(w, h),
+    fallback: `/media/layers/${id}-1600.webp`,
+    srcAvif: layerSrcset(id, widths, "avif"),
+    srcWebp: layerSrcset(id, widths, "webp"),
+    srcAvifNarrow: layerSrcset(id, narrow, "avif"),
+    srcWebpNarrow: layerSrcset(id, narrow, "webp"),
+  };
+});
 
 useHead({
   link: [
@@ -75,7 +107,7 @@ function prefersReduced() {
   );
 }
 
-function barClearance(targetId) {
+function barClearance(targetId, extraGap = 0) {
   const root = scroller.value;
   if (!root) return 0;
   const nav = root.querySelector(".section-nav");
@@ -88,7 +120,7 @@ function barClearance(targetId) {
   /* The gold up control needs a little more air under the pinned pill
      than a section heading does. Every in-page target is read with the
      bar pinned, so the gap does not depend on whether it has stuck yet. */
-  const gap = targetId === "about" ? 20 : 12;
+  const gap = (targetId === "about" ? 20 : 12) + extraGap;
   let cover = stickyTop + padTop + inner.offsetHeight;
   const shell = nav.classList.contains("is-open") ? nav.querySelector("#nav-tab-slot .tablist-shell") : null;
   if (shell) {
@@ -132,7 +164,7 @@ function endNativeScroll() {
   window.clearTimeout(followTimer);
 }
 
-function scrollToEl(id, behavior) {
+function scrollToEl(id, behavior, extraGap = 0) {
   const root = scroller.value;
   if (!root || typeof document === "undefined") return;
   const jumpTitle = titleLocked.value && root.scrollTop <= 32;
@@ -149,7 +181,7 @@ function scrollToEl(id, behavior) {
       const anchor = anchorFor(id);
       if (anchor && root.scrollTop < end - 2) {
         const anchorTop = anchor.getBoundingClientRect().top - root.getBoundingClientRect().top;
-        const clearance = barClearance(id);
+        const clearance = barClearance(id, extraGap);
         if (anchorTop > clearance + 8) {
           const next = Math.min(end, root.scrollTop + (anchorTop - clearance));
           if (next > root.scrollTop + 2) {
@@ -172,8 +204,10 @@ function scrollToEl(id, behavior) {
     applySpy();
   };
   const landed = () => {
+    if (gen !== scrollGen) return;
     endNativeScroll();
     pinLanding();
+    finishResumeLeave();
   };
   beginNativeScroll();
   if (id === "top") {
@@ -188,7 +222,7 @@ function scrollToEl(id, behavior) {
   const max = Math.max(0, root.scrollHeight - root.clientHeight);
   let top = Math.max(
     0,
-    el.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - barClearance(id),
+    el.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - barClearance(id, extraGap),
   );
   /* A target a few pixels short of the end never quite becomes the last
      section. Land on the end instead. */
@@ -256,6 +290,9 @@ function syncScroll(behavior) {
   lastKey = key;
   pinGen += 1;
   if (switchingTabs) {
+    /* Tab clicks stay in the morph. Pinning the heading would clear it
+       under the bar and collapse the row back to the main labels. */
+    if (dockState.open || dockState.docked) return;
     if (resumeNeedsRealign()) {
       markScrollTarget("resume");
       scrollToEl("resume", behavior);
@@ -396,6 +433,7 @@ function onSpy(entries) {
 let navQuietUntil = 0;
 
 function go(id) {
+  cancelResumeLeave();
   /* Learn more and the up control stay no-ops for the whole sunrise,
      even after the page has left the title. Cancelling there used to
      snap back to the top. The up control also quiets nav taps, because
@@ -439,6 +477,21 @@ function go(id) {
   router.push(path);
 }
 
+function onResumeNav(event) {
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+  if (animating || performance.now() < navQuietUntil) {
+    event.preventDefault();
+    return;
+  }
+  /* The end-cap is the way out. Anywhere else, Resume still jumps to the section. */
+  if (dockState.open || dockState.docked) {
+    event.preventDefault();
+    leaveResumeMode();
+    return;
+  }
+  onNav(event, "resume");
+}
+
 function onNav(event, id) {
   if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
   /* The up tween slides the bar under a finger that is still tapping.
@@ -457,6 +510,14 @@ provide(scrollKey, go);
 const dockState = reactive({ docked: false, open: false, joined: false, hold: 0 });
 provide(dockKey, dockState);
 
+/* Matches the pill morph. A little longer than the 400ms ease so the
+   tabs are fully collapsed before they move back inline. */
+const NAV_MORPH_MS = 480;
+/* Extra air under the pill when the end-cap sends you back, so the
+   heading sits just below the bar instead of under About. */
+const RESUME_BACK_GAP = 24;
+let resumeLeaveUntil = 0;
+let resumeLeaveAt = 0;
 let closeDockTimer = 0;
 
 function measureTabHold() {
@@ -466,8 +527,67 @@ function measureTabHold() {
   if (height > 0) dockState.hold = height;
 }
 
-/* The row is out of flow and a same-height placeholder keeps the
-   document from growing or shrinking, so docking does not move
+/* Pin each label's max-width to its own text. Otherwise max-width
+   animates from a loose rem and the pill dips, then overshoots. */
+function pinLabelWidths() {
+  if (dockState.docked || dockState.open) return;
+  const links = [...document.querySelectorAll(".section-nav a.nav-link:not(.nav-resume)")];
+  if (!links.length) return;
+  for (const link of links) link.style.transition = "none";
+  for (const link of links) link.style.removeProperty("--label-max");
+  const widths = links.map((link) => link.getBoundingClientRect().width);
+  for (let i = 0; i < links.length; i++) {
+    if (widths[i] > 1) links[i].style.setProperty("--label-max", `${Math.ceil(widths[i])}px`);
+  }
+  void links[0].offsetWidth;
+  for (const link of links) link.style.transition = "";
+}
+
+/* Measure a copy. Toggling transition on the live tab, then opening in
+   the same frame, makes WebKit skip the ease and flash every label. */
+function pinTabWidths() {
+  const inner = document.querySelector(".nav-inner");
+  const buttons = [...document.querySelectorAll("#nav-tab-slot button")];
+  if (!inner || !buttons.length) return false;
+  const pad = getComputedStyle(inner).getPropertyValue("--tab-pad").trim() || "16px";
+  for (const button of buttons) {
+    const probe = button.cloneNode(true);
+    probe.style.transition = "none";
+    probe.style.maxWidth = "none";
+    probe.style.paddingLeft = pad;
+    probe.style.paddingRight = pad;
+    probe.style.transform = "none";
+    probe.style.position = "absolute";
+    probe.style.visibility = "hidden";
+    probe.style.pointerEvents = "none";
+    button.parentElement.appendChild(probe);
+    const w = probe.getBoundingClientRect().width;
+    probe.remove();
+    if (w > 1) button.style.setProperty("--tab-max", `${Math.ceil(w)}px`);
+  }
+  return true;
+}
+
+/* --tab-max is set while max-width is still 0, then the row opens on the
+   next frame so the ease runs from zero instead of the measured width. */
+function scheduleOpen(tries = 0) {
+  if (!dockState.docked || dockState.open) return;
+  requestAnimationFrame(() => {
+    if (!dockState.docked || dockState.open) return;
+    if (!pinTabWidths() && tries < 8) {
+      scheduleOpen(tries + 1);
+      return;
+    }
+    requestAnimationFrame(() => {
+      if (!dockState.docked || dockState.open) return;
+      dockState.open = true;
+      dockState.joined = true;
+    });
+  });
+}
+
+/* Tabs move into the fixed-height pill. A same-height placeholder keeps
+   the resume section from growing or shrinking, so docking does not move
    scrollTop. Do not snap scroll position here: a correction also
    aborts the page's own smooth scrolls and fast wheels. */
 function setDock(next) {
@@ -481,39 +601,98 @@ function setDock(next) {
       dockState.joined = true;
       return;
     }
-    if (!dockState.docked) {
-      dockState.docked = true;
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (!dockState.docked) return;
-          dockState.open = true;
-          dockState.joined = true;
-        });
-      });
-    } else {
-      dockState.open = true;
-      dockState.joined = true;
-    }
+    pinLabelWidths();
+    if (!dockState.docked) dockState.docked = true;
+    scheduleOpen();
     return;
   }
-  if (!dockState.docked || !dockState.open) return;
-  if (prefersReduced()) {
+  if (!dockState.docked) return;
+  window.clearTimeout(closeDockTimer);
+  if (prefersReduced() || !dockState.open) {
     dockState.open = false;
     dockState.joined = false;
     dockState.docked = false;
     return;
   }
   dockState.open = false;
+  dockState.joined = false;
+  closeDockTimer = window.setTimeout(() => {
+    if (!dockState.open) {
+      dockState.joined = false;
+      dockState.docked = false;
+      nextTick(pinLabelWidths);
+    }
+  }, NAV_MORPH_MS);
+}
+
+function cancelResumeLeave() {
+  if (!resumeLeaveUntil) return;
+  resumeLeaveUntil = 0;
+  resumeLeaveAt = 0;
+  scrollGen += 1;
+  endNativeScroll();
+  window.clearTimeout(closeDockTimer);
+  const root = scroller.value;
+  if (root) {
+    const y = root.scrollTop;
+    root.style.scrollBehavior = "auto";
+    drivingScroll = true;
+    root.scrollTop = y;
+    root.style.scrollBehavior = "";
+    lastScrollY = y;
+  }
+  updateDock();
+}
+
+/* The chevron and the Resume corner leave the morph and stop a little
+   above the Resume heading. The section stays Resume — this is not a
+   trip back to About. Tabs stay in the pill until that scroll lands so
+   putting them back inline cannot cut the smooth scroll short. */
+function leaveResumeMode() {
+  cancelTween();
+  activeSection.value = "resume";
+  if (route.name === "resume") resumePath = route.path;
+  markScrollTarget("resume");
+  const path = resumePath || "/resume";
+  if (route.name !== "resume" && route.path !== path) {
+    urlFromSpy = true;
+    router.replace(path);
+  }
+  resumeLeaveAt = performance.now();
+  resumeLeaveUntil = resumeLeaveAt + 5000;
+  window.clearTimeout(closeDockTimer);
+  if (prefersReduced()) {
+    dockState.open = false;
+    dockState.joined = false;
+    dockState.docked = false;
+  } else if (dockState.docked || dockState.open) {
+    dockState.open = false;
+    dockState.joined = false;
+  }
+  scrollToEl("resume", undefined, RESUME_BACK_GAP);
+  window.setTimeout(() => {
+    if (resumeLeaveUntil) finishResumeLeave();
+  }, 5000);
+}
+
+function finishResumeLeave() {
+  if (!resumeLeaveUntil) return;
+  const started = resumeLeaveAt;
+  resumeLeaveUntil = 0;
+  resumeLeaveAt = 0;
+  const wait = prefersReduced() ? 0 : Math.max(0, NAV_MORPH_MS - (performance.now() - started));
   window.clearTimeout(closeDockTimer);
   closeDockTimer = window.setTimeout(() => {
     if (!dockState.open) {
       dockState.joined = false;
       dockState.docked = false;
     }
-  }, 320);
+    updateDock();
+  }, wait);
 }
 
 function updateDock() {
+  if (resumeLeaveUntil && performance.now() < resumeLeaveUntil) return;
   const root = scroller.value;
   const sent = document.getElementById("resume-tabs-sentinel");
   const resume = document.getElementById("resume");
@@ -801,6 +980,7 @@ function clampTitleLock(root) {
 }
 
 function onIntroWheel(event) {
+  if (resumeLeaveUntil) cancelResumeLeave();
   if (event.deltaY) armGesture(500);
   if (titleLocked.value) {
     const root = scroller.value;
@@ -976,6 +1156,7 @@ function onTouchEnd() {
 }
 
 function onTouchMove(event) {
+  if (resumeLeaveUntil) cancelResumeLeave();
   armGesture(800);
   const y = event.touches[0]?.clientY ?? touchStartY;
   const dy = touchStartY - y;
@@ -1010,6 +1191,7 @@ function onIntroKey(event) {
   const down = event.key === "ArrowDown" || event.key === "PageDown" || (event.key === " " && !event.shiftKey);
   const up = event.key === "ArrowUp" || event.key === "PageUp" || (event.key === " " && event.shiftKey);
   if (!down && !up) return;
+  if (resumeLeaveUntil) cancelResumeLeave();
   if (titleLocked.value) {
     const root = scroller.value;
     const about = cachedAbout || aboutAnchor();
@@ -1217,6 +1399,7 @@ function onResize() {
   }
   lastWidth = window.innerWidth;
   updateDock();
+  pinLabelWidths();
 }
 
 let shellStarted = false;
@@ -1254,6 +1437,10 @@ async function startShell() {
   window.addEventListener("keydown", onIntroKey);
   window.addEventListener("resize", onResize);
   updateDock();
+  pinLabelWidths();
+  document.fonts?.ready?.then(() => {
+    if (!dockState.open) pinLabelWidths();
+  });
   if (queued === "about" || queued === "home") go(queued);
   spyObserver = new IntersectionObserver(onSpy, {
     root,
@@ -1347,11 +1534,24 @@ watch(
       aria-hidden="true"
     >
       <picture>
-        <source type="image/avif" :srcset="layer.srcAvif" :sizes="layerSizes" />
+        <source
+          media="(min-width: 821px), (min-width: 801px) and (orientation: landscape)"
+          type="image/avif"
+          :srcset="layer.srcAvif"
+          :sizes="layer.sizes"
+        />
+        <source
+          media="(min-width: 821px), (min-width: 801px) and (orientation: landscape)"
+          type="image/webp"
+          :srcset="layer.srcWebp"
+          :sizes="layer.sizes"
+        />
+        <source type="image/avif" :srcset="layer.srcAvifNarrow" :sizes="layer.sizes" />
+        <source type="image/webp" :srcset="layer.srcWebpNarrow" :sizes="layer.sizes" />
         <img
           :src="layer.fallback"
-          :srcset="layer.srcWebp"
-          :sizes="layerSizes"
+          :srcset="layer.srcWebpNarrow"
+          :sizes="layer.sizes"
           alt=""
           decoding="async"
           :width="layer.w"
@@ -1375,13 +1575,47 @@ watch(
       <nav class="section-nav" :class="{ 'is-docked': dockState.docked, 'is-open': dockState.open, 'is-joined': dockState.joined }" aria-label="Sections">
         <div class="nav-cluster">
           <div class="nav-inner">
-            <a href="/about" :aria-current="activeSection === 'about' ? 'page' : undefined" @click="onNav($event, 'about')">About</a>
-            <a href="/projects" :aria-current="activeSection === 'projects' ? 'page' : undefined" @click="onNav($event, 'projects')">Projects</a>
-            <a href="/resume" :aria-current="activeSection === 'resume' ? 'page' : undefined" @click="onNav($event, 'resume')">Resume</a>
-            <a href="/skills" :aria-current="activeSection === 'skills' ? 'page' : undefined" @click="onNav($event, 'skills')">Skills</a>
-          </div>
-          <div class="nav-dock-clip">
-            <div id="nav-tab-slot" class="nav-dock"></div>
+            <a
+              class="nav-link"
+              href="/about"
+              :aria-current="activeSection === 'about' ? 'page' : undefined"
+              :aria-hidden="dockState.open ? 'true' : undefined"
+              :tabindex="dockState.open ? -1 : undefined"
+              @click="onNav($event, 'about')"
+            >About</a>
+            <a
+              class="nav-link"
+              href="/projects"
+              :aria-current="activeSection === 'projects' ? 'page' : undefined"
+              :aria-hidden="dockState.open ? 'true' : undefined"
+              :tabindex="dockState.open ? -1 : undefined"
+              @click="onNav($event, 'projects')"
+            >Projects</a>
+            <a
+              class="nav-link nav-resume"
+              :href="route.name === 'resume' ? route.path : '/resume'"
+              :aria-current="activeSection === 'resume' ? 'page' : undefined"
+              :aria-expanded="dockState.open ? 'true' : undefined"
+              :aria-label="dockState.open ? 'Resume, back to main nav' : undefined"
+              @click="onResumeNav($event)"
+            >
+              <span class="nav-back" aria-hidden="true">
+                <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 3 5 8l5 5" />
+                </svg>
+              </span>
+              <span class="nav-label">Resume</span>
+            </a>
+            <a
+              class="nav-link"
+              href="/skills"
+              :aria-current="activeSection === 'skills' ? 'page' : undefined"
+              :aria-hidden="dockState.open ? 'true' : undefined"
+              :tabindex="dockState.open ? -1 : undefined"
+              @click="onNav($event, 'skills')"
+            >Skills</a>
+            <span class="nav-divider" aria-hidden="true"></span>
+            <div id="nav-tab-slot" class="nav-subs" :inert="dockState.open ? undefined : true"></div>
           </div>
         </div>
       </nav>
