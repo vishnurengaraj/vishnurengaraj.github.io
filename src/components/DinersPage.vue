@@ -110,9 +110,11 @@ function mapPadding() {
     const drawer = Math.min(480, Math.max(0, stageWidth - left - gutter));
     left += drawer;
   }
+  const padLeft = Math.round(Math.min(left + 36, stageWidth - 96));
+  const padRight = Math.max(24, Math.min(170, stageWidth - padLeft - 72));
   return {
-    paddingTopLeft: [Math.round(Math.min(left + 36, stageWidth * 0.7)), 52],
-    paddingBottomRight: [170, 64],
+    paddingTopLeft: [padLeft, 52],
+    paddingBottomRight: [padRight, 64],
   };
 }
 

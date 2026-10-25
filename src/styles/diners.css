@@ -871,12 +871,11 @@ html:has(.diners) #app {
   .diners .detail::before {
     content: "";
     position: absolute;
-    top: 50%;
+    top: 82px;
     right: 14px;
     z-index: 5;
     width: 4px;
     height: 56px;
-    margin-top: -28px;
     border-radius: 99px;
     background: var(--primary);
     box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.55);
