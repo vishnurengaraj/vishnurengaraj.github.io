@@ -29,8 +29,10 @@ const sortKey = ref("weighted");
 const selectedId = ref(null);
 const shown = ref(null);
 const detailOpen = ref(false);
-const panelOpen = ref(route.query.list !== "closed");
+const peekId = ref(null);
+const panelOpen = ref(route.query.list === "open");
 const motionOn = ref(false);
+let peekTimer = 0;
 
 const forceOpen = computed(() => route.query.list === "open");
 const sorted = computed(() => {
@@ -91,15 +93,28 @@ function markerClass(place) {
   return neighbor.lat < place.lat ? "mk above" : "mk below";
 }
 
+function stageWidth() {
+  return pageEl.value?.querySelector(".stage")?.clientWidth || window.innerWidth;
+}
+
+function listWidth() {
+  if (isPhone()) return panelOpen.value ? Math.min(360, window.innerWidth - 48) : 0;
+  if (!panelOpen.value) return 48;
+  return Math.min(520, Math.max(380, window.innerWidth * 0.36));
+}
+
+function drawerWidth() {
+  if (isPhone() || !detailOpen.value) return 0;
+  const left = listWidth();
+  const gap = panelOpen.value ? 72 : 88;
+  return Math.max(0, Math.min(440, stageWidth() - left - gap));
+}
+
 function mapPadding() {
   const phone = isPhone();
-  let left = phone ? 16 : 84;
-  if (!phone) {
-    const mapRect = mapEl.value?.getBoundingClientRect();
-    const panelRect = pageEl.value?.querySelector("#panel")?.getBoundingClientRect();
-    if (mapRect && panelRect) left = Math.max(64, Math.round(panelRect.right - mapRect.left) + 40);
-  }
-  const right = !phone && detailOpen.value ? 448 : phone ? 18 : 150;
+  const overlay = phone ? 16 : listWidth() + drawerWidth() + 24;
+  const left = phone ? 16 : Math.min(Math.round(overlay), Math.round(stageWidth() * 0.62));
+  const right = phone ? 18 : 72;
   return {
     paddingTopLeft: [left, phone ? 72 : 52],
     paddingBottomRight: [right, phone ? 36 : 64],
@@ -117,32 +132,23 @@ function fitMap(animate) {
   });
 }
 
-function focusPlace(place) {
-  if (!map || !leafletApi) return;
-  const zoom = Math.max(map.getZoom(), 14);
-  const pad = mapPadding();
-  const size = map.getSize();
-  const viewX = (pad.paddingTopLeft[0] + size.x - pad.paddingBottomRight[0]) / 2;
-  const viewY = (pad.paddingTopLeft[1] + size.y - pad.paddingBottomRight[1]) / 2;
-  const shift = leafletApi.point(size.x / 2 - viewX, size.y / 2 - viewY);
-  const center = map.unproject(map.project([place.lat, place.lng], zoom).add(shift), zoom);
-  map.flyTo(center, zoom, { duration: prefersReduced() ? 0 : 0.6 });
-}
-
 function paintPins() {
   pageEl.value?.querySelectorAll(".pin").forEach((pin) => {
-    pin.classList.toggle("sel", pin.dataset.id === selectedId.value);
+    const id = pin.dataset.id;
+    pin.classList.toggle("sel", id === selectedId.value);
+    pin.classList.toggle("peek", !detailOpen.value && id === peekId.value);
   });
   for (const [id, marker] of Object.entries(markers)) {
-    marker.setZIndexOffset(id === selectedId.value ? 800 : 0);
+    const selected = id === selectedId.value;
+    const peeked = !detailOpen.value && id === peekId.value;
+    marker.setZIndexOffset(selected ? 800 : peeked ? 500 : 0);
   }
 }
 
 function applyInitialPanel() {
   const query = route.query.list;
   if (query === "open") panelOpen.value = true;
-  else if (query === "closed") panelOpen.value = false;
-  else panelOpen.value = !isPhone();
+  else panelOpen.value = false;
 }
 
 function setPanel(isOpen) {
@@ -158,7 +164,26 @@ function setPanel(isOpen) {
   }, 280);
 }
 
+function peek(place) {
+  if (!place || isPhone() || detailOpen.value) return;
+  window.clearTimeout(peekTimer);
+  peekId.value = place.id;
+  shown.value = place;
+}
+
+function unpeek(place) {
+  if (isPhone()) return;
+  window.clearTimeout(peekTimer);
+  peekTimer = window.setTimeout(() => {
+    if (detailOpen.value) return;
+    if (place && peekId.value !== place.id) return;
+    peekId.value = null;
+  }, 80);
+}
+
 function openDetail(place) {
+  window.clearTimeout(peekTimer);
+  peekId.value = null;
   selectedId.value = place.id;
   shown.value = place;
   detailOpen.value = true;
@@ -166,20 +191,27 @@ function openDetail(place) {
 }
 
 function closeDetail() {
+  window.clearTimeout(peekTimer);
   selectedId.value = null;
+  peekId.value = null;
   detailOpen.value = false;
   paintPins();
+  if (!isPhone()) {
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(() => fitMap(true), 40);
+  }
 }
 
 function select(place) {
-  if (isPhone()) setPanel(false);
-  openDetail(place);
   if (isPhone()) {
+    setPanel(false);
+    openDetail(place);
     const zoom = map ? Math.max(map.getZoom(), 14) : 14;
     map?.flyTo([place.lat, place.lng], zoom, { duration: prefersReduced() ? 0 : 0.6 });
     return;
   }
-  focusPlace(place);
+  openDetail(place);
+  fitMap(true);
 }
 
 function onKey(event) {
@@ -190,6 +222,7 @@ function onKey(event) {
 }
 
 function onResize() {
+  if (isPhone()) peekId.value = null;
   window.clearTimeout(resizeTimer);
   resizeTimer = window.setTimeout(() => {
     map?.invalidateSize();
@@ -198,10 +231,20 @@ function onResize() {
 }
 
 function onCardKey(event, place) {
-  if (event.key === "Enter") select(place);
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    select(place);
+  }
 }
 
-watch(selectedId, () => nextTick(paintPins));
+watch([selectedId, peekId, detailOpen], () => nextTick(paintPins));
+
+watch(shown, () => {
+  nextTick(() => {
+    const el = pageEl.value?.querySelector(".detail");
+    if (el) el.scrollTop = 0;
+  });
+});
 
 onMounted(async () => {
   applyInitialPanel();
@@ -235,20 +278,35 @@ onMounted(async () => {
       iconAnchor: [22, 44],
       html: `<div class="pin${rankOf(place) === 1 ? "" : " mid"}" data-id="${place.id}"><span>${place.weighted.toFixed(1)}</span></div><div class="mk-name">${escapeHtml(place.name)}</div>`,
     });
-    const marker = leaflet.marker([place.lat, place.lng], { icon, riseOnHover: true }).addTo(map);
+    const marker = leaflet.marker([place.lat, place.lng], { icon, riseOnHover: true, keyboard: true }).addTo(map);
     marker.getElement()?.setAttribute("aria-label", place.name);
-    marker.on("click", () => {
-      openDetail(place);
-      if (!isPhone()) focusPlace(place);
+    marker.on("mouseover", () => peek(place));
+    marker.on("focus", () => peek(place));
+    marker.on("mouseout", (event) => {
+      const next = event.originalEvent?.relatedTarget;
+      const iconEl = marker.getElement();
+      if (next instanceof Node && iconEl?.contains(next)) return;
+      unpeek(place);
     });
+    marker.on("blur", () => unpeek(place));
+    marker.on("click", () => select(place));
     markers[place.id] = marker;
   }
+  map.on("click", (event) => {
+    const target = event.originalEvent?.target;
+    if (target instanceof Element && target.closest(".leaflet-marker-icon, .leaflet-control")) return;
+    if (isPhone()) return;
+    if (detailOpen.value) closeDetail();
+    else peekId.value = null;
+  });
   map.invalidateSize();
-  fitMap(false);
   const deep = route.query.d;
-  if (typeof deep === "string") {
-    const place = DINERS.find((item) => item.id === deep);
-    if (place) openDetail(place);
+  const deepPlace = typeof deep === "string" ? DINERS.find((item) => item.id === deep) : null;
+  if (deepPlace) {
+    openDetail(deepPlace);
+    fitMap(false);
+  } else {
+    fitMap(false);
   }
   window.addEventListener("keydown", onKey);
   window.addEventListener("resize", onResize);
@@ -259,6 +317,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   window.clearTimeout(resizeTimer);
+  window.clearTimeout(peekTimer);
   window.removeEventListener("keydown", onKey);
   window.removeEventListener("resize", onResize);
   map?.remove();
@@ -325,10 +384,14 @@ onUnmounted(() => {
               v-for="place in sorted"
               :key="place.id"
               class="card"
-              :class="{ sel: selectedId === place.id }"
+              :class="{ sel: selectedId === place.id, peek: peekId === place.id && !detailOpen }"
               tabindex="0"
               @click="select(place)"
               @keydown="onCardKey($event, place)"
+              @mouseenter="peek(place)"
+              @mouseleave="unpeek(place)"
+              @focus="peek(place)"
+              @blur="unpeek(place)"
             >
               <div
                 class="thumb"
@@ -364,11 +427,15 @@ onUnmounted(() => {
           ☰ List <span>{{ DINERS.length }}</span>
         </button>
       </section>
-    </main>
-
-    <aside class="detail" :class="{ open: detailOpen }" :aria-hidden="detailOpen ? 'false' : 'true'" :inert="detailOpen ? undefined : true">
+      <aside
+        class="detail"
+        :class="{ open: detailOpen, peek: Boolean(peekId) && !detailOpen }"
+        :aria-hidden="detailOpen ? 'false' : 'true'"
+        :inert="detailOpen ? undefined : true"
+        aria-label="Diner details"
+      >
       <button class="close" type="button" aria-label="Close" @click="closeDetail">×</button>
-      <div v-if="shown">
+      <div v-if="shown" class="drawer-card">
         <div
           class="ph"
           :style="photoSrc(shown) ? undefined : { backgroundImage: photoPlaceholder(shown) }"
@@ -409,7 +476,8 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
-    </aside>
+      </aside>
+    </main>
     <div class="scrim" :class="{ open: detailOpen }" @click="closeDetail"></div>
 
     <footer class="foot">
