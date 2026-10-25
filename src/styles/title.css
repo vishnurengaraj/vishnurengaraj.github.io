@@ -171,18 +171,16 @@
    content sheet. Each band overlaps the next by 12px so its shadow
    falls on the color below. A gap here would show the night sky as a
    dark bar. The extra height cancels that overlap, so each stripe
-   still contributes 16vh (64px at the minimum). Bottom corners are
-   rounded; black Material shadows read as ink on the oranges, so the
-   shadow is a soft night-purple tint. */
+   still contributes 16vh (64px at the minimum). Colored bands have
+   rounded bottoms; black Material shadows read as ink on the oranges,
+   so the shadow is a soft night-purple tint. The white band stays
+   square and unshadowed so it meets the sheet without grey corner
+   arcs or a hairline. */
 .sunrise {
   position: relative;
   z-index: 12;
   margin-top: 0;
-  /* Sheet color in the bottom corner-radius, so the white band's
-     rounded corners meet the content instead of revealing the sky. */
-  background:
-    linear-gradient(#f7f7f8, #f7f7f8) bottom / 100% 14px no-repeat,
-    #221445;
+  background: #221445;
 }
 
 .band {
@@ -212,6 +210,8 @@
   height: calc(16vh + 4px);
   min-height: 68px;
   background: #f7f7f8;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 /* Full-bleed, native aspect. Every layer is at least the viewport plus
