@@ -1489,3 +1489,14 @@ html.js .panel-block.is-out {
     content: none;
   }
 }
+
+/* Short screens (landscape phones): a parked card would cover most of the view. */
+@media (max-height: 560px) {
+  .skills {
+    position: static;
+  }
+
+  .skills::before {
+    content: none;
+  }
+}
