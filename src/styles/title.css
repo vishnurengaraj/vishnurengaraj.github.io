@@ -181,6 +181,10 @@
   z-index: 12;
   margin-top: 0;
   background: #221445;
+  /* Paint containment clips this layer to its border box. At 125% and
+     150% the shadowed stacking context otherwise leaves a grey hairline
+     on the sheet. Band shadows are inside, so they stay intact. */
+  contain: paint;
 }
 
 .band {
