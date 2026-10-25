@@ -2,9 +2,7 @@
 
 ## wendys
 - Local: `wendys.jpg`
-- Page: https://restaurantguru.com/Wendys-Place-El-Segundo
-- Image: https://img4.restaurantguru.com/w550/h367/r5bb-Wendys-Place-interior-2026-09.jpg
-- Note: Wendy's Place storefront (El Segundo); review-site photo via Restaurant Guru — license unclear; replace if Vishnu uploads his own.
+- Note: Photo by Vishnu. Breakfast table and Wendy's Place window. Replaces the earlier Restaurant Guru storefront shot.
 
 ## unclebills
 - Local: `unclebills.jpg`

@@ -14,9 +14,8 @@ const PLACES = [
     atmosphere: 7.5,
     service: 5,
     hue: [280, 30],
-    /* Replace the file, or clear photo, when a personal shot is ready. */
     photo: "/media/diners/wendys.jpg",
-    photoCredit: "Wendy's Place storefront",
+    photoCredit: "Photo by Vishnu",
   },
   {
     id: "unclebills",
