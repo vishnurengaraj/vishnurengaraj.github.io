@@ -868,7 +868,19 @@ html:has(.diners) #app {
   }
 
   .diners .detail.peek {
-    width: 128px;
+    width: 112px;
+  }
+
+  .diners .detail.peek::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 28px;
+    background: linear-gradient(90deg, transparent, var(--bg2));
+    z-index: 2;
+    pointer-events: none;
   }
 
   .diners .detail.peek::after {
@@ -880,6 +892,7 @@ html:has(.diners) #app {
     width: 3px;
     background: var(--sec);
     z-index: 3;
+    pointer-events: none;
   }
 
   .diners .detail:not(.open) .close {
