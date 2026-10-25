@@ -8,6 +8,10 @@
 - Local: `unclebills.jpg`
 - Note: Photo by Vishnu. Patio breakfast spread. Replaces the earlier official-site exterior.
 
+## oceandiner
+- Local: `oceandiner.jpg`
+- Note: Photo by Vishnu.
+
 ## marthas
 - Local: `marthas.jpg`
 - Page: https://marthashermosabeach.com/
