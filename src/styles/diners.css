@@ -166,6 +166,7 @@ html:has(.diners) #app {
   overflow: visible;
   background: transparent;
   border: 0;
+  cursor: pointer;
 }
 
 .diners .mk-name {
@@ -191,6 +192,7 @@ html:has(.diners) #app {
   top: 30px;
 }
 
+.diners .mk:has(.pin.peek) .mk-name,
 .diners .mk:has(.pin.sel) .mk-name {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.5), 0 2px 8px rgba(26, 16, 51, 0.16);
@@ -221,9 +223,14 @@ html:has(.diners) #app {
 }
 
 .diners .pin:hover,
+.diners .pin.peek,
 .diners .pin.sel {
   transform: rotate(-45deg) scale(1.15);
   background: var(--primary-deep);
+}
+
+.diners .pin.peek {
+  box-shadow: 0 0 0 4px rgba(255, 176, 32, 0.45), 0 4px 12px rgba(26, 16, 51, 0.35);
 }
 
 .diners .pin.sel {
@@ -406,8 +413,13 @@ html:has(.diners) #app {
   box-shadow: 0 1px 3px rgba(30, 35, 41, 0.06);
 }
 
-.diners .card:hover {
+.diners .card:hover,
+.diners .card.peek {
   border-color: rgba(45, 29, 122, 0.45);
+}
+
+.diners .card.peek {
+  box-shadow: inset 3px 0 0 var(--sec);
 }
 
 .diners .card.sel {
@@ -603,7 +615,7 @@ html:has(.diners) #app {
   position: absolute;
   top: 12px;
   right: 12px;
-  z-index: 2;
+  z-index: 5;
   width: 34px;
   height: 34px;
   border-radius: 50%;
@@ -798,6 +810,7 @@ html:has(.diners) #app {
 
 .diners.no-anim .panel,
 .diners.no-anim .detail,
+.diners.no-anim .detail .drawer-card,
 .diners.no-anim .scrim {
   transition: none;
 }
@@ -807,10 +820,77 @@ html:has(.diners) #app {
     display: none;
   }
 
+  /* Left drawer over the map. Width grows from the panel edge so the
+     card's left side (photo, title) peeks first, then the rest pulls out
+     to the right. Kept under the list so it cannot cover the rankings. */
   .diners .detail {
-    top: auto;
+    --drawer-open: min(440px, calc(100vw - 48px - 88px));
+    position: absolute;
+    top: 0;
     bottom: 0;
-    height: 100%;
+    left: 48px;
+    right: auto;
+    width: 0;
+    height: auto;
+    max-width: none;
+    border: 0;
+    z-index: 790;
+    overflow: hidden;
+    pointer-events: none;
+    transform: none;
+    transition:
+      width 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+      left 0.25s ease;
+    box-shadow: none;
+  }
+
+  .diners .detail .drawer-card {
+    width: var(--drawer-open);
+    min-height: 100%;
+    transform: translateX(-40px);
+    transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .diners .panel.open ~ .detail {
+    --drawer-open: min(440px, calc(100vw - clamp(380px, 36vw, 520px) - 72px));
+    left: clamp(380px, 36vw, 520px);
+  }
+
+  .diners .detail.peek,
+  .diners .detail.open {
+    border-right: 1px solid var(--line);
+    box-shadow: 18px 0 44px rgba(26, 16, 51, 0.18);
+  }
+
+  .diners .detail.peek .drawer-card,
+  .diners .detail.open .drawer-card {
+    transform: none;
+  }
+
+  .diners .detail.peek {
+    width: 128px;
+  }
+
+  .diners .detail.peek::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--sec);
+    z-index: 3;
+  }
+
+  .diners .detail:not(.open) .close {
+    visibility: hidden;
+  }
+
+  .diners .detail.open {
+    width: var(--drawer-open);
+    overflow-x: hidden;
+    overflow-y: auto;
+    pointer-events: auto;
   }
 }
 
@@ -946,6 +1026,7 @@ html:has(.diners) #app {
 @media (prefers-reduced-motion: reduce) {
   .diners .panel,
   .diners .detail,
+  .diners .detail .drawer-card,
   .diners .scrim,
   .diners .pin {
     transition: none;
