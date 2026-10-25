@@ -495,6 +495,46 @@ function measureTabHold() {
   if (height > 0) dockState.hold = height;
 }
 
+/* Pin each label's max-width to its own text. Otherwise max-width
+   animates from a loose rem and the pill dips, then overshoots. */
+function pinLabelWidths() {
+  if (dockState.docked || dockState.open) return;
+  const links = [...document.querySelectorAll(".section-nav a.nav-link:not(.nav-resume)")];
+  if (!links.length) return;
+  for (const link of links) link.style.transition = "none";
+  for (const link of links) link.style.removeProperty("--label-max");
+  const widths = links.map((link) => link.getBoundingClientRect().width);
+  for (let i = 0; i < links.length; i++) {
+    if (widths[i] > 1) links[i].style.setProperty("--label-max", `${Math.ceil(widths[i])}px`);
+  }
+  void links[0].offsetWidth;
+  for (const link of links) link.style.transition = "";
+}
+
+function pinTabWidths() {
+  const inner = document.querySelector(".nav-inner");
+  const buttons = [...document.querySelectorAll("#nav-tab-slot button")];
+  if (!inner || !buttons.length) return;
+  const pad = getComputedStyle(inner).getPropertyValue("--tab-pad").trim() || "16px";
+  for (const button of buttons) button.style.transition = "none";
+  void buttons[0].offsetWidth;
+  for (const button of buttons) {
+    button.style.maxWidth = "none";
+    button.style.paddingLeft = pad;
+    button.style.paddingRight = pad;
+  }
+  const widths = buttons.map((button) => button.getBoundingClientRect().width);
+  for (let i = 0; i < buttons.length; i++) {
+    const button = buttons[i];
+    button.style.maxWidth = "";
+    button.style.paddingLeft = "";
+    button.style.paddingRight = "";
+    if (widths[i] > 1) button.style.setProperty("--tab-max", `${Math.ceil(widths[i])}px`);
+  }
+  void buttons[0].offsetWidth;
+  for (const button of buttons) button.style.transition = "";
+}
+
 /* Tabs move into the fixed-height pill. A same-height placeholder keeps
    the resume section from growing or shrinking, so docking does not move
    scrollTop. Do not snap scroll position here: a correction also
@@ -510,16 +550,19 @@ function setDock(next) {
       dockState.joined = true;
       return;
     }
+    pinLabelWidths();
     if (!dockState.docked) {
       dockState.docked = true;
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           if (!dockState.docked) return;
+          pinTabWidths();
           dockState.open = true;
           dockState.joined = true;
         });
       });
     } else {
+      pinTabWidths();
       dockState.open = true;
       dockState.joined = true;
     }
@@ -539,6 +582,7 @@ function setDock(next) {
     if (!dockState.open) {
       dockState.joined = false;
       dockState.docked = false;
+      nextTick(pinLabelWidths);
     }
   }, NAV_MORPH_MS);
 }
@@ -1317,6 +1361,7 @@ function onResize() {
   }
   lastWidth = window.innerWidth;
   updateDock();
+  pinLabelWidths();
 }
 
 let shellStarted = false;
@@ -1354,6 +1399,10 @@ async function startShell() {
   window.addEventListener("keydown", onIntroKey);
   window.addEventListener("resize", onResize);
   updateDock();
+  pinLabelWidths();
+  document.fonts?.ready?.then(() => {
+    if (!dockState.open) pinLabelWidths();
+  });
   if (queued === "about" || queued === "home") go(queued);
   spyObserver = new IntersectionObserver(onSpy, {
     root,
@@ -1496,7 +1545,7 @@ watch(
               :href="route.name === 'resume' ? route.path : '/resume'"
               :aria-current="activeSection === 'resume' ? 'page' : undefined"
               :aria-expanded="dockState.open ? 'true' : undefined"
-              :aria-label="dockState.open ? 'Back to main nav' : undefined"
+              :aria-label="dockState.open ? 'Resume, back to main nav' : undefined"
               @click="onResumeNav($event)"
             >
               <span class="nav-back" aria-hidden="true">
