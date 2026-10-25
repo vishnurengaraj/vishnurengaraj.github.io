@@ -20,8 +20,31 @@ const router = useRouter();
 const scroller = ref(null);
 const ready = ref(false);
 const titleLocked = ref(false);
-const layerSizes = "(max-width: 360px) 900px, (max-width: 800px) 1500px, 1800px";
-const layerWidths = [960, 1600, 2400, 3200];
+// Painted width in title.css:
+//   max(100vw * --ridge-overscan, (100dvh - --ridge-top) / --ridge-show * --aspect)
+//   --ridge-overscan: 1.08; --ridge-show: 0.5;
+//   --ridge-top: clamp(132px, 7vh + 360px, 62vh)
+// vh stands in for dvh here; they match on desktop, and the narrow slots
+// below cover phones. Keep in sync with widthsFor() in scripts/render-ridge-layers.mjs.
+function ridgeSizes(masterW, masterH) {
+  const aspect = Math.round((masterW / masterH) * 10000) / 10000;
+  const scale = (aspect * 2).toFixed(4);
+  const painted = `max(108vw, calc((100vh - clamp(132px, 7vh + 360px, 62vh)) * ${scale}))`;
+  return `(max-width: 360px) 900px, (max-width: 800px) 1500px, ${painted}`;
+}
+
+function ridgeWidths(master) {
+  const widths = [960, 1600, 2400, 3200];
+  if (master >= 4200) widths.push(4200);
+  if (master >= 4800) widths.push(4800);
+  else if (master > 4200) widths.push(master);
+  return widths;
+}
+
+function layerSrcset(id, widths, ext) {
+  return widths.map((n) => `/media/layers/${id}-${n}.${ext} ${n}w`).join(", ");
+}
+
 const ridgeLayers = [
   ["l1", 14058, 4277],
   ["l2", 4686, 1689],
@@ -30,14 +53,21 @@ const ridgeLayers = [
   ["l5", 4685, 1704],
   ["l6", 4685, 1707],
   ["l7", 4685, 2019],
-].map(([id, w, h]) => ({
-  id,
-  w,
-  h,
-  fallback: `/media/layers/${id}-1600.webp`,
-  srcAvif: layerWidths.map((n) => `/media/layers/${id}-${n}.avif ${n}w`).join(", "),
-  srcWebp: layerWidths.map((n) => `/media/layers/${id}-${n}.webp ${n}w`).join(", "),
-}));
+].map(([id, w, h]) => {
+  const widths = ridgeWidths(w);
+  const narrow = widths.filter((n) => n <= 3200);
+  return {
+    id,
+    w,
+    h,
+    sizes: ridgeSizes(w, h),
+    fallback: `/media/layers/${id}-1600.webp`,
+    srcAvif: layerSrcset(id, widths, "avif"),
+    srcWebp: layerSrcset(id, widths, "webp"),
+    srcAvifNarrow: layerSrcset(id, narrow, "avif"),
+    srcWebpNarrow: layerSrcset(id, narrow, "webp"),
+  };
+});
 
 useHead({
   link: [
@@ -1347,11 +1377,24 @@ watch(
       aria-hidden="true"
     >
       <picture>
-        <source type="image/avif" :srcset="layer.srcAvif" :sizes="layerSizes" />
+        <source
+          media="(min-width: 801px)"
+          type="image/avif"
+          :srcset="layer.srcAvif"
+          :sizes="layer.sizes"
+        />
+        <source
+          media="(min-width: 801px)"
+          type="image/webp"
+          :srcset="layer.srcWebp"
+          :sizes="layer.sizes"
+        />
+        <source type="image/avif" :srcset="layer.srcAvifNarrow" :sizes="layer.sizes" />
+        <source type="image/webp" :srcset="layer.srcWebpNarrow" :sizes="layer.sizes" />
         <img
           :src="layer.fallback"
-          :srcset="layer.srcWebp"
-          :sizes="layerSizes"
+          :srcset="layer.srcWebpNarrow"
+          :sizes="layer.sizes"
           alt=""
           decoding="async"
           :width="layer.w"
