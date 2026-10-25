@@ -452,8 +452,6 @@
 
   .section-nav.is-open a.nav-resume {
     padding: 0 8px;
-    font-size: 12px;
-    letter-spacing: 0;
   }
 
   .section-nav.is-open .nav-subs .tablist button {
