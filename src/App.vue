@@ -344,9 +344,9 @@ let routeFromTween = false;
 let spySettle = 0;
 let spyObserver;
 
-/* The skills card sits under the resume tabs and sticks with the pill.
-   The anchor is the flow position, so a stuck card does not keep Skills
-   highlighted for the whole resume. Farther down a panel, Resume takes over. */
+/* The skills card sits in normal flow under the resume tabs and scrolls
+   away with the page. Skills stays highlighted only while that card is in
+   the band under the nav. Farther down a panel, Resume takes over. */
 function skillsInView() {
   const root = scroller.value;
   const mark = document.getElementById("skills");
