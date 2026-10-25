@@ -511,28 +511,47 @@ function pinLabelWidths() {
   for (const link of links) link.style.transition = "";
 }
 
+/* Measure a copy. Toggling transition on the live tab, then opening in
+   the same frame, makes WebKit skip the ease and flash every label. */
 function pinTabWidths() {
   const inner = document.querySelector(".nav-inner");
   const buttons = [...document.querySelectorAll("#nav-tab-slot button")];
-  if (!inner || !buttons.length) return;
+  if (!inner || !buttons.length) return false;
   const pad = getComputedStyle(inner).getPropertyValue("--tab-pad").trim() || "16px";
-  for (const button of buttons) button.style.transition = "none";
-  void buttons[0].offsetWidth;
   for (const button of buttons) {
-    button.style.maxWidth = "none";
-    button.style.paddingLeft = pad;
-    button.style.paddingRight = pad;
+    const probe = button.cloneNode(true);
+    probe.style.transition = "none";
+    probe.style.maxWidth = "none";
+    probe.style.paddingLeft = pad;
+    probe.style.paddingRight = pad;
+    probe.style.transform = "none";
+    probe.style.position = "absolute";
+    probe.style.visibility = "hidden";
+    probe.style.pointerEvents = "none";
+    button.parentElement.appendChild(probe);
+    const w = probe.getBoundingClientRect().width;
+    probe.remove();
+    if (w > 1) button.style.setProperty("--tab-max", `${Math.ceil(w)}px`);
   }
-  const widths = buttons.map((button) => button.getBoundingClientRect().width);
-  for (let i = 0; i < buttons.length; i++) {
-    const button = buttons[i];
-    button.style.maxWidth = "";
-    button.style.paddingLeft = "";
-    button.style.paddingRight = "";
-    if (widths[i] > 1) button.style.setProperty("--tab-max", `${Math.ceil(widths[i])}px`);
-  }
-  void buttons[0].offsetWidth;
-  for (const button of buttons) button.style.transition = "";
+  return true;
+}
+
+/* --tab-max is set while max-width is still 0, then the row opens on the
+   next frame so the ease runs from zero instead of the measured width. */
+function scheduleOpen(tries = 0) {
+  if (!dockState.docked || dockState.open) return;
+  requestAnimationFrame(() => {
+    if (!dockState.docked || dockState.open) return;
+    if (!pinTabWidths() && tries < 8) {
+      scheduleOpen(tries + 1);
+      return;
+    }
+    requestAnimationFrame(() => {
+      if (!dockState.docked || dockState.open) return;
+      dockState.open = true;
+      dockState.joined = true;
+    });
+  });
 }
 
 /* Tabs move into the fixed-height pill. A same-height placeholder keeps
@@ -551,21 +570,8 @@ function setDock(next) {
       return;
     }
     pinLabelWidths();
-    if (!dockState.docked) {
-      dockState.docked = true;
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (!dockState.docked) return;
-          pinTabWidths();
-          dockState.open = true;
-          dockState.joined = true;
-        });
-      });
-    } else {
-      pinTabWidths();
-      dockState.open = true;
-      dockState.joined = true;
-    }
+    if (!dockState.docked) dockState.docked = true;
+    scheduleOpen();
     return;
   }
   if (!dockState.docked) return;
