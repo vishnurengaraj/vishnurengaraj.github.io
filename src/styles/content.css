@@ -1198,6 +1198,22 @@ html.js .panel-block.is-out {
   }
 }
 
+/* Five section labels, including Diners, stay on one row at phone widths. */
+@media (max-width: 440px) {
+  .section-nav a {
+    padding: 0 8px;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 360px) {
+  .section-nav a {
+    padding: 0 6px;
+    font-size: 0.75rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .panel-stage.is-anim[data-dir] > .is-active {
     animation-name: panel-fade-in;
