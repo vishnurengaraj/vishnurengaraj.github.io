@@ -14,9 +14,8 @@ const PLACES = [
     atmosphere: 7.5,
     service: 5,
     hue: [280, 30],
-    /* Replace the file, or clear photo, when a personal shot is ready. */
     photo: "/media/diners/wendys.jpg",
-    photoCredit: "Wendy's Place storefront",
+    photoCredit: "Photo by Vishnu",
   },
   {
     id: "unclebills",
@@ -31,7 +30,7 @@ const PLACES = [
     service: 6,
     hue: [205, 30],
     photo: "/media/diners/unclebills.jpg",
-    photoCredit: "Uncle Bill's Pancake House (official site)",
+    photoCredit: "Photo by Vishnu",
   },
   {
     id: "marthas",
@@ -73,6 +72,18 @@ export function mapsUrl(place) {
   return (
     "https://www.google.com/maps/search/?api=1&query=" +
     encodeURIComponent(`${place.name}, ${place.addr}`)
+  );
+}
+
+/** Apple Maps pin at the diner's coordinates, labeled with name and address. */
+export function appleMapsUrl(place) {
+  return (
+    "https://maps.apple.com/?ll=" +
+    place.lat +
+    "," +
+    place.lng +
+    "&q=" +
+    encodeURIComponent(place.name + ", " + place.addr)
   );
 }
 

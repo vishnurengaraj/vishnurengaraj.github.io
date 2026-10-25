@@ -678,9 +678,18 @@ html:has(.diners) #app {
   color: var(--text);
 }
 
+.diners .btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .diners .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex: 1 1 140px;
   gap: 8px;
   background: var(--primary);
   color: var(--on-primary);
@@ -694,6 +703,18 @@ html:has(.diners) #app {
 .diners .btn:hover {
   background: var(--primary-deep);
   color: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.45);
+}
+
+.diners .btn-secondary {
+  background: transparent;
+  color: var(--primary);
+  box-shadow: inset 0 0 0 1.5px var(--primary);
+}
+
+.diners .btn-secondary:hover {
+  background: var(--primary);
+  color: var(--on-primary);
   box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.45);
 }
 

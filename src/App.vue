@@ -1379,7 +1379,6 @@ watch(
             <a href="/projects" :aria-current="activeSection === 'projects' ? 'page' : undefined" @click="onNav($event, 'projects')">Projects</a>
             <a href="/resume" :aria-current="activeSection === 'resume' ? 'page' : undefined" @click="onNav($event, 'resume')">Resume</a>
             <a href="/skills" :aria-current="activeSection === 'skills' ? 'page' : undefined" @click="onNav($event, 'skills')">Skills</a>
-            <a href="/diners">Diners</a>
           </div>
           <div class="nav-dock-clip">
             <div id="nav-tab-slot" class="nav-dock"></div>

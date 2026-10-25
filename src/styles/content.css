@@ -839,6 +839,17 @@ video {
   gap: 1.5rem 2rem;
 }
 
+/* One Diners link is visible at a time. The mid copy sits in the open
+   space between the name and the contact cluster once that gap is wide
+   enough; otherwise it joins LinkedIn, Email, and Resume. */
+.site-footer .footer-diners {
+  white-space: nowrap;
+}
+
+.site-footer .footer-diners-mid {
+  display: none;
+}
+
 .footer-id {
   display: flex;
   align-items: center;
@@ -933,6 +944,22 @@ video {
   50% {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@media (min-width: 900px) {
+  .footer-inner {
+    display: grid;
+    grid-template-columns: auto minmax(max-content, 1fr) auto;
+  }
+
+  .site-footer .footer-diners-mid {
+    display: inline-flex;
+    justify-self: center;
+  }
+
+  .site-footer .footer-diners-inline {
+    display: none;
   }
 }
 
@@ -1195,22 +1222,6 @@ html.js .panel-block.is-out {
     padding: 0 clamp(6px, 2.4vw, 12px);
     font-size: clamp(0.75rem, 0.68rem + 0.35vw, 0.8125rem);
     line-height: 1.125rem;
-  }
-}
-
-/* Five section labels, including Diners, stay on one row at phone widths. */
-@media (max-width: 440px) {
-  .section-nav a {
-    padding: 0 8px;
-    font-size: 0.8125rem;
-    white-space: nowrap;
-  }
-}
-
-@media (max-width: 360px) {
-  .section-nav a {
-    padding: 0 6px;
-    font-size: 0.75rem;
   }
 }
 

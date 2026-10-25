@@ -2,15 +2,11 @@
 
 ## wendys
 - Local: `wendys.jpg`
-- Page: https://restaurantguru.com/Wendys-Place-El-Segundo
-- Image: https://img4.restaurantguru.com/w550/h367/r5bb-Wendys-Place-interior-2026-09.jpg
-- Note: Wendy's Place storefront (El Segundo); review-site photo via Restaurant Guru — license unclear; replace if Vishnu uploads his own.
+- Note: Photo by Vishnu. Breakfast table and Wendy's Place window. Replaces the earlier Restaurant Guru storefront shot.
 
 ## unclebills
 - Local: `unclebills.jpg`
-- Page: https://www.unclebills.net/
-- Image: https://www.unclebills.net/uploads/3/0/2/0/30209783/background-images/167832268.jpg
-- Note: Uncle Bill's Pancake House exterior; from restaurant's official website.
+- Note: Photo by Vishnu. Patio breakfast spread. Replaces the earlier official-site exterior.
 
 ## marthas
 - Local: `marthas.jpg`
