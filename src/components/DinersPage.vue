@@ -28,11 +28,28 @@ const pageEl = ref(null);
 const sortKey = ref("weighted");
 const selectedId = ref(null);
 const hoverId = ref(null);
-const shown = ref(null);
 const detailOpen = ref(false);
 const panelOpen = ref(route.query.list === "open");
 const motionOn = ref(false);
-const drawerPeek = computed(() => !detailOpen.value && hoverId.value != null && shown.value != null);
+const shuffling = ref(false);
+const frontIndex = ref(0);
+const slots = reactive([
+  { place: null, role: "tucked" },
+  { place: null, role: "tucked" },
+]);
+
+const SHUFFLE_MS = 680;
+
+const weightLegend = [
+  ["Taste", WEIGHTS.taste],
+  ["Price", WEIGHTS.price],
+  ["Atmosphere", WEIGHTS.atmosphere],
+  ["Service", WEIGHTS.service],
+]
+  .map(([label, share]) => `${label} ${Math.round(share * 100)}%`)
+  .join(" · ");
+
+const cardOut = computed(() => slots.some((layer) => layer.role !== "tucked"));
 
 const forceOpen = computed(() => route.query.list === "open");
 const sorted = computed(() => {
@@ -75,6 +92,7 @@ let leafletApi;
 let markers = {};
 let resizeTimer = 0;
 let hoverTimer = 0;
+let shuffleTimer = 0;
 
 function escapeHtml(value) {
   return String(value)
@@ -173,27 +191,95 @@ function setPanel(isOpen) {
   }, 280);
 }
 
-function openDetail(place) {
-  window.clearTimeout(hoverTimer);
-  hoverId.value = null;
+function scrollLayer(index) {
+  const body = pageEl.value?.querySelectorAll(".detail-body")[index];
+  if (body) body.scrollTop = 0;
+}
+
+function finishOpen(index, place) {
   selectedId.value = place.id;
-  shown.value = place;
   detailOpen.value = true;
   nextTick(() => {
-    const scroller = pageEl.value?.querySelector(".detail-body");
-    if (scroller) scroller.scrollTop = 0;
+    scrollLayer(index);
     paintPins();
     if (!isPhone()) focusPlace(place);
   });
 }
 
+function openDetail(place) {
+  window.clearTimeout(hoverTimer);
+  if (shuffling.value) return;
+  if (!isPhone() && detailOpen.value) {
+    const front = slots[frontIndex.value];
+    if (front.place?.id === place.id) return;
+    shuffleTo(place);
+    return;
+  }
+  hoverId.value = null;
+  const index = frontIndex.value;
+  const other = slots[1 - index];
+  if (other.role !== "tucked") other.role = "tucked";
+  slots[index].place = place;
+  slots[index].role = "open";
+  finishOpen(index, place);
+}
+
 function closeDetail() {
+  window.clearTimeout(shuffleTimer);
+  shuffling.value = false;
+  hoverId.value = null;
   selectedId.value = null;
   detailOpen.value = false;
+  for (const layer of slots) {
+    if (layer.role !== "tucked") layer.role = "tucked";
+  }
   paintPins();
   if (isPhone()) return;
   window.clearTimeout(resizeTimer);
   resizeTimer = window.setTimeout(() => fitMap(true), 320);
+}
+
+function shuffleTo(place) {
+  if (isPhone() || shuffling.value) return;
+  const from = frontIndex.value;
+  const to = 1 - from;
+  shuffling.value = true;
+  slots[to].place = place;
+
+  const commit = () => {
+    if (!shuffling.value) return;
+    slots[from].role = "tucked";
+    slots[from].place = null;
+    slots[to].role = "open";
+    frontIndex.value = to;
+    shuffling.value = false;
+    hoverId.value = null;
+    finishOpen(to, place);
+  };
+
+  if (prefersReduced()) {
+    commit();
+    return;
+  }
+
+  const run = () => {
+    if (!shuffling.value) return;
+    slots[from].role = "leaving";
+    slots[to].role = "arriving";
+    shuffleTimer = window.setTimeout(commit, SHUFFLE_MS);
+  };
+
+  if (slots[to].role === "behind") {
+    run();
+    return;
+  }
+
+  slots[to].role = "behind";
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => run());
+    });
+  });
 }
 
 function select(place) {
@@ -208,17 +294,37 @@ function select(place) {
 }
 
 function setHover(place) {
-  if (!place || !canPeek() || detailOpen.value) return;
+  if (!place || !canPeek() || shuffling.value) return;
   window.clearTimeout(hoverTimer);
   hoverId.value = place.id;
-  shown.value = place;
+  if (detailOpen.value) {
+    const front = slots[frontIndex.value];
+    const back = slots[1 - frontIndex.value];
+    if (front.place?.id === place.id) {
+      if (back.role === "behind") back.role = "tucked";
+      return;
+    }
+    back.place = place;
+    back.role = "behind";
+    return;
+  }
+  const front = slots[frontIndex.value];
+  front.place = place;
+  front.role = "peek";
 }
 
 function clearHover() {
-  if (!canPeek()) return;
+  if (!canPeek() || shuffling.value) return;
   window.clearTimeout(hoverTimer);
   hoverTimer = window.setTimeout(() => {
     hoverId.value = null;
+    if (detailOpen.value) {
+      const back = slots[1 - frontIndex.value];
+      if (back.role === "behind") back.role = "tucked";
+      return;
+    }
+    const front = slots[frontIndex.value];
+    if (front.role === "peek") front.role = "tucked";
   }, 220);
 }
 
@@ -226,21 +332,23 @@ function holdHover() {
   window.clearTimeout(hoverTimer);
 }
 
-function openPeeked() {
-  if (shown.value) select(shown.value);
+function openPeeked(place) {
+  if (place) select(place);
 }
 
 function onKey(event) {
   if (event.key !== "Escape") return;
-  if (detailOpen.value) {
+  if (detailOpen.value || shuffling.value) {
     event.preventDefault();
     closeDetail();
     return;
   }
-  if (hoverId.value) {
+  const front = slots[frontIndex.value];
+  if (front.role === "peek") {
     event.preventDefault();
     window.clearTimeout(hoverTimer);
     hoverId.value = null;
+    front.role = "tucked";
   }
 }
 
@@ -268,15 +376,13 @@ onMounted(async () => {
   await nextTick();
   const el = mapEl.value;
   if (!el) return;
-  map = leaflet.map(el, { zoomControl: false, scrollWheelZoom: true }).setView([33.89, -118.4], 12);
-  map.attributionControl?.setPosition("bottomright");
+  map = leaflet
+    .map(el, { zoomControl: false, scrollWheelZoom: true, attributionControl: false })
+    .setView([33.89, -118.4], 12);
   leaflet
     .tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
-      {
-        attribution: "Tiles &copy; Esri, HERE, Garmin, &copy; OpenStreetMap contributors",
-        maxZoom: 16,
-      },
+      { maxZoom: 16 },
     )
     .addTo(map);
   leaflet
@@ -323,6 +429,7 @@ onMounted(async () => {
 onUnmounted(() => {
   window.clearTimeout(resizeTimer);
   window.clearTimeout(hoverTimer);
+  window.clearTimeout(shuffleTimer);
   window.removeEventListener("keydown", onKey);
   window.removeEventListener("resize", onResize);
   map?.remove();
@@ -338,14 +445,8 @@ onUnmounted(() => {
     :class="{ 'no-anim': !motionOn, 'force-open': forceOpen }"
   >
     <header class="top">
-      <div class="brand">
-        <a class="crumb" href="/">vishnu.rengaraj.com<span>/diners</span></a>
-        <h1>Diners <span class="badge">{{ DINERS.length }} visits</span></h1>
-        <p class="sub">South Bay Sunday breakfast</p>
-      </div>
-      <div class="legend-top">
-        <strong>Weighted</strong> = Taste 40% · Price 30% · Atmosphere 15% · Service 15%
-      </div>
+      <a class="crumb" href="https://vishnu.rengaraj.com/">vishnu.rengaraj.com<span>/diners</span></a>
+      <h1 class="sr-only">Diners</h1>
     </header>
 
     <main class="stage">
@@ -373,6 +474,7 @@ onUnmounted(() => {
               ‹
             </button>
           </div>
+          <p class="list-weights"><strong>Weighted</strong> = {{ weightLegend }}</p>
           <div class="sort">
             <label for="diner-sort">Sort</label>
             <select id="diner-sort" v-model="sortKey">
@@ -433,73 +535,77 @@ onUnmounted(() => {
         </button>
       </section>
       <aside
+        v-for="(layer, index) in slots"
+        :key="index"
         class="detail"
-        :class="{ open: detailOpen, peek: drawerPeek }"
-        :aria-hidden="detailOpen ? 'false' : 'true'"
-        :inert="detailOpen || drawerPeek ? undefined : true"
-        :aria-label="shown ? shown.name : 'Diner'"
+        :class="layer.role"
+        :aria-hidden="layer.role === 'open' || layer.role === 'peek' || layer.role === 'behind' ? 'false' : 'true'"
+        :inert="layer.role === 'peek' || layer.role === 'behind' || layer.role === 'open' ? undefined : true"
+        :aria-label="layer.place ? layer.place.name : 'Diner'"
         @mouseenter="holdHover"
         @mouseleave="clearHover"
       >
         <button
-          v-if="drawerPeek"
+          v-if="layer.place && (layer.role === 'peek' || layer.role === 'behind')"
           class="peek-hit"
           type="button"
           tabindex="-1"
-          :aria-label="shown ? `Show ${shown.name}` : 'Show diner'"
-          @click.stop="openPeeked"
+          :aria-label="`Show ${layer.place.name}`"
+          @click.stop="openPeeked(layer.place)"
         ></button>
-        <button v-show="detailOpen" class="close" type="button" aria-label="Close" @click="closeDetail">×</button>
-        <div class="detail-body" :inert="detailOpen ? undefined : true">
-          <div v-if="shown">
-        <div
-          class="ph"
-          :style="photoSrc(shown) ? undefined : { backgroundImage: photoPlaceholder(shown) }"
-        >
-          <img
-            v-if="photoSrc(shown)"
-            :src="photoSrc(shown)"
-            :alt="shown.name"
-            @error="onPhotoError(shown.id)"
-          />
-          <span v-if="!photoSrc(shown)" class="demo">PHOTO COMING SOON</span>
-          <span v-else-if="shown.photoCredit" class="credit">{{ shown.photoCredit }}</span>
-          <span v-if="shown.certified" class="cert-banner">Certified</span>
-        </div>
-        <div class="d-in">
-          <h2>{{ shown.name }}</h2>
-          <div class="hood">{{ shown.hood }} · Rank #{{ rankOf(shown) }} of {{ DINERS.length }}</div>
-          <div class="big">
-            <b>{{ shown.weighted.toFixed(2) }}</b>
-            <span>weighted score<br>visited · out of 10</span>
-          </div>
-          <div v-for="[label, key] in bars" :key="key" class="bar">
-            <div class="lbl">
-              <span>{{ label }}<em>{{ Math.round(WEIGHTS[key] * 100) }}%</em></span>
-              <b>{{ shown[key] }}</b>
+        <button
+          v-show="layer.role === 'open' || layer.role === 'leaving'"
+          class="close"
+          type="button"
+          aria-label="Close"
+          @click="closeDetail"
+        >×</button>
+        <div class="detail-body" :inert="layer.role === 'open' ? undefined : true">
+          <div v-if="layer.place">
+            <div
+              class="ph"
+              :style="photoSrc(layer.place) ? undefined : { backgroundImage: photoPlaceholder(layer.place) }"
+            >
+              <img
+                v-if="photoSrc(layer.place)"
+                :src="photoSrc(layer.place)"
+                :alt="layer.place.name"
+                @error="onPhotoError(layer.place.id)"
+              />
+              <span v-if="!photoSrc(layer.place)" class="demo">PHOTO COMING SOON</span>
+              <span v-else-if="layer.place.photoCredit" class="credit">{{ layer.place.photoCredit }}</span>
+              <span v-if="layer.place.certified" class="cert-banner">Certified</span>
             </div>
-            <div class="tr"><div class="fi" :style="{ width: barWidth(shown, key) }"></div></div>
-          </div>
-          <p v-if="shown.note" class="note">{{ shown.note }}</p>
-          <div class="meta">
-            <template v-if="shown.order"><b>Ordered:</b> {{ shown.order }}<br></template>
-            <template v-if="shown.cost"><b>Spend:</b> {{ shown.cost }}<br></template>
-            {{ shown.addr }}
-          </div>
-          <div class="btns">
-            <a class="btn" :href="mapsUrl(shown)" target="_blank" rel="noopener">Open in Google Maps</a>
-            <a class="btn btn-secondary" :href="appleMapsUrl(shown)" target="_blank" rel="noopener">Open in Apple Maps</a>
+            <div class="d-in">
+              <h2>{{ layer.place.name }}</h2>
+              <div class="hood">{{ layer.place.hood }} · Rank #{{ rankOf(layer.place) }} of {{ DINERS.length }}</div>
+              <div class="big">
+                <b>{{ layer.place.weighted.toFixed(2) }}</b>
+                <span>weighted score<br>visited · out of 10</span>
+              </div>
+              <div v-for="[label, key] in bars" :key="key" class="bar">
+                <div class="lbl">
+                  <span>{{ label }}<em>{{ Math.round(WEIGHTS[key] * 100) }}%</em></span>
+                  <b>{{ layer.place[key] }}</b>
+                </div>
+                <div class="tr"><div class="fi" :style="{ width: barWidth(layer.place, key) }"></div></div>
+              </div>
+              <p v-if="layer.place.note" class="note">{{ layer.place.note }}</p>
+              <div class="meta">
+                <template v-if="layer.place.order"><b>Ordered:</b> {{ layer.place.order }}<br></template>
+                <template v-if="layer.place.cost"><b>Spend:</b> {{ layer.place.cost }}<br></template>
+                {{ layer.place.addr }}
+              </div>
+              <div class="btns">
+                <a class="btn" :href="mapsUrl(layer.place)" target="_blank" rel="noopener">Open in Google Maps</a>
+                <a class="btn btn-secondary" :href="appleMapsUrl(layer.place)" target="_blank" rel="noopener">Open in Apple Maps</a>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      </div>
       </aside>
+      <div class="seam-shadow" :class="{ on: cardOut }" aria-hidden="true"></div>
     </main>
     <div class="scrim" :class="{ open: detailOpen }" @click="closeDetail"></div>
-
-    <footer class="foot">
-      <span>⛰ Scores from Sunday visits, logged in the Google Sheet after each meal.</span>
-      <span class="muted">Map tiles © Esri · OpenStreetMap</span>
-    </footer>
   </div>
 </template>

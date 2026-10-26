@@ -53,10 +53,9 @@ html:has(.diners) #app {
 
 .diners .top {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   gap: 16px;
-  padding: 22px 32px 16px;
+  padding: 12px 32px;
   border-bottom: 1px solid var(--line);
   position: relative;
   background: rgba(255, 253, 251, 0.85);
@@ -80,62 +79,38 @@ html:has(.diners) #app {
 
 .diners .crumb {
   font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 14px;
+  letter-spacing: 0.01em;
   color: var(--muted);
   text-decoration: none;
 }
 
+.diners .crumb:hover {
+  color: var(--primary);
+}
+
 .diners .crumb span {
-  color: var(--sec-text);
+  color: var(--primary);
 }
 
-.diners h1 {
-  margin: 6px 0 2px;
-  font-size: 34px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  color: var(--text);
-}
-
-.diners .badge {
+.diners .list-weights {
+  margin: 0;
+  padding: 0 16px 12px;
   font-family: var(--mono);
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #1f1f1f;
-  border: 1px solid var(--sec);
-  background: rgba(255, 176, 32, 0.22);
-  padding: 4px 9px;
-  border-radius: 999px;
-}
-
-.diners .sub {
-  margin: 0;
+  line-height: 1.45;
   color: var(--muted);
-  font-size: 15px;
 }
 
-.diners .legend-top {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--muted);
-  padding-bottom: 4px;
-}
-
-.diners .legend-top strong {
+.diners .list-weights strong {
   color: var(--primary);
+  font-weight: 700;
 }
 
 .diners .stage {
   --drawer-left: 48px;
-  --drawer-peek: 120px;
+  --drawer-peek: 64px;
+  --drawer-behind: 40px;
   flex: 1;
   min-height: 0;
   position: relative;
@@ -161,6 +136,10 @@ html:has(.diners) #app {
 .diners .leaflet-container {
   font-family: Roboto, sans-serif;
   background: #eef0f2;
+}
+
+.diners .leaflet-control-attribution {
+  display: none !important;
 }
 
 .diners .leaflet-control-zoom a {
@@ -582,8 +561,9 @@ html:has(.diners) #app {
   display: none;
 }
 
-/* Desktop drawer: tucked behind the left rail, a photo sliver on hover,
-   then the full card pulled out over the map. Phone resets this below. */
+/* Desktop drawer: the card sits under the left rail and slides out to the right,
+   so a hover peek is the card's right edge. A second card can peek past an open
+   drawer's right edge; choosing it shuffles the two. Phone resets this below. */
 .diners .detail {
   position: absolute;
   top: 0;
@@ -594,21 +574,79 @@ html:has(.diners) #app {
   background: var(--bg2);
   border-right: 2px solid var(--sec);
   border-radius: 0 18px 18px 0;
-  z-index: 750;
+  z-index: 740;
   transform: translateX(calc(-100% - 72px));
-  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), left 0.25s ease;
+  transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), left 0.25s ease;
   overflow: hidden;
   pointer-events: none;
   box-shadow: 16px 0 40px rgba(26, 16, 51, 0.16);
 }
 
 .diners .detail.peek,
+.diners .detail.behind,
 .diners .detail.open {
   pointer-events: auto;
 }
 
+.diners .detail.peek {
+  transform: translateX(calc(-100% + var(--drawer-peek)));
+  z-index: 760;
+}
+
 .diners .detail.open {
   transform: translateX(0);
+  z-index: 760;
+}
+
+.diners .detail.behind {
+  transform: translateX(var(--drawer-behind));
+  z-index: 745;
+  box-shadow:
+    -10px 0 16px rgba(26, 16, 51, 0.12),
+    10px 0 22px rgba(26, 16, 51, 0.16);
+}
+
+.diners .stage:has(.detail.behind) .detail.open {
+  box-shadow: 4px 0 12px rgba(26, 16, 51, 0.12);
+}
+
+.diners .detail.leaving,
+.diners .detail.arriving {
+  transition: transform 0.62s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.diners .detail.leaving {
+  transform: translateX(calc(-100% - 72px));
+  z-index: 770;
+}
+
+.diners .detail.arriving {
+  transform: translateX(0);
+  z-index: 750;
+}
+
+/* Rail casts a purple shadow onto the card where it emerges. */
+.diners .seam-shadow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--drawer-left);
+  width: 26px;
+  z-index: 790;
+  pointer-events: none;
+  opacity: 0;
+  transition: left 0.25s ease, opacity 0.25s ease;
+  background: linear-gradient(
+    90deg,
+    rgba(45, 29, 122, 0.4) 0%,
+    rgba(45, 29, 122, 0.12) 50%,
+    rgba(45, 29, 122, 0) 100%
+  );
+}
+
+.diners .seam-shadow.on {
+  opacity: 1;
 }
 
 .diners .detail-body {
@@ -621,12 +659,12 @@ html:has(.diners) #app {
   transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* While only a sliver is out, shift the card so that sliver is its left edge
-   (photo, name) instead of the right-hand padding. */
-.diners .detail.peek .detail-body {
+.diners .detail.peek .detail-body,
+.diners .detail.behind .detail-body,
+.diners .detail.leaving .detail-body,
+.diners .detail.arriving .detail-body {
   pointer-events: none;
   overflow: hidden;
-  transform: translateX(calc(100% - var(--drawer-peek)));
 }
 
 .diners .peek-hit {
@@ -834,57 +872,17 @@ html:has(.diners) #app {
   box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.45);
 }
 
-.diners .foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 14px 32px;
-  border-top: 1px solid var(--line);
-  font-size: 13px;
-  color: var(--variant);
-  background: var(--bg2);
-}
-
-.diners .foot .muted {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--muted);
-}
-
 .diners.no-anim .panel,
 .diners.no-anim .detail,
 .diners.no-anim .detail-body,
-.diners.no-anim .scrim {
+.diners.no-anim .scrim,
+.diners.no-anim .seam-shadow {
   transition: none;
 }
 
 @media (min-width: 641px) {
   .diners .scrim {
     display: none;
-  }
-
-  .diners .detail.peek {
-    transform: translateX(calc(-100% + var(--drawer-peek)));
-  }
-
-  .diners .detail::before {
-    content: "";
-    position: absolute;
-    top: 82px;
-    right: 14px;
-    z-index: 5;
-    width: 4px;
-    height: 56px;
-    border-radius: 99px;
-    background: var(--primary);
-    box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.55);
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .diners .detail.peek::before {
-    opacity: 1;
   }
 }
 
@@ -898,14 +896,6 @@ html:has(.diners) #app {
   .diners .top::after {
     left: 16px;
     right: 16px;
-  }
-
-  .diners h1 {
-    font-size: 26px;
-  }
-
-  .diners .legend-top {
-    font-size: 11px;
   }
 
   .diners .panel {
@@ -997,18 +987,18 @@ html:has(.diners) #app {
     box-shadow: 0 -12px 32px rgba(30, 35, 41, 0.18);
   }
 
-  .diners .detail.open,
-  .diners .detail.peek {
+  .diners .detail.open {
     transform: none;
+    z-index: 1001;
   }
 
   .diners .detail:not(.open) {
     transform: translateY(105%);
+    pointer-events: none;
   }
 
-  .diners .foot {
-    padding: 10px 16px;
-    font-size: 11px;
+  .diners .seam-shadow {
+    display: none;
   }
 
   /* Keep a phone map clear if the list was painted open without ?list=open. */
@@ -1032,8 +1022,8 @@ html:has(.diners) #app {
   .diners .detail,
   .diners .detail-body,
   .diners .scrim,
-  .diners .pin,
-  .diners .detail::before {
+  .diners .seam-shadow,
+  .diners .pin {
     transition: none;
   }
 
