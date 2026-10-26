@@ -51,48 +51,6 @@ html:has(.diners) #app {
   color: var(--sec-text);
 }
 
-.diners .top {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 32px;
-  border-bottom: 1px solid var(--line);
-  position: relative;
-  background: rgba(255, 253, 251, 0.85);
-}
-
-.diners .top::after {
-  content: "";
-  position: absolute;
-  left: 32px;
-  right: 32px;
-  bottom: -1px;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    var(--primary),
-    var(--primary-soft) 30%,
-    rgba(255, 176, 32, 0.6) 55%,
-    transparent 75%
-  );
-}
-
-.diners .crumb {
-  font-family: var(--mono);
-  font-size: 14px;
-  letter-spacing: 0.01em;
-  color: var(--muted);
-  text-decoration: none;
-}
-
-.diners .crumb:hover {
-  color: var(--primary);
-}
-
-.diners .crumb span {
-  color: var(--primary);
-}
-
 .diners .list-weights {
   margin: 0;
   padding: 0 16px 12px;
@@ -887,17 +845,6 @@ html:has(.diners) #app {
 }
 
 @media (max-width: 640px) {
-  .diners .top {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 14px 16px 10px;
-  }
-
-  .diners .top::after {
-    left: 16px;
-    right: 16px;
-  }
-
   .diners .panel {
     position: absolute;
     top: 0;
@@ -925,6 +872,10 @@ html:has(.diners) #app {
     min-width: 0;
   }
 
+  .diners .panel-head {
+    padding-top: calc(16px + env(safe-area-inset-top, 0px));
+  }
+
   .diners .card {
     grid-template-columns: 56px 1fr auto;
     gap: 10px;
@@ -946,7 +897,7 @@ html:has(.diners) #app {
     gap: 8px;
     position: absolute;
     left: 12px;
-    top: 12px;
+    top: calc(12px + env(safe-area-inset-top, 0px));
     z-index: 700;
     background: var(--primary);
     color: var(--on-primary);

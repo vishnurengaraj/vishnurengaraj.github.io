@@ -444,10 +444,7 @@ onUnmounted(() => {
     class="diners"
     :class="{ 'no-anim': !motionOn, 'force-open': forceOpen }"
   >
-    <header class="top">
-      <a class="crumb" href="https://vishnu.rengaraj.com/">vishnu.rengaraj.com<span>/diners</span></a>
-      <h1 class="sr-only">Diners</h1>
-    </header>
+    <h1 class="sr-only">Diners</h1>
 
     <main class="stage">
       <aside id="panel" class="panel" :class="{ open: panelOpen }" aria-label="Restaurant list">
