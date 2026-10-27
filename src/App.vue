@@ -6,6 +6,7 @@ import monoBold from "@fontsource/roboto-mono/files/roboto-mono-latin-700-normal
 import headingBlack from "./fonts/roboto-900-headings.woff2?url";
 import Stars from "./components/Stars.vue";
 import Hero from "./components/Hero.vue";
+import Headlamps from "./components/Headlamps.vue";
 import AboutSection from "./components/AboutSection.vue";
 import ProjectsSection from "./components/ProjectsSection.vue";
 import ResumeSection from "./components/ResumeSection.vue";
@@ -1563,6 +1564,7 @@ watch(
           :height="layer.h"
         />
       </picture>
+      <Headlamps v-if="layer.id === 'l6'" />
     </div>
     <div class="ridge-ground" aria-hidden="true"></div>
     <div class="sunrise" aria-hidden="true">
