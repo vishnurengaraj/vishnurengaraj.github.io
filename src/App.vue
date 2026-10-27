@@ -1020,7 +1020,19 @@ function onIntroWheel(event) {
 }
 
 let parallaxY = "";
+
+/* is-title-scroll / is-title-off hold the headlamp beams. See title.css. */
+function syncTitleMotion(root) {
+  const y = root.scrollTop;
+  const limit = heroLimit || root.clientHeight || 0;
+  const off = limit > 0 && y > limit;
+  const scrolling = !off && y > 2;
+  if (root.classList.contains("is-title-off") !== off) root.classList.toggle("is-title-off", off);
+  if (root.classList.contains("is-title-scroll") !== scrolling) root.classList.toggle("is-title-scroll", scrolling);
+}
+
 function syncParallax(root) {
+  syncTitleMotion(root);
   if (prefersReduced()) {
     parallaxHeld = true;
     root.classList.remove("is-parallax");

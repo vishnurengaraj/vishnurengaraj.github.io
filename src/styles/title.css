@@ -124,6 +124,21 @@
   opacity: 0.7;
 }
 
+/* Each beam frame re-rasters the headlamp blurs and the ridge masks.
+   That is cheap enough while the title sits still, and it is what
+   turns the sunrise into a handful of jumps once the peaks move.
+   Hold the beams (the filtered look stays) for the tween, for a
+   manual scroll through the title, and once the title is off screen. */
+.prlx.is-intro .beam,
+.prlx.is-title-scroll .beam,
+.prlx.is-title-off .beam {
+  animation-play-state: paused;
+}
+
+.prlx.is-title-off .headlamps {
+  content-visibility: hidden;
+}
+
 .hero-shooter {
   position: absolute;
   left: 0;
