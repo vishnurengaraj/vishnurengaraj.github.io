@@ -125,10 +125,10 @@
 }
 
 /* Each beam frame re-rasters the headlamp blurs and the ridge masks.
-   That is cheap enough while the title sits still, and it is what
-   turns the sunrise into a handful of jumps once the peaks move.
-   Hold the beams (the filtered look stays) for the tween, for a
-   manual scroll through the title, and once the title is off screen. */
+   That is cheap enough while the title sits still. Hold the beams
+   for the tween, for a manual scroll through the title, and once
+   the title is off screen. Desktop keeps the filtered look while
+   the cinematic plays. */
 .prlx.is-intro .beam,
 .prlx.is-title-scroll .beam,
 .prlx.is-title-off .beam {
@@ -137,6 +137,20 @@
 
 .prlx.is-title-off .headlamps {
   content-visibility: hidden;
+}
+
+/* Pausing the beams was not enough on iPhone Safari. The filter and
+   mask graph is still invalidated every time l6 moves, so the sunrise
+   lands as ~0.3–0.4s leaps (the same pattern as the on-device clip).
+   Stripping filter/mask in CSS left the SVG in the render tree and
+   did not beat removing it. On small screens, drop the whole lamp
+   SVG for the tween and for a manual title scroll. At rest the lamps
+   stay, filters included. */
+@media (max-width: 900px) {
+  .prlx.is-intro .headlamps,
+  .prlx.is-title-scroll .headlamps {
+    display: none;
+  }
 }
 
 .hero-shooter {
