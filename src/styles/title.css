@@ -196,20 +196,21 @@
 
 /* Stacked sunrise cards. They start exactly at the bottom of the
    hero so none of the horizon band shows inside the title viewport.
-   The first band matches the sky horizon. The last band matches the
-   content sheet. Each band overlaps the next by 12px so its shadow
-   falls on the color below. A gap here would show the night sky as a
-   dark bar. The extra height cancels that overlap, so each stripe
-   still contributes 16vh (64px at the minimum). Colored bands have
-   rounded bottoms; black Material shadows read as ink on the oranges,
-   so the shadow is a soft night-purple tint. The white band stays
-   square and unshadowed so it meets the sheet without grey corner
-   arcs or a hairline. */
+   The first band matches the front ridge (#3d3354) so the treeline
+   meets the sunrise. The last band matches the content sheet. Each
+   band overlaps the next by 8px so its shadow falls on the color
+   below. A gap here would show as a hairline. The extra height
+   cancels that overlap, so each stripe still contributes 8vh. There
+   are 18 stripes, the same total length the old 9 had at 16vh.
+   Colored bands have rounded bottoms; black Material shadows read as
+   ink on the oranges, so the shadow is a soft night-purple tint. The
+   white band stays square and unshadowed so it meets the sheet
+   without grey corner arcs or a hairline. */
 .sunrise {
   position: relative;
   z-index: 12;
   margin-top: 0;
-  background: #221445;
+  background: #3d3354;
   /* Paint containment clips this layer to its border box. At 125% and
      150% the shadowed stacking context otherwise leaves a grey hairline
      on the sheet. Band shadows are inside, so they stay intact. */
@@ -219,10 +220,10 @@
 .band {
   display: block;
   position: relative;
-  height: calc(16vh + 12px);
-  min-height: 76px;
-  margin-bottom: -12px;
-  border-radius: 0 0 14px 14px;
+  height: calc(8vh + 8px);
+  min-height: 40px;
+  margin-bottom: -8px;
+  border-radius: 0 0 12px 12px;
   box-shadow:
     0 1px 2px rgba(26, 16, 51, 0.18),
     0 6px 14px rgba(26, 16, 51, 0.22);
@@ -240,25 +241,43 @@
 .band-white {
   z-index: 1;
   margin-bottom: 0;
-  height: calc(16vh + 4px);
-  min-height: 68px;
+  height: calc(8vh + 4px);
+  min-height: 36px;
   background: #f7f7f8;
   border-radius: 0;
   box-shadow: none;
+}
+
+/* ?proto=1 can still show the old 9 tall bars. */
+.prlx.is-title-classic .band {
+  height: calc(16vh + 12px);
+  min-height: 76px;
+  margin-bottom: -12px;
+  border-radius: 0 0 14px 14px;
+}
+
+.prlx.is-title-classic .band-white {
+  height: calc(16vh + 4px);
+  min-height: 68px;
+  margin-bottom: 0;
+  border-radius: 0;
 }
 
 /* Full-bleed, native aspect. Every layer is at least the viewport plus
    a little overscan, so a side edge never enters the window. If that
    height is taller than the sky under the name, the flat ground continues
    past the bottom of the hero and the peaks stay put.
-   --scroll is the scroller's scrollTop; only transform moves on scroll. */
-.l1-bg { --aspect: 3.2866; --rate: -0.62; z-index: 10; }
-.l2-bg { --aspect: 2.7744; --rate: -0.4; z-index: 9; }
-.l3-bg { --aspect: 2.7695; --rate: -0.32; z-index: 8; }
-.l4-bg { --aspect: 2.75; --rate: -0.18; z-index: 7; }
-.l5-bg { --aspect: 2.7494; --rate: -0.12; z-index: 6; }
-.l6-bg { --aspect: 2.7446; --rate: -0.08; z-index: 5; }
-.l7-bg { --aspect: 2.3205; --rate: -0.04; z-index: 4; }
+   --scroll is the scroller's scrollTop; the translate is extra, on top
+   of that scroll. Fallbacks are the shipping rates: l1 is 0 so the
+   front stays with the bars, and the far ridges lift. ?proto=1 writes
+   --rate-l1…l7 when a comparison variant is selected. */
+.l1-bg { --aspect: 3.2866; --rate: var(--rate-l1, 0); z-index: 10; }
+.l2-bg { --aspect: 2.7744; --rate: var(--rate-l2, -0.06); z-index: 9; }
+.l3-bg { --aspect: 2.7695; --rate: var(--rate-l3, -0.12); z-index: 8; }
+.l4-bg { --aspect: 2.75; --rate: var(--rate-l4, -0.18); z-index: 7; }
+.l5-bg { --aspect: 2.7494; --rate: var(--rate-l5, -0.24); z-index: 6; }
+.l6-bg { --aspect: 2.7446; --rate: var(--rate-l6, -0.3); z-index: 5; }
+.l7-bg { --aspect: 2.3205; --rate: var(--rate-l7, -0.36); z-index: 4; }
 
 .l1-bg,
 .l2-bg,
