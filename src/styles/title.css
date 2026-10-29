@@ -247,18 +247,37 @@
   box-shadow: none;
 }
 
+/* C / D. Twice the stripes, same sunrise length: each band contributes
+   8vh instead of 16vh, so the stack is still 144vh + 4px. A shorter
+   overlap keeps the shadow on the color below without eating the stripe. */
+.prlx.is-title-dense .band {
+  height: calc(8vh + 8px);
+  min-height: 40px;
+  margin-bottom: -8px;
+  border-radius: 0 0 12px 12px;
+}
+
+.prlx.is-title-dense .band-white {
+  height: calc(8vh + 4px);
+  min-height: 36px;
+  margin-bottom: 0;
+  border-radius: 0;
+}
+
 /* Full-bleed, native aspect. Every layer is at least the viewport plus
    a little overscan, so a side edge never enters the window. If that
    height is taller than the sky under the name, the flat ground continues
    past the bottom of the hero and the peaks stay put.
-   --scroll is the scroller's scrollTop; only transform moves on scroll. */
-.l1-bg { --aspect: 3.2866; --rate: -0.62; z-index: 10; }
-.l2-bg { --aspect: 2.7744; --rate: -0.4; z-index: 9; }
-.l3-bg { --aspect: 2.7695; --rate: -0.32; z-index: 8; }
-.l4-bg { --aspect: 2.75; --rate: -0.18; z-index: 7; }
-.l5-bg { --aspect: 2.7494; --rate: -0.12; z-index: 6; }
-.l6-bg { --aspect: 2.7446; --rate: -0.08; z-index: 5; }
-.l7-bg { --aspect: 2.3205; --rate: -0.04; z-index: 4; }
+   --scroll is the scroller's scrollTop; the translate is extra, on top
+   of that scroll. These fallbacks are the live rates. The prototype
+   picker writes --rate-l1…l7 on .prlx (0 locks a ridge to the bars). */
+.l1-bg { --aspect: 3.2866; --rate: var(--rate-l1, -0.62); z-index: 10; }
+.l2-bg { --aspect: 2.7744; --rate: var(--rate-l2, -0.4); z-index: 9; }
+.l3-bg { --aspect: 2.7695; --rate: var(--rate-l3, -0.32); z-index: 8; }
+.l4-bg { --aspect: 2.75; --rate: var(--rate-l4, -0.18); z-index: 7; }
+.l5-bg { --aspect: 2.7494; --rate: var(--rate-l5, -0.12); z-index: 6; }
+.l6-bg { --aspect: 2.7446; --rate: var(--rate-l6, -0.08); z-index: 5; }
+.l7-bg { --aspect: 2.3205; --rate: var(--rate-l7, -0.04); z-index: 4; }
 
 .l1-bg,
 .l2-bg,

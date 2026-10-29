@@ -1,5 +1,5 @@
 <script setup>
-import { nextTick, onMounted, onUnmounted, provide, reactive, ref, watch } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, provide, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useHead } from "@unhead/vue";
 import monoBold from "@fontsource/roboto-mono/files/roboto-mono-latin-700-normal.woff2?url";
@@ -12,7 +12,16 @@ import ProjectsSection from "./components/ProjectsSection.vue";
 import ResumeSection from "./components/ResumeSection.vue";
 import SiteFooter from "./components/SiteFooter.vue";
 import DinersPage from "./components/DinersPage.vue";
+import TitleProto from "./components/TitleProto.vue";
 import { dockKey, scrollKey } from "./scroll.js";
+import {
+  LAYER_IDS,
+  PROTO_STORAGE_KEY,
+  bandsFor,
+  ratesFor,
+  readTitleVariant,
+  variantById,
+} from "./title-proto.js";
 
 const ORIGIN = "https://vishnu.rengaraj.com";
 const route = useRoute();
@@ -20,6 +29,19 @@ const router = useRouter();
 const scroller = ref(null);
 const ready = ref(false);
 const titleLocked = ref(false);
+const titleVariant = ref("current");
+const protoReady = ref(false);
+const protoPanel = ref(null);
+let protoHold = false;
+const titleMeta = computed(() => variantById(titleVariant.value) || variantById("current"));
+const titleDense = computed(() => titleMeta.value.dense);
+const sunriseBands = computed(() => bandsFor(titleDense.value));
+const titleRateVars = computed(() => {
+  const rates = ratesFor(titleMeta.value.rates);
+  const style = {};
+  for (const id of LAYER_IDS) style[`--rate-${id}`] = String(rates[id]);
+  return style;
+});
 // Painted width in title.css:
 //   max(100vw * --ridge-overscan, (100dvh - --ridge-top) / --ridge-show * --aspect)
 //   --ridge-overscan: 1.08; --ridge-show: 0.5;
@@ -382,6 +404,12 @@ function markScrollTarget(id) {
   spyLock = spyPick() === wanted ? null : id === "top" ? "top" : id;
 }
 
+function shellTo(path) {
+  const title = route.query.title;
+  if (typeof title !== "string" || title === "" || title === "current") return path;
+  return { path, query: { title } };
+}
+
 function syncSpyUrl(section) {
   if (route.name === "diners") return;
   if (route.name === "resume") resumePath = route.path;
@@ -393,7 +421,7 @@ function syncSpyUrl(section) {
         : "/";
   if (route.path === path) return;
   urlFromSpy = true;
-  router.replace(path);
+  router.replace(shellTo(path));
 }
 
 function releaseSpyLock() {
@@ -439,6 +467,7 @@ function onSpy(entries) {
 let navQuietUntil = 0;
 
 function go(id) {
+  protoHold = false;
   cancelResumeLeave();
   /* Learn more and the up control stay no-ops for the whole sunrise,
      even after the page has left the title. Cancelling there used to
@@ -453,12 +482,12 @@ function go(id) {
     if (!prefersReduced() && y > 2) {
       if (route.path !== "/") {
         routeFromTween = true;
-        router.push("/");
+        router.push(shellTo("/"));
       }
       playUp();
       return;
     }
-    if (route.path !== "/") router.push("/");
+    if (route.path !== "/") router.push(shellTo("/"));
     else scrollToEl("top", "auto");
     return;
   }
@@ -480,7 +509,7 @@ function go(id) {
     scrollToEl(id === "top" ? "top" : id);
     return;
   }
-  router.push(path);
+  router.push(shellTo(path));
 }
 
 function onResumeNav(event) {
@@ -662,7 +691,7 @@ function leaveResumeMode() {
   const path = resumePath || "/resume";
   if (route.name !== "resume" && route.path !== path) {
     urlFromSpy = true;
-    router.replace(path);
+    router.replace(shellTo(path));
   }
   resumeLeaveAt = performance.now();
   resumeLeaveUntil = resumeLeaveAt + 5000;
@@ -1031,6 +1060,83 @@ function syncTitleMotion(root) {
   if (root.classList.contains("is-title-scroll") !== scrolling) root.classList.toggle("is-title-scroll", scrolling);
 }
 
+function publishProto() {
+  const panel = protoPanel.value;
+  const root = scroller.value;
+  if (!panel || !root) return;
+  const rates = ratesFor(titleMeta.value.rates);
+  const about = cachedAbout || aboutAnchor() || 1;
+  const limit = heroLimit || root.clientHeight || 0;
+  const y = root.scrollTop;
+  const applied = prefersReduced() ? 0 : limit && y > limit ? limit : y;
+  panel.setReadout({
+    lead: Math.round(-applied * rates.l1),
+    rate: rates.l1,
+    far: rates.l7,
+    progress: Math.min(1, Math.max(0, y / about)),
+  });
+}
+
+function scrubTo(progress) {
+  const root = scroller.value;
+  if (!root) return;
+  cancelTween();
+  scrollGen += 1;
+  endNativeScroll();
+  protoHold = progress > 0.02 && progress < 0.98;
+  const about = cachedAbout || aboutAnchor() || 1;
+  const max = Math.max(0, root.scrollHeight - root.clientHeight);
+  const y = Math.round(Math.min(max, Math.max(0, progress * about)));
+  root.style.scrollBehavior = "auto";
+  drivingScroll = true;
+  root.scrollTop = y;
+  lastScrollY = y;
+  lastProgrammatic = y;
+  root.style.scrollBehavior = "";
+  syncParallax(root);
+}
+
+function onProtoScrub(at) {
+  const root = scroller.value;
+  if (!root) return;
+  if (at === "mid") {
+    measureStatic();
+    const about = cachedAbout || aboutAnchor();
+    const sun = root.querySelector(".sunrise");
+    if (!sun || !about) return;
+    /* Meet parks the first color edge at 42% so the ridges and the bars
+       share the frame. The geometric middle of the sunrise is later,
+       after the short phone ridges have already left. */
+    const y = sun.offsetTop - root.clientHeight * 0.42;
+    scrubTo(y / about);
+    return;
+  }
+  scrubTo(at);
+}
+
+function setTitleVariant(id) {
+  const next = variantById(id);
+  if (!next) return;
+  const root = scroller.value;
+  const about = cachedAbout || aboutAnchor() || 1;
+  const progress = root ? root.scrollTop / about : 0;
+  titleVariant.value = next.id;
+  try {
+    sessionStorage.setItem(PROTO_STORAGE_KEY, next.id);
+  } catch {
+    /* Private mode can reject the write. The URL still carries the pick. */
+  }
+  const query = { ...route.query };
+  if (next.id === "current") delete query.title;
+  else query.title = next.id;
+  router.replace({ query });
+  nextTick(() => {
+    measureStatic();
+    if (progress > 0.01) scrubTo(progress);
+    else publishProto();
+  });
+}
+
 function syncParallax(root) {
   syncTitleMotion(root);
   if (prefersReduced()) {
@@ -1040,6 +1146,7 @@ function syncParallax(root) {
       parallaxY = "0";
       root.style.setProperty("--scroll", "0px");
     }
+    publishProto();
     return;
   }
   const y = root.scrollTop;
@@ -1052,14 +1159,17 @@ function syncParallax(root) {
       parallaxY = held;
       root.style.setProperty("--scroll", `${held}px`);
     }
+    publishProto();
     return;
   }
   parallaxHeld = false;
   root.classList.add("is-parallax");
   const next = String(Math.round(y));
-  if (next === parallaxY) return;
-  parallaxY = next;
-  root.style.setProperty("--scroll", `${next}px`);
+  if (next !== parallaxY) {
+    parallaxY = next;
+    root.style.setProperty("--scroll", `${next}px`);
+  }
+  publishProto();
 }
 
 function scheduleChrome() {
@@ -1502,7 +1612,33 @@ function stopShell() {
 
 onMounted(() => {
   document.documentElement.classList.add("vue-ready");
-  startShell();
+  let stored = "";
+  try {
+    stored = sessionStorage.getItem(PROTO_STORAGE_KEY) || "";
+  } catch {
+    stored = "";
+  }
+  const queryTitle = Array.isArray(route.query.title) ? route.query.title[0] : route.query.title;
+  titleVariant.value = readTitleVariant(queryTitle, stored);
+  if (variantById(queryTitle)) {
+    try {
+      sessionStorage.setItem(PROTO_STORAGE_KEY, titleVariant.value);
+    } catch {
+      /* The query string is enough for this visit. */
+    }
+  }
+  protoReady.value = true;
+  const at = Array.isArray(route.query.at) ? route.query.at[0] : route.query.at;
+  startShell().then(() => {
+    if (typeof at === "string" && at !== "") {
+      if (at === "mid") onProtoScrub("mid");
+      else {
+        const n = Number(at);
+        if (Number.isFinite(n)) scrubTo(Math.min(1, Math.max(0, n)));
+      }
+    } else publishProto();
+    document.documentElement.dataset.titleProto = "ready";
+  });
 });
 
 onUnmounted(() => {
@@ -1525,7 +1661,7 @@ watch(
     if (route.name === "diners") return;
     if (route.name === "resume") resumePath = route.path;
     if (!ready.value || !scroller.value) return;
-    if (urlFromSpy || routeFromTween) {
+    if (protoHold || urlFromSpy || routeFromTween) {
       urlFromSpy = false;
       routeFromTween = false;
       lastKey = `${route.name}:${route.params.tab || ""}:${targetForRoute()}`;
@@ -1540,7 +1676,20 @@ watch(
   <DinersPage v-if="route.name === 'diners'" />
   <template v-else>
   <a class="skip" href="/about" @click="onNav($event, 'about')">Skip to content</a>
-  <div class="prlx" ref="scroller">
+  <TitleProto
+    v-if="protoReady"
+    ref="protoPanel"
+    :variant="titleVariant"
+    @pick="setTitleVariant"
+    @scrub="onProtoScrub"
+  />
+  <div
+    class="prlx"
+    :class="{ 'is-title-dense': titleDense }"
+    :style="titleRateVars"
+    :data-title-variant="titleVariant"
+    ref="scroller"
+  >
     <Hero />
     <div class="mountain-bg sky-grad" aria-hidden="true"></div>
     <Stars />
@@ -1579,16 +1728,14 @@ watch(
       <Headlamps v-if="layer.id === 'l6'" />
     </div>
     <div class="ridge-ground" aria-hidden="true"></div>
-    <div class="sunrise" aria-hidden="true">
-      <div class="band band-night"></div>
-      <div class="band band-mauve"></div>
-      <div class="band band-pink"></div>
-      <div class="band band-coral"></div>
-      <div class="band band-orange"></div>
-      <div class="band band-gold"></div>
-      <div class="band band-yellow"></div>
-      <div class="band band-bright"></div>
-      <div class="band band-white"></div>
+    <div class="sunrise" aria-hidden="true" :data-band-count="sunriseBands.length">
+      <div
+        v-for="band in sunriseBands"
+        :key="band.id"
+        class="band"
+        :class="band.className"
+        :style="band.style"
+      ></div>
     </div>
     <main class="sheet">
       <nav class="section-nav" :class="{ 'is-docked': dockState.docked, 'is-open': dockState.open, 'is-joined': dockState.joined }" aria-label="Sections">
