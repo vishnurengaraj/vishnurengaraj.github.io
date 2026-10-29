@@ -10,11 +10,12 @@
 }
 
 .center-col {
+  --col-pad: clamp(20px, 4vw, 40px);
   max-width: 1500px;
   margin: 0 auto;
   width: 100%;
-  padding-left: clamp(20px, 4vw, 40px);
-  padding-right: clamp(20px, 4vw, 40px);
+  padding-left: var(--col-pad);
+  padding-right: var(--col-pad);
 }
 
 .measure {
@@ -262,17 +263,20 @@
   padding-top: 0;
 }
 
+/* Same control as .learn, pointing home. Circle everywhere the title
+   control is a circle; the portrait pill lives in the query below. */
 .home-return {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100vw;
-  max-width: 100vw;
-  min-height: 56px;
-  margin: 0 calc(50% - 50vw) 1.25rem;
+  width: 60px;
+  height: 60px;
+  min-height: 60px;
+  max-width: 60px;
+  margin: 8px auto 1.5rem;
   padding: 0;
   border: 0;
-  border-radius: 0;
+  border-radius: 50%;
   background: #ffb020;
   color: #1f1f1f;
   cursor: pointer;
@@ -287,25 +291,33 @@
 
 .home-return:focus-visible {
   outline: 3px solid #1f1f1f;
-  outline-offset: -6px;
+  outline-offset: 3px;
 }
 
 .home-return:active {
   filter: brightness(0.96);
 }
 
-@media (min-width: 720px) {
+@media (max-height: 560px) and (orientation: landscape) {
   .home-return {
-    width: 60px;
-    height: 60px;
-    min-height: 60px;
-    max-width: 60px;
-    margin: 8px auto 1.5rem;
-    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    min-height: 48px;
+    max-width: 48px;
   }
+}
 
-  .home-return:focus-visible {
-    outline-offset: 3px;
+@media (max-width: 900px) and (orientation: portrait) {
+  /* Match .learn: centered pill, 40px of inset on each side, capped at
+     320px. 100% is the padded column, so add --col-pad back and the pill
+     lands on the same width as the title control. */
+  .home-return {
+    width: min(320px, calc(100% - 80px + 2 * var(--col-pad)));
+    max-width: min(320px, calc(100% - 80px + 2 * var(--col-pad)));
+    height: 56px;
+    min-height: 56px;
+    margin: 0 auto 1.25rem;
+    border-radius: 999px;
   }
 }
 
