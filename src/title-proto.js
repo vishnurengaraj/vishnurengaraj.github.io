@@ -1,13 +1,12 @@
-/* Title-scroll prototypes. Not the production choice.
-   The ridges are position:absolute inside the scroller, so they already
-   travel 1:1 with the sunrise bands. --rate adds a second translate:
-   translateY = --scroll * --rate. --scroll tracks scrollTop until one
-   viewport, then holds. Viewport speed while it tracks is 1 - rate
-   (1 is the color bars). A negative rate lifts that ridge ahead of
-   the bars; the lead freezes once --scroll holds.
+/* Title scroll. The ridges are position:absolute inside the scroller,
+   so they already travel 1:1 with the sunrise bands. --rate adds
+   translateY = --scroll * --rate. --scroll follows scrollTop for one
+   viewport, then holds. Speed against the bars is 1 - rate.
 
-   Live l1 rate is -0.62, so the front ridge runs at 1.62× the bars
-   for the first screen and then sits 0.62× the viewport above them. */
+   Shipping is variant D: the front ridge rate is 0, so it stays with
+   the bars, and the far ridges lift (l7 -0.36) so their peaks rise
+   above the treeline. The old l1 rate of -0.62 ran the front at 1.62×
+   the bars. ?proto=1 still opens the comparison picker. */
 
 export const LAYER_IDS = ["l1", "l2", "l3", "l4", "l5", "l6", "l7"];
 
@@ -41,11 +40,17 @@ const LIVE_BANDS = [
   { id: "white", className: "band-white" },
 ];
 
-/* 18 bars. The 9 live stops stay exact. Each shorter step gets one
-   OKLab midpoint. Mauve → pink is the long step, so it gets two
-   (thirds) and the count lands on 18. The sheet end stays #f7f7f8. */
+/* Opaque fill of the front ridge, sampled from l1 (rgb 61, 51, 84).
+   The first sunrise bar uses it so the treeline meets the bars. */
+export const RIDGE_COLOR = "#3d3354";
+
+/* 18 bars over the same sunrise length as the old 9. The live stops
+   from mauve onward stay exact. Each shorter step gets one OKLab
+   midpoint. Mauve → pink is the long step, so it gets two (thirds).
+   The sheet end stays #f7f7f8. The first bar is the ridge, not the
+   old night #221445. */
 const DENSE_COLORS = [
-  "#221445",
+  RIDGE_COLOR,
   "#3f245a",
   "#5e3470",
   "#7f4074",
@@ -144,7 +149,7 @@ export const VARIANTS = [
     rates: "accent",
     dense: true,
     blurb:
-      "18 bars plus the Accent lift. Denser gradient, far peaks above the treeline, front matched to the color.",
+      "Shipping look. 18 bars, far peaks lifted, front locked to the bars. The first bar is the ridge color.",
     warn: "Phone: extra shadowed bands, plus the far-ridge lift. The bars are the hitch risk; the lift is the crop risk.",
   },
 ];
@@ -156,8 +161,10 @@ export function variantById(id) {
   return BY_ID.get(id) || null;
 }
 
+export const PRODUCTION_VARIANT = "d";
+
 export function readTitleVariant(queryValue, stored) {
-  return variantById(queryValue)?.id || variantById(stored)?.id || "current";
+  return variantById(queryValue)?.id || variantById(stored)?.id || PRODUCTION_VARIANT;
 }
 
 export const PROTO_STORAGE_KEY = "title-proto";

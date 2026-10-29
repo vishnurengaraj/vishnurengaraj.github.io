@@ -16,6 +16,7 @@ import TitleProto from "./components/TitleProto.vue";
 import { dockKey, scrollKey } from "./scroll.js";
 import {
   LAYER_IDS,
+  PRODUCTION_VARIANT,
   PROTO_STORAGE_KEY,
   bandsFor,
   ratesFor,
@@ -29,13 +30,14 @@ const router = useRouter();
 const scroller = ref(null);
 const ready = ref(false);
 const titleLocked = ref(false);
-const titleVariant = ref("current");
+const titleVariant = ref(PRODUCTION_VARIANT);
 const protoReady = ref(false);
 const protoPanel = ref(null);
 let protoHold = false;
-const titleMeta = computed(() => variantById(titleVariant.value) || variantById("current"));
+const titleMeta = computed(() => variantById(titleVariant.value) || variantById(PRODUCTION_VARIANT));
 const titleDense = computed(() => titleMeta.value.dense);
 const sunriseBands = computed(() => bandsFor(titleDense.value));
+const sunriseFill = computed(() => sunriseBands.value[0]?.style?.backgroundColor || "#221445");
 const titleRateVars = computed(() => {
   const rates = ratesFor(titleMeta.value.rates);
   const style = {};
@@ -405,9 +407,11 @@ function markScrollTarget(id) {
 }
 
 function shellTo(path) {
+  if (route.query.proto !== "1") return path;
+  const query = { proto: "1" };
   const title = route.query.title;
-  if (typeof title !== "string" || title === "" || title === "current") return path;
-  return { path, query: { title } };
+  if (typeof title === "string" && title !== "" && title !== PRODUCTION_VARIANT) query.title = title;
+  return { path, query };
 }
 
 function syncSpyUrl(section) {
@@ -1127,7 +1131,7 @@ function setTitleVariant(id) {
     /* Private mode can reject the write. The URL still carries the pick. */
   }
   const query = { ...route.query };
-  if (next.id === "current") delete query.title;
+  if (next.id === PRODUCTION_VARIANT) delete query.title;
   else query.title = next.id;
   router.replace({ query });
   nextTick(() => {
@@ -1610,26 +1614,36 @@ function stopShell() {
   ready.value = false;
 }
 
+function protoRequested() {
+  const proto = route.query.proto;
+  return proto === "1" || (Array.isArray(proto) && proto.includes("1"));
+}
+
 onMounted(() => {
   document.documentElement.classList.add("vue-ready");
-  let stored = "";
-  try {
-    stored = sessionStorage.getItem(PROTO_STORAGE_KEY) || "";
-  } catch {
-    stored = "";
-  }
-  const queryTitle = Array.isArray(route.query.title) ? route.query.title[0] : route.query.title;
-  titleVariant.value = readTitleVariant(queryTitle, stored);
-  if (variantById(queryTitle)) {
+  const protoOn = protoRequested();
+  let at = "";
+  if (protoOn) {
+    let stored = "";
     try {
-      sessionStorage.setItem(PROTO_STORAGE_KEY, titleVariant.value);
+      stored = sessionStorage.getItem(PROTO_STORAGE_KEY) || "";
     } catch {
-      /* The query string is enough for this visit. */
+      stored = "";
     }
+    const queryTitle = Array.isArray(route.query.title) ? route.query.title[0] : route.query.title;
+    titleVariant.value = readTitleVariant(queryTitle, stored);
+    if (variantById(queryTitle)) {
+      try {
+        sessionStorage.setItem(PROTO_STORAGE_KEY, titleVariant.value);
+      } catch {
+        /* The query string is enough for this visit. */
+      }
+    }
+    protoReady.value = true;
+    at = Array.isArray(route.query.at) ? route.query.at[0] : route.query.at || "";
   }
-  protoReady.value = true;
-  const at = Array.isArray(route.query.at) ? route.query.at[0] : route.query.at;
   startShell().then(() => {
+    if (!protoOn) return;
     if (typeof at === "string" && at !== "") {
       if (at === "mid") onProtoScrub("mid");
       else {
@@ -1685,7 +1699,7 @@ watch(
   />
   <div
     class="prlx"
-    :class="{ 'is-title-dense': titleDense }"
+    :class="{ 'is-title-classic': !titleDense }"
     :style="titleRateVars"
     :data-title-variant="titleVariant"
     ref="scroller"
@@ -1728,7 +1742,7 @@ watch(
       <Headlamps v-if="layer.id === 'l6'" />
     </div>
     <div class="ridge-ground" aria-hidden="true"></div>
-    <div class="sunrise" aria-hidden="true" :data-band-count="sunriseBands.length">
+    <div class="sunrise" aria-hidden="true" :data-band-count="sunriseBands.length" :style="{ backgroundColor: sunriseFill }">
       <div
         v-for="band in sunriseBands"
         :key="band.id"

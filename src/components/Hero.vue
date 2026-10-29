@@ -318,17 +318,18 @@ onUnmounted(() => {
 }
 
 @media (max-width: 900px) and (orientation: portrait) {
+  /* Wide centered pill. 24px of margin on each side, and it sits above
+     the home indicator instead of running edge to edge. */
   .learn {
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: auto;
-    min-height: calc(56px + env(safe-area-inset-bottom, 0px));
-    padding: 0 0 env(safe-area-inset-bottom, 0px);
-    box-sizing: border-box;
-    border-radius: 0;
-    transform: none;
+    left: 50%;
+    right: auto;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    width: min(480px, calc(100% - 48px));
+    height: 56px;
+    min-height: 56px;
+    padding: 0;
+    border-radius: 999px;
+    transform: translateX(-50%);
     animation: none;
   }
 }
