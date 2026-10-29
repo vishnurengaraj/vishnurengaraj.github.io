@@ -1,7 +1,7 @@
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { DINERS } from "../data/diners.js";
-import { pinAnchor, pinMarkup } from "./protoPins.js";
+import { dropMarkup } from "./pins.js";
 
 const STYLE = "https://tiles.openfreemap.org/styles/positron";
 
@@ -47,8 +47,8 @@ function addBuildings(map) {
   );
 }
 
-/** Variant B: pitched OpenFreeMap camera. Pin artwork is swapped with setPinStyle. */
-export async function mountMapLibreProto(mapEl, { handlers, pinStyle: initialPin = "1" }) {
+/** Pitched OpenFreeMap map with flat teardrop pins. */
+export async function mountDinerMap(mapEl, { handlers }) {
   const view = camera();
   const map = new maplibregl.Map({
     container: mapEl,
@@ -68,7 +68,6 @@ export async function mountMapLibreProto(mapEl, { handlers, pinStyle: initialPin
 
   const markers = {};
   let disposed = false;
-  let pinStyle = initialPin === "2" || initialPin === "3" ? initialPin : "1";
 
   const loaded = new Promise((resolve) => {
     const timer = window.setTimeout(resolve, 8000);
@@ -92,44 +91,27 @@ export async function mountMapLibreProto(mapEl, { handlers, pinStyle: initialPin
       position: [1.15, 210, 28],
     });
   } catch (error) {
-    console.warn("Prototype B buildings skipped", error);
+    console.warn("Diner building layer skipped", error);
   }
 
-  function buildMarkers() {
-    for (const marker of Object.values(markers)) marker.remove();
-    for (const id of Object.keys(markers)) delete markers[id];
-    for (const place of DINERS) {
-      const wrap = document.createElement("div");
-      wrap.innerHTML = pinMarkup(place, pinStyle, { labelled: true });
-      const node = wrap.firstElementChild;
-      node.addEventListener("click", (event) => {
-        event.stopPropagation();
-        handlers.onClick(place);
-      });
-      node.addEventListener("mouseenter", () => handlers.onHover(place));
-      node.addEventListener("mouseleave", () => handlers.onLeave());
-      markers[place.id] = new maplibregl.Marker({
-        element: node,
-        anchor: pinAnchor(pinStyle),
-        pitchAlignment: "viewport",
-        rotationAlignment: "viewport",
-      })
-        .setLngLat([place.lng, place.lat])
-        .addTo(map);
-    }
-  }
-
-  buildMarkers();
-
-  function signalReady() {
-    if (disposed) return;
-    map.once("idle", () => {
-      if (disposed) return;
-      window.__dinersProtoReady = "b";
+  for (const place of DINERS) {
+    const wrap = document.createElement("div");
+    wrap.innerHTML = dropMarkup(place);
+    const node = wrap.firstElementChild;
+    node.addEventListener("click", (event) => {
+      event.stopPropagation();
+      handlers.onClick(place);
     });
-    window.setTimeout(() => {
-      if (!disposed && window.__dinersProtoReady !== "b") window.__dinersProtoReady = "b";
-    }, 2500);
+    node.addEventListener("mouseenter", () => handlers.onHover(place));
+    node.addEventListener("mouseleave", () => handlers.onLeave());
+    markers[place.id] = new maplibregl.Marker({
+      element: node,
+      anchor: "bottom",
+      pitchAlignment: "viewport",
+      rotationAlignment: "viewport",
+    })
+      .setLngLat([place.lng, place.lat])
+      .addTo(map);
   }
 
   return {
@@ -147,7 +129,6 @@ export async function mountMapLibreProto(mapEl, { handlers, pinStyle: initialPin
         bearing: cam.bearing,
         duration: animate ? 650 : 0,
       });
-      signalReady();
     },
     focus(place, { padding, reduced }) {
       const cam = camera();
@@ -178,21 +159,12 @@ export async function mountMapLibreProto(mapEl, { handlers, pinStyle: initialPin
         essential: true,
       });
     },
-    setPinStyle(next) {
-      const style = next === "2" || next === "3" ? next : "1";
-      if (style === pinStyle || disposed) return;
-      pinStyle = style;
-      buildMarkers();
-    },
     paint(selectedId, hoverId) {
       for (const [id, marker] of Object.entries(markers)) {
         const el = marker.getElement();
         if (!el) continue;
         el.style.zIndex = id === selectedId ? "8" : id === hoverId ? "4" : "";
       }
-    },
-    getZoom() {
-      return map.getZoom();
     },
     destroy() {
       disposed = true;

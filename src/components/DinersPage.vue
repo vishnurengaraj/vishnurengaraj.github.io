@@ -3,10 +3,7 @@ import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from
 import { useRoute, useRouter } from "vue-router";
 import { useHead } from "@unhead/vue";
 import { DINERS, WEIGHTS, appleMapsUrl, mapsUrl, photoPlaceholder, rankOf } from "../data/diners.js";
-import { PIN_STYLES, PROTO_VARIANTS, pinStyleId, protoId } from "../diners/variants.js";
-import "leaflet/dist/leaflet.css";
 import "../styles/diners.css";
-import "../styles/diners-proto.css";
 
 useHead({
   title: "Diners · Vishnu Rengaraj",
@@ -27,29 +24,6 @@ const route = useRoute();
 const router = useRouter();
 const mapEl = ref(null);
 const pageEl = ref(null);
-const proto = computed(() => protoId(route.query.proto));
-const protoMeta = computed(() => (proto.value ? PROTO_VARIANTS[proto.value] : null));
-const protoChoices = [PROTO_VARIANTS.a, PROTO_VARIANTS.b, PROTO_VARIANTS.c];
-const pinStyle = computed(() => (proto.value === "b" ? pinStyleId(route.query.pin) : null));
-const activePin = computed(() => PIN_STYLES.find((item) => item.id === pinStyle.value) || null);
-const bannerTitle = computed(() => {
-  if (activePin.value) return `B · ${activePin.value.title}`;
-  return protoMeta.value ? protoMeta.value.title : "";
-});
-const mapAria = computed(() =>
-  protoMeta.value ? `Map of visited diners, prototype ${bannerTitle.value}` : "Map of visited diners",
-);
-
-function protoLink(id) {
-  const query = { ...route.query };
-  if (id) query.proto = id;
-  else delete query.proto;
-  return { path: "/diners", query };
-}
-
-function pinLink(id) {
-  return { path: "/diners", query: { ...route.query, proto: "b", pin: id } };
-}
 const sortKey = ref("weighted");
 const selectedId = ref(null);
 const hoverId = ref(null);
@@ -112,34 +86,12 @@ function prefersReduced() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-let map;
-let leafletApi;
-let markers = {};
-let controller = null;
-let bootGen = 0;
-let bootQueue = Promise.resolve();
+let mapApi = null;
+let mountGen = 0;
 let alive = true;
 let resizeTimer = 0;
 let hoverTimer = 0;
 let shuffleTimer = 0;
-
-function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-/** Lift or drop a label when two diners sit on the same short stretch of coast. */
-function markerClass(place) {
-  const neighbor = DINERS.find((other) => {
-    if (other.id === place.id) return false;
-    return Math.abs(other.lat - place.lat) < 0.01 && Math.abs(other.lng - place.lng) < 0.02;
-  });
-  if (!neighbor) return "mk";
-  return neighbor.lat < place.lat ? "mk above" : "mk below";
-}
 
 function mapPadding() {
   const phone = isPhone();
@@ -166,55 +118,27 @@ function mapPadding() {
 }
 
 function invalidateMap() {
-  if (controller) controller.invalidateSize();
-  else map?.invalidateSize();
+  mapApi?.invalidateSize();
 }
 
 function fitMap(animate) {
-  const motion = Boolean(animate) && !prefersReduced();
-  if (controller) {
-    controller.fit({ animate: motion, padding: mapPadding(), maxZoom: 14 });
-    return;
-  }
-  if (!map || !leafletApi) return;
-  const pad = mapPadding();
-  map.fitBounds(leafletApi.latLngBounds(DINERS.map((place) => [place.lat, place.lng])), {
-    paddingTopLeft: pad.paddingTopLeft,
-    paddingBottomRight: pad.paddingBottomRight,
+  mapApi?.fit({
+    animate: Boolean(animate) && !prefersReduced(),
+    padding: mapPadding(),
     maxZoom: 14,
-    animate: motion,
   });
 }
 
 function focusPlace(place) {
-  if (controller) {
-    controller.focus(place, { padding: mapPadding(), reduced: prefersReduced() });
-    return;
-  }
-  if (!map || !leafletApi) return;
-  const zoom = Math.max(map.getZoom(), 14);
-  const pad = mapPadding();
-  const size = map.getSize();
-  const viewX = (pad.paddingTopLeft[0] + size.x - pad.paddingBottomRight[0]) / 2;
-  const viewY = (pad.paddingTopLeft[1] + size.y - pad.paddingBottomRight[1]) / 2;
-  const shift = leafletApi.point(size.x / 2 - viewX, size.y / 2 - viewY);
-  const center = map.unproject(map.project([place.lat, place.lng], zoom).add(shift), zoom);
-  map.flyTo(center, zoom, { duration: prefersReduced() ? 0 : 0.6 });
+  mapApi?.focus(place, { padding: mapPadding(), reduced: prefersReduced() });
 }
 
 function paintPins() {
-  pageEl.value?.querySelectorAll(".pin, .gem, .mpin").forEach((pin) => {
+  pageEl.value?.querySelectorAll(".drop").forEach((pin) => {
     pin.classList.toggle("sel", pin.dataset.id === selectedId.value);
     pin.classList.toggle("hot", pin.dataset.id === hoverId.value);
   });
-  if (controller) {
-    controller.paint(selectedId.value, hoverId.value);
-    return;
-  }
-  for (const [id, marker] of Object.entries(markers)) {
-    const rank = id === selectedId.value ? 800 : id === hoverId.value ? 400 : 0;
-    marker.setZIndexOffset(rank);
-  }
+  mapApi?.paint(selectedId.value, hoverId.value);
 }
 
 function applyInitialPanel() {
@@ -333,11 +257,7 @@ function select(place) {
   if (isPhone()) {
     setPanel(false);
     openDetail(place);
-    if (controller) controller.phoneFocus(place, { reduced: prefersReduced() });
-    else {
-      const zoom = map ? Math.max(map.getZoom(), 14) : 14;
-      map?.flyTo([place.lat, place.lng], zoom, { duration: prefersReduced() ? 0 : 0.6 });
-    }
+    mapApi?.phoneFocus(place, { reduced: prefersReduced() });
     return;
   }
   openDetail(place);
@@ -434,141 +354,27 @@ function markerHandlers() {
   };
 }
 
-function destroyMapOnly() {
-  if (controller) {
-    controller.destroy();
-    controller = null;
-  }
-  map?.remove();
-  map = null;
-  markers = {};
-  leafletApi = null;
-}
-
-async function mountLive(gen) {
-  const leaflet = await import("leaflet");
-  if (!alive || gen !== bootGen) return;
+async function startMap() {
+  const gen = ++mountGen;
+  const { mountDinerMap } = await import("../diners/map.js");
+  if (!alive || gen !== mountGen) return;
   const el = mapEl.value;
   if (!el) return;
-  const instance = leaflet
-    .map(el, { zoomControl: false, scrollWheelZoom: true, attributionControl: false })
-    .setView([33.89, -118.4], 12);
-  leaflet
-    .tileLayer(
-      "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
-      { maxZoom: 16 },
-    )
-    .addTo(instance);
-  leaflet
-    .tileLayer(
-      "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}",
-      { maxZoom: 16, pane: "shadowPane" },
-    )
-    .addTo(instance);
-  leaflet.control.zoom({ position: "bottomright" }).addTo(instance);
-  const nextMarkers = {};
-  for (const place of DINERS) {
-    const icon = leaflet.divIcon({
-      className: markerClass(place),
-      iconSize: [44, 44],
-      iconAnchor: [22, 44],
-      html: `<div class="pin${rankOf(place) === 1 ? "" : " mid"}" data-id="${place.id}"><span>${place.weighted.toFixed(1)}</span></div><div class="mk-name">${escapeHtml(place.name)}</div>`,
-    });
-    const marker = leaflet.marker([place.lat, place.lng], { icon, riseOnHover: true }).addTo(instance);
-    marker.getElement()?.setAttribute("aria-label", place.name);
-    marker.on("mouseover", () => setHover(place));
-    marker.on("mouseout", (event) => {
-      const next = event.originalEvent?.relatedTarget;
-      const node = marker.getElement();
-      if (next instanceof Node && node && (next === node || node.contains(next))) return;
-      clearHover();
-    });
-    marker.on("click", () => {
-      if (isPhone()) openDetail(place);
-      else select(place);
-    });
-    nextMarkers[place.id] = marker;
-  }
-  if (!alive || gen !== bootGen) {
-    instance.remove();
+  const created = await mountDinerMap(el, { handlers: markerHandlers() });
+  if (!alive || gen !== mountGen) {
+    created?.destroy();
     return;
   }
-  map = instance;
-  leafletApi = leaflet;
-  markers = nextMarkers;
-  map.invalidateSize();
-}
-
-async function runBoot(gen) {
-  if (!alive || gen !== bootGen) return;
-  destroyMapOnly();
-  window.__dinersProtoReady = "";
-  await nextTick();
-  if (!alive || gen !== bootGen) return;
-  const el = mapEl.value;
-  if (!el) return;
-  const variant = proto.value;
-  if (variant === "b") {
-    const { mountMapLibreProto } = await import("../diners/maplibreProto.js");
-    if (!alive || gen !== bootGen) return;
-    const created = await mountMapLibreProto(el, {
-      handlers: markerHandlers(),
-      pinStyle: pinStyle.value || "1",
-    });
-    if (!alive || gen !== bootGen) {
-      created?.destroy();
-      return;
-    }
-    controller = created;
-  } else if (variant) {
-    const { mountLeafletProto } = await import("../diners/leafletProto.js");
-    if (!alive || gen !== bootGen) return;
-    const created = await mountLeafletProto(el, {
-      variant,
-      pageEl: pageEl.value,
-      handlers: markerHandlers(),
-    });
-    if (!alive || gen !== bootGen) {
-      created?.destroy();
-      return;
-    }
-    controller = created;
-  } else {
-    await mountLive(gen);
-    if (!alive || gen !== bootGen) return;
-  }
-  if (!alive || gen !== bootGen) return;
+  mapApi = created;
   const deep = route.query.d;
   const deepPlace = typeof deep === "string" ? DINERS.find((item) => item.id === deep) : undefined;
-  if (detailOpen.value) {
-    fitMap(false);
-    const place = slots[frontIndex.value].place;
-    if (place && !isPhone()) focusPlace(place);
-    return;
-  }
   if (!deepPlace || isPhone()) fitMap(false);
   if (deepPlace) openDetail(deepPlace);
-  if (!variant) window.__dinersProtoReady = "live";
 }
-
-function bootMap() {
-  const gen = ++bootGen;
-  bootQueue = bootQueue
-    .then(() => runBoot(gen))
-    .catch((error) => console.error("diner map", error));
-}
-
-watch(proto, () => bootMap(), { flush: "post" });
-
-watch(pinStyle, (style) => {
-  if (!style || !controller?.setPinStyle) return;
-  controller.setPinStyle(style);
-  nextTick(paintPins);
-});
 
 onMounted(() => {
   applyInitialPanel();
-  bootMap();
+  startMap();
   window.addEventListener("keydown", onKey);
   window.addEventListener("resize", onResize);
   requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -578,13 +384,14 @@ onMounted(() => {
 
 onUnmounted(() => {
   alive = false;
-  bootGen += 1;
+  mountGen += 1;
   window.clearTimeout(resizeTimer);
   window.clearTimeout(hoverTimer);
   window.clearTimeout(shuffleTimer);
   window.removeEventListener("keydown", onKey);
   window.removeEventListener("resize", onResize);
-  destroyMapOnly();
+  mapApi?.destroy();
+  mapApi = null;
 });
 </script>
 
@@ -592,7 +399,7 @@ onUnmounted(() => {
   <div
     ref="pageEl"
     class="diners"
-    :class="[proto ? `proto-${proto}` : '', { 'no-anim': !motionOn, 'force-open': forceOpen }]"
+    :class="{ 'no-anim': !motionOn, 'force-open': forceOpen }"
   >
     <h1 class="sr-only">Diners</h1>
 
@@ -676,33 +483,7 @@ onUnmounted(() => {
         </div>
       </aside>
       <section class="mapwrap">
-        <div id="diners-map" ref="mapEl" role="region" :aria-label="mapAria"></div>
-        <div v-if="protoMeta" class="proto-banner" role="note">
-          <p class="proto-kicker">Prototype · not live</p>
-          <p class="proto-title">{{ bannerTitle }}</p>
-          <p class="proto-sub">{{ activePin ? activePin.sub : protoMeta.sub }}</p>
-          <nav v-if="proto === 'b'" class="proto-switch proto-pins" aria-label="Pin styles">
-            <RouterLink
-              v-for="item in PIN_STYLES"
-              :key="item.id"
-              :to="pinLink(item.id)"
-              :class="{ on: item.id === pinStyle }"
-              :aria-current="item.id === pinStyle ? 'page' : undefined"
-              :aria-label="item.title"
-            >{{ item.switch }}</RouterLink>
-          </nav>
-          <nav class="proto-switch" aria-label="Map prototypes">
-            <RouterLink
-              v-for="item in protoChoices"
-              :key="item.id"
-              :to="protoLink(item.id)"
-              :class="{ on: item.id === proto }"
-              :aria-current="item.id === proto ? 'page' : undefined"
-              :aria-label="item.title"
-            >{{ item.switch }}</RouterLink>
-            <RouterLink :to="protoLink(null)" :aria-label="'Live diners map'">Live</RouterLink>
-          </nav>
-        </div>
+        <div id="diners-map" ref="mapEl" role="region" aria-label="Map of visited diners"></div>
         <button class="fab" type="button" aria-label="Open list" @click="setPanel(true)">
           ☰ List <span>{{ DINERS.length }}</span>
         </button>
