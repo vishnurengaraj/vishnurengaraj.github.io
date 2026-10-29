@@ -3,7 +3,6 @@ import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from
 import { useRoute, useRouter } from "vue-router";
 import { useHead } from "@unhead/vue";
 import { DINERS, WEIGHTS, appleMapsUrl, mapsUrl, photoPlaceholder, rankOf } from "../data/diners.js";
-import "leaflet/dist/leaflet.css";
 import "../styles/diners.css";
 
 useHead({
@@ -87,30 +86,12 @@ function prefersReduced() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-let map;
-let leafletApi;
-let markers = {};
+let mapApi = null;
+let mountGen = 0;
+let alive = true;
 let resizeTimer = 0;
 let hoverTimer = 0;
 let shuffleTimer = 0;
-
-function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-/** Lift or drop a label when two diners sit on the same short stretch of coast. */
-function markerClass(place) {
-  const neighbor = DINERS.find((other) => {
-    if (other.id === place.id) return false;
-    return Math.abs(other.lat - place.lat) < 0.01 && Math.abs(other.lng - place.lng) < 0.02;
-  });
-  if (!neighbor) return "mk";
-  return neighbor.lat < place.lat ? "mk above" : "mk below";
-}
 
 function mapPadding() {
   const phone = isPhone();
@@ -136,38 +117,28 @@ function mapPadding() {
   };
 }
 
+function invalidateMap() {
+  mapApi?.invalidateSize();
+}
+
 function fitMap(animate) {
-  if (!map || !leafletApi) return;
-  const pad = mapPadding();
-  map.fitBounds(leafletApi.latLngBounds(DINERS.map((place) => [place.lat, place.lng])), {
-    paddingTopLeft: pad.paddingTopLeft,
-    paddingBottomRight: pad.paddingBottomRight,
-    maxZoom: 14,
+  mapApi?.fit({
     animate: Boolean(animate) && !prefersReduced(),
+    padding: mapPadding(),
+    maxZoom: 14,
   });
 }
 
 function focusPlace(place) {
-  if (!map || !leafletApi) return;
-  const zoom = Math.max(map.getZoom(), 14);
-  const pad = mapPadding();
-  const size = map.getSize();
-  const viewX = (pad.paddingTopLeft[0] + size.x - pad.paddingBottomRight[0]) / 2;
-  const viewY = (pad.paddingTopLeft[1] + size.y - pad.paddingBottomRight[1]) / 2;
-  const shift = leafletApi.point(size.x / 2 - viewX, size.y / 2 - viewY);
-  const center = map.unproject(map.project([place.lat, place.lng], zoom).add(shift), zoom);
-  map.flyTo(center, zoom, { duration: prefersReduced() ? 0 : 0.6 });
+  mapApi?.focus(place, { padding: mapPadding(), reduced: prefersReduced() });
 }
 
 function paintPins() {
-  pageEl.value?.querySelectorAll(".pin").forEach((pin) => {
+  pageEl.value?.querySelectorAll(".drop").forEach((pin) => {
     pin.classList.toggle("sel", pin.dataset.id === selectedId.value);
     pin.classList.toggle("hot", pin.dataset.id === hoverId.value);
   });
-  for (const [id, marker] of Object.entries(markers)) {
-    const rank = id === selectedId.value ? 800 : id === hoverId.value ? 400 : 0;
-    marker.setZIndexOffset(rank);
-  }
+  mapApi?.paint(selectedId.value, hoverId.value);
 }
 
 function applyInitialPanel() {
@@ -186,7 +157,7 @@ function setPanel(isOpen) {
   }
   window.clearTimeout(resizeTimer);
   resizeTimer = window.setTimeout(() => {
-    map?.invalidateSize();
+    invalidateMap();
     if (!isPhone()) fitMap(true);
   }, 280);
 }
@@ -286,8 +257,7 @@ function select(place) {
   if (isPhone()) {
     setPanel(false);
     openDetail(place);
-    const zoom = map ? Math.max(map.getZoom(), 14) : 14;
-    map?.flyTo([place.lat, place.lng], zoom, { duration: prefersReduced() ? 0 : 0.6 });
+    mapApi?.phoneFocus(place, { reduced: prefersReduced() });
     return;
   }
   openDetail(place);
@@ -355,7 +325,7 @@ function onKey(event) {
 function onResize() {
   window.clearTimeout(resizeTimer);
   resizeTimer = window.setTimeout(() => {
-    map?.invalidateSize();
+    invalidateMap();
     if (!isPhone()) fitMap(false);
   }, 150);
 }
@@ -369,56 +339,42 @@ function onCardKey(event, place) {
 
 watch([selectedId, hoverId], () => nextTick(paintPins));
 
-onMounted(async () => {
-  applyInitialPanel();
-  const leaflet = await import("leaflet");
-  leafletApi = leaflet;
-  await nextTick();
-  const el = mapEl.value;
-  if (!el) return;
-  map = leaflet
-    .map(el, { zoomControl: false, scrollWheelZoom: true, attributionControl: false })
-    .setView([33.89, -118.4], 12);
-  leaflet
-    .tileLayer(
-      "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
-      { maxZoom: 16 },
-    )
-    .addTo(map);
-  leaflet
-    .tileLayer(
-      "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}",
-      { maxZoom: 16, pane: "shadowPane" },
-    )
-    .addTo(map);
-  leaflet.control.zoom({ position: "bottomright" }).addTo(map);
-  for (const place of DINERS) {
-    const icon = leaflet.divIcon({
-      className: markerClass(place),
-      iconSize: [44, 44],
-      iconAnchor: [22, 44],
-      html: `<div class="pin${rankOf(place) === 1 ? "" : " mid"}" data-id="${place.id}"><span>${place.weighted.toFixed(1)}</span></div><div class="mk-name">${escapeHtml(place.name)}</div>`,
-    });
-    const marker = leaflet.marker([place.lat, place.lng], { icon, riseOnHover: true }).addTo(map);
-    marker.getElement()?.setAttribute("aria-label", place.name);
-    marker.on("mouseover", () => setHover(place));
-    marker.on("mouseout", (event) => {
-      const next = event.originalEvent?.relatedTarget;
-      const el = marker.getElement();
-      if (next instanceof Node && el && (next === el || el.contains(next))) return;
+function markerHandlers() {
+  return {
+    onHover(place) {
+      setHover(place);
+    },
+    onLeave() {
       clearHover();
-    });
-    marker.on("click", () => {
+    },
+    onClick(place) {
       if (isPhone()) openDetail(place);
       else select(place);
-    });
-    markers[place.id] = marker;
+    },
+  };
+}
+
+async function startMap() {
+  const gen = ++mountGen;
+  const { mountDinerMap } = await import("../diners/map.js");
+  if (!alive || gen !== mountGen) return;
+  const el = mapEl.value;
+  if (!el) return;
+  const created = await mountDinerMap(el, { handlers: markerHandlers() });
+  if (!alive || gen !== mountGen) {
+    created?.destroy();
+    return;
   }
-  map.invalidateSize();
+  mapApi = created;
   const deep = route.query.d;
   const deepPlace = typeof deep === "string" ? DINERS.find((item) => item.id === deep) : undefined;
   if (!deepPlace || isPhone()) fitMap(false);
   if (deepPlace) openDetail(deepPlace);
+}
+
+onMounted(() => {
+  applyInitialPanel();
+  startMap();
   window.addEventListener("keydown", onKey);
   window.addEventListener("resize", onResize);
   requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -427,14 +383,15 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+  alive = false;
+  mountGen += 1;
   window.clearTimeout(resizeTimer);
   window.clearTimeout(hoverTimer);
   window.clearTimeout(shuffleTimer);
   window.removeEventListener("keydown", onKey);
   window.removeEventListener("resize", onResize);
-  map?.remove();
-  map = null;
-  markers = {};
+  mapApi?.destroy();
+  mapApi = null;
 });
 </script>
 
