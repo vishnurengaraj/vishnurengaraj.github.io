@@ -3,7 +3,7 @@ import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from
 import { useRoute, useRouter } from "vue-router";
 import { useHead } from "@unhead/vue";
 import { DINERS, WEIGHTS, appleMapsUrl, mapsUrl, photoPlaceholder, rankOf } from "../data/diners.js";
-import { PROTO_VARIANTS, protoId } from "../diners/variants.js";
+import { PIN_STYLES, PROTO_VARIANTS, pinStyleId, protoId } from "../diners/variants.js";
 import "leaflet/dist/leaflet.css";
 import "../styles/diners.css";
 import "../styles/diners-proto.css";
@@ -30,8 +30,14 @@ const pageEl = ref(null);
 const proto = computed(() => protoId(route.query.proto));
 const protoMeta = computed(() => (proto.value ? PROTO_VARIANTS[proto.value] : null));
 const protoChoices = [PROTO_VARIANTS.a, PROTO_VARIANTS.b, PROTO_VARIANTS.c];
+const pinStyle = computed(() => (proto.value === "b" ? pinStyleId(route.query.pin) : null));
+const activePin = computed(() => PIN_STYLES.find((item) => item.id === pinStyle.value) || null);
+const bannerTitle = computed(() => {
+  if (activePin.value) return `B · ${activePin.value.title}`;
+  return protoMeta.value ? protoMeta.value.title : "";
+});
 const mapAria = computed(() =>
-  protoMeta.value ? `Map of visited diners, prototype ${protoMeta.value.title}` : "Map of visited diners",
+  protoMeta.value ? `Map of visited diners, prototype ${bannerTitle.value}` : "Map of visited diners",
 );
 
 function protoLink(id) {
@@ -39,6 +45,10 @@ function protoLink(id) {
   if (id) query.proto = id;
   else delete query.proto;
   return { path: "/diners", query };
+}
+
+function pinLink(id) {
+  return { path: "/diners", query: { ...route.query, proto: "b", pin: id } };
 }
 const sortKey = ref("weighted");
 const selectedId = ref(null);
@@ -193,7 +203,7 @@ function focusPlace(place) {
 }
 
 function paintPins() {
-  pageEl.value?.querySelectorAll(".pin, .gem").forEach((pin) => {
+  pageEl.value?.querySelectorAll(".pin, .gem, .mpin").forEach((pin) => {
     pin.classList.toggle("sel", pin.dataset.id === selectedId.value);
     pin.classList.toggle("hot", pin.dataset.id === hoverId.value);
   });
@@ -501,7 +511,10 @@ async function runBoot(gen) {
   if (variant === "b") {
     const { mountMapLibreProto } = await import("../diners/maplibreProto.js");
     if (!alive || gen !== bootGen) return;
-    const created = await mountMapLibreProto(el, { handlers: markerHandlers() });
+    const created = await mountMapLibreProto(el, {
+      handlers: markerHandlers(),
+      pinStyle: pinStyle.value || "1",
+    });
     if (!alive || gen !== bootGen) {
       created?.destroy();
       return;
@@ -546,6 +559,12 @@ function bootMap() {
 }
 
 watch(proto, () => bootMap(), { flush: "post" });
+
+watch(pinStyle, (style) => {
+  if (!style || !controller?.setPinStyle) return;
+  controller.setPinStyle(style);
+  nextTick(paintPins);
+});
 
 onMounted(() => {
   applyInitialPanel();
@@ -660,8 +679,18 @@ onUnmounted(() => {
         <div id="diners-map" ref="mapEl" role="region" :aria-label="mapAria"></div>
         <div v-if="protoMeta" class="proto-banner" role="note">
           <p class="proto-kicker">Prototype · not live</p>
-          <p class="proto-title">{{ protoMeta.title }}</p>
-          <p class="proto-sub">{{ protoMeta.sub }}</p>
+          <p class="proto-title">{{ bannerTitle }}</p>
+          <p class="proto-sub">{{ activePin ? activePin.sub : protoMeta.sub }}</p>
+          <nav v-if="proto === 'b'" class="proto-switch proto-pins" aria-label="Pin styles">
+            <RouterLink
+              v-for="item in PIN_STYLES"
+              :key="item.id"
+              :to="pinLink(item.id)"
+              :class="{ on: item.id === pinStyle }"
+              :aria-current="item.id === pinStyle ? 'page' : undefined"
+              :aria-label="item.title"
+            >{{ item.switch }}</RouterLink>
+          </nav>
           <nav class="proto-switch" aria-label="Map prototypes">
             <RouterLink
               v-for="item in protoChoices"

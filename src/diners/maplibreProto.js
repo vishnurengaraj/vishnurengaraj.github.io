@@ -1,7 +1,7 @@
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { DINERS } from "../data/diners.js";
-import { gemMarkup } from "./protoPins.js";
+import { pinAnchor, pinMarkup } from "./protoPins.js";
 
 const STYLE = "https://tiles.openfreemap.org/styles/positron";
 
@@ -47,8 +47,8 @@ function addBuildings(map) {
   );
 }
 
-/** Variant B: real pitched camera, free light vector tiles, billboarded sculpted pins. */
-export async function mountMapLibreProto(mapEl, { handlers }) {
+/** Variant B: pitched OpenFreeMap camera. Pin artwork is swapped with setPinStyle. */
+export async function mountMapLibreProto(mapEl, { handlers, pinStyle: initialPin = "1" }) {
   const view = camera();
   const map = new maplibregl.Map({
     container: mapEl,
@@ -68,6 +68,7 @@ export async function mountMapLibreProto(mapEl, { handlers }) {
 
   const markers = {};
   let disposed = false;
+  let pinStyle = initialPin === "2" || initialPin === "3" ? initialPin : "1";
 
   const loaded = new Promise((resolve) => {
     const timer = window.setTimeout(resolve, 8000);
@@ -94,26 +95,31 @@ export async function mountMapLibreProto(mapEl, { handlers }) {
     console.warn("Prototype B buildings skipped", error);
   }
 
-  for (const place of DINERS) {
-    const el = document.createElement("div");
-    el.innerHTML = gemMarkup(place, { labelled: true });
-    const gem = el.firstElementChild;
-    gem.addEventListener("click", (event) => {
-      event.stopPropagation();
-      handlers.onClick(place);
-    });
-    gem.addEventListener("mouseenter", () => handlers.onHover(place));
-    gem.addEventListener("mouseleave", () => handlers.onLeave());
-    const marker = new maplibregl.Marker({
-      element: gem,
-      anchor: "bottom",
-      pitchAlignment: "viewport",
-      rotationAlignment: "viewport",
-    })
-      .setLngLat([place.lng, place.lat])
-      .addTo(map);
-    markers[place.id] = marker;
+  function buildMarkers() {
+    for (const marker of Object.values(markers)) marker.remove();
+    for (const id of Object.keys(markers)) delete markers[id];
+    for (const place of DINERS) {
+      const wrap = document.createElement("div");
+      wrap.innerHTML = pinMarkup(place, pinStyle, { labelled: true });
+      const node = wrap.firstElementChild;
+      node.addEventListener("click", (event) => {
+        event.stopPropagation();
+        handlers.onClick(place);
+      });
+      node.addEventListener("mouseenter", () => handlers.onHover(place));
+      node.addEventListener("mouseleave", () => handlers.onLeave());
+      markers[place.id] = new maplibregl.Marker({
+        element: node,
+        anchor: pinAnchor(pinStyle),
+        pitchAlignment: "viewport",
+        rotationAlignment: "viewport",
+      })
+        .setLngLat([place.lng, place.lat])
+        .addTo(map);
+    }
   }
+
+  buildMarkers();
 
   function signalReady() {
     if (disposed) return;
@@ -171,6 +177,12 @@ export async function mountMapLibreProto(mapEl, { handlers }) {
         duration: reduced ? 0 : 650,
         essential: true,
       });
+    },
+    setPinStyle(next) {
+      const style = next === "2" || next === "3" ? next : "1";
+      if (style === pinStyle || disposed) return;
+      pinStyle = style;
+      buildMarkers();
     },
     paint(selectedId, hoverId) {
       for (const [id, marker] of Object.entries(markers)) {
