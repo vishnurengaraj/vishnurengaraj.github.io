@@ -13,7 +13,7 @@ import ResumeSection from "./components/ResumeSection.vue";
 import SiteFooter from "./components/SiteFooter.vue";
 import DinersPage from "./components/DinersPage.vue";
 import TitleProto from "./components/TitleProto.vue";
-import { dockKey, scrollKey } from "./scroll.js";
+import { dockKey, resumeTopKey, scrollKey } from "./scroll.js";
 import {
   LAYER_IDS,
   PRODUCTION_VARIANT,
@@ -188,7 +188,7 @@ function endNativeScroll() {
   window.clearTimeout(followTimer);
 }
 
-function scrollToEl(id, behavior, extraGap = 0) {
+function scrollToEl(id, behavior, extraGap = 0, focusLanding = true) {
   const root = scroller.value;
   if (!root || typeof document === "undefined") return;
   const jumpTitle = titleLocked.value && root.scrollTop <= 32;
@@ -236,7 +236,7 @@ function scrollToEl(id, behavior, extraGap = 0) {
   beginNativeScroll();
   if (id === "top") {
     root.scrollTo({ top: 0, behavior: mode });
-    document.getElementById("top")?.focus({ preventScroll: true });
+    if (focusLanding) document.getElementById("top")?.focus({ preventScroll: true });
     if (mode === "smooth") root.addEventListener("scrollend", landed, { once: true });
     else landed();
     return;
@@ -274,7 +274,7 @@ function scrollToEl(id, behavior, extraGap = 0) {
       window.setTimeout(pinLanding, 1600);
     } else landed();
   }
-  document.getElementById(id)?.focus({ preventScroll: true });
+  if (focusLanding) document.getElementById(id)?.focus({ preventScroll: true });
 }
 
 function targetForRoute() {
@@ -299,31 +299,58 @@ function visibleBelowBars(el) {
   return bottom > clearance + 1 && top < root.clientHeight - 1;
 }
 
-/* A tab click should move the page only when the heading has gone above
-   or behind the bars and the in-page tab row is gone too. */
-function resumeNeedsRealign() {
-  const heading = document.getElementById("resume-heading");
-  const tabs = document.querySelector("#resume-tab-slot .tablist-shell");
-  return !visibleBelowBars(heading) && !visibleBelowBars(tabs);
+/* Tab changes open at the Resume heading. Instant, and before the new
+   panel paints, so a long Experience list does not leave Education
+   mid-page. Drop a docked row in the same turn: the inline tabs sit
+   under the heading, still readable beneath the main pill. */
+function jumpResumeTop() {
+  if (resumeLeaveUntil) {
+    resumeLeaveUntil = 0;
+    resumeLeaveAt = 0;
+    scrollGen += 1;
+    endNativeScroll();
+  }
+  window.clearTimeout(closeDockTimer);
+  if (dockState.docked || dockState.open) {
+    dockState.open = false;
+    dockState.joined = false;
+    dockState.docked = false;
+  }
+  /* Keep the lock through the paint. The skills card is on screen here,
+     and publishing /skills would scroll the heading back under the bar. */
+  activeSection.value = "resume";
+  spyLock = "resume";
+  resumeJumpHold = performance.now() + 500;
+  scrollToEl("resume", "instant", 0, false);
+  const gen = ++resumePinGen;
+  /* The route update measures the bar again while the dock is mid-render
+     and can park the heading underneath it. Re-pin once layout is done. */
+  requestAnimationFrame(() => {
+    if (gen !== resumePinGen) return;
+    const root = scroller.value;
+    const heading = document.getElementById("resume-heading");
+    const nav = root?.querySelector(".nav-inner");
+    if (!root || !heading || !nav) return;
+    const delta = heading.getBoundingClientRect().top - (nav.getBoundingClientRect().bottom + 12);
+    if (Math.abs(delta) <= 2) return;
+    root.style.scrollBehavior = "auto";
+    drivingScroll = true;
+    root.scrollTop = Math.max(0, root.scrollTop + delta);
+    root.style.scrollBehavior = "";
+  });
 }
 
 function syncScroll(behavior) {
   const key = `${route.name}:${route.params.tab || ""}:${targetForRoute()}`;
   if (key === lastKey) return;
-  /* /skills is the card under the tab row. A tab click from there only
-     swaps the panel, same as a click that stays on /resume. */
+  /* /skills is the card under the tab row. Coming back from it is a tab
+     change, same as Experience to Education. */
   const switchingTabs =
     route.name === "resume" && (lastKey.startsWith("resume:") || lastKey.startsWith("skills:"));
   lastKey = key;
   pinGen += 1;
   if (switchingTabs) {
-    /* Tab clicks stay in the morph. Pinning the heading would clear it
-       under the bar and collapse the row back to the main labels. */
-    if (dockState.open || dockState.docked) return;
-    if (resumeNeedsRealign()) {
-      markScrollTarget("resume");
-      scrollToEl("resume", behavior);
-    }
+    jumpResumeTop();
     return;
   }
   const target = targetForRoute();
@@ -363,6 +390,8 @@ const activeSection = ref(sectionIds.includes(route.name) ? route.name : null);
 const spySeen = new Set();
 let resumePath = route.name === "resume" ? route.path : "/resume";
 let spyLock = null;
+let resumeJumpHold = 0;
+let resumePinGen = 0;
 let passedSection = null;
 let urlFromSpy = false;
 let routeFromTween = false;
@@ -443,7 +472,7 @@ function applySpy() {
   const next = spyPick();
   if (spyLock) {
     const wanted = spyLock === "top" ? null : spyLock;
-    if (next === wanted) spyLock = null;
+    if (next === wanted && performance.now() >= resumeJumpHold) spyLock = null;
     else return;
   }
   if (activeSection.value === next) return;
@@ -545,6 +574,7 @@ function onNav(event, id) {
 }
 
 provide(scrollKey, go);
+provide(resumeTopKey, jumpResumeTop);
 
 const dockState = reactive({ docked: false, open: false, joined: false, hold: 0 });
 provide(dockKey, dockState);

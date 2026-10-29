@@ -1,7 +1,7 @@
 <script setup>
 import { inject, nextTick, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { dockKey } from "../scroll.js";
+import { dockKey, resumeTopKey } from "../scroll.js";
 import BulletTree from "./BulletTree.vue";
 import MediaFrame from "./MediaFrame.vue";
 import ResponsiveImg from "./ResponsiveImg.vue";
@@ -25,6 +25,7 @@ const tabs = [
 const route = useRoute();
 const router = useRouter();
 const dock = inject(dockKey);
+const jumpResumeTop = inject(resumeTopKey, () => {});
 const tabIds = tabs.map((tab) => tab.id);
 
 function tabFromRoute() {
@@ -84,6 +85,8 @@ function onAnimEnd(event) {
 
 function select(id) {
   if (!tabIds.includes(id) || id === current.value) return;
+  /* Scroll while the old panel is still mounted, then swap. */
+  jumpResumeTop();
   current.value = id;
   const path = id === "experience" ? "/resume" : `/resume/${id}`;
   if (route.path !== path) router.push(path);
