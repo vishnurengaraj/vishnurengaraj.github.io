@@ -318,13 +318,13 @@ onUnmounted(() => {
 }
 
 @media (max-width: 900px) and (orientation: portrait) {
-  /* Wide centered pill. 24px of margin on each side, and it sits above
-     the home indicator instead of running edge to edge. */
+  /* Centered pill, narrower than the screen. 40px of margin on each
+     side, capped at 320px, and it sits above the home indicator. */
   .learn {
     left: 50%;
     right: auto;
     bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-    width: min(480px, calc(100% - 48px));
+    width: min(320px, calc(100% - 80px));
     height: 56px;
     min-height: 56px;
     padding: 0;
