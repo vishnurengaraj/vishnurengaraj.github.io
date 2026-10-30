@@ -108,6 +108,7 @@ function dismissSway(event) {
       key.startsWith("Arrow");
     if (!dismisses) return;
   }
+  /* Freeze yaw and the pitch float together. The map stays pitched. */
   swayBlocked = true;
   mapApi?.stopIdleSway();
 }

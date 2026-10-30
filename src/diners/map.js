@@ -5,13 +5,17 @@ import { dropMarkup } from "./pins.js";
 
 const STYLE = "https://tiles.openfreemap.org/styles/positron";
 
-/* Idle yaw around the resting bearing. Tuned to the phone reference clip:
-   a short drift either side (not a spin), one direction in about four
-   seconds, sine ease so the turnaround is calm. Pitch and zoom stay put. */
+/* Idle motion on the pitched map. Yaw is ±13° around the resting bearing.
+   Pitch floats ±1.5° around the pitched base (phone 58°, desktop 64°).
+   Both share one sine: 42s for a full cycle, about 21s each way — five
+   times the previous 8.4s sway. The first 700ms ramps in from rest.
+   Zoom stays put. */
 const SWAY_AMPLITUDE_DEG = 13;
-const SWAY_PERIOD_MS = 8400;
+const SWAY_PERIOD_MS = 42000;
+const PITCH_FLOAT_DEG = 1.5;
 const SWAY_RAMP_MS = 700;
-const SWAY_SESSION_MS = 8 * 60 * 60 * 1000;
+/* Whole cycles only, so the handoff to the next ease lands on rest. */
+const SWAY_SESSION_MS = SWAY_PERIOD_MS * 686;
 
 function camera() {
   const phone = window.matchMedia("(max-width: 640px)").matches;
@@ -22,7 +26,7 @@ function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-/** -1..1 scale for a sine yaw. 0 at rest, eased in, easing out at each end. */
+/** -1..1 sine shared by yaw and pitch. 0 at rest, eased in, slow at each end. */
 function swayScale(elapsedMs) {
   const ramp = Math.min(1, elapsedMs / SWAY_RAMP_MS);
   const envelope = ramp * ramp * (3 - 2 * ramp);
@@ -90,6 +94,7 @@ export async function mountDinerMap(mapEl, { handlers }) {
   let disposed = false;
   let swayState = "idle";
   let restingBearing = null;
+  let restingPitch = null;
   let removeMotionListener = null;
 
   const loaded = new Promise((resolve) => {
@@ -144,23 +149,31 @@ export async function mountDinerMap(mapEl, { handlers }) {
     return camera().bearing;
   }
 
+  function framedPitch() {
+    /* After idle motion is dismissed, keep the pitch we froze on. A later
+       fit or focus must not ease off that float or flatten the map. */
+    if (swayState === "stopped") return map.getPitch();
+    return camera().pitch;
+  }
+
   function stopIdleSway() {
     if (swayState === "stopped") return;
     swayState = "stopped";
     removeMotionListener?.();
     removeMotionListener = null;
     /* Freeze the in-flight ease where it is. Do not pass a new bearing or
-       pitch — stopping must not flatten the map or jump the yaw. */
+       pitch — stopping must not flatten the map or jump the yaw or float. */
     if (!disposed) map.stop();
   }
 
   function runSway() {
     if (disposed || swayState === "stopped") return;
     if (restingBearing == null) restingBearing = map.getBearing();
-    const base = restingBearing;
+    if (restingPitch == null) restingPitch = map.getPitch();
     swayState = "running";
     map.easeTo({
-      bearing: base + SWAY_AMPLITUDE_DEG,
+      bearing: restingBearing + SWAY_AMPLITUDE_DEG,
+      pitch: restingPitch + PITCH_FLOAT_DEG,
       duration: SWAY_SESSION_MS,
       easing(t) {
         return swayScale(t * SWAY_SESSION_MS);
@@ -209,19 +222,17 @@ export async function mountDinerMap(mapEl, { handlers }) {
     startIdleSway,
     stopIdleSway,
     fit({ animate, padding, maxZoom }) {
-      const cam = camera();
       const bounds = new maplibregl.LngLatBounds();
       for (const place of DINERS) bounds.extend([place.lng, place.lat]);
       map.fitBounds(bounds, {
         padding: trbl(padding),
         maxZoom,
-        pitch: cam.pitch,
+        pitch: framedPitch(),
         bearing: framedBearing(),
         duration: animate ? 650 : 0,
       });
     },
     focus(place, { padding, reduced }) {
-      const cam = camera();
       const canvas = map.getCanvas();
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
@@ -231,7 +242,7 @@ export async function mountDinerMap(mapEl, { handlers }) {
       map.flyTo({
         center: [place.lng, place.lat],
         zoom: Math.max(map.getZoom(), 14.2),
-        pitch: cam.pitch,
+        pitch: framedPitch(),
         bearing: framedBearing(),
         offset: [viewX - width / 2, viewY - height / 2],
         duration: reduced ? 0 : 650,
