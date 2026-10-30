@@ -92,6 +92,25 @@ let alive = true;
 let resizeTimer = 0;
 let hoverTimer = 0;
 let shuffleTimer = 0;
+let swayBlocked = false;
+let pageNode = null;
+
+function dismissSway(event) {
+  if (event?.type === "keydown") {
+    const key = event.key;
+    const dismisses =
+      key === "Enter" ||
+      key === " " ||
+      key === "Escape" ||
+      key === "+" ||
+      key === "-" ||
+      key === "=" ||
+      key.startsWith("Arrow");
+    if (!dismisses) return;
+  }
+  swayBlocked = true;
+  mapApi?.stopIdleSway();
+}
 
 function mapPadding() {
   const phone = isPhone();
@@ -370,10 +389,16 @@ async function startMap() {
   const deepPlace = typeof deep === "string" ? DINERS.find((item) => item.id === deep) : undefined;
   if (!deepPlace || isPhone()) fitMap(false);
   if (deepPlace) openDetail(deepPlace);
+  if (swayBlocked) created.stopIdleSway();
+  else created.startIdleSway();
 }
 
 onMounted(() => {
   applyInitialPanel();
+  pageNode = pageEl.value;
+  pageNode?.addEventListener("pointerdown", dismissSway, true);
+  pageNode?.addEventListener("wheel", dismissSway, { capture: true, passive: true });
+  pageNode?.addEventListener("keydown", dismissSway, true);
   startMap();
   window.addEventListener("keydown", onKey);
   window.addEventListener("resize", onResize);
@@ -388,6 +413,9 @@ onUnmounted(() => {
   window.clearTimeout(resizeTimer);
   window.clearTimeout(hoverTimer);
   window.clearTimeout(shuffleTimer);
+  pageNode?.removeEventListener("pointerdown", dismissSway, true);
+  pageNode?.removeEventListener("wheel", dismissSway, true);
+  pageNode?.removeEventListener("keydown", dismissSway, true);
   window.removeEventListener("keydown", onKey);
   window.removeEventListener("resize", onResize);
   mapApi?.destroy();
