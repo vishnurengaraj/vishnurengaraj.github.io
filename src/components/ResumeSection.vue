@@ -1,7 +1,6 @@
 <script setup>
-import { inject, nextTick, onUnmounted, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { dockKey, resumeTopKey } from "../scroll.js";
+import { inject, nextTick, onMounted, watch } from "vue";
+import { dockKey, resumeJumpKey, resumePartKey } from "../scroll.js";
 import BulletTree from "./BulletTree.vue";
 import MediaFrame from "./MediaFrame.vue";
 import ResponsiveImg from "./ResponsiveImg.vue";
@@ -22,109 +21,42 @@ const tabs = [
   { id: "awards", label: "Awards" },
 ];
 
-const route = useRoute();
-const router = useRouter();
 const dock = inject(dockKey);
-const jumpResumeTop = inject(resumeTopKey, () => {});
-const tabIds = tabs.map((tab) => tab.id);
+const current = inject(resumePartKey);
+const jumpResumePart = inject(resumeJumpKey);
 
-function tabFromRoute() {
-  return tabIds.includes(route.params.tab) ? route.params.tab : "experience";
+function prefersReduced() {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
 }
 
-const current = ref(route.name === "resume" ? tabFromRoute() : "experience");
-const stage = ref(null);
-const stageMin = ref(0);
-const leaving = ref(null);
-const dir = ref("forward");
-let leaveTimer = 0;
-let swipeX = 0;
-let swipeY = 0;
-
-watch(
-  () => route.fullPath,
-  () => {
-    if (route.name !== "resume") return;
-    const next = tabFromRoute();
-    if (next !== current.value) current.value = next;
-  },
-);
-
-watch(current, async (next, prev) => {
-  if (!prev || next === prev) return;
-  dir.value = tabIds.indexOf(next) > tabIds.indexOf(prev) ? "forward" : "back";
-  window.clearTimeout(leaveTimer);
-  if (stage.value) stageMin.value = stage.value.offsetHeight;
-  leaving.value = prev;
-  await nextTick();
-  stage.value?.querySelectorAll(".is-active, .is-out").forEach((el) => {
-    el.style.animation = "none";
-    void el.offsetWidth;
-    el.style.animation = "";
-  });
-  leaveTimer = window.setTimeout(endLeave, 420);
-});
-
-function endLeave() {
-  window.clearTimeout(leaveTimer);
-  if (!leaving.value) {
-    stageMin.value = 0;
-    return;
-  }
-  const active = stage.value?.querySelector(".panel-block.is-active");
-  stageMin.value = active?.offsetHeight || 0;
-  leaving.value = null;
-  requestAnimationFrame(() => {
-    if (!leaving.value) stageMin.value = 0;
-  });
-}
-
-function onAnimEnd(event) {
-  if (event.target?.classList?.contains("is-out")) endLeave();
-}
-
-function select(id) {
-  if (!tabIds.includes(id) || id === current.value) return;
-  /* Scroll while the old panel is still mounted, then swap. */
-  jumpResumeTop();
-  current.value = id;
-  const path = id === "experience" ? "/resume" : `/resume/${id}`;
-  if (route.path !== path) router.push(path);
-}
-
-function onSwipeStart(event) {
-  const touch = event.touches?.[0];
-  if (!touch) return;
-  swipeX = touch.clientX;
-  swipeY = touch.clientY;
-}
-
-function onSwipeEnd(event) {
-  const touch = event.changedTouches?.[0];
-  if (!touch) return;
-  const dx = touch.clientX - swipeX;
-  const dy = touch.clientY - swipeY;
-  if (Math.abs(dx) < 64 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-  const index = tabIds.indexOf(current.value);
-  if (dx < 0 && index < tabIds.length - 1) select(tabIds[index + 1]);
-  else if (dx > 0 && index > 0) select(tabIds[index - 1]);
-}
-
-onUnmounted(() => window.clearTimeout(leaveTimer));
-
-function onKeydown(event) {
-  const ids = tabs.map((tab) => tab.id);
-  const index = ids.indexOf(current.value);
-  let next = index;
-  if (event.key === "ArrowRight") next = (index + 1) % ids.length;
-  else if (event.key === "ArrowLeft") next = (index - 1 + ids.length) % ids.length;
-  else if (event.key === "Home") next = 0;
-  else if (event.key === "End") next = ids.length - 1;
-  else return;
+function onPick(event, id) {
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
   event.preventDefault();
-  select(ids[next]);
-  document.getElementById(`tab-${ids[next]}`)?.focus();
+  jumpResumePart(id);
 }
+
+/* Keep the chosen label in the row when the four names overflow.
+   Scroll the row only — scrollIntoView would move the page too. */
+async function revealCurrent(id) {
+  if (!id) return;
+  await nextTick();
+  const link = document.getElementById(`tab-${id}`);
+  const row = link?.closest(".tablist");
+  if (!link || !row || row.scrollWidth <= row.clientWidth + 1) return;
+  const rowBox = row.getBoundingClientRect();
+  const linkBox = link.getBoundingClientRect();
+  const delta = linkBox.left - rowBox.left - (row.clientWidth - linkBox.width) / 2;
+  row.scrollTo({
+    left: Math.max(0, row.scrollLeft + delta),
+    behavior: prefersReduced() ? "instant" : "smooth",
+  });
+}
+
+watch(current, revealCurrent);
+onMounted(() => revealCurrent(current.value));
 </script>
 
 <template>
@@ -136,21 +68,18 @@ function onKeydown(event) {
     </div>
     <Teleport defer :to="dock.docked ? '#nav-tab-slot' : '#resume-tab-slot'">
       <div class="tablist-shell">
-        <div class="tablist" role="tablist" aria-label="Resume sections" @keydown="onKeydown">
-      <button
-        v-for="tab in tabs"
-        :id="`tab-${tab.id}`"
-        :key="tab.id"
-        type="button"
-        role="tab"
-        :aria-selected="current === tab.id"
-        :aria-controls="`panel-${tab.id}`"
-        :tabindex="current === tab.id ? 0 : -1"
-        @click="select(tab.id)"
-      >
-        {{ tab.label }}
-      </button>
-        </div>
+        <nav class="tablist" aria-label="Resume sections">
+          <a
+            v-for="tab in tabs"
+            :id="`tab-${tab.id}`"
+            :key="tab.id"
+            :href="`/resume/${tab.id}`"
+            :aria-current="current === tab.id ? 'location' : undefined"
+            @click="onPick($event, tab.id)"
+          >
+            {{ tab.label }}
+          </a>
+        </nav>
       </div>
     </Teleport>
 
@@ -159,25 +88,8 @@ function onKeydown(event) {
       <li v-for="skill in skills" :key="skill">{{ skill }}</li>
     </ul>
 
-    <div
-      ref="stage"
-      class="panel-stage"
-      :class="{ 'is-anim': leaving }"
-      :data-dir="dir"
-      :style="stageMin ? { minHeight: `${stageMin}px` } : undefined"
-      @animationend="onAnimEnd"
-      @touchstart.passive="onSwipeStart"
-      @touchend.passive="onSwipeEnd"
-    >
-    <div
-      id="panel-experience"
-      class="panel-block"
-      :class="{ 'is-active': current === 'experience', 'is-out': leaving === 'experience' }"
-      :aria-hidden="leaving === 'experience' ? 'true' : undefined"
-      role="tabpanel"
-      aria-labelledby="tab-experience"
-      tabindex="0"
-    >
+    <section id="experience" class="panel-block resume-part" tabindex="-1" aria-labelledby="experience-heading">
+      <h3 id="experience-heading" class="era">Experience</h3>
       <article v-for="job in experience" :key="job.title" class="card">
         <header class="card-head">
           <h3>{{ job.title }}</h3>
@@ -195,17 +107,10 @@ function onKeydown(event) {
           <span class="sr-only"> about {{ job.title }} (opens in a new tab)</span>
         </a>
       </article>
-    </div>
+    </section>
 
-    <div
-      id="panel-education"
-      class="panel-block"
-      :class="{ 'is-active': current === 'education', 'is-out': leaving === 'education' }"
-      :aria-hidden="leaving === 'education' ? 'true' : undefined"
-      role="tabpanel"
-      aria-labelledby="tab-education"
-      tabindex="0"
-    >
+    <section id="education" class="panel-block resume-part" tabindex="-1" aria-labelledby="education-heading">
+      <h3 id="education-heading" class="era">Education</h3>
       <article v-for="school in education" :key="school.subtitle" class="card">
         <header class="card-head">
           <h3>{{ school.title }}</h3>
@@ -260,17 +165,10 @@ function onKeydown(event) {
           <span class="sr-only"> (opens in a new tab)</span>
         </a>
       </article>
-    </div>
+    </section>
 
-    <div
-      id="panel-clubs"
-      class="panel-block"
-      :class="{ 'is-active': current === 'clubs', 'is-out': leaving === 'clubs' }"
-      :aria-hidden="leaving === 'clubs' ? 'true' : undefined"
-      role="tabpanel"
-      aria-labelledby="tab-clubs"
-      tabindex="0"
-    >
+    <section id="clubs" class="panel-block resume-part" tabindex="-1" aria-labelledby="clubs-heading">
+      <h3 id="clubs-heading" class="era">Clubs</h3>
       <article v-for="club in clubs" :key="club.title" class="card">
         <header class="card-head">
           <h3>{{ club.title }}</h3>
@@ -290,17 +188,10 @@ function onKeydown(event) {
           <span class="sr-only"> about {{ club.title }} (opens in a new tab)</span>
         </a>
       </article>
-    </div>
+    </section>
 
-    <div
-      id="panel-awards"
-      class="panel-block"
-      :class="{ 'is-active': current === 'awards', 'is-out': leaving === 'awards' }"
-      :aria-hidden="leaving === 'awards' ? 'true' : undefined"
-      role="tabpanel"
-      aria-labelledby="tab-awards"
-      tabindex="0"
-    >
+    <section id="awards" class="panel-block resume-part" tabindex="-1" aria-labelledby="awards-heading">
+      <h3 id="awards-heading" class="era">Awards</h3>
       <article v-for="award in awards" :key="award.title" class="card card-compact">
         <header class="card-head">
           <h3>{{ award.title }}</h3>
@@ -318,8 +209,6 @@ function onKeydown(event) {
           <span class="sr-only"> (opens in a new tab)</span>
         </a>
       </article>
-    </div>
-    </div>
+    </section>
   </section>
 </template>
-

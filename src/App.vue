@@ -13,7 +13,7 @@ import ResumeSection from "./components/ResumeSection.vue";
 import SiteFooter from "./components/SiteFooter.vue";
 import DinersPage from "./components/DinersPage.vue";
 import TitleProto from "./components/TitleProto.vue";
-import { dockKey, resumeTopKey, scrollKey } from "./scroll.js";
+import { RESUME_PARTS, dockKey, resumeJumpKey, resumePartKey, scrollKey } from "./scroll.js";
 import {
   LAYER_IDS,
   PRODUCTION_VARIANT,
@@ -191,6 +191,7 @@ function endNativeScroll() {
 function scrollToEl(id, behavior, extraGap = 0, focusLanding = true) {
   const root = scroller.value;
   if (!root || typeof document === "undefined") return;
+  const started = performance.now();
   const jumpTitle = titleLocked.value && root.scrollTop <= 32;
   /* "instant", not "auto": auto defers to the CSS smooth scroll on .prlx,
      so reduced-motion jumps were still animating. */
@@ -203,28 +204,39 @@ function scrollToEl(id, behavior, extraGap = 0, focusLanding = true) {
     const end = Math.max(0, root.scrollHeight - root.clientHeight);
     if (id !== "top" && Math.abs(root.scrollTop - top) <= 600) {
       const anchor = anchorFor(id);
-      if (anchor && root.scrollTop < end - 2) {
+      if (anchor) {
         const anchorTop = anchor.getBoundingClientRect().top - root.getBoundingClientRect().top;
         const clearance = barClearance(id, extraGap);
-        if (anchorTop > clearance + 8) {
-          const next = Math.min(end, root.scrollTop + (anchorTop - clearance));
-          if (next > root.scrollTop + 2) {
+        const delta = anchorTop - clearance;
+        const atEnd = root.scrollTop >= end - 2;
+        /* Positive: the page grew and the heading sits too low.
+           Negative: it slipped under the sticky bar. Don't push the
+           last heading under the bar just to reach the end. */
+        if ((!atEnd && delta > 8) || delta < -2) {
+          const nextTop = Math.min(end, Math.max(0, root.scrollTop + delta));
+          if (Math.abs(nextTop - root.scrollTop) > 2) {
             root.style.scrollBehavior = "auto";
             drivingScroll = true;
-            root.scrollTop = next;
+            root.scrollTop = nextTop;
             root.style.scrollBehavior = "";
           }
         }
       }
     }
-    const endNow = Math.max(0, root.scrollHeight - root.clientHeight);
-    if (endNow - root.scrollTop <= 32 && endNow - root.scrollTop > 1) {
-      root.style.scrollBehavior = "auto";
-      drivingScroll = true;
-      root.scrollTop = endNow;
-      root.style.scrollBehavior = "";
-    }
     updateDock();
+    if (resumePartLocked) {
+      let arrived = id === "top";
+      if (!arrived) {
+        const nextPart = resumePartFromScroll();
+        const near =
+          Math.abs(root.scrollTop - top) <= 48 ||
+          root.scrollTop >= root.scrollHeight - root.clientHeight - 2;
+        const timedOut = performance.now() - started > 1400;
+        arrived = near || timedOut || nextPart === resumePartLockTarget;
+      }
+      if (arrived) resumePartLocked = false;
+    }
+    if (!resumePartLocked) applyResumePart();
     applySpy();
   };
   const landed = () => {
@@ -242,15 +254,14 @@ function scrollToEl(id, behavior, extraGap = 0, focusLanding = true) {
     return;
   }
   const el = anchorFor(id);
-  if (!el) return;
-  const max = Math.max(0, root.scrollHeight - root.clientHeight);
+  if (!el) {
+    resumePartLocked = false;
+    return;
+  }
   let top = Math.max(
     0,
     el.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - barClearance(id, extraGap),
   );
-  /* A target a few pixels short of the end never quite becomes the last
-     section. Land on the end instead. */
-  if (max - top <= 32) top = max;
   if (Math.abs(root.scrollTop - top) < 2) {
     landed();
   } else {
@@ -299,61 +310,29 @@ function visibleBelowBars(el) {
   return bottom > clearance + 1 && top < root.clientHeight - 1;
 }
 
-/* Tab changes open at the Resume heading. Instant, and before the new
-   panel paints, so a long Experience list does not leave Education
-   mid-page. Drop a docked row in the same turn: the inline tabs sit
-   under the heading, still readable beneath the main pill. */
-function jumpResumeTop() {
-  if (resumeLeaveUntil) {
-    resumeLeaveUntil = 0;
-    resumeLeaveAt = 0;
-    scrollGen += 1;
-    endNativeScroll();
-  }
-  window.clearTimeout(closeDockTimer);
-  if (dockState.docked || dockState.open) {
-    dockState.open = false;
-    dockState.joined = false;
-    dockState.docked = false;
-  }
-  /* Keep the lock through the paint. The skills card is on screen here,
-     and publishing /skills would scroll the heading back under the bar. */
-  activeSection.value = "resume";
-  spyLock = "resume";
-  resumeJumpHold = performance.now() + 500;
-  scrollToEl("resume", "instant", 0, false);
-  const gen = ++resumePinGen;
-  /* The route update measures the bar again while the dock is mid-render
-     and can park the heading underneath it. Re-pin once layout is done. */
-  requestAnimationFrame(() => {
-    if (gen !== resumePinGen) return;
-    const root = scroller.value;
-    const heading = document.getElementById("resume-heading");
-    const nav = root?.querySelector(".nav-inner");
-    if (!root || !heading || !nav) return;
-    const delta = heading.getBoundingClientRect().top - (nav.getBoundingClientRect().bottom + 12);
-    if (Math.abs(delta) <= 2) return;
-    root.style.scrollBehavior = "auto";
-    drivingScroll = true;
-    root.scrollTop = Math.max(0, root.scrollTop + delta);
-    root.style.scrollBehavior = "";
-  });
+function resumePartFromRoute() {
+  const tab = route.params.tab;
+  return RESUME_PARTS.includes(tab) ? tab : null;
 }
 
 function syncScroll(behavior) {
-  const key = `${route.name}:${route.params.tab || ""}:${targetForRoute()}`;
+  const part = resumePartFromRoute();
+  const key = `${route.name}:${part || ""}:${targetForRoute()}`;
   if (key === lastKey) return;
-  /* /skills is the card under the tab row. Coming back from it is a tab
-     change, same as Experience to Education. */
-  const switchingTabs =
-    route.name === "resume" && (lastKey.startsWith("resume:") || lastKey.startsWith("skills:"));
   lastKey = key;
   pinGen += 1;
-  if (switchingTabs) {
-    jumpResumeTop();
+  const target = targetForRoute();
+  /* /resume/education opens on Education. /resume is the heading.
+     Hold that part so the sections we pass do not take the URL. */
+  if (part) {
+    beginResumeLock(part);
+    markScrollTarget("resume");
+    scrollToEl(part, behavior);
+    if (behavior === "instant") settleRoute(part, pinGen);
     return;
   }
-  const target = targetForRoute();
+  if (target === "resume") beginResumeLock(null);
+  else resumePartLocked = false;
   markScrollTarget(target);
   scrollToEl(target, behavior);
   if (behavior === "instant") settleRoute(target, pinGen);
@@ -373,8 +352,11 @@ function settleRoute(id, gen) {
     const clearance = barClearance(id);
     const max = root.scrollHeight - root.clientHeight;
     const atEnd = root.scrollTop >= max - 2;
-    if (atEnd && top < root.clientHeight * 0.75) {
+    /* At the end of a long page the heading may already be on screen.
+       Still re-pin when it has slipped under the bar. */
+    if (atEnd && top < root.clientHeight * 0.75 && top >= clearance - 2) {
       updateDock();
+      if (!resumePartLocked) applyResumePart();
       applySpy();
       return;
     }
@@ -387,13 +369,17 @@ function settleRoute(id, gen) {
 
 const sectionIds = ["about", "projects", "resume", "skills"];
 const activeSection = ref(sectionIds.includes(route.name) ? route.name : null);
+const resumePart = ref(resumePartFromRoute());
 const spySeen = new Set();
 let resumePath = route.name === "resume" ? route.path : "/resume";
 let spyLock = null;
-let resumeJumpHold = 0;
-let resumePinGen = 0;
+/* Set while a jump to one resume part is in flight. The value is that
+   part, or null when the jump is to the Resume heading. */
+let resumePartLocked = false;
+let resumePartLockTarget = null;
 let passedSection = null;
 let urlFromSpy = false;
+let resumePartUrl = "";
 let routeFromTween = false;
 let spySettle = 0;
 let spyObserver;
@@ -458,7 +444,7 @@ function syncSpyUrl(section) {
 }
 
 function releaseSpyLock() {
-  if (!spyLock) return;
+  if (!spyLock || resumePartLocked) return;
   const wanted = spyLock === "top" ? null : spyLock;
   const next = spyPick();
   spyLock = null;
@@ -468,16 +454,84 @@ function releaseSpyLock() {
 }
 
 function applySpy() {
-  if (route.name === "diners") return;
+  if (route.name === "diners" || resumePartLocked) return;
   const next = spyPick();
   if (spyLock) {
     const wanted = spyLock === "top" ? null : spyLock;
-    if (next === wanted && performance.now() >= resumeJumpHold) spyLock = null;
+    if (next === wanted) spyLock = null;
     else return;
   }
   if (activeSection.value === next) return;
   activeSection.value = next;
   syncSpyUrl(next);
+}
+
+/* A jump to Awards passes Experience on the way. Hold the part the
+   reader asked for so the bar and the URL do not flicker through the
+   sections in between. A wheel or drag takes over. */
+function beginResumeLock(target) {
+  resumePartLocked = true;
+  resumePartLockTarget = target;
+  resumePart.value = target;
+}
+
+function resumePartFromScroll() {
+  const root = scroller.value;
+  if (!root) return null;
+  const clearance = barClearance("resume");
+  const rootTop = root.getBoundingClientRect().top;
+  const atEnd = root.scrollTop >= root.scrollHeight - root.clientHeight - 2;
+  let current = null;
+  for (const id of RESUME_PARTS) {
+    const el = document.getElementById(`${id}-heading`) || document.getElementById(id);
+    if (!el) continue;
+    const top = el.getBoundingClientRect().top - rootTop;
+    if (top <= clearance + 24) current = id;
+    else if (atEnd && top < root.clientHeight) current = id;
+  }
+  return current;
+}
+
+function publishResumePart(next) {
+  if (skillsInView()) return;
+  const main = spyLock && spyLock !== "top" ? spyLock : spyPick();
+  if (main !== "resume") return;
+  const path = next ? `/resume/${next}` : "/resume";
+  resumePath = path;
+  if (route.path === path || resumePartUrl === path) return;
+  /* The section spy publishes this path when Resume is taking over
+     from About, Projects, or Skills. Publishing here too would start
+     a second navigation and scroll again. */
+  if (activeSection.value !== "resume") return;
+  resumePartUrl = path;
+  urlFromSpy = true;
+  router.replace(shellTo(path));
+}
+
+function applyResumePart() {
+  if (route.name === "diners") return;
+  const next = resumePartFromScroll();
+  if (resumePartLocked) {
+    if (next !== resumePartLockTarget) return;
+    resumePartLocked = false;
+  }
+  if (resumePart.value !== next) resumePart.value = next;
+  publishResumePart(next);
+}
+
+function jumpResumePart(id) {
+  if (!RESUME_PARTS.includes(id)) return;
+  if (animating || performance.now() < navQuietUntil) return;
+  cancelResumeLeave();
+  cancelTween();
+  const path = `/resume/${id}`;
+  beginResumeLock(id);
+  if (route.path === path) {
+    markScrollTarget("resume");
+    scrollToEl(id);
+    return;
+  }
+  router.push(shellTo(path));
 }
 
 function onSpy(entries) {
@@ -532,6 +586,7 @@ function go(id) {
     activeSection.value = id === "top" ? null : id;
   }
   if (id === "resume" && route.name === "resume") {
+    beginResumeLock(null);
     markScrollTarget("resume");
     scrollToEl("resume");
     return;
@@ -574,7 +629,8 @@ function onNav(event, id) {
 }
 
 provide(scrollKey, go);
-provide(resumeTopKey, jumpResumeTop);
+provide(resumePartKey, resumePart);
+provide(resumeJumpKey, jumpResumePart);
 
 const dockState = reactive({ docked: false, open: false, joined: false, hold: 0 });
 provide(dockKey, dockState);
@@ -616,7 +672,7 @@ function pinLabelWidths() {
    the same frame, makes WebKit skip the ease and flash every label. */
 function pinTabWidths() {
   const inner = document.querySelector(".nav-inner");
-  const buttons = [...document.querySelectorAll("#nav-tab-slot button")];
+  const buttons = [...document.querySelectorAll("#nav-tab-slot a")];
   if (!inner || !buttons.length) return false;
   const pad = getComputedStyle(inner).getPropertyValue("--tab-pad").trim() || "16px";
   for (const button of buttons) {
@@ -719,6 +775,7 @@ function cancelResumeLeave() {
    putting them back inline cannot cut the smooth scroll short. */
 function leaveResumeMode() {
   cancelTween();
+  beginResumeLock(null);
   activeSection.value = "resume";
   if (route.name === "resume") resumePath = route.path;
   markScrollTarget("resume");
@@ -1050,6 +1107,7 @@ function clampTitleLock(root) {
 
 function onIntroWheel(event) {
   if (resumeLeaveUntil) cancelResumeLeave();
+  if (event.deltaY && !animating) resumePartLocked = false;
   if (event.deltaY) armGesture(500);
   if (titleLocked.value) {
     const root = scroller.value;
@@ -1211,6 +1269,7 @@ function scheduleChrome() {
   chromeFrame = requestAnimationFrame(() => {
     chromeFrame = 0;
     updateDock();
+    if (!resumePartLocked) applyResumePart();
     if (!spyLock) applySpy();
     const root = scroller.value;
     if (!root || animating) return;
@@ -1299,6 +1358,7 @@ function onIntroScroll() {
     }
   }
   lastScrollY = y;
+  if (!followNative) resumePartLocked = false;
   syncParallax(root);
   scheduleChrome();
   queueAnchor();
@@ -1322,6 +1382,7 @@ function onTouchMove(event) {
   armGesture(800);
   const y = event.touches[0]?.clientY ?? touchStartY;
   const dy = touchStartY - y;
+  if (Math.abs(dy) > 10 && !animating) resumePartLocked = false;
   const root = scroller.value;
   const about = cachedAbout || aboutAnchor();
   if (titleLocked.value && root) {
@@ -1354,6 +1415,7 @@ function onIntroKey(event) {
   const up = event.key === "ArrowUp" || event.key === "PageUp" || (event.key === " " && event.shiftKey);
   if (!down && !up) return;
   if (resumeLeaveUntil) cancelResumeLeave();
+  if (!animating) resumePartLocked = false;
   if (titleLocked.value) {
     const root = scroller.value;
     const about = cachedAbout || aboutAnchor();
@@ -1708,6 +1770,7 @@ watch(
     if (protoHold || urlFromSpy || routeFromTween) {
       urlFromSpy = false;
       routeFromTween = false;
+      resumePartUrl = "";
       lastKey = `${route.name}:${route.params.tab || ""}:${targetForRoute()}`;
       return;
     }
@@ -1835,6 +1898,7 @@ watch(
         <ResumeSection />
       </div>
       <SiteFooter />
+      <div class="scroll-tail" aria-hidden="true"></div>
     </main>
   </div>
   </template>
