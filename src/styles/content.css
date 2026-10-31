@@ -160,7 +160,7 @@
   touch-action: pan-y;
 }
 
-.nav-subs .tablist button {
+.nav-subs .tablist a {
   flex: none;
   min-width: 0;
   min-height: 40px;
@@ -180,7 +180,7 @@
     color var(--nav-dur) var(--nav-ease);
 }
 
-.section-nav.is-open .nav-subs .tablist button {
+.section-nav.is-open .nav-subs .tablist a {
   max-width: var(--tab-max, 9.5rem);
   padding: 0 var(--tab-pad);
   opacity: 1;
@@ -188,8 +188,17 @@
   pointer-events: auto;
 }
 
-.section-nav.is-open .nav-subs .tablist button[aria-selected="true"] {
+.section-nav .nav-subs .tablist a:hover {
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.section-nav.is-open .nav-subs .tablist a[aria-current="location"] {
   box-shadow: inset 0 -2px 0 rgba(253, 128, 70, 0.35);
+}
+
+.section-nav .nav-subs .tablist a[aria-current="location"],
+.section-nav .nav-subs .tablist a[aria-current="location"]:hover {
+  color: var(--md-sys-color-on-primary-container);
 }
 
 @media (min-width: 720px) {
@@ -214,11 +223,11 @@
 
   /* Size stays on while the row closes. Gating it on .is-open snapped
      12px back to 14px and widened the pill under the leaving labels. */
-  .nav-subs .tablist button {
+  .nav-subs .tablist a {
     font-size: 12px;
   }
 
-  .section-nav.is-open .nav-subs .tablist button {
+  .section-nav.is-open .nav-subs .tablist a {
     max-width: var(--tab-max, 7.5rem);
     padding: 0 var(--tab-pad);
   }
@@ -234,7 +243,7 @@
     --tab-pad: 4px;
   }
 
-  .nav-subs .tablist button {
+  .nav-subs .tablist a {
     font-size: 11px;
     letter-spacing: 0;
   }
@@ -323,7 +332,7 @@
 
 .section-nav a,
 .pill,
-.tablist button,
+.tablist a,
 .to-top,
 .site-footer a {
   position: relative;
@@ -332,7 +341,7 @@
 
 .section-nav a::before,
 .pill::before,
-.tablist button::before,
+.tablist a::before,
 .to-top::before,
 .site-footer a::before {
   content: "";
@@ -348,7 +357,7 @@
 @media (hover: hover) {
   .section-nav a:hover::before,
   .pill:hover::before,
-  .tablist button:hover::before,
+  .tablist a:hover::before,
   .to-top:hover::before,
   .site-footer a:hover::before,
   .more:hover::before {
@@ -370,7 +379,7 @@
 
 .section-nav a:active::before,
 .pill:active::before,
-.tablist button:active::before,
+.tablist a:active::before,
 .to-top:active::before,
 .site-footer a:active::before,
 .more:active::before {
@@ -466,7 +475,7 @@
     padding: 0 8px;
   }
 
-  .section-nav.is-open .nav-subs .tablist button {
+  .section-nav.is-open .nav-subs .tablist a {
     padding: 0 var(--tab-pad);
   }
 }
@@ -857,7 +866,7 @@ video {
   display: none;
 }
 
-.tablist button {
+.tablist a {
   appearance: none;
   border: 0;
   background: transparent;
@@ -872,11 +881,24 @@ video {
   flex: 0 0 auto;
   cursor: pointer;
   scroll-snap-align: start;
+  text-decoration: none;
 }
 
-.tablist button[aria-selected="true"] {
+.tablist a[aria-current="location"] {
   background: var(--md-sys-color-primary-container);
   color: var(--md-sys-color-on-primary-container);
+}
+
+.resume-part {
+  min-width: 0;
+}
+
+.resume-part + .resume-part {
+  margin-top: 2rem;
+}
+
+.resume-part > .era {
+  margin-top: 0;
 }
 
 .card {
@@ -998,6 +1020,13 @@ video {
 .lead,
 .project {
   box-shadow: var(--shadow-raised);
+}
+
+/* Room past the footer so the last resume heading can sit under the
+   sticky bar. 44rem is the bar plus a short final section; anything
+   taller than the viewport contributes nothing. */
+.scroll-tail {
+  height: max(0px, calc(100dvh - 44rem));
 }
 
 .site-footer {
@@ -1160,118 +1189,6 @@ video {
   }
 }
 
-html.js .panel-stage {
-  display: grid;
-  min-width: 0;
-}
-
-html.js .panel-stage > .panel-block {
-  grid-area: 1 / 1;
-  align-self: start;
-  width: 100%;
-  min-width: 0;
-}
-
-html.js .panel-block {
-  display: none;
-}
-
-html.js .panel-block.is-active,
-html.js .panel-block.is-out {
-  display: block;
-}
-
-.panel-stage.is-anim {
-  overflow-x: clip;
-}
-
-.panel-stage.is-anim > .is-out {
-  z-index: 0;
-  pointer-events: none;
-}
-
-.panel-stage.is-anim > .is-active {
-  z-index: 1;
-}
-
-.panel-stage.is-anim[data-dir="forward"] > .is-active {
-  animation: panel-in-right 200ms var(--md-sys-motion-easing-standard) 120ms both;
-}
-
-.panel-stage.is-anim[data-dir="forward"] > .is-out {
-  animation: panel-out-left 120ms var(--md-sys-motion-easing-standard) both;
-}
-
-.panel-stage.is-anim[data-dir="back"] > .is-active {
-  animation: panel-in-left 200ms var(--md-sys-motion-easing-standard) 120ms both;
-}
-
-.panel-stage.is-anim[data-dir="back"] > .is-out {
-  animation: panel-out-right 120ms var(--md-sys-motion-easing-standard) both;
-}
-
-@keyframes panel-in-right {
-  from {
-    opacity: 0;
-    transform: translateX(48px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes panel-out-left {
-  from {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateX(-48px);
-  }
-}
-
-@keyframes panel-in-left {
-  from {
-    opacity: 0;
-    transform: translateX(-48px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes panel-out-right {
-  from {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateX(48px);
-  }
-}
-
-@keyframes panel-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes panel-fade-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
 @media (min-width: 960px) {
   #projects {
     display: grid;
@@ -1301,13 +1218,9 @@ html.js .panel-block.is-out {
     align-items: start;
   }
 
-  html.js .panel-block {
-    display: none;
-  }
-
-  html.js .panel-block.is-active,
-  html.js .panel-block.is-out {
-    display: grid;
+  .panel-block > .era,
+  .coursework {
+    grid-column: 1 / -1;
   }
 
   .panel-block > .card,
@@ -1315,23 +1228,19 @@ html.js .panel-block.is-out {
     margin: 0;
   }
 
-  .coursework {
-    grid-column: 1 / -1;
-  }
-
   /* Awards cards are short and uneven. Columns let the next card rise
-     instead of leaving a blank row under the shorter neighbor.
-     A bare #panel-awards would beat the hidden-panel rule and leave
-     Awards painted on top of every other tab. */
-  html.js #panel-awards.is-active,
-  html.js #panel-awards.is-out,
-  html:not(.js) #panel-awards {
+     instead of leaving a blank row under the shorter neighbor. */
+  #awards {
     display: block;
     columns: 2;
     column-gap: 1rem;
   }
 
-  #panel-awards > .card {
+  #awards > .era {
+    column-span: all;
+  }
+
+  #awards > .card {
     break-inside: avoid;
     display: inline-block;
     width: 100%;
@@ -1378,7 +1287,7 @@ html.js .panel-block.is-out {
 }
 
 @media (max-width: 420px) {
-  .tablist button {
+  .tablist a {
     padding: 0 14px;
   }
 }
@@ -1395,7 +1304,7 @@ html.js .panel-block.is-out {
     gap: 2px;
   }
 
-  #resume-tab-slot .tablist button {
+  #resume-tab-slot .tablist a {
     padding: 0 clamp(6px, 2.4vw, 12px);
     font-size: clamp(0.75rem, 0.68rem + 0.35vw, 0.8125rem);
     line-height: 1.125rem;
@@ -1403,26 +1312,14 @@ html.js .panel-block.is-out {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .panel-stage.is-anim[data-dir] > .is-active {
-    animation-name: panel-fade-in;
-    animation-duration: 160ms;
-    animation-timing-function: linear;
-  }
-
-  .panel-stage.is-anim[data-dir] > .is-out {
-    animation-name: panel-fade-out;
-    animation-duration: 160ms;
-    animation-timing-function: linear;
-  }
-
   .section-nav a,
   .section-nav a::before,
   .nav-inner,
   .nav-back,
   .nav-divider,
-  .nav-subs .tablist button,
+  .nav-subs .tablist a,
   .pill::before,
-  .tablist button::before,
+  .tablist a::before,
   .to-top::before,
   .site-footer a::before,
   .more::before,
@@ -1455,6 +1352,7 @@ html.js .panel-block.is-out {
   .skip,
   .learn,
   .section-nav,
+  .scroll-tail,
   .to-top {
     display: none !important;
   }
