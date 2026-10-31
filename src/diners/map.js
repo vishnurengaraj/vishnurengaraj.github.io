@@ -7,11 +7,11 @@ const STYLE = "https://tiles.openfreemap.org/styles/positron";
 
 /* Idle motion on the pitched map. Yaw is ±13° around the resting bearing.
    Pitch floats ±1.5° around the pitched base (phone 58°, desktop 64°).
-   Both share one sine: 42s for a full cycle, about 21s each way — five
-   times the previous 8.4s sway. The first 700ms ramps in from rest.
+   Both share one sine: 84s for a full cycle, about 42s each way — half
+   the speed of the previous 42s sway. The first 700ms ramps in from rest.
    Zoom stays put. */
 const SWAY_AMPLITUDE_DEG = 13;
-const SWAY_PERIOD_MS = 42000;
+const SWAY_PERIOD_MS = 84000;
 const PITCH_FLOAT_DEG = 1.5;
 const SWAY_RAMP_MS = 700;
 /* Whole cycles only, so the handoff to the next ease lands on rest. */
