@@ -1,0 +1,3 @@
+# #36: /skills is a resume section. Redirect even though skills.html exists.
+/skills /resume/skills 301
+/skills/ /resume/skills 301

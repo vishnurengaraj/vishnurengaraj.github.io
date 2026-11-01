@@ -77,6 +77,22 @@ ingress:
 
 In the Cloudflare dashboard, attach those hostnames to the tunnel. After the tunnel answers, the GitHub Pages `CNAME` can go.
 
+## Cloudflare Workers (staging only)
+
+The same `dist/` can be served by a Workers Static Assets script named `rengaraj` (`wrangler.jsonc`). That config has no routes and no custom domains. `npm run deploy` publishes to `*.workers.dev` and does not move `vishnu.rengaraj.com`, `rengaraj.com`, or `www.rengaraj.com` off the tunnel. `scripts/deploy.sh` is still how the Pi is updated. `wedding.rengaraj.com` is a separate Pages project and is not part of this Worker.
+
+```bash
+npm ci
+npx wrangler login   # once, on the Cloudflare account that owns rengaraj.com
+npm run deploy       # build, then wrangler deploy
+```
+
+`/about` is served from `about.html` (`assets.html_handling`: `auto-trailing-slash`). A path with no file falls through to `index.html`, matching nginx `try_files` ending at `/index.html`. `/skills` is a 301 to `/resume/skills` (`public/_redirects`). Cache and security headers are in `public/_headers`.
+
+After the first deploy, attach `cf.rengaraj.com` as a Worker custom domain for `rengaraj`. Do not attach `vishnu.rengaraj.com`, the apex, or `www` until the tunnel is explicitly cut over. Leave the Pi 301 from apex and www in place until then.
+
+GitHub Actions (`.github/workflows/workers.yml`) runs `npm run deploy` on master and on manual dispatch. If `CLOUDFLARE_API_TOKEN` is not set on the repo, the job skips and DNS stays as it is.
+
 ## Local preview
 
 ```bash
