@@ -851,6 +851,7 @@ video {
 .section-nav {
   --pull-dur: 420ms;
   --pull-overlap: 8px;
+  --dock-tab-pad: 12px;
 }
 
 .section-nav.is-open a.nav-resume {
@@ -888,6 +889,10 @@ video {
 
 .section-nav.is-open .nav-subs {
   max-width: var(--subs-max, 34rem);
+  /* The closed row is pulled under Resume so the names wipe out from
+     behind the chip. Once open, that overlap lets the gold section
+     pill show through the chip's rounded corners. Sit clear of it. */
+  margin-left: 4px;
 }
 
 .nav-subs .tablist {
@@ -902,7 +907,7 @@ video {
   max-width: none;
   opacity: 1;
   transform: none;
-  padding: 0 12px;
+  padding: 0 var(--dock-tab-pad, 12px);
   pointer-events: auto;
   transition:
     background-color var(--md-sys-motion-duration-short) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
@@ -1353,6 +1358,15 @@ video {
 @media (max-width: 420px) {
   .tablist a {
     padding: 0 14px;
+  }
+}
+
+/* The open row sits 4px clear of Resume instead of 8px under it.
+   That is 12px wider. On a phone the bar was already at its ends,
+   so the section labels give the width back. */
+@media (max-width: 400px) {
+  .section-nav {
+    --dock-tab-pad: 9px;
   }
 }
 

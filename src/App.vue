@@ -685,7 +685,7 @@ function pinTabWidths() {
   const inner = document.querySelector(".nav-inner");
   const buttons = [...document.querySelectorAll("#nav-tab-slot a")];
   if (!inner || !buttons.length) return false;
-  const pad = "12px";
+  const pad = getComputedStyle(buttons[0]).paddingLeft || "12px";
   let sum = 0;
   for (const button of buttons) {
     const probe = button.cloneNode(true);
