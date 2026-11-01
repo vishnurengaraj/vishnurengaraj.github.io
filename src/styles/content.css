@@ -849,7 +849,7 @@ video {
 /* Section names wipe out from behind the Resume chip. The chip stays the
    same size it is when Resume is selected in the resting bar. */
 .section-nav {
-  --pull-dur: 380ms;
+  --pull-dur: 420ms;
   --pull-overlap: 8px;
 }
 

@@ -707,36 +707,54 @@ function pinTabWidths() {
 /* --tab-max is set while max-width is still 0, then the row opens on the
    next frame so the ease runs from zero instead of the measured width. */
 function scheduleOpen(tries = 0) {
-  if (!dockState.docked || dockState.open) return;
+  if (!dockState.docked || dockState.open || tuckCloseUntil) return;
   requestAnimationFrame(() => {
-    if (!dockState.docked || dockState.open) return;
+    if (!dockState.docked || dockState.open || tuckCloseUntil) return;
     if (!pinTabWidths() && tries < 8) {
       scheduleOpen(tries + 1);
       return;
     }
     requestAnimationFrame(() => {
-      if (!dockState.docked || dockState.open) return;
+      if (!dockState.docked || dockState.open || tuckCloseUntil) return;
+      tuckCloseUntil = 0;
       dockState.open = true;
       dockState.joined = true;
     });
   });
 }
 
-/* The in-page slot has already dropped clear of the bar. Holding the
-   section labels in the sticky pill past that point stacks two bars. */
-function slotClearOfBar() {
-  const sent = document.getElementById("resume-tabs-sentinel");
-  const bar = scroller.value?.querySelector(".nav-inner");
-  if (!sent || !bar) return true;
-  return sent.getBoundingClientRect().top > bar.getBoundingClientRect().bottom + 28;
-}
+/* Long enough for the names to wipe fully behind Resume. A steady
+   scroll starts this early and plays it out before the in-page slot
+   reaches the bar. Faster travel shortens the same wipe; a flick with
+   no time for it snaps. */
+const TUCK_MS = 450;
+const TUCK_MIN_MS = 120;
+let tuckCloseUntil = 0;
+let tuckLatched = false;
+let dockScrollY = -1;
+let dockScrollAt = 0;
+let upFrames = 0;
 
 function releaseDockNow() {
   window.clearTimeout(closeDockTimer);
+  tuckCloseUntil = 0;
+  const nav = scroller.value?.querySelector(".section-nav");
+  nav?.style.removeProperty("--pull-dur");
   dockState.open = false;
   dockState.joined = false;
   dockState.docked = false;
   nextTick(pinLabelWidths);
+}
+
+function beginReverseTuck(ms) {
+  if (tuckCloseUntil || !dockState.docked || !dockState.open) return;
+  const nav = scroller.value?.querySelector(".section-nav");
+  if (nav) nav.style.setProperty("--pull-dur", `${Math.round(ms)}ms`);
+  dockState.open = false;
+  dockState.joined = false;
+  /* Stay docked until the wipe has painted. Undock is a separate step,
+     and only once the in-page slot is back at the bar. */
+  tuckCloseUntil = performance.now() + ms + 16;
 }
 
 /* Tabs move into the fixed-height pill. A same-height placeholder keeps
@@ -744,41 +762,19 @@ function releaseDockNow() {
    scrollTop. Do not snap scroll position here: a correction also
    aborts the page's own smooth scrolls and fast wheels. */
 function setDock(next) {
-  if (next) {
-    if (dockState.docked && dockState.open) return;
-    window.clearTimeout(closeDockTimer);
-    if (prefersReduced()) {
-      if (!dockState.docked) measureTabHold();
-      dockState.docked = true;
-      dockState.open = true;
-      dockState.joined = true;
-      return;
-    }
-    if (!dockState.docked) measureTabHold();
-    pinLabelWidths();
-    dockState.docked = true;
-    scheduleOpen();
-    return;
-  }
-  if (!dockState.docked) return;
-  /* Tuck the section names back behind Resume, then return them to the
-     page. If the slot has already cleared the bar, skip the tuck so the
-     two pills cannot both stay stuck. */
-  if (!dockState.open) {
-    if (!prefersReduced() && !slotClearOfBar()) return;
-    releaseDockNow();
-    return;
-  }
-  if (prefersReduced() || slotClearOfBar()) {
-    releaseDockNow();
-    return;
-  }
-  dockState.open = false;
-  dockState.joined = false;
+  if (!next || (dockState.docked && dockState.open)) return;
   window.clearTimeout(closeDockTimer);
-  closeDockTimer = window.setTimeout(() => {
-    if (!dockState.open) releaseDockNow();
-  }, 420);
+  if (prefersReduced()) {
+    if (!dockState.docked) measureTabHold();
+    dockState.docked = true;
+    dockState.open = true;
+    dockState.joined = true;
+    return;
+  }
+  if (!dockState.docked) measureTabHold();
+  pinLabelWidths();
+  dockState.docked = true;
+  scheduleOpen();
 }
 
 function cancelResumeLeave() {
@@ -849,13 +845,120 @@ function updateDock() {
   const barRect = bar.getBoundingClientRect();
   const resumeBottom = resume.getBoundingClientRect().bottom;
   const owns = resumeBottom > barRect.bottom + 24;
-  /* Give the section pill back as soon as its slot is visible again.
-     Waiting until the Resume heading was on screen left both bars stuck. */
   const sent = document.getElementById("resume-tabs-sentinel");
   if (!sent) return;
-  const sentTop = sent.getBoundingClientRect().top;
-  const limit = dockState.docked ? barRect.bottom + 8 : barRect.bottom + 1;
-  setDock(owns && sentTop <= limit);
+  const y = root.scrollTop;
+  const now = performance.now();
+  const scrollingUp = dockScrollY >= 0 && y < dockScrollY - 0.5;
+  const scrollingDown = dockScrollY >= 0 && y > dockScrollY + 0.5;
+  if (scrollingUp) upFrames += 1;
+  else upFrames = 0;
+  /* Positive when the in-page slot is below the bar (on screen). */
+  const gap = sent.getBoundingClientRect().top - barRect.bottom;
+  /* How many pixels of the slot are still covered by the bar. The empty
+     hold is the double pill once this goes negative. */
+  const slotEl = document.querySelector(".tab-hold")
+    || document.querySelector("#resume-tab-slot .tablist-shell");
+  const cover = slotEl
+    ? barRect.bottom - slotEl.getBoundingClientRect().bottom
+    : -gap - (dockState.hold || 56);
+  const dt = Math.min(32, Math.max(8, dockScrollAt ? now - dockScrollAt : 16));
+  const upSpeed = scrollingUp ? (dockScrollY - y) / dt : 0;
+
+  if (!owns) {
+    tuckLatched = false;
+    if (dockState.docked || dockState.open || tuckCloseUntil) releaseDockNow();
+    dockScrollY = y;
+    dockScrollAt = now;
+    return;
+  }
+
+  if (prefersReduced()) {
+    tuckLatched = false;
+    if (cover > 8) setDock(true);
+    else if (dockState.docked) releaseDockNow();
+    dockScrollY = y;
+    dockScrollAt = now;
+    return;
+  }
+
+  if (tuckCloseUntil) {
+    if (scrollingDown && gap <= 1) {
+      tuckCloseUntil = 0;
+      tuckLatched = false;
+      setDock(true);
+    } else if (cover <= 0 || gap > 8) {
+      /* The empty hold is about to show under the bar. */
+      tuckLatched = true;
+      releaseDockNow();
+    } else if (now >= tuckCloseUntil && cover <= 28) {
+      /* Wipe has finished and the real pill is what crosses the bar. */
+      tuckLatched = true;
+      releaseDockNow();
+    }
+    dockScrollY = y;
+    dockScrollAt = now;
+    return;
+  }
+
+  /* Scrolling back down, or the slot sitting on screen below the bar,
+     ends the "just tucked" latch so the names can dock again. */
+  if (scrollingDown || gap > 8) tuckLatched = false;
+
+  if (dockState.docked && cover <= 0) {
+    tuckLatched = true;
+    releaseDockNow();
+    dockScrollY = y;
+    dockScrollAt = now;
+    return;
+  }
+
+  /* scheduleOpen can miss the teleport on the first frames after a jump.
+     Keep trying while the slot is still above the bar and we are not tucking.
+     An upward nudge during that window must not undock. */
+  if (dockState.docked && !dockState.open && !tuckCloseUntil && gap <= 1) {
+    scheduleOpen();
+    dockScrollY = y;
+    dockScrollAt = now;
+    return;
+  }
+
+  if (dockState.docked && dockState.open && upFrames >= 2 && gap <= 1 && upSpeed > 0.02 && cover > 16) {
+    /* Time until the empty hold would peek out under the bar.
+       Play the whole wipe in that time, capped at TUCK_MS, so a steady
+       scroll finishes before undock. A flick that is already on the bar
+       snaps; a fast frame while the hold is still far away does not. */
+    const msToHandoff = (cover - 16) / upSpeed;
+    if (msToHandoff >= TUCK_MIN_MS && msToHandoff <= TUCK_MS + 80) {
+      beginReverseTuck(Math.min(TUCK_MS, Math.round(msToHandoff)));
+      dockScrollY = y;
+      dockScrollAt = now;
+      return;
+    }
+  }
+
+  if (dockState.docked && dockState.open && upFrames >= 2 && cover <= 16 && upSpeed > 0.02) {
+    tuckLatched = true;
+    releaseDockNow();
+    dockScrollY = y;
+    dockScrollAt = now;
+    return;
+  }
+
+  if (dockState.docked && gap > 1) {
+    tuckLatched = true;
+    releaseDockNow();
+    dockScrollY = y;
+    dockScrollAt = now;
+    return;
+  }
+
+  /* Latch, not scroll direction, blocks the re-dock. A settled landing
+     on the section has no downward delta, and requiring one left the
+     names undocked until the next scroll down. */
+  if (!dockState.docked && !tuckLatched && gap <= 1) setDock(true);
+  dockScrollY = y;
+  dockScrollAt = now;
 }
 
 let armedDown = true;
