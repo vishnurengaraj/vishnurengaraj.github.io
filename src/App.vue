@@ -147,10 +147,8 @@ function barClearance(targetId, extraGap = 0) {
   const gap = (targetId === "about" ? 20 : 12) + extraGap;
   let cover = stickyTop + padTop + inner.offsetHeight;
   const shell = nav.classList.contains("is-open") ? nav.querySelector("#nav-tab-slot .tablist-shell") : null;
-  const stuck = root.querySelector(".tablist-wrap.is-stuck .tablist-shell");
-  for (const el of [shell, stuck]) {
-    if (!el) continue;
-    const bottom = el.getBoundingClientRect().bottom - rootTop;
+  if (shell) {
+    const bottom = shell.getBoundingClientRect().bottom - rootTop;
     if (bottom > cover) cover = bottom;
   }
   return cover + gap;
@@ -428,22 +426,11 @@ function queryValue(key) {
   return Array.isArray(raw) ? raw[0] : raw;
 }
 
-function readNavMode() {
-  const mode = queryValue("nav");
-  return mode === "a" || mode === "b" || mode === "c" ? mode : "";
-}
-
 function shellTo(path) {
-  const query = {};
-  if (queryValue("proto") === "1") {
-    query.proto = "1";
-    const title = queryValue("title");
-    if (typeof title === "string" && title !== "" && title !== PRODUCTION_VARIANT) query.title = title;
-  }
-  const nav = readNavMode();
-  if (nav) query.nav = nav;
-  if (queryValue("navproto") === "1") query.navproto = "1";
-  if (!Object.keys(query).length) return path;
+  if (queryValue("proto") !== "1") return path;
+  const query = { proto: "1" };
+  const title = queryValue("title");
+  if (typeof title === "string" && title !== "" && title !== PRODUCTION_VARIANT) query.title = title;
   return { path, query };
 }
 
@@ -650,35 +637,8 @@ provide(scrollKey, go);
 provide(resumePartKey, resumePart);
 provide(resumeJumpKey, jumpResumePart);
 
-const dockState = reactive({
-  docked: false,
-  open: false,
-  joined: false,
-  hold: 0,
-  mode: readNavMode(),
-});
+const dockState = reactive({ docked: false, open: false, joined: false, hold: 0 });
 provide(dockKey, dockState);
-
-const showNavProto = computed(() => dockState.mode !== "" || queryValue("navproto") === "1");
-
-function syncNavMode(mode) {
-  dockState.mode = mode;
-  if (typeof document === "undefined") return;
-  if (mode) document.documentElement.dataset.nav = mode;
-  else delete document.documentElement.dataset.nav;
-}
-
-watch(readNavMode, (mode, prev) => {
-  const changed = mode !== prev;
-  syncNavMode(mode);
-  if (!changed) return;
-  window.clearTimeout(closeDockTimer);
-  dockState.open = false;
-  dockState.joined = false;
-  dockState.docked = false;
-  nextTick(() => updateDock());
-});
-syncNavMode(dockState.mode);
 
 /* Matches the pill morph. A little longer than the 400ms ease so the
    tabs are fully collapsed before they move back inline. */
@@ -719,7 +679,7 @@ function pinTabWidths() {
   const inner = document.querySelector(".nav-inner");
   const buttons = [...document.querySelectorAll("#nav-tab-slot a")];
   if (!inner || !buttons.length) return false;
-  const pad = isPullMode() ? "12px" : getComputedStyle(inner).getPropertyValue("--tab-pad").trim() || "16px";
+  const pad = "12px";
   let sum = 0;
   for (const button of buttons) {
     const probe = button.cloneNode(true);
@@ -762,10 +722,6 @@ function scheduleOpen(tries = 0) {
   });
 }
 
-function isPullMode() {
-  return dockState.mode === "a" || dockState.mode === "b" || dockState.mode === "c";
-}
-
 /* The in-page slot has already dropped clear of the bar. Holding the
    section labels in the sticky pill past that point stacks two bars. */
 function slotClearOfBar() {
@@ -805,26 +761,24 @@ function setDock(next) {
     return;
   }
   if (!dockState.docked) return;
-  /* Pull variants tuck the section names back behind Resume before the
-     pill leaves the bar. The default path, and any scroll that has
-     already cleared the slot, put the names back on the page now. */
+  /* Tuck the section names back behind Resume, then return them to the
+     page. If the slot has already cleared the bar, skip the tuck so the
+     two pills cannot both stay stuck. */
   if (!dockState.open) {
-    if (isPullMode() && !prefersReduced() && !slotClearOfBar()) return;
+    if (!prefersReduced() && !slotClearOfBar()) return;
     releaseDockNow();
     return;
   }
-  const morphOut = isPullMode() && !prefersReduced() && !slotClearOfBar();
-  if (!morphOut) {
+  if (prefersReduced() || slotClearOfBar()) {
     releaseDockNow();
     return;
   }
   dockState.open = false;
   dockState.joined = false;
   window.clearTimeout(closeDockTimer);
-  const wait = dockState.mode === "b" ? 640 : 460;
   closeDockTimer = window.setTimeout(() => {
     if (!dockState.open) releaseDockNow();
-  }, wait);
+  }, 420);
 }
 
 function cancelResumeLeave() {
@@ -902,22 +856,6 @@ function updateDock() {
   const sentTop = sent.getBoundingClientRect().top;
   const limit = dockState.docked ? barRect.bottom + 8 : barRect.bottom + 1;
   setDock(owns && sentTop <= limit);
-}
-
-function pickNavMode(event, mode) {
-  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
-  event.preventDefault();
-  const query = { ...route.query, navproto: "1" };
-  if (mode) query.nav = mode;
-  else delete query.nav;
-  router.replace({ path: route.path, query });
-}
-
-function navProtoHref(mode) {
-  const query = { ...route.query, navproto: "1" };
-  if (mode) query.nav = mode;
-  else delete query.nav;
-  return router.resolve({ path: route.path, query }).href;
 }
 
 let armedDown = true;
@@ -1924,7 +1862,7 @@ watch(
     </div>
     <main class="sheet">
       <nav class="section-nav" :class="{ 'is-docked': dockState.docked, 'is-open': dockState.open, 'is-joined': dockState.joined }" aria-label="Sections">
-        <div class="nav-cluster" :aria-hidden="dockState.docked && (dockState.mode === 'b' || dockState.mode === 'c') ? 'true' : undefined">
+        <div class="nav-cluster">
           <div class="nav-inner">
             <a
               class="nav-link"
@@ -1979,11 +1917,5 @@ watch(
       <div class="scroll-tail" aria-hidden="true"></div>
     </main>
   </div>
-  <nav v-if="showNavProto" class="nav-proto" aria-label="Resume nav prototypes">
-    <a :href="navProtoHref('')" :aria-current="dockState.mode === '' ? 'true' : undefined" @click="pickNavMode($event, '')">Default</a>
-    <a :href="navProtoHref('a')" :aria-current="dockState.mode === 'a' ? 'true' : undefined" @click="pickNavMode($event, 'a')">A Tuck</a>
-    <a :href="navProtoHref('b')" :aria-current="dockState.mode === 'b' ? 'true' : undefined" @click="pickNavMode($event, 'b')">B Stagger</a>
-    <a :href="navProtoHref('c')" :aria-current="dockState.mode === 'c' ? 'true' : undefined" @click="pickNavMode($event, 'c')">C Strip</a>
-  </nav>
   </template>
 </template>

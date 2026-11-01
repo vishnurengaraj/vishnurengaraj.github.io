@@ -846,11 +846,14 @@ video {
   box-shadow: var(--shadow-rest);
 }
 
-/* Pull-out prototypes. Resume keeps the same lavender chip it has in the
-   resting bar. Section names come out from behind that chip, to the right.
-   A is one motion. B starts further underneath and staggers each name.
-   C grows a separate strip out of the chip instead of sharing the pill. */
-html[data-nav] .section-nav.is-open a.nav-resume {
+/* Section names wipe out from behind the Resume chip. The chip stays the
+   same size it is when Resume is selected in the resting bar. */
+.section-nav {
+  --pull-dur: 380ms;
+  --pull-overlap: 8px;
+}
+
+.section-nav.is-open a.nav-resume {
   align-self: center;
   margin: 0;
   padding: 0 16px;
@@ -860,42 +863,42 @@ html[data-nav] .section-nav.is-open a.nav-resume {
   z-index: 2;
 }
 
-html[data-nav] .section-nav.is-open a.nav-resume .nav-back {
+.section-nav.is-open a.nav-resume .nav-back {
   max-width: 0;
   margin-right: 0;
   opacity: 0;
 }
 
-html[data-nav] .section-nav.is-docked .nav-divider {
+.section-nav.is-docked .nav-divider {
   width: 0;
   margin: 0;
   opacity: 0;
 }
 
-html[data-nav] .nav-subs {
+.nav-subs {
   position: relative;
   z-index: 1;
   overflow: hidden;
   max-width: 0;
-  margin-left: calc(var(--pull-overlap, 10px) * -1);
+  margin-left: calc(var(--pull-overlap) * -1);
   transition:
-    max-width var(--pull-dur, 400ms) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
-    margin-left var(--pull-dur, 400ms) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1));
+    max-width var(--pull-dur) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    margin-left var(--pull-dur) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
-html[data-nav] .section-nav.is-open .nav-subs {
+.section-nav.is-open .nav-subs {
   max-width: var(--subs-max, 34rem);
 }
 
-html[data-nav] .nav-subs .tablist {
+.nav-subs .tablist {
   gap: 0;
   padding: 0;
   background: transparent;
   box-shadow: none;
 }
 
-html[data-nav] .nav-subs .tablist a,
-html[data-nav] .section-nav.is-open .nav-subs .tablist a {
+.nav-subs .tablist a,
+.section-nav.is-open .nav-subs .tablist a {
   max-width: none;
   opacity: 1;
   transform: none;
@@ -904,92 +907,6 @@ html[data-nav] .section-nav.is-open .nav-subs .tablist a {
   transition:
     background-color var(--md-sys-motion-duration-short) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
     color var(--md-sys-motion-duration-short) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1));
-}
-
-html[data-nav="a"] {
-  --pull-dur: 380ms;
-  --pull-overlap: 8px;
-}
-
-html[data-nav="b"] {
-  --pull-dur: 520ms;
-  --pull-overlap: 28px;
-}
-
-html[data-nav="b"] .nav-subs .tablist a {
-  opacity: 0;
-  transform: translateX(-22px);
-  transition:
-    opacity 280ms var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
-    transform 420ms var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
-    background-color var(--md-sys-motion-duration-short) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
-    color var(--md-sys-motion-duration-short) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1));
-}
-
-html[data-nav="b"] .section-nav.is-open .nav-subs .tablist a {
-  opacity: 1;
-  transform: none;
-}
-
-html[data-nav="b"] .section-nav.is-open .nav-subs .tablist a:nth-child(1) { transition-delay: 40ms; }
-html[data-nav="b"] .section-nav.is-open .nav-subs .tablist a:nth-child(2) { transition-delay: 90ms; }
-html[data-nav="b"] .section-nav.is-open .nav-subs .tablist a:nth-child(3) { transition-delay: 140ms; }
-html[data-nav="b"] .section-nav.is-open .nav-subs .tablist a:nth-child(4) { transition-delay: 190ms; }
-
-html[data-nav="c"] {
-  --pull-dur: 440ms;
-  --pull-overlap: 20px;
-}
-
-html[data-nav="c"] .section-nav.is-open .nav-inner {
-  overflow: visible;
-  gap: 0;
-}
-
-html[data-nav="c"] .section-nav.is-open .nav-subs {
-  max-width: calc(var(--subs-max, 34rem) + var(--pull-overlap));
-  background: #ffffff;
-  border-radius: 999px;
-  box-shadow: var(--shadow-rest);
-  margin-left: calc(var(--pull-overlap) * -1);
-  padding-left: var(--pull-overlap);
-}
-
-.nav-proto {
-  position: fixed;
-  left: 50%;
-  bottom: calc(12px + env(safe-area-inset-bottom));
-  z-index: 40;
-  display: flex;
-  gap: 4px;
-  width: max-content;
-  max-width: calc(100% - 24px);
-  padding: 4px;
-  transform: translateX(-50%);
-  background: #ffffff;
-  border-radius: var(--md-sys-shape-corner-full);
-  box-shadow: var(--shadow-raised);
-}
-
-.nav-proto a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 40px;
-  padding: 0 12px;
-  border-radius: var(--md-sys-shape-corner-full);
-  color: var(--md-sys-color-on-surface);
-  font-family: var(--font);
-  font-size: 0.75rem;
-  font-weight: 700;
-  line-height: 1rem;
-  letter-spacing: 0.02em;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.nav-proto a[aria-current="true"] {
-  background: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-on-primary-container);
 }
 
 .tablist {
@@ -1482,8 +1399,8 @@ html[data-nav="c"] .section-nav.is-open .nav-subs {
     transform: none;
   }
 
-  html[data-nav] .nav-subs,
-  html[data-nav] .nav-subs .tablist a {
+  .nav-subs,
+  .nav-subs .tablist a {
     transition: none;
   }
 }
