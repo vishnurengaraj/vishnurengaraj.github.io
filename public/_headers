@@ -1,0 +1,37 @@
+# HTML routes keep the Workers default:
+# Cache-Control: public, max-age=0, must-revalidate
+# A Cache-Control on /* would be comma-joined with the asset rules below.
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Cross-Origin-Opener-Policy: same-origin
+  Strict-Transport-Security: max-age=15552000
+
+# Hashed bundles. Matches the Pi (30 days, immutable).
+/static/*
+  Cache-Control: public, max-age=2592000, immutable
+
+# PDFs and other files under /assets (Pi: 7 days).
+/assets/*
+  Cache-Control: public, max-age=604800
+
+# Diner photos are replaced at the same URL. One day, not a week,
+# so a swap is not stuck. Do not also set Cache-Control on /media/*:
+# both rules would match and the values would be joined.
+/media/diners/*
+  Cache-Control: public, max-age=86400
+
+/media/img/*
+  Cache-Control: public, max-age=604800
+
+/media/layers/*
+  Cache-Control: public, max-age=604800
+
+/media/video/*
+  Cache-Control: public, max-age=604800
+
+# workers.dev is a preview. Do not index it.
+https://:worker.:account.workers.dev/*
+  X-Robots-Tag: noindex

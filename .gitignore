@@ -10,3 +10,4 @@ deploy.env
 test-results/
 playwright-report/
 blob-report/
+.wrangler/

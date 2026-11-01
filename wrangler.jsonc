@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "rengaraj",
+  "account_id": "e1d1e0ffd0e31722cfab59b9d3c22210",
+  // Today's date. Do not attach routes or custom domains here.
+  // vishnu.rengaraj.com, rengaraj.com, and www stay on the tunnel.
+  "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  "assets": {
+    "directory": "./dist",
+    // vite-ssg writes flat files (about.html, resume/education.html).
+    // /about serves about.html; /about/ and /about.html redirect to /about.
+    "html_handling": "auto-trailing-slash",
+    // nginx try_files ends at /index.html. HTML handling resolves a real
+    // .html file first, so /about is not replaced by the home page.
+    // Only paths with no asset fall through to index.html.
+    "not_found_handling": "single-page-application"
+  }
+}
