@@ -207,10 +207,6 @@
     padding: 0 24px 8px;
   }
 
-  html[data-nav="b"] .tablist-wrap,
-  html[data-nav="c"] .tablist-wrap {
-    top: 16px;
-  }
 }
 
 @media (max-width: 640px) {
@@ -850,63 +846,113 @@ video {
   box-shadow: var(--shadow-rest);
 }
 
-/* B Swap and C Rise keep the section pill in the page and stick it in
-   the same slot as the main pill. The main pill steps aside while it
-   is stuck, so the two never sit fully opaque on top of each other. */
-html[data-nav="b"] .tablist-wrap,
-html[data-nav="c"] .tablist-wrap {
-  position: sticky;
-  top: 8px;
-  z-index: 32;
+/* Pull-out prototypes. Resume keeps the same lavender chip it has in the
+   resting bar. Section names come out from behind that chip, to the right.
+   A is one motion. B starts further underneath and staggers each name.
+   C grows a separate strip out of the chip instead of sharing the pill. */
+html[data-nav] .section-nav.is-open a.nav-resume {
+  align-self: center;
+  margin: 0;
+  padding: 0 16px;
+  min-height: 48px;
+  border-radius: var(--md-sys-shape-corner-full);
+  position: relative;
+  z-index: 2;
 }
 
-html[data-nav="b"] .section-nav .nav-cluster,
-html[data-nav="c"] .section-nav .nav-cluster {
+html[data-nav] .section-nav.is-open a.nav-resume .nav-back {
+  max-width: 0;
+  margin-right: 0;
+  opacity: 0;
+}
+
+html[data-nav] .section-nav.is-docked .nav-divider {
+  width: 0;
+  margin: 0;
+  opacity: 0;
+}
+
+html[data-nav] .nav-subs {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  max-width: 0;
+  margin-left: calc(var(--pull-overlap, 10px) * -1);
   transition:
-    opacity 280ms var(--md-sys-motion-easing-standard),
-    transform 280ms var(--md-sys-motion-easing-standard);
+    max-width var(--pull-dur, 400ms) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    margin-left var(--pull-dur, 400ms) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
-html[data-nav="b"] .section-nav.is-docked .nav-cluster {
+html[data-nav] .section-nav.is-open .nav-subs {
+  max-width: var(--subs-max, 34rem);
+}
+
+html[data-nav] .nav-subs .tablist {
+  gap: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+html[data-nav] .nav-subs .tablist a,
+html[data-nav] .section-nav.is-open .nav-subs .tablist a {
+  max-width: none;
+  opacity: 1;
+  transform: none;
+  padding: 0 12px;
+  pointer-events: auto;
+  transition:
+    background-color var(--md-sys-motion-duration-short) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    color var(--md-sys-motion-duration-short) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+html[data-nav="a"] {
+  --pull-dur: 380ms;
+  --pull-overlap: 8px;
+}
+
+html[data-nav="b"] {
+  --pull-dur: 520ms;
+  --pull-overlap: 28px;
+}
+
+html[data-nav="b"] .nav-subs .tablist a {
   opacity: 0;
-  transform: translateY(-18px);
-  pointer-events: none;
+  transform: translateX(-22px);
+  transition:
+    opacity 280ms var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    transform 420ms var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    background-color var(--md-sys-motion-duration-short) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    color var(--md-sys-motion-duration-short) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
-html[data-nav="b"] .tablist-wrap.is-stuck .tablist-shell {
-  animation: pill-swap-in 280ms var(--md-sys-motion-easing-standard) both;
+html[data-nav="b"] .section-nav.is-open .nav-subs .tablist a {
+  opacity: 1;
+  transform: none;
 }
 
-html[data-nav="c"] .section-nav.is-docked .nav-cluster {
-  opacity: 0;
-  transform: scale(0.94);
-  pointer-events: none;
+html[data-nav="b"] .section-nav.is-open .nav-subs .tablist a:nth-child(1) { transition-delay: 40ms; }
+html[data-nav="b"] .section-nav.is-open .nav-subs .tablist a:nth-child(2) { transition-delay: 90ms; }
+html[data-nav="b"] .section-nav.is-open .nav-subs .tablist a:nth-child(3) { transition-delay: 140ms; }
+html[data-nav="b"] .section-nav.is-open .nav-subs .tablist a:nth-child(4) { transition-delay: 190ms; }
+
+html[data-nav="c"] {
+  --pull-dur: 440ms;
+  --pull-overlap: 20px;
 }
 
-html[data-nav="c"] .tablist-wrap.is-stuck .tablist-shell {
-  animation: pill-rise 340ms cubic-bezier(0.2, 0, 0, 1) both;
+html[data-nav="c"] .section-nav.is-open .nav-inner {
+  overflow: visible;
+  gap: 0;
 }
 
-@keyframes pill-swap-in {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes pill-rise {
-  from {
-    opacity: 0.35;
-    transform: translateY(36px) scale(0.94);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+html[data-nav="c"] .section-nav.is-open .nav-subs {
+  max-width: calc(var(--subs-max, 34rem) + var(--pull-overlap));
+  background: #ffffff;
+  border-radius: 999px;
+  box-shadow: var(--shadow-rest);
+  margin-left: calc(var(--pull-overlap) * -1);
+  padding-left: var(--pull-overlap);
 }
 
 .nav-proto {
@@ -1436,12 +1482,9 @@ html[data-nav="c"] .tablist-wrap.is-stuck .tablist-shell {
     transform: none;
   }
 
-  html[data-nav="b"] .section-nav .nav-cluster,
-  html[data-nav="c"] .section-nav .nav-cluster,
-  html[data-nav="b"] .tablist-wrap.is-stuck .tablist-shell,
-  html[data-nav="c"] .tablist-wrap.is-stuck .tablist-shell {
+  html[data-nav] .nav-subs,
+  html[data-nav] .nav-subs .tablist a {
     transition: none;
-    animation: none;
   }
 }
 

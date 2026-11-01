@@ -24,8 +24,7 @@ const tabs = [
 const dock = inject(dockKey);
 const current = inject(resumePartKey);
 const jumpResumePart = inject(resumeJumpKey);
-const embedInNav = computed(() => dock.docked && dock.mode !== "b" && dock.mode !== "c");
-const stickInPage = computed(() => dock.docked && (dock.mode === "b" || dock.mode === "c"));
+const embedInNav = computed(() => dock.docked);
 
 function prefersReduced() {
   return (
@@ -65,7 +64,7 @@ onMounted(() => revealCurrent(current.value));
   <section id="resume" class="section" tabindex="-1" aria-labelledby="resume-heading">
     <h2 id="resume-heading" class="section-title">Resume</h2>
     <div id="resume-tabs-sentinel" class="tab-sentinel" aria-hidden="true"></div>
-    <div id="resume-tab-slot" class="tablist-wrap" :class="{ 'is-stuck': stickInPage }">
+    <div id="resume-tab-slot" class="tablist-wrap">
       <div v-if="embedInNav" class="tab-hold" :style="{ height: `${dock.hold}px` }" aria-hidden="true"></div>
     </div>
     <Teleport defer :to="embedInNav ? '#nav-tab-slot' : '#resume-tab-slot'">

@@ -719,7 +719,8 @@ function pinTabWidths() {
   const inner = document.querySelector(".nav-inner");
   const buttons = [...document.querySelectorAll("#nav-tab-slot a")];
   if (!inner || !buttons.length) return false;
-  const pad = getComputedStyle(inner).getPropertyValue("--tab-pad").trim() || "16px";
+  const pad = isPullMode() ? "12px" : getComputedStyle(inner).getPropertyValue("--tab-pad").trim() || "16px";
+  let sum = 0;
   for (const button of buttons) {
     const probe = button.cloneNode(true);
     probe.style.transition = "none";
@@ -733,8 +734,13 @@ function pinTabWidths() {
     button.parentElement.appendChild(probe);
     const w = probe.getBoundingClientRect().width;
     probe.remove();
-    if (w > 1) button.style.setProperty("--tab-max", `${Math.ceil(w)}px`);
+    if (w > 1) {
+      button.style.setProperty("--tab-max", `${Math.ceil(w)}px`);
+      sum += Math.ceil(w);
+    }
   }
+  const subs = document.querySelector("#nav-tab-slot");
+  if (subs && sum > 0) subs.style.setProperty("--subs-max", `${sum}px`);
   return true;
 }
 
@@ -756,13 +762,12 @@ function scheduleOpen(tries = 0) {
   });
 }
 
-function embedsInNav() {
-  return dockState.mode !== "b" && dockState.mode !== "c";
+function isPullMode() {
+  return dockState.mode === "a" || dockState.mode === "b" || dockState.mode === "c";
 }
 
-/* The in-page slot has already dropped clear of the bar. A morph that
-   keeps the section labels inside the sticky pill would leave them
-   stuck over the Resume title. */
+/* The in-page slot has already dropped clear of the bar. Holding the
+   section labels in the sticky pill past that point stacks two bars. */
 function slotClearOfBar() {
   const sent = document.getElementById("resume-tabs-sentinel");
   const bar = scroller.value?.querySelector(".nav-inner");
@@ -783,11 +788,11 @@ function releaseDockNow() {
    scrollTop. Do not snap scroll position here: a correction also
    aborts the page's own smooth scrolls and fast wheels. */
 function setDock(next) {
-  const embed = embedsInNav();
   if (next) {
-    if (dockState.docked && (dockState.open || !embed)) return;
+    if (dockState.docked && dockState.open) return;
     window.clearTimeout(closeDockTimer);
-    if (!embed || prefersReduced()) {
+    if (prefersReduced()) {
+      if (!dockState.docked) measureTabHold();
       dockState.docked = true;
       dockState.open = true;
       dockState.joined = true;
@@ -800,14 +805,15 @@ function setDock(next) {
     return;
   }
   if (!dockState.docked) return;
-  /* Prototype A reverses the merge, but only while the slot is still
-     at the bar. The default path puts the pill back on the page now. */
+  /* Pull variants tuck the section names back behind Resume before the
+     pill leaves the bar. The default path, and any scroll that has
+     already cleared the slot, put the names back on the page now. */
   if (!dockState.open) {
-    if (dockState.mode === "a" && !prefersReduced() && !slotClearOfBar()) return;
+    if (isPullMode() && !prefersReduced() && !slotClearOfBar()) return;
     releaseDockNow();
     return;
   }
-  const morphOut = embed && dockState.mode === "a" && !prefersReduced() && !slotClearOfBar();
+  const morphOut = isPullMode() && !prefersReduced() && !slotClearOfBar();
   if (!morphOut) {
     releaseDockNow();
     return;
@@ -815,9 +821,10 @@ function setDock(next) {
   dockState.open = false;
   dockState.joined = false;
   window.clearTimeout(closeDockTimer);
+  const wait = dockState.mode === "b" ? 640 : 460;
   closeDockTimer = window.setTimeout(() => {
     if (!dockState.open) releaseDockNow();
-  }, NAV_MORPH_MS);
+  }, wait);
 }
 
 function cancelResumeLeave() {
@@ -888,22 +895,8 @@ function updateDock() {
   const barRect = bar.getBoundingClientRect();
   const resumeBottom = resume.getBoundingClientRect().bottom;
   const owns = resumeBottom > barRect.bottom + 24;
-  /* B and C leave the section pill in the page and stick it themselves.
-     Dock means that pill has taken the sticky slot, so the main pill
-     can step aside. A and the default path merge labels into the main
-     pill, and give the section pill back as soon as its slot is visible
-     again — not a heading later, which left both bars stuck. */
-  if (!embedsInNav()) {
-    const shell = document.querySelector("#resume-tab-slot .tablist-shell");
-    if (!shell) {
-      setDock(false);
-      return;
-    }
-    const shellTop = shell.getBoundingClientRect().top;
-    const limit = dockState.docked ? barRect.top + 6 : barRect.top + 1;
-    setDock(owns && shellTop <= limit);
-    return;
-  }
+  /* Give the section pill back as soon as its slot is visible again.
+     Waiting until the Resume heading was on screen left both bars stuck. */
   const sent = document.getElementById("resume-tabs-sentinel");
   if (!sent) return;
   const sentTop = sent.getBoundingClientRect().top;
@@ -1988,9 +1981,9 @@ watch(
   </div>
   <nav v-if="showNavProto" class="nav-proto" aria-label="Resume nav prototypes">
     <a :href="navProtoHref('')" :aria-current="dockState.mode === '' ? 'true' : undefined" @click="pickNavMode($event, '')">Default</a>
-    <a :href="navProtoHref('a')" :aria-current="dockState.mode === 'a' ? 'true' : undefined" @click="pickNavMode($event, 'a')">A Morph</a>
-    <a :href="navProtoHref('b')" :aria-current="dockState.mode === 'b' ? 'true' : undefined" @click="pickNavMode($event, 'b')">B Swap</a>
-    <a :href="navProtoHref('c')" :aria-current="dockState.mode === 'c' ? 'true' : undefined" @click="pickNavMode($event, 'c')">C Rise</a>
+    <a :href="navProtoHref('a')" :aria-current="dockState.mode === 'a' ? 'true' : undefined" @click="pickNavMode($event, 'a')">A Tuck</a>
+    <a :href="navProtoHref('b')" :aria-current="dockState.mode === 'b' ? 'true' : undefined" @click="pickNavMode($event, 'b')">B Stagger</a>
+    <a :href="navProtoHref('c')" :aria-current="dockState.mode === 'c' ? 'true' : undefined" @click="pickNavMode($event, 'c')">C Strip</a>
   </nav>
   </template>
 </template>
