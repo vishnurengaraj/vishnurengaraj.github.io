@@ -42,6 +42,7 @@ export default defineConfig(({ mode }) => {
           "/projects",
           "/skills",
           "/resume",
+          "/resume/skills",
           "/resume/experience",
           "/resume/education",
           "/resume/clubs",

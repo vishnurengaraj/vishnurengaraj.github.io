@@ -4,9 +4,9 @@ export const routes = [
   { path: "/", name: "home", component: shell },
   { path: "/about", name: "about", component: shell },
   { path: "/projects", name: "projects", component: shell },
-  { path: "/skills", name: "skills", component: shell },
+  { path: "/skills", redirect: (to) => ({ path: "/resume/skills", query: to.query }) },
   {
-    path: "/resume/:tab(experience|education|clubs|awards)?",
+    path: "/resume/:tab(skills|experience|education|clubs|awards)?",
     name: "resume",
     component: shell,
   },
