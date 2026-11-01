@@ -148,8 +148,8 @@ function barClearance(targetId, extraGap = 0) {
   let cover = stickyTop + padTop + inner.offsetHeight;
   const shell = nav.classList.contains("is-open") ? nav.querySelector("#nav-tab-slot .tablist-shell") : null;
   if (shell) {
-    const shellBottom = shell.getBoundingClientRect().bottom - rootTop;
-    if (shellBottom > cover) cover = shellBottom;
+    const bottom = shell.getBoundingClientRect().bottom - rootTop;
+    if (bottom > cover) cover = bottom;
   }
   return cover + gap;
 }
@@ -421,10 +421,15 @@ function markScrollTarget(id) {
   spyLock = spyPick() === wanted ? null : id === "top" ? "top" : id;
 }
 
+function queryValue(key) {
+  const raw = route.query[key];
+  return Array.isArray(raw) ? raw[0] : raw;
+}
+
 function shellTo(path) {
-  if (route.query.proto !== "1") return path;
+  if (queryValue("proto") !== "1") return path;
   const query = { proto: "1" };
-  const title = route.query.title;
+  const title = queryValue("title");
   if (typeof title === "string" && title !== "" && title !== PRODUCTION_VARIANT) query.title = title;
   return { path, query };
 }
@@ -658,14 +663,20 @@ function pinLabelWidths() {
   if (dockState.docked || dockState.open) return;
   const links = [...document.querySelectorAll(".section-nav a.nav-link:not(.nav-resume)")];
   if (!links.length) return;
-  for (const link of links) link.style.transition = "none";
-  for (const link of links) link.style.removeProperty("--label-max");
-  const widths = links.map((link) => link.getBoundingClientRect().width);
-  for (let i = 0; i < links.length; i++) {
-    if (widths[i] > 1) links[i].style.setProperty("--label-max", `${Math.ceil(widths[i])}px`);
+  /* Measure a copy. Clearing the live transition here snapped Resume
+     the rest of the way back at the end of a tuck. */
+  for (const link of links) {
+    const probe = link.cloneNode(true);
+    probe.style.transition = "none";
+    probe.style.maxWidth = "none";
+    probe.style.position = "absolute";
+    probe.style.visibility = "hidden";
+    probe.style.pointerEvents = "none";
+    link.parentElement.appendChild(probe);
+    const w = probe.getBoundingClientRect().width;
+    probe.remove();
+    if (w > 1) link.style.setProperty("--label-max", `${Math.ceil(w)}px`);
   }
-  void links[0].offsetWidth;
-  for (const link of links) link.style.transition = "";
 }
 
 /* Measure a copy. Toggling transition on the live tab, then opening in
@@ -674,7 +685,8 @@ function pinTabWidths() {
   const inner = document.querySelector(".nav-inner");
   const buttons = [...document.querySelectorAll("#nav-tab-slot a")];
   if (!inner || !buttons.length) return false;
-  const pad = getComputedStyle(inner).getPropertyValue("--tab-pad").trim() || "16px";
+  const pad = "12px";
+  let sum = 0;
   for (const button of buttons) {
     const probe = button.cloneNode(true);
     probe.style.transition = "none";
@@ -688,27 +700,127 @@ function pinTabWidths() {
     button.parentElement.appendChild(probe);
     const w = probe.getBoundingClientRect().width;
     probe.remove();
-    if (w > 1) button.style.setProperty("--tab-max", `${Math.ceil(w)}px`);
+    if (w > 1) {
+      button.style.setProperty("--tab-max", `${Math.ceil(w)}px`);
+      sum += Math.ceil(w);
+    }
   }
+  const subs = document.querySelector("#nav-tab-slot");
+  if (subs && sum > 0) subs.style.setProperty("--subs-max", `${sum}px`);
   return true;
 }
 
 /* --tab-max is set while max-width is still 0, then the row opens on the
    next frame so the ease runs from zero instead of the measured width. */
 function scheduleOpen(tries = 0) {
-  if (!dockState.docked || dockState.open) return;
+  if (!dockState.docked || dockState.open || tuckCloseUntil) return;
   requestAnimationFrame(() => {
-    if (!dockState.docked || dockState.open) return;
+    if (!dockState.docked || dockState.open || tuckCloseUntil) return;
     if (!pinTabWidths() && tries < 8) {
       scheduleOpen(tries + 1);
       return;
     }
     requestAnimationFrame(() => {
-      if (!dockState.docked || dockState.open) return;
+      if (!dockState.docked || dockState.open || tuckCloseUntil) return;
+      tuckCloseUntil = 0;
       dockState.open = true;
       dockState.joined = true;
     });
   });
+}
+
+/* Long enough for the names to wipe fully behind Resume. A steady
+   scroll starts this early and plays it out before the in-page slot
+   reaches the bar. The desktop Experience landing only has about
+   100px of runway, so a mouse wheel arrives sooner than TUCK_MIN_MS.
+   That case still plays the full wipe; the empty hold is collapsed
+   for the duration so it cannot show as a second pill. A flick snaps. */
+const TUCK_MS = 450;
+/* Below this the names used to snap and Resume jumped in one frame.
+   A steady wheel from the Experience landing is often 70–140ms. */
+const TUCK_MIN_MS = 64;
+/* When the runway is shorter than that, still play a full wipe.
+   Long enough for the chip to slide instead of jumping. */
+const SHORT_TUCK_MS = 110;
+const FLICK_PX = 72;
+let tuckCloseUntil = 0;
+let tuckLatched = false;
+let tuckHeldPx = 0;
+let dockScrollY = -1;
+let dockScrollAt = 0;
+let upFrames = 0;
+
+function clearTuckTiming() {
+  scroller.value?.querySelector(".section-nav")?.style.removeProperty("--pull-dur");
+}
+
+/* Keep the content under the slot pixel-stable when its height changes. */
+function shiftScroll(dy) {
+  const root = scroller.value;
+  if (!root || Math.abs(dy) < 0.5) return;
+  const next = root.scrollTop + dy;
+  dockScrollY = next;
+  dockScrollAt = performance.now();
+  lastScrollY = next;
+  const behavior = root.style.scrollBehavior;
+  root.style.scrollBehavior = "auto";
+  drivingScroll = true;
+  root.scrollTop = next;
+  root.style.scrollBehavior = behavior;
+}
+
+function collapseHoldForTuck() {
+  if (tuckHeldPx || dockState.hold < 2) return;
+  const anchor = document.getElementById("resume-tab-slot")?.nextElementSibling;
+  const before = anchor?.getBoundingClientRect().top;
+  tuckHeldPx = dockState.hold;
+  dockState.hold = 0;
+  nextTick(() => {
+    if (!anchor || before == null) return;
+    shiftScroll(anchor.getBoundingClientRect().top - before);
+  });
+}
+
+function restoreHoldHeight() {
+  const px = tuckHeldPx;
+  tuckHeldPx = 0;
+  if (!px || !dockState.docked) return;
+  const anchor = document.getElementById("resume-tab-slot")?.nextElementSibling;
+  const before = anchor?.getBoundingClientRect().top;
+  dockState.hold = px;
+  nextTick(() => {
+    if (!anchor || before == null) return;
+    shiftScroll(anchor.getBoundingClientRect().top - before);
+  });
+}
+
+function releaseDockNow() {
+  window.clearTimeout(closeDockTimer);
+  tuckCloseUntil = 0;
+  const compensate = tuckHeldPx > 0;
+  tuckHeldPx = 0;
+  clearTuckTiming();
+  const anchor = document.getElementById("resume-tab-slot")?.nextElementSibling;
+  const before = compensate && anchor ? anchor.getBoundingClientRect().top : null;
+  dockState.open = false;
+  dockState.joined = false;
+  dockState.docked = false;
+  nextTick(() => {
+    pinLabelWidths();
+    if (before == null || !anchor.isConnected) return;
+    shiftScroll(anchor.getBoundingClientRect().top - before);
+  });
+}
+
+function beginReverseTuck(ms) {
+  if (tuckCloseUntil || !dockState.docked || !dockState.open) return;
+  const nav = scroller.value?.querySelector(".section-nav");
+  if (nav) nav.style.setProperty("--pull-dur", `${Math.round(ms)}ms`);
+  dockState.open = false;
+  dockState.joined = false;
+  /* Stay docked until the wipe has painted. Undock is a separate step,
+     and only once the in-page slot is back at the bar. */
+  tuckCloseUntil = performance.now() + ms + 16;
 }
 
 /* Tabs move into the fixed-height pill. A same-height placeholder keeps
@@ -716,38 +828,19 @@ function scheduleOpen(tries = 0) {
    scrollTop. Do not snap scroll position here: a correction also
    aborts the page's own smooth scrolls and fast wheels. */
 function setDock(next) {
-  if (next) {
-    if (dockState.docked && dockState.open) return;
-    if (!dockState.docked) measureTabHold();
-    window.clearTimeout(closeDockTimer);
-    if (prefersReduced()) {
-      dockState.docked = true;
-      dockState.open = true;
-      dockState.joined = true;
-      return;
-    }
-    pinLabelWidths();
-    if (!dockState.docked) dockState.docked = true;
-    scheduleOpen();
-    return;
-  }
-  if (!dockState.docked) return;
+  if (!next || (dockState.docked && dockState.open)) return;
   window.clearTimeout(closeDockTimer);
-  if (prefersReduced() || !dockState.open) {
-    dockState.open = false;
-    dockState.joined = false;
-    dockState.docked = false;
+  if (prefersReduced()) {
+    if (!dockState.docked) measureTabHold();
+    dockState.docked = true;
+    dockState.open = true;
+    dockState.joined = true;
     return;
   }
-  dockState.open = false;
-  dockState.joined = false;
-  closeDockTimer = window.setTimeout(() => {
-    if (!dockState.open) {
-      dockState.joined = false;
-      dockState.docked = false;
-      nextTick(pinLabelWidths);
-    }
-  }, NAV_MORPH_MS);
+  if (!dockState.docked) measureTabHold();
+  pinLabelWidths();
+  dockState.docked = true;
+  scheduleOpen();
 }
 
 function cancelResumeLeave() {
@@ -771,8 +864,8 @@ function cancelResumeLeave() {
 
 /* The chevron and the Resume corner leave the morph and stop a little
    above the Resume heading. The section stays Resume — this is not a
-   trip back to About. Tabs stay in the pill until that scroll lands so
-   putting them back inline cannot cut the smooth scroll short. */
+   trip back to About. The section pill goes back on the page first, so
+   it travels with the heading instead of staying stuck in the bar. */
 function leaveResumeMode() {
   cancelTween();
   beginResumeLock(null);
@@ -786,15 +879,7 @@ function leaveResumeMode() {
   }
   resumeLeaveAt = performance.now();
   resumeLeaveUntil = resumeLeaveAt + 5000;
-  window.clearTimeout(closeDockTimer);
-  if (prefersReduced()) {
-    dockState.open = false;
-    dockState.joined = false;
-    dockState.docked = false;
-  } else if (dockState.docked || dockState.open) {
-    dockState.open = false;
-    dockState.joined = false;
-  }
+  releaseDockNow();
   scrollToEl("resume", undefined, RESUME_BACK_GAP);
   window.setTimeout(() => {
     if (resumeLeaveUntil) finishResumeLeave();
@@ -820,26 +905,143 @@ function finishResumeLeave() {
 function updateDock() {
   if (resumeLeaveUntil && performance.now() < resumeLeaveUntil) return;
   const root = scroller.value;
-  const sent = document.getElementById("resume-tabs-sentinel");
   const resume = document.getElementById("resume");
   const bar = root?.querySelector(".nav-inner");
-  if (!root || !sent || !resume || !bar) return;
-  const barBottom = bar.getBoundingClientRect().bottom;
-  const sentTop = sent.getBoundingClientRect().top;
+  if (!root || !resume || !bar) return;
+  const barRect = bar.getBoundingClientRect();
   const resumeBottom = resume.getBoundingClientRect().bottom;
-  const heading = document.getElementById("resume-heading");
-  const shell = root.querySelector("#nav-tab-slot .tablist-shell");
-  const barEdge = shell ? Math.max(barBottom, shell.getBoundingClientRect().bottom) : barBottom;
-  const headingH = heading ? heading.offsetHeight : 48;
-  const headingTop = heading ? heading.getBoundingClientRect().top : sentTop;
-  /* The heading is in view under the pill, so the tabs belong inline
-     beneath it. Hysteresis only applies while that heading is still
-     up under the bar, or the row would cover the title. */
-  const headingClear = headingTop >= barBottom - 2;
-  const limit = dockState.docked && !headingClear ? barEdge + headingH + 40 : barBottom + 1;
-  /* Stay docked while the resume section still owns the screen. The skills
-     card is under the tab row, so it keeps the pill instead of releasing it. */
-  setDock(sentTop <= limit && resumeBottom > barBottom + 24);
+  const owns = resumeBottom > barRect.bottom + 24;
+  const sent = document.getElementById("resume-tabs-sentinel");
+  if (!sent) return;
+  const y = root.scrollTop;
+  const now = performance.now();
+  const scrollingUp = dockScrollY >= 0 && y < dockScrollY - 0.5;
+  const scrollingDown = dockScrollY >= 0 && y > dockScrollY + 0.5;
+  if (scrollingUp) upFrames += 1;
+  else upFrames = 0;
+  /* Positive when the in-page slot is below the bar (on screen). */
+  const gap = sent.getBoundingClientRect().top - barRect.bottom;
+  /* How many pixels of the slot are still covered by the bar. The empty
+     hold is the double pill once this goes negative. */
+  const slotEl = document.querySelector(".tab-hold")
+    || document.querySelector("#resume-tab-slot .tablist-shell");
+  const cover = slotEl
+    ? barRect.bottom - slotEl.getBoundingClientRect().bottom
+    : -gap - (dockState.hold || 56);
+  const dt = Math.min(32, Math.max(16, dockScrollAt ? now - dockScrollAt : 16));
+  const upSpeed = scrollingUp ? (dockScrollY - y) / dt : 0;
+
+  if (!owns) {
+    tuckLatched = false;
+    if (dockState.docked || dockState.open || tuckCloseUntil) releaseDockNow();
+    dockScrollY = y;
+    dockScrollAt = now;
+    return;
+  }
+
+  if (prefersReduced()) {
+    tuckLatched = false;
+    if (cover > 8) setDock(true);
+    else if (dockState.docked) releaseDockNow();
+    dockScrollY = y;
+    dockScrollAt = now;
+    return;
+  }
+
+  const holdEl = document.querySelector(".tab-hold");
+  const holdHole = !!holdEl && holdEl.getBoundingClientRect().height > 2 && cover <= 0;
+  if (tuckCloseUntil) {
+    const frameDelta = scrollingUp ? dockScrollY - y : 0;
+    if (scrollingDown && gap <= 1) {
+      tuckCloseUntil = 0;
+      tuckLatched = false;
+      clearTuckTiming();
+      restoreHoldHeight();
+      setDock(true);
+    } else if (frameDelta > FLICK_PX || (!tuckHeldPx && (holdHole || gap > 8))) {
+      /* A flick, or the empty hold about to show, leaves the bar now. */
+      tuckLatched = true;
+      releaseDockNow();
+    } else if (now >= tuckCloseUntil && (tuckHeldPx || cover <= 28)) {
+      /* Wipe has finished. A collapsed hold means the page had too
+         little runway, so undock now; the pill returns with the slot. */
+      tuckLatched = true;
+      releaseDockNow();
+    }
+    dockScrollY = y;
+    dockScrollAt = now;
+    return;
+  }
+
+  /* Scrolling back down, or the slot sitting on screen below the bar,
+     ends the "just tucked" latch so the names can dock again. */
+  if (scrollingDown || gap > 8) tuckLatched = false;
+
+  if (dockState.docked && dockState.open && upFrames >= 2 && upSpeed > 0.02) {
+    /* Time until the empty hold would peek out under the bar.
+       When that trip is about one tuck long, play the wipe in that
+       time. The Experience landing is closer than that on desktop, so
+       a wheel would miss the 120ms cutoff and the chip would jump.
+       A steady scroll there still plays the full wipe, with the hold
+       collapsed so the page never shows an empty slot. */
+    const frameDelta = scrollingUp ? dockScrollY - y : 0;
+    const msToHandoff = Math.max(0, cover - 16) / upSpeed;
+    const flick = frameDelta > FLICK_PX;
+    if (flick && msToHandoff < TUCK_MIN_MS) {
+      tuckLatched = true;
+      releaseDockNow();
+      dockScrollY = y;
+      dockScrollAt = now;
+      return;
+    }
+    if (cover > 16 && msToHandoff > TUCK_MS + 80) {
+      /* Still far above the bar at this speed. */
+    } else if (cover > 16 && msToHandoff >= TUCK_MIN_MS) {
+      beginReverseTuck(Math.min(TUCK_MS, Math.round(msToHandoff)));
+      dockScrollY = y;
+      dockScrollAt = now;
+      return;
+    } else if (!flick) {
+      beginReverseTuck(SHORT_TUCK_MS);
+      collapseHoldForTuck();
+      dockScrollY = y;
+      dockScrollAt = now;
+      return;
+    }
+  }
+
+  if (dockState.docked && cover <= 0) {
+    tuckLatched = true;
+    releaseDockNow();
+    dockScrollY = y;
+    dockScrollAt = now;
+    return;
+  }
+
+  /* scheduleOpen can miss the teleport on the first frames after a jump.
+     Keep trying while the slot is still above the bar and we are not tucking.
+     An upward nudge during that window must not undock. */
+  if (dockState.docked && !dockState.open && !tuckCloseUntil && gap <= 1) {
+    scheduleOpen();
+    dockScrollY = y;
+    dockScrollAt = now;
+    return;
+  }
+
+  if (dockState.docked && gap > 1) {
+    tuckLatched = true;
+    releaseDockNow();
+    dockScrollY = y;
+    dockScrollAt = now;
+    return;
+  }
+
+  /* Latch, not scroll direction, blocks the re-dock. A settled landing
+     on the section has no downward delta, and requiring one left the
+     names undocked until the next scroll down. */
+  if (!dockState.docked && !tuckLatched && gap <= 1) setDock(true);
+  dockScrollY = y;
+  dockScrollAt = now;
 }
 
 let armedDown = true;

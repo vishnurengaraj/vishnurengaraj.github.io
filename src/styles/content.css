@@ -206,6 +206,7 @@
     top: 16px;
     padding: 0 24px 8px;
   }
+
 }
 
 @media (max-width: 640px) {
@@ -845,6 +846,69 @@ video {
   box-shadow: var(--shadow-rest);
 }
 
+/* Section names wipe out from behind the Resume chip. The chip stays the
+   same size it is when Resume is selected in the resting bar. */
+.section-nav {
+  --pull-dur: 420ms;
+  --pull-overlap: 8px;
+}
+
+.section-nav.is-open a.nav-resume {
+  align-self: center;
+  margin: 0;
+  padding: 0 16px;
+  min-height: 48px;
+  border-radius: var(--md-sys-shape-corner-full);
+  position: relative;
+  z-index: 2;
+}
+
+.section-nav.is-open a.nav-resume .nav-back {
+  max-width: 0;
+  margin-right: 0;
+  opacity: 0;
+}
+
+.section-nav.is-docked .nav-divider {
+  width: 0;
+  margin: 0;
+  opacity: 0;
+}
+
+.nav-subs {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  max-width: 0;
+  margin-left: calc(var(--pull-overlap) * -1);
+  transition:
+    max-width var(--pull-dur) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    margin-left var(--pull-dur) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.section-nav.is-open .nav-subs {
+  max-width: var(--subs-max, 34rem);
+}
+
+.nav-subs .tablist {
+  gap: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.nav-subs .tablist a,
+.section-nav.is-open .nav-subs .tablist a {
+  max-width: none;
+  opacity: 1;
+  transform: none;
+  padding: 0 12px;
+  pointer-events: auto;
+  transition:
+    background-color var(--md-sys-motion-duration-short) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+    color var(--md-sys-motion-duration-short) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
 .tablist {
   display: flex;
   flex-wrap: nowrap;
@@ -1333,6 +1397,11 @@ video {
   .scope-star {
     opacity: 0.9;
     transform: none;
+  }
+
+  .nav-subs,
+  .nav-subs .tablist a {
+    transition: none;
   }
 }
 
