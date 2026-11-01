@@ -147,9 +147,11 @@ function barClearance(targetId, extraGap = 0) {
   const gap = (targetId === "about" ? 20 : 12) + extraGap;
   let cover = stickyTop + padTop + inner.offsetHeight;
   const shell = nav.classList.contains("is-open") ? nav.querySelector("#nav-tab-slot .tablist-shell") : null;
-  if (shell) {
-    const shellBottom = shell.getBoundingClientRect().bottom - rootTop;
-    if (shellBottom > cover) cover = shellBottom;
+  const stuck = root.querySelector(".tablist-wrap.is-stuck .tablist-shell");
+  for (const el of [shell, stuck]) {
+    if (!el) continue;
+    const bottom = el.getBoundingClientRect().bottom - rootTop;
+    if (bottom > cover) cover = bottom;
   }
   return cover + gap;
 }
@@ -421,11 +423,27 @@ function markScrollTarget(id) {
   spyLock = spyPick() === wanted ? null : id === "top" ? "top" : id;
 }
 
+function queryValue(key) {
+  const raw = route.query[key];
+  return Array.isArray(raw) ? raw[0] : raw;
+}
+
+function readNavMode() {
+  const mode = queryValue("nav");
+  return mode === "a" || mode === "b" || mode === "c" ? mode : "";
+}
+
 function shellTo(path) {
-  if (route.query.proto !== "1") return path;
-  const query = { proto: "1" };
-  const title = route.query.title;
-  if (typeof title === "string" && title !== "" && title !== PRODUCTION_VARIANT) query.title = title;
+  const query = {};
+  if (queryValue("proto") === "1") {
+    query.proto = "1";
+    const title = queryValue("title");
+    if (typeof title === "string" && title !== "" && title !== PRODUCTION_VARIANT) query.title = title;
+  }
+  const nav = readNavMode();
+  if (nav) query.nav = nav;
+  if (queryValue("navproto") === "1") query.navproto = "1";
+  if (!Object.keys(query).length) return path;
   return { path, query };
 }
 
@@ -632,8 +650,35 @@ provide(scrollKey, go);
 provide(resumePartKey, resumePart);
 provide(resumeJumpKey, jumpResumePart);
 
-const dockState = reactive({ docked: false, open: false, joined: false, hold: 0 });
+const dockState = reactive({
+  docked: false,
+  open: false,
+  joined: false,
+  hold: 0,
+  mode: readNavMode(),
+});
 provide(dockKey, dockState);
+
+const showNavProto = computed(() => dockState.mode !== "" || queryValue("navproto") === "1");
+
+function syncNavMode(mode) {
+  dockState.mode = mode;
+  if (typeof document === "undefined") return;
+  if (mode) document.documentElement.dataset.nav = mode;
+  else delete document.documentElement.dataset.nav;
+}
+
+watch(readNavMode, (mode, prev) => {
+  const changed = mode !== prev;
+  syncNavMode(mode);
+  if (!changed) return;
+  window.clearTimeout(closeDockTimer);
+  dockState.open = false;
+  dockState.joined = false;
+  dockState.docked = false;
+  nextTick(() => updateDock());
+});
+syncNavMode(dockState.mode);
 
 /* Matches the pill morph. A little longer than the 400ms ease so the
    tabs are fully collapsed before they move back inline. */
@@ -711,42 +756,67 @@ function scheduleOpen(tries = 0) {
   });
 }
 
+function embedsInNav() {
+  return dockState.mode !== "b" && dockState.mode !== "c";
+}
+
+/* The in-page slot has already dropped clear of the bar. A morph that
+   keeps the section labels inside the sticky pill would leave them
+   stuck over the Resume title. */
+function slotClearOfBar() {
+  const sent = document.getElementById("resume-tabs-sentinel");
+  const bar = scroller.value?.querySelector(".nav-inner");
+  if (!sent || !bar) return true;
+  return sent.getBoundingClientRect().top > bar.getBoundingClientRect().bottom + 28;
+}
+
+function releaseDockNow() {
+  window.clearTimeout(closeDockTimer);
+  dockState.open = false;
+  dockState.joined = false;
+  dockState.docked = false;
+  nextTick(pinLabelWidths);
+}
+
 /* Tabs move into the fixed-height pill. A same-height placeholder keeps
    the resume section from growing or shrinking, so docking does not move
    scrollTop. Do not snap scroll position here: a correction also
    aborts the page's own smooth scrolls and fast wheels. */
 function setDock(next) {
+  const embed = embedsInNav();
   if (next) {
-    if (dockState.docked && dockState.open) return;
-    if (!dockState.docked) measureTabHold();
+    if (dockState.docked && (dockState.open || !embed)) return;
     window.clearTimeout(closeDockTimer);
-    if (prefersReduced()) {
+    if (!embed || prefersReduced()) {
       dockState.docked = true;
       dockState.open = true;
       dockState.joined = true;
       return;
     }
+    if (!dockState.docked) measureTabHold();
     pinLabelWidths();
-    if (!dockState.docked) dockState.docked = true;
+    dockState.docked = true;
     scheduleOpen();
     return;
   }
   if (!dockState.docked) return;
-  window.clearTimeout(closeDockTimer);
-  if (prefersReduced() || !dockState.open) {
-    dockState.open = false;
-    dockState.joined = false;
-    dockState.docked = false;
+  /* Prototype A reverses the merge, but only while the slot is still
+     at the bar. The default path puts the pill back on the page now. */
+  if (!dockState.open) {
+    if (dockState.mode === "a" && !prefersReduced() && !slotClearOfBar()) return;
+    releaseDockNow();
+    return;
+  }
+  const morphOut = embed && dockState.mode === "a" && !prefersReduced() && !slotClearOfBar();
+  if (!morphOut) {
+    releaseDockNow();
     return;
   }
   dockState.open = false;
   dockState.joined = false;
+  window.clearTimeout(closeDockTimer);
   closeDockTimer = window.setTimeout(() => {
-    if (!dockState.open) {
-      dockState.joined = false;
-      dockState.docked = false;
-      nextTick(pinLabelWidths);
-    }
+    if (!dockState.open) releaseDockNow();
   }, NAV_MORPH_MS);
 }
 
@@ -771,8 +841,8 @@ function cancelResumeLeave() {
 
 /* The chevron and the Resume corner leave the morph and stop a little
    above the Resume heading. The section stays Resume — this is not a
-   trip back to About. Tabs stay in the pill until that scroll lands so
-   putting them back inline cannot cut the smooth scroll short. */
+   trip back to About. The section pill goes back on the page first, so
+   it travels with the heading instead of staying stuck in the bar. */
 function leaveResumeMode() {
   cancelTween();
   beginResumeLock(null);
@@ -786,15 +856,7 @@ function leaveResumeMode() {
   }
   resumeLeaveAt = performance.now();
   resumeLeaveUntil = resumeLeaveAt + 5000;
-  window.clearTimeout(closeDockTimer);
-  if (prefersReduced()) {
-    dockState.open = false;
-    dockState.joined = false;
-    dockState.docked = false;
-  } else if (dockState.docked || dockState.open) {
-    dockState.open = false;
-    dockState.joined = false;
-  }
+  releaseDockNow();
   scrollToEl("resume", undefined, RESUME_BACK_GAP);
   window.setTimeout(() => {
     if (resumeLeaveUntil) finishResumeLeave();
@@ -820,26 +882,49 @@ function finishResumeLeave() {
 function updateDock() {
   if (resumeLeaveUntil && performance.now() < resumeLeaveUntil) return;
   const root = scroller.value;
-  const sent = document.getElementById("resume-tabs-sentinel");
   const resume = document.getElementById("resume");
   const bar = root?.querySelector(".nav-inner");
-  if (!root || !sent || !resume || !bar) return;
-  const barBottom = bar.getBoundingClientRect().bottom;
-  const sentTop = sent.getBoundingClientRect().top;
+  if (!root || !resume || !bar) return;
+  const barRect = bar.getBoundingClientRect();
   const resumeBottom = resume.getBoundingClientRect().bottom;
-  const heading = document.getElementById("resume-heading");
-  const shell = root.querySelector("#nav-tab-slot .tablist-shell");
-  const barEdge = shell ? Math.max(barBottom, shell.getBoundingClientRect().bottom) : barBottom;
-  const headingH = heading ? heading.offsetHeight : 48;
-  const headingTop = heading ? heading.getBoundingClientRect().top : sentTop;
-  /* The heading is in view under the pill, so the tabs belong inline
-     beneath it. Hysteresis only applies while that heading is still
-     up under the bar, or the row would cover the title. */
-  const headingClear = headingTop >= barBottom - 2;
-  const limit = dockState.docked && !headingClear ? barEdge + headingH + 40 : barBottom + 1;
-  /* Stay docked while the resume section still owns the screen. The skills
-     card is under the tab row, so it keeps the pill instead of releasing it. */
-  setDock(sentTop <= limit && resumeBottom > barBottom + 24);
+  const owns = resumeBottom > barRect.bottom + 24;
+  /* B and C leave the section pill in the page and stick it themselves.
+     Dock means that pill has taken the sticky slot, so the main pill
+     can step aside. A and the default path merge labels into the main
+     pill, and give the section pill back as soon as its slot is visible
+     again — not a heading later, which left both bars stuck. */
+  if (!embedsInNav()) {
+    const shell = document.querySelector("#resume-tab-slot .tablist-shell");
+    if (!shell) {
+      setDock(false);
+      return;
+    }
+    const shellTop = shell.getBoundingClientRect().top;
+    const limit = dockState.docked ? barRect.top + 6 : barRect.top + 1;
+    setDock(owns && shellTop <= limit);
+    return;
+  }
+  const sent = document.getElementById("resume-tabs-sentinel");
+  if (!sent) return;
+  const sentTop = sent.getBoundingClientRect().top;
+  const limit = dockState.docked ? barRect.bottom + 8 : barRect.bottom + 1;
+  setDock(owns && sentTop <= limit);
+}
+
+function pickNavMode(event, mode) {
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+  event.preventDefault();
+  const query = { ...route.query, navproto: "1" };
+  if (mode) query.nav = mode;
+  else delete query.nav;
+  router.replace({ path: route.path, query });
+}
+
+function navProtoHref(mode) {
+  const query = { ...route.query, navproto: "1" };
+  if (mode) query.nav = mode;
+  else delete query.nav;
+  return router.resolve({ path: route.path, query }).href;
 }
 
 let armedDown = true;
@@ -1846,7 +1931,7 @@ watch(
     </div>
     <main class="sheet">
       <nav class="section-nav" :class="{ 'is-docked': dockState.docked, 'is-open': dockState.open, 'is-joined': dockState.joined }" aria-label="Sections">
-        <div class="nav-cluster">
+        <div class="nav-cluster" :aria-hidden="dockState.docked && (dockState.mode === 'b' || dockState.mode === 'c') ? 'true' : undefined">
           <div class="nav-inner">
             <a
               class="nav-link"
@@ -1901,5 +1986,11 @@ watch(
       <div class="scroll-tail" aria-hidden="true"></div>
     </main>
   </div>
+  <nav v-if="showNavProto" class="nav-proto" aria-label="Resume nav prototypes">
+    <a :href="navProtoHref('')" :aria-current="dockState.mode === '' ? 'true' : undefined" @click="pickNavMode($event, '')">Default</a>
+    <a :href="navProtoHref('a')" :aria-current="dockState.mode === 'a' ? 'true' : undefined" @click="pickNavMode($event, 'a')">A Morph</a>
+    <a :href="navProtoHref('b')" :aria-current="dockState.mode === 'b' ? 'true' : undefined" @click="pickNavMode($event, 'b')">B Swap</a>
+    <a :href="navProtoHref('c')" :aria-current="dockState.mode === 'c' ? 'true' : undefined" @click="pickNavMode($event, 'c')">C Rise</a>
+  </nav>
   </template>
 </template>
