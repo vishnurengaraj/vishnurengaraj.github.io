@@ -888,6 +888,10 @@ video {
 
 .section-nav.is-open .nav-subs {
   max-width: var(--subs-max, 34rem);
+  /* The closed row is pulled under Resume so the names wipe out from
+     behind the chip. Once open, that overlap lets the gold section
+     pill show through the chip's rounded corners. Sit clear of it. */
+  margin-left: 4px;
 }
 
 .nav-subs .tablist {
