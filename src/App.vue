@@ -663,14 +663,20 @@ function pinLabelWidths() {
   if (dockState.docked || dockState.open) return;
   const links = [...document.querySelectorAll(".section-nav a.nav-link:not(.nav-resume)")];
   if (!links.length) return;
-  for (const link of links) link.style.transition = "none";
-  for (const link of links) link.style.removeProperty("--label-max");
-  const widths = links.map((link) => link.getBoundingClientRect().width);
-  for (let i = 0; i < links.length; i++) {
-    if (widths[i] > 1) links[i].style.setProperty("--label-max", `${Math.ceil(widths[i])}px`);
+  /* Measure a copy. Clearing the live transition here snapped Resume
+     the rest of the way back at the end of a tuck. */
+  for (const link of links) {
+    const probe = link.cloneNode(true);
+    probe.style.transition = "none";
+    probe.style.maxWidth = "none";
+    probe.style.position = "absolute";
+    probe.style.visibility = "hidden";
+    probe.style.pointerEvents = "none";
+    link.parentElement.appendChild(probe);
+    const w = probe.getBoundingClientRect().width;
+    probe.remove();
+    if (w > 1) link.style.setProperty("--label-max", `${Math.ceil(w)}px`);
   }
-  void links[0].offsetWidth;
-  for (const link of links) link.style.transition = "";
 }
 
 /* Measure a copy. Toggling transition on the live tab, then opening in
@@ -725,25 +731,85 @@ function scheduleOpen(tries = 0) {
 
 /* Long enough for the names to wipe fully behind Resume. A steady
    scroll starts this early and plays it out before the in-page slot
-   reaches the bar. Faster travel shortens the same wipe; a flick with
-   no time for it snaps. */
+   reaches the bar. The desktop Experience landing only has about
+   100px of runway, so a mouse wheel arrives sooner than TUCK_MIN_MS.
+   That case still plays the full wipe; the empty hold is collapsed
+   for the duration so it cannot show as a second pill. A flick snaps. */
 const TUCK_MS = 450;
-const TUCK_MIN_MS = 120;
+/* Below this the names used to snap and Resume jumped in one frame.
+   A steady wheel from the Experience landing is often 70–140ms. */
+const TUCK_MIN_MS = 64;
+/* When the runway is shorter than that, still play a full wipe.
+   Long enough for the chip to slide instead of jumping. */
+const SHORT_TUCK_MS = 110;
+const FLICK_PX = 72;
 let tuckCloseUntil = 0;
 let tuckLatched = false;
+let tuckHeldPx = 0;
 let dockScrollY = -1;
 let dockScrollAt = 0;
 let upFrames = 0;
 
+function clearTuckTiming() {
+  scroller.value?.querySelector(".section-nav")?.style.removeProperty("--pull-dur");
+}
+
+/* Keep the content under the slot pixel-stable when its height changes. */
+function shiftScroll(dy) {
+  const root = scroller.value;
+  if (!root || Math.abs(dy) < 0.5) return;
+  const next = root.scrollTop + dy;
+  dockScrollY = next;
+  dockScrollAt = performance.now();
+  lastScrollY = next;
+  const behavior = root.style.scrollBehavior;
+  root.style.scrollBehavior = "auto";
+  drivingScroll = true;
+  root.scrollTop = next;
+  root.style.scrollBehavior = behavior;
+}
+
+function collapseHoldForTuck() {
+  if (tuckHeldPx || dockState.hold < 2) return;
+  const anchor = document.getElementById("resume-tab-slot")?.nextElementSibling;
+  const before = anchor?.getBoundingClientRect().top;
+  tuckHeldPx = dockState.hold;
+  dockState.hold = 0;
+  nextTick(() => {
+    if (!anchor || before == null) return;
+    shiftScroll(anchor.getBoundingClientRect().top - before);
+  });
+}
+
+function restoreHoldHeight() {
+  const px = tuckHeldPx;
+  tuckHeldPx = 0;
+  if (!px || !dockState.docked) return;
+  const anchor = document.getElementById("resume-tab-slot")?.nextElementSibling;
+  const before = anchor?.getBoundingClientRect().top;
+  dockState.hold = px;
+  nextTick(() => {
+    if (!anchor || before == null) return;
+    shiftScroll(anchor.getBoundingClientRect().top - before);
+  });
+}
+
 function releaseDockNow() {
   window.clearTimeout(closeDockTimer);
   tuckCloseUntil = 0;
-  const nav = scroller.value?.querySelector(".section-nav");
-  nav?.style.removeProperty("--pull-dur");
+  const compensate = tuckHeldPx > 0;
+  tuckHeldPx = 0;
+  clearTuckTiming();
+  const anchor = document.getElementById("resume-tab-slot")?.nextElementSibling;
+  const before = compensate && anchor ? anchor.getBoundingClientRect().top : null;
   dockState.open = false;
   dockState.joined = false;
   dockState.docked = false;
-  nextTick(pinLabelWidths);
+  nextTick(() => {
+    pinLabelWidths();
+    if (before == null || !anchor.isConnected) return;
+    shiftScroll(anchor.getBoundingClientRect().top - before);
+  });
 }
 
 function beginReverseTuck(ms) {
@@ -862,7 +928,7 @@ function updateDock() {
   const cover = slotEl
     ? barRect.bottom - slotEl.getBoundingClientRect().bottom
     : -gap - (dockState.hold || 56);
-  const dt = Math.min(32, Math.max(8, dockScrollAt ? now - dockScrollAt : 16));
+  const dt = Math.min(32, Math.max(16, dockScrollAt ? now - dockScrollAt : 16));
   const upSpeed = scrollingUp ? (dockScrollY - y) / dt : 0;
 
   if (!owns) {
@@ -882,17 +948,23 @@ function updateDock() {
     return;
   }
 
+  const holdEl = document.querySelector(".tab-hold");
+  const holdHole = !!holdEl && holdEl.getBoundingClientRect().height > 2 && cover <= 0;
   if (tuckCloseUntil) {
+    const frameDelta = scrollingUp ? dockScrollY - y : 0;
     if (scrollingDown && gap <= 1) {
       tuckCloseUntil = 0;
       tuckLatched = false;
+      clearTuckTiming();
+      restoreHoldHeight();
       setDock(true);
-    } else if (cover <= 0 || gap > 8) {
-      /* The empty hold is about to show under the bar. */
+    } else if (frameDelta > FLICK_PX || (!tuckHeldPx && (holdHole || gap > 8))) {
+      /* A flick, or the empty hold about to show, leaves the bar now. */
       tuckLatched = true;
       releaseDockNow();
-    } else if (now >= tuckCloseUntil && cover <= 28) {
-      /* Wipe has finished and the real pill is what crosses the bar. */
+    } else if (now >= tuckCloseUntil && (tuckHeldPx || cover <= 28)) {
+      /* Wipe has finished. A collapsed hold means the page had too
+         little runway, so undock now; the pill returns with the slot. */
       tuckLatched = true;
       releaseDockNow();
     }
@@ -904,6 +976,39 @@ function updateDock() {
   /* Scrolling back down, or the slot sitting on screen below the bar,
      ends the "just tucked" latch so the names can dock again. */
   if (scrollingDown || gap > 8) tuckLatched = false;
+
+  if (dockState.docked && dockState.open && upFrames >= 2 && upSpeed > 0.02) {
+    /* Time until the empty hold would peek out under the bar.
+       When that trip is about one tuck long, play the wipe in that
+       time. The Experience landing is closer than that on desktop, so
+       a wheel would miss the 120ms cutoff and the chip would jump.
+       A steady scroll there still plays the full wipe, with the hold
+       collapsed so the page never shows an empty slot. */
+    const frameDelta = scrollingUp ? dockScrollY - y : 0;
+    const msToHandoff = Math.max(0, cover - 16) / upSpeed;
+    const flick = frameDelta > FLICK_PX;
+    if (flick && msToHandoff < TUCK_MIN_MS) {
+      tuckLatched = true;
+      releaseDockNow();
+      dockScrollY = y;
+      dockScrollAt = now;
+      return;
+    }
+    if (cover > 16 && msToHandoff > TUCK_MS + 80) {
+      /* Still far above the bar at this speed. */
+    } else if (cover > 16 && msToHandoff >= TUCK_MIN_MS) {
+      beginReverseTuck(Math.min(TUCK_MS, Math.round(msToHandoff)));
+      dockScrollY = y;
+      dockScrollAt = now;
+      return;
+    } else if (!flick) {
+      beginReverseTuck(SHORT_TUCK_MS);
+      collapseHoldForTuck();
+      dockScrollY = y;
+      dockScrollAt = now;
+      return;
+    }
+  }
 
   if (dockState.docked && cover <= 0) {
     tuckLatched = true;
@@ -918,28 +1023,6 @@ function updateDock() {
      An upward nudge during that window must not undock. */
   if (dockState.docked && !dockState.open && !tuckCloseUntil && gap <= 1) {
     scheduleOpen();
-    dockScrollY = y;
-    dockScrollAt = now;
-    return;
-  }
-
-  if (dockState.docked && dockState.open && upFrames >= 2 && gap <= 1 && upSpeed > 0.02 && cover > 16) {
-    /* Time until the empty hold would peek out under the bar.
-       Play the whole wipe in that time, capped at TUCK_MS, so a steady
-       scroll finishes before undock. A flick that is already on the bar
-       snaps; a fast frame while the hold is still far away does not. */
-    const msToHandoff = (cover - 16) / upSpeed;
-    if (msToHandoff >= TUCK_MIN_MS && msToHandoff <= TUCK_MS + 80) {
-      beginReverseTuck(Math.min(TUCK_MS, Math.round(msToHandoff)));
-      dockScrollY = y;
-      dockScrollAt = now;
-      return;
-    }
-  }
-
-  if (dockState.docked && dockState.open && upFrames >= 2 && cover <= 16 && upSpeed > 0.02) {
-    tuckLatched = true;
-    releaseDockNow();
     dockScrollY = y;
     dockScrollAt = now;
     return;
