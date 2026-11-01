@@ -819,24 +819,6 @@ video {
   overflow: hidden;
 }
 
-.tablist-wrap {
-  position: static;
-  display: flex;
-  justify-content: center;
-  max-width: 100%;
-  margin: 0 0 1rem;
-}
-
-.tablist-wrap:empty {
-  display: none;
-  margin: 0;
-}
-
-.tab-hold {
-  width: 100%;
-  flex: 0 0 auto;
-}
-
 .tablist-shell {
   min-width: 0;
   max-width: 100%;
@@ -1097,13 +1079,6 @@ video {
 .lead,
 .project {
   box-shadow: var(--shadow-raised);
-}
-
-/* Room past the footer so the last resume heading can sit under the
-   sticky bar. 44rem is the bar plus a short final section; anything
-   taller than the viewport contributes nothing. */
-.scroll-tail {
-  height: max(0px, calc(100dvh - 44rem));
 }
 
 .site-footer {
@@ -1368,19 +1343,6 @@ video {
   .tablist a {
     padding: 0 14px;
   }
-
-  /* The in-page row is the padded column, not the full phone width.
-     Five labels at the resting type run past 390–414, so this row
-     uses the docked size until the column can hold them. */
-  #resume-tab-slot .tablist {
-    gap: 2px;
-  }
-
-  #resume-tab-slot .tablist a {
-    padding: 0 clamp(5px, 1.7vw, 11px);
-    font-size: clamp(0.6875rem, 0.6rem + 0.45vw, 0.8125rem);
-    line-height: 1.125rem;
-  }
 }
 
 /* Skills is a fifth label. 9px of pad fitted four names at 400px and
@@ -1454,7 +1416,6 @@ video {
   .skip,
   .learn,
   .section-nav,
-  .scroll-tail,
   .to-top {
     display: none !important;
   }
