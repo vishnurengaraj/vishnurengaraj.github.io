@@ -1,6 +1,6 @@
 <script setup>
 import { inject, nextTick, onMounted, watch } from "vue";
-import { dockKey, resumeJumpKey, resumePartKey } from "../scroll.js";
+import { resumeJumpKey, resumePartKey } from "../scroll.js";
 import BulletTree from "./BulletTree.vue";
 import MediaFrame from "./MediaFrame.vue";
 import ResponsiveImg from "./ResponsiveImg.vue";
@@ -22,7 +22,6 @@ const tabs = [
   { id: "awards", label: "Awards" },
 ];
 
-const dock = inject(dockKey);
 const current = inject(resumePartKey);
 const jumpResumePart = inject(resumeJumpKey);
 
@@ -64,10 +63,7 @@ onMounted(() => revealCurrent(current.value));
   <section id="resume" class="section" tabindex="-1" aria-labelledby="resume-heading">
     <h2 id="resume-heading" class="section-title">Resume</h2>
     <div id="resume-tabs-sentinel" class="tab-sentinel" aria-hidden="true"></div>
-    <div id="resume-tab-slot" class="tablist-wrap">
-      <div v-if="dock.docked" class="tab-hold" :style="{ height: `${dock.hold}px` }" aria-hidden="true"></div>
-    </div>
-    <Teleport defer :to="dock.docked ? '#nav-tab-slot' : '#resume-tab-slot'">
+    <Teleport defer to="#nav-tab-slot">
       <div class="tablist-shell">
         <nav class="tablist" aria-label="Resume sections">
           <a
