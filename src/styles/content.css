@@ -814,8 +814,7 @@ video {
   overflow-wrap: anywhere;
 }
 
-.tab-sentinel,
-.skills-anchor {
+.tab-sentinel {
   height: 0;
   overflow: hidden;
 }
@@ -916,6 +915,7 @@ video {
 
 .tablist {
   display: flex;
+  align-items: center;
   flex-wrap: nowrap;
   gap: 4px;
   margin: 0;
@@ -935,8 +935,16 @@ video {
   display: none;
 }
 
+/* These anchors sit outside .section-nav once a reverse tuck puts the
+   row back on the page. A flex item that is not itself a flex box
+   top-aligns its text in the 48px target, so the label rides high in
+   the pill. The docked row only looked centered because .section-nav a
+   already uses inline-flex. */
 .tablist a {
   appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 0;
   background: transparent;
   color: var(--md-sys-color-on-surface-variant);
@@ -1288,6 +1296,7 @@ video {
   }
 
   .panel-block > .era,
+  .panel-block > .skills,
   .coursework {
     grid-column: 1 / -1;
   }
@@ -1359,33 +1368,43 @@ video {
   .tablist a {
     padding: 0 14px;
   }
+
+  /* The in-page row is the padded column, not the full phone width.
+     Five labels at the resting type run past 390–414, so this row
+     uses the docked size until the column can hold them. */
+  #resume-tab-slot .tablist {
+    gap: 2px;
+  }
+
+  #resume-tab-slot .tablist a {
+    padding: 0 clamp(5px, 1.7vw, 11px);
+    font-size: clamp(0.6875rem, 0.6rem + 0.45vw, 0.8125rem);
+    line-height: 1.125rem;
+  }
 }
 
-/* The open row sits 4px clear of Resume instead of 8px under it.
-   That is 12px wider. On a phone the bar was already at its ends,
-   so the section labels give the width back. */
-@media (max-width: 400px) {
+/* Skills is a fifth label. 9px of pad fitted four names at 400px and
+   clips Awards once Skills is in the row. 4px keeps the 4px gap and
+   the Resume chip, and still clears the pill edge from 360 through 414. */
+@media (max-width: 414px) {
   .section-nav {
-    --dock-tab-pad: 9px;
+    --dock-tab-pad: 4px;
+  }
+
+  .nav-subs .tablist a {
+    letter-spacing: 0;
+  }
+}
+
+@media (max-width: 340px) {
+  .section-nav {
+    --dock-tab-pad: 3px;
   }
 }
 
 @media (max-width: 380px) {
   .section-nav a {
     padding: 0 12px;
-  }
-
-  /* The in-page row is narrower than the docked one (20px page gutters).
-     Use the docked row's type and tighter padding so all four tabs,
-     Awards included, fit at 320-375px instead of scrolling off. */
-  #resume-tab-slot .tablist {
-    gap: 2px;
-  }
-
-  #resume-tab-slot .tablist a {
-    padding: 0 clamp(6px, 2.4vw, 12px);
-    font-size: clamp(0.75rem, 0.68rem + 0.35vw, 0.8125rem);
-    line-height: 1.125rem;
   }
 }
 

@@ -15,6 +15,7 @@ import {
 } from "../data/content.js";
 
 const tabs = [
+  { id: "skills", label: "Skills" },
   { id: "experience", label: "Experience" },
   { id: "education", label: "Education" },
   { id: "clubs", label: "Clubs" },
@@ -38,7 +39,7 @@ function onPick(event, id) {
   jumpResumePart(id);
 }
 
-/* Keep the chosen label in the row when the four names overflow.
+/* Keep the chosen label in the row when the names overflow.
    Scroll the row only — scrollIntoView would move the page too. */
 async function revealCurrent(id) {
   if (!id) return;
@@ -83,10 +84,12 @@ onMounted(() => revealCurrent(current.value));
       </div>
     </Teleport>
 
-    <div id="skills" class="skills-anchor" aria-hidden="true"></div>
-    <ul class="skills" aria-label="Skills">
-      <li v-for="skill in skills" :key="skill">{{ skill }}</li>
-    </ul>
+    <section id="skills" class="panel-block resume-part" tabindex="-1" aria-labelledby="skills-heading">
+      <h3 id="skills-heading" class="era">Skills</h3>
+      <ul class="skills">
+        <li v-for="skill in skills" :key="skill">{{ skill }}</li>
+      </ul>
+    </section>
 
     <section id="experience" class="panel-block resume-part" tabindex="-1" aria-labelledby="experience-heading">
       <h3 id="experience-heading" class="era">Experience</h3>

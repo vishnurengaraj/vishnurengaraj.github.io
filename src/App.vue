@@ -188,6 +188,134 @@ function endNativeScroll() {
   window.clearTimeout(followTimer);
 }
 
+/* A section jump is not a finger on the resume tuck. updateDock reads
+   scroll deltas and would reverse-tuck or re-dock, and that path writes
+   scrollTop, which cancels the smooth scroll and leaves the reader in
+   Resume. Held until the heading arrives. */
+let jumpGuard = null;
+
+function resumeJumpTarget(id) {
+  return id === "resume" || RESUME_PARTS.includes(id);
+}
+
+function prepareJumpDock(id) {
+  window.clearTimeout(closeDockTimer);
+  tuckCloseUntil = 0;
+  clearTuckTiming();
+  if (!resumeJumpTarget(id)) {
+    tuckHeldPx = 0;
+    if (dockState.docked || dockState.open) {
+      dockState.open = false;
+      dockState.joined = false;
+      dockState.docked = false;
+      tuckLatched = true;
+    }
+    return;
+  }
+  if (tuckHeldPx) {
+    dockState.hold = tuckHeldPx;
+    tuckHeldPx = 0;
+  }
+  if (dockState.docked && !dockState.open) {
+    dockState.open = true;
+    dockState.joined = true;
+  }
+}
+
+function armJumpGuard(id, top) {
+  const root = scroller.value;
+  const y = root ? root.scrollTop : top;
+  const token = { gen: scrollGen, id, top, best: Math.abs(y - top), until: performance.now() + 2500 };
+  jumpGuard = token;
+  window.setTimeout(() => {
+    if (jumpGuard === token) jumpGuard = null;
+  }, 2600);
+}
+
+function jumpGuardOn() {
+  if (!jumpGuard) return false;
+  if (performance.now() > jumpGuard.until) {
+    jumpGuard = null;
+    return false;
+  }
+  return true;
+}
+
+function releaseJumpGuard(gen, y, top) {
+  if (!jumpGuard || jumpGuard.gen !== gen) return;
+  if (Math.abs(y - top) <= 48 || performance.now() > jumpGuard.until) jumpGuard = null;
+}
+
+/* WebKit focuses a sticky nav link and scrolls it into view over the
+   next few frames, using the stuck offset as if it were the layout
+   position. That jump is downward, into Resume, and the tuck then
+   treats it as a scroll. A press that did not drag is put back. */
+let navPress = null;
+
+function onNavPointerDown(event) {
+  if (event.button > 0) return;
+  window.removeEventListener("pointermove", onNavPointerMove);
+  window.removeEventListener("pointerup", onNavPointerDone);
+  window.removeEventListener("pointercancel", onNavPointerDone);
+  const root = scroller.value;
+  navPress = {
+    y: root ? root.scrollTop : 0,
+    clientY: event.clientY,
+    t: performance.now(),
+    dragged: false,
+  };
+  window.addEventListener("pointermove", onNavPointerMove);
+  window.addEventListener("pointerup", onNavPointerDone);
+  window.addEventListener("pointercancel", onNavPointerDone);
+}
+
+function onNavPointerMove(event) {
+  if (!navPress || navPress.dragged) return;
+  if (Math.abs(event.clientY - navPress.clientY) > 8) navPress.dragged = true;
+}
+
+function onNavPointerDone() {
+  window.removeEventListener("pointermove", onNavPointerMove);
+  window.removeEventListener("pointerup", onNavPointerDone);
+  window.removeEventListener("pointercancel", onNavPointerDone);
+  const press = navPress;
+  window.setTimeout(() => {
+    if (navPress === press) navPress = null;
+  }, 700);
+}
+
+function correctNavPressScroll(root, y) {
+  if (!navPress || navPress.dragged || jumpGuardOn()) return false;
+  if (performance.now() - navPress.t > 700) {
+    navPress = null;
+    return false;
+  }
+  if (Math.abs(y - navPress.y) < 24) return false;
+  root.style.scrollBehavior = "auto";
+  drivingScroll = true;
+  root.scrollTop = navPress.y;
+  lastScrollY = navPress.y;
+  root.style.scrollBehavior = "";
+  return true;
+}
+
+function correctJumpFight(root, y) {
+  if (!jumpGuardOn()) return false;
+  const dist = Math.abs(y - jumpGuard.top);
+  if (dist < jumpGuard.best) {
+    jumpGuard.best = dist;
+    return false;
+  }
+  if (dist <= jumpGuard.best + 64) return false;
+  root.style.scrollBehavior = "auto";
+  drivingScroll = true;
+  root.scrollTop = jumpGuard.top;
+  lastScrollY = jumpGuard.top;
+  root.style.scrollBehavior = "";
+  jumpGuard.best = 0;
+  return true;
+}
+
 function scrollToEl(id, behavior, extraGap = 0, focusLanding = true) {
   const root = scroller.value;
   if (!root || typeof document === "undefined") return;
@@ -197,10 +325,12 @@ function scrollToEl(id, behavior, extraGap = 0, focusLanding = true) {
      so reduced-motion jumps were still animating. */
   const mode = behavior === "smooth" || (!behavior && !prefersReduced() && !jumpTitle) ? "smooth" : "instant";
   const gen = ++scrollGen;
+  let top = 0;
   /* The page can grow while a smooth scroll is in flight. Re-measure
      so the heading still meets the bar, or the end when it cannot. */
   const pinLanding = () => {
     if (gen !== scrollGen) return;
+    releaseJumpGuard(gen, root.scrollTop, top);
     const end = Math.max(0, root.scrollHeight - root.clientHeight);
     if (id !== "top" && Math.abs(root.scrollTop - top) <= 600) {
       const anchor = anchorFor(id);
@@ -247,6 +377,8 @@ function scrollToEl(id, behavior, extraGap = 0, focusLanding = true) {
   };
   beginNativeScroll();
   if (id === "top") {
+    prepareJumpDock(id);
+    armJumpGuard(id, 0);
     root.scrollTo({ top: 0, behavior: mode });
     if (focusLanding) document.getElementById("top")?.focus({ preventScroll: true });
     if (mode === "smooth") root.addEventListener("scrollend", landed, { once: true });
@@ -256,12 +388,15 @@ function scrollToEl(id, behavior, extraGap = 0, focusLanding = true) {
   const el = anchorFor(id);
   if (!el) {
     resumePartLocked = false;
+    endNativeScroll();
     return;
   }
-  let top = Math.max(
+  prepareJumpDock(id);
+  top = Math.max(
     0,
     el.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - barClearance(id, extraGap),
   );
+  armJumpGuard(id, top);
   if (Math.abs(root.scrollTop - top) < 2) {
     landed();
   } else {
@@ -292,23 +427,11 @@ function targetForRoute() {
   if (route.name === "about") return "about";
   if (route.name === "projects") return "projects";
   if (route.name === "resume") return "resume";
-  if (route.name === "skills") return "skills";
   return "top";
 }
 
 let lastKey = "";
 let pinGen = 0;
-
-/* True when the element is on screen in the open area under the sticky
-   nav or the docked tab row. */
-function visibleBelowBars(el) {
-  const root = scroller.value;
-  if (!root || !el) return false;
-  const top = el.getBoundingClientRect().top - root.getBoundingClientRect().top;
-  const bottom = el.getBoundingClientRect().bottom - root.getBoundingClientRect().top;
-  const clearance = barClearance("resume");
-  return bottom > clearance + 1 && top < root.clientHeight - 1;
-}
 
 function resumePartFromRoute() {
   const tab = route.params.tab;
@@ -367,7 +490,7 @@ function settleRoute(id, gen) {
   window.addEventListener("load", pin, { once: true });
 }
 
-const sectionIds = ["about", "projects", "resume", "skills"];
+const sectionIds = ["about", "projects", "resume"];
 const activeSection = ref(sectionIds.includes(route.name) ? route.name : null);
 const resumePart = ref(resumePartFromRoute());
 const spySeen = new Set();
@@ -384,33 +507,12 @@ let routeFromTween = false;
 let spySettle = 0;
 let spyObserver;
 
-/* The skills card sits in normal flow under the resume tabs and scrolls
-   away with the page. Skills stays highlighted only while that card is in
-   the band under the nav. Farther down a panel, Resume takes over. */
-function skillsInView() {
-  const root = scroller.value;
-  const mark = document.getElementById("skills");
-  const card = document.querySelector("#resume .skills");
-  if (!root || !mark || !card) return false;
-  const heading = document.getElementById("resume-heading");
-  if (heading && visibleBelowBars(heading)) return false;
-  const top = mark.getBoundingClientRect().top - root.getBoundingClientRect().top;
-  const bottom = top + card.offsetHeight;
-  const clearance = barClearance("skills");
-  return top < root.clientHeight * 0.45 && bottom > clearance + 8;
-}
-
 function spyPick() {
   let next = null;
   for (const id of sectionIds) {
-    if (id === "skills") continue;
     if (spySeen.has(id)) next = id;
   }
-  if (!next && passedSection && passedSection !== "skills") next = passedSection;
-  /* The card can sit in the spy band while the Resume heading is still
-     the landmark. skillsInView waits until that heading has cleared. */
-  if (skillsInView()) return "skills";
-  if (!next && (spySeen.has("skills") || passedSection === "skills")) return "resume";
+  if (!next && passedSection) next = passedSection;
   return next;
 }
 
@@ -438,7 +540,7 @@ function syncSpyUrl(section) {
   if (route.name === "diners") return;
   if (route.name === "resume") resumePath = route.path;
   const path =
-    section === "about" || section === "projects" || section === "skills"
+    section === "about" || section === "projects"
       ? `/${section}`
       : section === "resume"
         ? resumePath
@@ -449,7 +551,7 @@ function syncSpyUrl(section) {
 }
 
 function releaseSpyLock() {
-  if (!spyLock || resumePartLocked) return;
+  if (!spyLock || resumePartLocked || jumpGuardOn()) return;
   const wanted = spyLock === "top" ? null : spyLock;
   const next = spyPick();
   spyLock = null;
@@ -459,7 +561,7 @@ function releaseSpyLock() {
 }
 
 function applySpy() {
-  if (route.name === "diners" || resumePartLocked) return;
+  if (route.name === "diners" || resumePartLocked || jumpGuardOn()) return;
   const next = spyPick();
   if (spyLock) {
     const wanted = spyLock === "top" ? null : spyLock;
@@ -498,14 +600,13 @@ function resumePartFromScroll() {
 }
 
 function publishResumePart(next) {
-  if (skillsInView()) return;
   const main = spyLock && spyLock !== "top" ? spyLock : spyPick();
   if (main !== "resume") return;
   const path = next ? `/resume/${next}` : "/resume";
   resumePath = path;
   if (route.path === path || resumePartUrl === path) return;
   /* The section spy publishes this path when Resume is taking over
-     from About, Projects, or Skills. Publishing here too would start
+     from About or Projects. Publishing here too would start
      a second navigation and scroll again. */
   if (activeSection.value !== "resume") return;
   resumePartUrl = path;
@@ -948,6 +1049,16 @@ function updateDock() {
     return;
   }
 
+  if (jumpGuardOn()) {
+    /* Navigation owns this scroll. A reverse tuck writes scrollTop and
+       cancels the smooth jump, which drops Projects back inside Resume. */
+    const toResume = resumeJumpTarget(jumpGuard.id);
+    if (toResume && !dockState.docked && !tuckLatched && gap <= 1) setDock(true);
+    dockScrollY = y;
+    dockScrollAt = now;
+    return;
+  }
+
   const holdEl = document.querySelector(".tab-hold");
   const holdHole = !!holdEl && holdEl.getBoundingClientRect().height > 2 && cover <= 0;
   if (tuckCloseUntil) {
@@ -1309,7 +1420,10 @@ function clampTitleLock(root) {
 
 function onIntroWheel(event) {
   if (resumeLeaveUntil) cancelResumeLeave();
-  if (event.deltaY && !animating) resumePartLocked = false;
+  if (event.deltaY && !animating) {
+    resumePartLocked = false;
+    jumpGuard = null;
+  }
   if (event.deltaY) armGesture(500);
   if (titleLocked.value) {
     const root = scroller.value;
@@ -1513,6 +1627,8 @@ function onIntroScroll() {
     queueAnchor();
     return;
   }
+  if (correctNavPressScroll(root, y)) return;
+  if (correctJumpFight(root, y)) return;
   if (animating) {
     const delta = y - lastProgrammatic;
     if (titleLocked.value) {
@@ -1584,7 +1700,10 @@ function onTouchMove(event) {
   armGesture(800);
   const y = event.touches[0]?.clientY ?? touchStartY;
   const dy = touchStartY - y;
-  if (Math.abs(dy) > 10 && !animating) resumePartLocked = false;
+  if (Math.abs(dy) > 10 && !animating) {
+    resumePartLocked = false;
+    jumpGuard = null;
+  }
   const root = scroller.value;
   const about = cachedAbout || aboutAnchor();
   if (titleLocked.value && root) {
@@ -1617,7 +1736,10 @@ function onIntroKey(event) {
   const up = event.key === "ArrowUp" || event.key === "PageUp" || (event.key === " " && event.shiftKey);
   if (!down && !up) return;
   if (resumeLeaveUntil) cancelResumeLeave();
-  if (!animating) resumePartLocked = false;
+  if (!animating) {
+    resumePartLocked = false;
+    jumpGuard = null;
+  }
   if (titleLocked.value) {
     const root = scroller.value;
     const about = cachedAbout || aboutAnchor();
@@ -1840,6 +1962,7 @@ async function startShell() {
   if (!root) return;
   shellStarted = true;
   ready.value = true;
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   if (route.name !== "home") {
     lastKey = "";
     syncScroll("instant");
@@ -2049,7 +2172,7 @@ watch(
     <main class="sheet">
       <nav class="section-nav" :class="{ 'is-docked': dockState.docked, 'is-open': dockState.open, 'is-joined': dockState.joined }" aria-label="Sections">
         <div class="nav-cluster">
-          <div class="nav-inner">
+          <div class="nav-inner" @pointerdown="onNavPointerDown">
             <a
               class="nav-link"
               href="/about"
@@ -2081,14 +2204,6 @@ watch(
               </span>
               <span class="nav-label">Resume</span>
             </a>
-            <a
-              class="nav-link"
-              href="/skills"
-              :aria-current="activeSection === 'skills' ? 'page' : undefined"
-              :aria-hidden="dockState.open ? 'true' : undefined"
-              :tabindex="dockState.open ? -1 : undefined"
-              @click="onNav($event, 'skills')"
-            >Skills</a>
             <span class="nav-divider" aria-hidden="true"></span>
             <div id="nav-tab-slot" class="nav-subs" :inert="dockState.open ? undefined : true"></div>
           </div>

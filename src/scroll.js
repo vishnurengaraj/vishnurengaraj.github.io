@@ -1,4 +1,4 @@
-export const RESUME_PARTS = ["experience", "education", "clubs", "awards"];
+export const RESUME_PARTS = ["skills", "experience", "education", "clubs", "awards"];
 
 export const scrollKey = Symbol("scrollTo");
 export const resumePartKey = Symbol("resumePart");
