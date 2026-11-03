@@ -1,0 +1,18 @@
+{
+  "id": "15968802509",
+  "city": "la",
+  "title": "Chino Half Revisited",
+  "date": "2025-09-28T00:00:00.000Z",
+  "distanceM": 21210,
+  "movingS": 8032,
+  "elevM": 483,
+  "mid": [
+    -117.74077,
+    33.917529
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 8064,
+  "type": "Run"
+}

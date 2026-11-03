@@ -1,0 +1,18 @@
+{
+  "id": "10522341238",
+  "city": "la",
+  "title": "Victor(y) Lap",
+  "date": "2024-01-08T00:00:00.000Z",
+  "distanceM": 6710,
+  "movingS": 2282,
+  "elevM": 11.2,
+  "mid": [
+    -118.336434,
+    33.887632
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2285,
+  "type": "Run"
+}

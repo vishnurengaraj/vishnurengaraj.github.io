@@ -1,0 +1,18 @@
+{
+  "id": "20125741548",
+  "city": "la",
+  "title": "Night Run",
+  "date": "2026-09-10T00:00:00.000Z",
+  "distanceM": 8290,
+  "movingS": 2755,
+  "elevM": 24,
+  "mid": [
+    -118.369654,
+    33.913871
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2925,
+  "type": "Run"
+}

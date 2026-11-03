@@ -1,0 +1,18 @@
+{
+  "id": "19290653928",
+  "city": "madrid",
+  "title": "MAD city Scamper",
+  "date": "2026-07-13T00:00:00.000Z",
+  "distanceM": 6570,
+  "movingS": 2300,
+  "elevM": 80,
+  "mid": [
+    -3.72287,
+    40.427314
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2489,
+  "type": "Run"
+}

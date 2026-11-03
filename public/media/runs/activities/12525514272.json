@@ -1,0 +1,18 @@
+{
+  "id": "12525514272",
+  "city": "la",
+  "title": "Run club reunion",
+  "date": "2024-09-28T00:00:00.000Z",
+  "distanceM": 17900,
+  "movingS": 5921,
+  "elevM": 88.4,
+  "mid": [
+    -118.434159,
+    33.974558
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 6593,
+  "type": "Run"
+}

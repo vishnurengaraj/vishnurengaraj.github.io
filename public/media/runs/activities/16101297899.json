@@ -1,0 +1,18 @@
+{
+  "id": "16101297899",
+  "city": "waco",
+  "title": "Night Run",
+  "date": "2025-10-10T00:00:00.000Z",
+  "distanceM": 7700,
+  "movingS": 2486,
+  "elevM": 12,
+  "mid": [
+    -97.117483,
+    31.548208
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 3637,
+  "type": "Run"
+}

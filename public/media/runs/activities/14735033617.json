@@ -1,0 +1,18 @@
+{
+  "id": "14735033617",
+  "city": "atlanta",
+  "title": "Post Marital Jaunt",
+  "date": "2025-06-08T00:00:00.000Z",
+  "distanceM": 8500,
+  "movingS": 2889,
+  "elevM": 88,
+  "mid": [
+    -84.322338,
+    33.992997
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2932,
+  "type": "Run"
+}

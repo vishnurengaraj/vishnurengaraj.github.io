@@ -1,0 +1,18 @@
+{
+  "id": "17774971837",
+  "city": "la",
+  "title": "Night Run",
+  "date": "2026-03-18T00:00:00.000Z",
+  "distanceM": 3380,
+  "movingS": 1051,
+  "elevM": 2,
+  "mid": [
+    -118.347171,
+    33.916311
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 1051,
+  "type": "Run"
+}

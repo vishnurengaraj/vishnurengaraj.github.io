@@ -1,0 +1,18 @@
+{
+  "id": "18562080379",
+  "city": "michigan",
+  "title": "Run Down Memory Lane",
+  "date": "2026-05-18T00:00:00.000Z",
+  "distanceM": 16310,
+  "movingS": 5810,
+  "elevM": 173.5,
+  "mid": [
+    -83.72597,
+    42.294419
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 5864,
+  "type": "Run"
+}

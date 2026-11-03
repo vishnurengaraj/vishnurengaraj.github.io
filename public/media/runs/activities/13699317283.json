@@ -1,0 +1,18 @@
+{
+  "id": "13699317283",
+  "city": "la",
+  "title": "Bulldog loop",
+  "date": "2025-02-22T00:00:00.000Z",
+  "distanceM": 25200,
+  "movingS": 11996,
+  "elevM": 948,
+  "mid": [
+    -118.751079,
+    34.080322
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 12464,
+  "type": "Run"
+}

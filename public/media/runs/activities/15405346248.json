@@ -1,0 +1,18 @@
+{
+  "id": "15405346248",
+  "city": "sf",
+  "title": "A Mile in His Shoes",
+  "date": "2025-08-09T00:00:00.000Z",
+  "distanceM": 33790,
+  "movingS": 11578,
+  "elevM": 40,
+  "mid": [
+    -121.966406,
+    37.400278
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 26835,
+  "type": "Run"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "9247694687",
+  "city": "la",
+  "title": "The Real Long Beach Grand Prix",
+  "date": "2023-06-11T00:00:00.000Z",
+  "distanceM": 21190,
+  "movingS": 6878,
+  "elevM": 71.6,
+  "mid": [
+    -118.175263,
+    33.764388
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 6881,
+  "type": "Run"
+}

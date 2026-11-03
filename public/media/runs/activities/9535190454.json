@@ -1,0 +1,18 @@
+{
+  "id": "9535190454",
+  "city": "la",
+  "title": "Brake Dust Boogie",
+  "date": "2023-07-27T00:00:00.000Z",
+  "distanceM": 10140,
+  "movingS": 2952,
+  "elevM": 23.7,
+  "mid": [
+    -118.37114,
+    33.913896
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2952,
+  "type": "Run"
+}

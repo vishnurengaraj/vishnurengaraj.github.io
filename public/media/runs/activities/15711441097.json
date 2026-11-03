@@ -1,0 +1,18 @@
+{
+  "id": "15711441097",
+  "city": "waco",
+  "title": "Evening Run",
+  "date": "2025-09-05T00:00:00.000Z",
+  "distanceM": 6540,
+  "movingS": 2166,
+  "elevM": 26,
+  "mid": [
+    -97.141927,
+    31.551138
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2197,
+  "type": "Run"
+}

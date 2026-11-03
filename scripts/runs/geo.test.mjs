@@ -3,8 +3,11 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { gzipSync } from "node:zlib";
 import { assignCity } from "./cities.mjs";
 import { applyPrivacy, decodePolyline, haversine, moveMeters, pathLength } from "./geo.mjs";
+import { coordsFromTrackBytes } from "./parse.mjs";
+import { isFootSport } from "./sports.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -60,24 +63,53 @@ test("optional zones hide a middle pass as well as the ends", () => {
   }
 });
 
-test("city assignment keeps South Bay on LA and does not smear a distant run", () => {
+test("city assignment keeps South Bay on LA and names away regions", () => {
   assert.equal(assignCity(-118.4016, 33.8622).id, "la");
   assert.equal(assignCity(-122.47, 37.804).id, "sf");
   assert.equal(assignCity(-73.966, 40.782).id, "nyc");
+  assert.equal(assignCity(139.77, 35.72).id, "tokyo");
+  assert.equal(assignCity(139.75, 35.68).id, "tokyo");
+  assert.equal(assignCity(-83.73, 42.29).id, "michigan");
+  assert.equal(assignCity(-83.15, 42.69).id, "michigan");
+  assert.equal(assignCity(-97.14, 31.56).id, "waco");
+  assert.equal(assignCity(-97.45, 31.4).id, "waco");
+  assert.equal(assignCity(-119.0, 37.66).id, "sierra");
+  assert.equal(assignCity(-118.51, 37.35).id, "sierra");
+  assert.equal(assignCity(-3.72, 40.43).label, "Madrid");
   const away = assignCity(-105.5, 39.0);
   assert.notEqual(away.id, "la");
   assert.equal(away.generated, true);
 });
 
-test("shipped sample is one heatmap per city", () => {
+test("walk, hike, and trail run are foot sports", () => {
+  for (const type of ["Run", "Trail Run", "Walk", "Hike", "Hiking", "TrailRun"]) {
+    assert.equal(isFootSport(type), true, type);
+  }
+  assert.equal(isFootSport("Ride"), false);
+  assert.equal(isFootSport("Virtual Run"), false);
+});
+
+test("gzipped gpx inflates before parsing", async () => {
+  const xml = `<?xml version="1.0"?><gpx><trk><trkseg>
+    <trkpt lat="33.86" lon="-118.40"></trkpt>
+    <trkpt lat="33.87" lon="-118.41"></trkpt>
+  </trkseg></trk></gpx>`;
+  const coords = await coordsFromTrackBytes("activity.gpx.gz", gzipSync(Buffer.from(xml)));
+  assert.equal(coords.length, 2);
+  assert.ok(Math.abs(coords[0][0] + 118.4) < 0.001);
+});
+
+test("shipped routes are one heatmap per named city", () => {
   const manifest = JSON.parse(readFileSync(path.join(ROOT, "src/data/runs/manifest.json"), "utf8"));
-  assert.equal(manifest.sample, true);
+  assert.equal(manifest.sample, false);
   assert.equal(manifest.defaultCity, "la");
   assert.equal(manifest.privacy.meters, 400);
-  assert.ok(manifest.probes.overlap.count >= 3);
-  const labels = manifest.cities.map((city) => city.label);
-  assert.deepEqual(labels.slice(0, 3), ["LA", "SF", "NYC"]);
+  assert.ok(manifest.runs.length > 400);
+  const types = new Set(manifest.runs.map((run) => run.type));
+  assert.ok(types.has("Run"));
+  assert.ok(types.has("Trail Run"));
   for (const city of manifest.cities) {
+    assert.equal(city.label === "Away" || city.id.startsWith("away-"), false);
     const lines = JSON.parse(
       readFileSync(path.join(ROOT, "public/media/runs/cities", `${city.id}.lines.geojson`), "utf8"),
     );

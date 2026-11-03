@@ -1,0 +1,18 @@
+{
+  "id": "16727454313",
+  "city": "la",
+  "title": "Night Run",
+  "date": "2025-12-12T00:00:00.000Z",
+  "distanceM": 8190,
+  "movingS": 2653,
+  "elevM": 33,
+  "mid": [
+    -118.369783,
+    33.913008
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2783,
+  "type": "Run"
+}

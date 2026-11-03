@@ -1,0 +1,18 @@
+{
+  "id": "18092868604",
+  "city": "sf",
+  "title": "Morning Run",
+  "date": "2026-04-13T00:00:00.000Z",
+  "distanceM": 6490,
+  "movingS": 2202,
+  "elevM": 36,
+  "mid": [
+    -121.968842,
+    37.369646
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2205,
+  "type": "Run"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "11512268412",
+  "city": "la",
+  "title": "Vishnu goes west",
+  "date": "2024-05-27T00:00:00.000Z",
+  "distanceM": 16020,
+  "movingS": 5610,
+  "elevM": 118.2,
+  "mid": [
+    -118.409439,
+    33.888844
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 6219,
+  "type": "Run"
+}

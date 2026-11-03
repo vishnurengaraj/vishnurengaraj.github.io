@@ -1,0 +1,18 @@
+{
+  "id": "12477942683",
+  "city": "michigan",
+  "title": "Lunch Run",
+  "date": "2024-09-22T00:00:00.000Z",
+  "distanceM": 10950,
+  "movingS": 3460,
+  "elevM": 91.8,
+  "mid": [
+    -83.195671,
+    42.717001
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 3511,
+  "type": "Run"
+}

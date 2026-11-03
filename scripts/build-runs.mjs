@@ -36,6 +36,9 @@ import {
   resolveFitFile,
 } from "./runs/parse.mjs";
 import { SAMPLE_PIER, buildSampleActivities } from "./runs/sample.mjs";
+import { FOOT_SPORTS, isFootSport, normalizeSport } from "./runs/sports.mjs";
+
+export { FOOT_SPORTS };
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT_DIR = path.join(ROOT, "public/media/runs");
@@ -205,7 +208,8 @@ async function main() {
     }
   }
 
-  const loaded = await loadSources(flags);
+  // Run, Trail Run, Walk, and Hike. Rides and virtual activities are dropped.
+  const loaded = (await loadSources(flags)).filter((activity) => isFootSport(activity.type));
   await rm(OUT_DIR, { recursive: true, force: true });
   await mkdir(path.dirname(MANIFEST_PATH), { recursive: true });
   await mkdir(path.join(OUT_DIR, "cities"), { recursive: true });
@@ -249,6 +253,7 @@ async function main() {
       id,
       city: city.id,
       title: activity.title || "Run",
+      type: normalizeSport(activity.type) || "Run",
       date: activity.date,
       distanceM: round(distanceM),
       movingS: movingS == null ? null : Math.round(movingS),
@@ -273,6 +278,7 @@ async function main() {
       properties: {
         id,
         title: summary.title,
+        type: summary.type,
         date: summary.date || "",
         distanceM: summary.distanceM,
         movingS: summary.movingS ?? 0,

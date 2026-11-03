@@ -1,0 +1,18 @@
+{
+  "id": "16324259153",
+  "city": "la",
+  "title": "V vs VRC",
+  "date": "2025-11-01T00:00:00.000Z",
+  "distanceM": 21080,
+  "movingS": 6732,
+  "elevM": 54,
+  "mid": [
+    -118.506607,
+    34.018787
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 6867,
+  "type": "Run"
+}

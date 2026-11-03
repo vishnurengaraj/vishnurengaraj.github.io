@@ -1,0 +1,18 @@
+{
+  "id": "9782537212",
+  "city": "la",
+  "title": "Morning Run",
+  "date": "2023-09-04T00:00:00.000Z",
+  "distanceM": 13160,
+  "movingS": 4223,
+  "elevM": 10.4,
+  "mid": [
+    -118.390392,
+    33.830869
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 4288,
+  "type": "Run"
+}

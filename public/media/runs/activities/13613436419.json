@@ -1,0 +1,18 @@
+{
+  "id": "13613436419",
+  "city": "fortuna",
+  "title": "Evening Run",
+  "date": "2025-02-12T00:00:00.000Z",
+  "distanceM": 7000,
+  "movingS": 2241,
+  "elevM": 71,
+  "mid": [
+    -84.645079,
+    10.471488
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2349,
+  "type": "Run"
+}

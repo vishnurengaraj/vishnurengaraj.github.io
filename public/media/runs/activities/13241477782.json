@@ -1,0 +1,18 @@
+{
+  "id": "13241477782",
+  "city": "la",
+  "title": "Los leones x2",
+  "date": "2025-01-01T00:00:00.000Z",
+  "distanceM": 24160,
+  "movingS": 11247,
+  "elevM": 1018.4,
+  "mid": [
+    -118.57408,
+    34.059326
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 12680,
+  "type": "Run"
+}

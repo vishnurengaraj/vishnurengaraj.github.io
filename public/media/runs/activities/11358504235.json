@@ -1,0 +1,18 @@
+{
+  "id": "11358504235",
+  "city": "la",
+  "title": "Freudian slip pt3",
+  "date": "2024-05-07T00:00:00.000Z",
+  "distanceM": 9370,
+  "movingS": 3164,
+  "elevM": 41.4,
+  "mid": [
+    -118.370928,
+    33.909617
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 3181,
+  "type": "Run"
+}

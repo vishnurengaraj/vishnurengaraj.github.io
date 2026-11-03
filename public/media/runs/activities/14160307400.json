@@ -1,0 +1,18 @@
+{
+  "id": "14160307400",
+  "city": "sonoma",
+  "title": "Lake Sonoma Marathon",
+  "date": "2025-04-12T00:00:00.000Z",
+  "distanceM": 42160,
+  "movingS": 21248,
+  "elevM": 1670,
+  "mid": [
+    -123.084512,
+    38.703123
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 22293,
+  "type": "Run"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "12949043416",
+  "city": "la",
+  "title": "Evening Run",
+  "date": "2024-11-20T00:00:00.000Z",
+  "distanceM": 10130,
+  "movingS": 3322,
+  "elevM": 32,
+  "mid": [
+    -118.330849,
+    33.883692
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 3545,
+  "type": "Run"
+}

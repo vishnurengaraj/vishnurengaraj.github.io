@@ -2,7 +2,7 @@
 
 `/runs` is a full-viewport map of runs, sibling to `/diners`. Far zoom is a density heatmap for the open city. Closer in, the heat fades and each run is a translucent hairline, so a path like the Strand builds a bright vein where runs repeat. Click a line (there is an invisible wider hit target) to open the run. Overlapping lines offer a short chooser. City chips fly the camera; only that city's lines are on the map.
 
-The page does not talk to Strava. `npm run build:runs` writes static files, and the site ships those.
+The page does not talk to Strava. `npm run build:runs` writes static files, and the site ships those. The committed files under `public/media/runs/` are a real export with photos left out. A no-flag build replaces that export with the labeled sample.
 
 ## Sample
 
@@ -16,7 +16,9 @@ npm run build:runs
 
 Any real source replaces the sample. Add `--sample` only if you also want the sample mixed in.
 
-Strava bulk export (unzipped). Distances in `activities.csv` are meters, times are seconds. Tracks are the `.gpx`, `.tcx`, or `.fit` files named in the `Filename` column. Run and Trail Run are kept. Virtual runs are skipped.
+Strava bulk export (unzipped). Distances in `activities.csv` are meters, times are seconds. Tracks are the `.gpx`, `.tcx`, or `.fit` files named in the `Filename` column, including `.gpx.gz`, `.tcx.gz`, and `.fit.gz`. Gzip is inflated with Node's zlib, then the inner file is parsed.
+
+Kept sports are **Run, Trail Run, Walk, and Hike** (also FIT `running`, `trail_running`, `walking`, and `hiking`). Rides and virtual activities are skipped. The allow list is `FOOT_SPORTS` in `scripts/runs/sports.mjs`, applied in `scripts/build-runs.mjs`.
 
 ```bash
 npm run build:runs -- --export ~/Downloads/strava-export --photos /workspace/strava/photos
@@ -42,7 +44,9 @@ Photos are read from `{photos}/{activityId}/`. EXIF is stripped. Put private exp
 
 ## Privacy
 
-Every published line has a 400m radius removed around its first and last points (clamped to 300–500m with `--trim`). A short run that never leaves that radius is dropped. An optional polygon file hides extra blocks: pass `--zones privacy-zones.geojson`, or drop `privacy-zones.geojson` next to `activities.csv`.
+Every published line has a 400m radius removed around its first and last points (clamped to 300–500m with `--trim`). A short activity that never leaves that radius is dropped. An optional polygon file hides extra blocks: pass `--zones privacy-zones.geojson`, or drop `privacy-zones.geojson` next to `activities.csv`.
+
+Tracks outside the metro list are named (Tokyo, Madrid, Michigan, Waco, the eastern Sierra, and so on). Adjacent cells that are the same place share one chip and one heatmap. A Globe button opens a globe of those regions; choosing one flies into that city's pitched map.
 
 ## Output
 

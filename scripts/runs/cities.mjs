@@ -117,6 +117,22 @@ export const METROS = [
 
 const PREFERRED = ["la", "sf", "nyc"];
 
+/** Named regions for tracks that fall outside the metro boxes.
+    Radii are wide enough to merge adjacent 0.5° away-buckets that are one place:
+    Tokyo's palace and Ueno, Waco's two cells, the eastern Sierra, and
+    Ann Arbor with Detroit. */
+export const PLACES = [
+  { id: "humboldt", label: "Humboldt", name: "Humboldt Redwoods", center: [-124.0, 40.32], radiusM: 50000, zoom: 10.8 },
+  { id: "madrid", label: "Madrid", name: "Madrid", center: [-3.72, 40.42], radiusM: 40000, zoom: 12.2 },
+  { id: "michigan", label: "Michigan", name: "Michigan", center: [-83.45, 42.48], radiusM: 85000, zoom: 8.2 },
+  { id: "tokyo", label: "Tokyo", name: "Tokyo", center: [139.76, 35.7], radiusM: 30000, zoom: 11.4 },
+  { id: "waco", label: "Waco", name: "Waco", center: [-97.28, 31.5], radiusM: 50000, zoom: 10.4 },
+  { id: "sierra", label: "Sierra", name: "Eastern Sierra", center: [-118.75, 37.5], radiusM: 60000, zoom: 9.1 },
+  { id: "atlanta", label: "Atlanta", name: "Atlanta", center: [-84.32, 33.99], radiusM: 40000, zoom: 11.4 },
+  { id: "sonoma", label: "Sonoma", name: "Lake Sonoma", center: [-123.05, 38.7], radiusM: 40000, zoom: 11.4 },
+  { id: "fortuna", label: "Fortuna", name: "La Fortuna", center: [-84.64, 10.47], radiusM: 40000, zoom: 12 },
+];
+
 function inMetro(metro, lng, lat) {
   return lng >= metro.west && lng <= metro.east && lat >= metro.south && lat <= metro.north;
 }
@@ -147,6 +163,9 @@ export function assignCity(lng, lat) {
     }
   }
   if (nearest && nearestM <= 80000) return { ...nearest, generated: false };
+  for (const place of PLACES) {
+    if (haversine([lng, lat], place.center) <= place.radiusM) return { ...place, generated: false };
+  }
   const bucket = awayBucket(lng, lat);
   return {
     id: bucket.id,
@@ -162,9 +181,7 @@ export function orderCities(cities) {
   const rank = (id) => {
     const index = PREFERRED.indexOf(id);
     if (index !== -1) return index;
-    const metro = METROS.findIndex((item) => item.id === id);
-    if (metro !== -1) return PREFERRED.length + metro;
-    return 100 + cities.findIndex((item) => item.id === id);
+    return 10;
   };
-  return [...cities].sort((a, b) => rank(a.id) - rank(b.id) || b.count - a.count);
+  return [...cities].sort((a, b) => rank(a.id) - rank(b.id) || b.count - a.count || a.label.localeCompare(b.label));
 }

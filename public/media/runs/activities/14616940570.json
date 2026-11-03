@@ -1,0 +1,18 @@
+{
+  "id": "14616940570",
+  "city": "la",
+  "title": "Evening Run",
+  "date": "2025-05-27T00:00:00.000Z",
+  "distanceM": 8210,
+  "movingS": 2590,
+  "elevM": 9,
+  "mid": [
+    -118.33421,
+    33.881377
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2770,
+  "type": "Run"
+}

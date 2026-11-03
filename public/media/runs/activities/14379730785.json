@@ -1,0 +1,18 @@
+{
+  "id": "14379730785",
+  "city": "la",
+  "title": "Bulldog pt2",
+  "date": "2025-05-04T00:00:00.000Z",
+  "distanceM": 24740,
+  "movingS": 10860,
+  "elevM": 962,
+  "mid": [
+    -118.748317,
+    34.079995
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 11197,
+  "type": "Run"
+}
