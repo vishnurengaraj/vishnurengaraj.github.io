@@ -62,3 +62,30 @@ test("empty and broken geometry produce no heat", () => {
   assert.deepEqual(densityHeat(null), { type: "FeatureCollection", features: [] });
   assert.deepEqual(densityHeat(collection([{ type: "Feature", geometry: null }])).features, []);
 });
+
+test("kernels along a curving route sit close enough to blend", () => {
+  const coords = [];
+  for (let i = 0; i <= 80; i++) {
+    const t = i / 80;
+    coords.push([-118.5 + t * 0.03, 33.95 + 0.006 * Math.sin(t * Math.PI * 3)]);
+  }
+  const heat = densityHeat(collection([line(coords)]));
+  const points = heat.features.map((feature) => feature.geometry.coordinates);
+  assert.ok(points.length > 20);
+  const meters = (a, b) => {
+    const mLng = 111320 * Math.cos((a[1] * Math.PI) / 180);
+    return Math.hypot((a[0] - b[0]) * mLng, (a[1] - b[1]) * 111320);
+  };
+  const gaps = points.map((point) => {
+    let best = Infinity;
+    for (const other of points) {
+      if (other === point) continue;
+      best = Math.min(best, meters(point, other));
+    }
+    return best;
+  });
+  gaps.sort((a, b) => a - b);
+  const median = gaps[Math.floor(gaps.length / 2)];
+  assert.ok(median < 75, `median kernel gap ${median}`);
+  assert.ok(median > 20, `median kernel gap ${median}`);
+});
