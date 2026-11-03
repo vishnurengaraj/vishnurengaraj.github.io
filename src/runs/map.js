@@ -1,6 +1,6 @@
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { densityHeat } from "./density.js";
+import { densityHeat, densityWeight } from "./density.js";
 
 const STYLE = "https://tiles.openfreemap.org/styles/positron";
 
@@ -52,9 +52,31 @@ function addBuildings(map) {
   );
 }
 
-/* Cream → amber → coral → purple, spread so low density stays light and
-   only heavy overlap reaches ink. MapLibre's kernel peaks near 0.4×weight×intensity,
-   so intensity tracks zoom against the 110m density cells in density.js. */
+/* Cream → amber → coral → purple. City intensity tracks zoom against the
+   110m cells in density.js. The globe ramp is wider so one kernel glows
+   instead of reading as a flat disc. MapLibre's peak is ~0.4×weight×intensity. */
+const GLOBE_HEAT_COLOR = [
+  "interpolate",
+  ["linear"],
+  ["heatmap-density"],
+  0,
+  "rgba(255, 214, 150, 0)",
+  0.05,
+  "rgba(255, 206, 130, 0.28)",
+  0.16,
+  "rgba(255, 170, 64, 0.5)",
+  0.34,
+  "rgba(240, 112, 40, 0.7)",
+  0.52,
+  "rgba(214, 72, 56, 0.82)",
+  0.7,
+  "rgba(150, 42, 112, 0.9)",
+  0.86,
+  "rgba(88, 32, 128, 0.94)",
+  1,
+  "rgba(45, 29, 122, 0.97)",
+];
+
 const HEAT_COLOR = [
   "interpolate",
   ["linear"],
@@ -341,20 +363,37 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick })
     return ["Noto Sans Regular"];
   }
 
+  const GLOBE_LAYERS = ["runs-globe-heat", "runs-globe", "runs-globe-label"];
+
   function ensureGlobeLayers() {
     if (map.getSource("runs-globe")) return;
     map.addSource("runs-globe", { type: "geojson", data: emptyCollection() });
+    /* One weighted point per region. The kernel is the same thermal ramp as the
+       city map, wide enough that a cluster like California blends instead of
+       stacking as separate discs. */
+    map.addLayer({
+      id: "runs-globe-heat",
+      type: "heatmap",
+      source: "runs-globe",
+      layout: { visibility: "none" },
+      paint: {
+        "heatmap-weight": ["coalesce", ["get", "w"], 0],
+        "heatmap-intensity": 1.85,
+        "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 0.8, 28, 1.55, 48, 3.2, 72],
+        "heatmap-opacity": 0.95,
+        "heatmap-color": GLOBE_HEAT_COLOR,
+      },
+    });
     map.addLayer({
       id: "runs-globe",
       type: "circle",
       source: "runs-globe",
       layout: { visibility: "none" },
       paint: {
-        "circle-radius": ["interpolate", ["linear"], ["sqrt", ["max", ["get", "count"], 1]], 1, 16, 20, 34],
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 0.8, 22, 1.55, 34, 3.2, 52],
         "circle-color": "#2d1d7a",
-        "circle-opacity": 0.92,
-        "circle-stroke-width": 2,
-        "circle-stroke-color": "#ffb020",
+        "circle-opacity": 0.01,
+        "circle-stroke-width": 0,
       },
     });
     try {
@@ -388,7 +427,12 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick })
         .sort((a, b) => (b.count || 1) - (a.count || 1))
         .map((city) => ({
         type: "Feature",
-        properties: { id: city.id, label: city.label, count: city.count || 1 },
+        properties: {
+          id: city.id,
+          label: city.label,
+          count: city.count || 1,
+          w: densityWeight(city.count || 1),
+        },
         geometry: { type: "Point", coordinates: city.center },
       })),
     };
@@ -538,7 +582,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick })
         }
         map.getSource("runs-globe").setData(globeCollection(cities));
         layerVisibility(CITY_LAYERS, false);
-        layerVisibility(["runs-globe", "runs-globe-label"], true);
+        layerVisibility(GLOBE_LAYERS, true);
         setSpace(true);
         map.flyTo({
           center: [-100, 36],
@@ -554,7 +598,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick })
         } catch (error) {
           console.warn("Mercator projection unavailable", error);
         }
-        layerVisibility(["runs-globe", "runs-globe-label"], false);
+        layerVisibility(GLOBE_LAYERS, false);
         layerVisibility(CITY_LAYERS, true);
         setSpace(false);
       }
