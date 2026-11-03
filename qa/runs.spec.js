@@ -70,12 +70,28 @@ test.describe("runs map", () => {
       await expect(page.locator(".scroll-tail")).toHaveCount(0);
       await expect(page.locator(".sample-tag")).toHaveCount(0);
       await expect(page.getByRole("button", { name: "Globe" })).toBeVisible();
+      const map = page.locator("#runs-map");
+      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+      await expect(map).toHaveAttribute("data-city", "la");
+      const regions = page.getByRole("button", { name: "Regions, LA selected" });
+      await expect(regions).toBeVisible();
+      await expect(regions).toHaveAttribute("aria-expanded", "false");
+      await expect(page.getByRole("radio", { name: "SF", exact: true })).toHaveCount(0);
+      const globeButton = await page.getByRole("button", { name: "Globe" }).boundingBox();
+      const regionBox = await regions.boundingBox();
+      expect(regionBox.x).toBeGreaterThan(globeButton.x + globeButton.width - 1);
+
+      await regions.click();
+      await expect(regions).toHaveAttribute("aria-expanded", "true");
       const chipLabels = await page.locator(".chips button").allTextContents();
       expect(chipLabels).toContain("LA");
       expect(chipLabels).toContain("SF");
       expect(chipLabels).toContain("Tokyo");
       expect(chipLabels).not.toContain("Away");
       expect(chipLabels.join(" ")).not.toMatch(/away-/);
+      const chipBox = await page.locator(".chips").boundingBox();
+      expect(chipBox.x).toBeGreaterThanOrEqual(-1);
+      expect(chipBox.x + chipBox.width).toBeLessThanOrEqual(viewport.width + 1);
       await expect(page.getByRole("radio", { name: "LA", exact: true })).toHaveAttribute("aria-checked", "true");
 
       const gap = await page.evaluate(() => {
@@ -84,10 +100,6 @@ test.describe("runs map", () => {
       });
       expect(gap).toBeLessThanOrEqual(2);
       expect(gap).toBeGreaterThanOrEqual(-2);
-
-      const map = page.locator("#runs-map");
-      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
-      await expect(map).toHaveAttribute("data-city", "la");
 
       const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
       expect(manifest.sample).toBe(false);
@@ -119,8 +131,10 @@ test.describe("runs map", () => {
       await expect(map).toHaveAttribute("data-runs", String(sf.count));
       await expect.poll(async () => Number(await map.getAttribute("data-lng"))).toBeLessThan(-122);
 
+      await page.getByRole("button", { name: "Regions, SF selected" }).click();
       await page.getByRole("radio", { name: "LA", exact: true }).click();
       await expect(map).toHaveAttribute("data-city", "la");
+      await expect(page.getByRole("button", { name: "Regions, LA selected" })).toHaveAttribute("aria-expanded", "false");
       await expect(map).toHaveAttribute("data-runs", String(la.count));
       await expect.poll(async () => Number(await map.getAttribute("data-lng"))).toBeGreaterThan(-119);
 
@@ -156,7 +170,11 @@ test.describe("runs map", () => {
       await expect(card.locator(".run-elev")).toContainText("ft");
       await expect(card.locator(".run-companions")).toHaveCount(0);
       await expect(card.locator(".sample-line")).toHaveCount(0);
-      await expect(card.locator(".photo-strip")).toHaveCount(0);
+      const photos = card.locator(".photo-strip img");
+      const photoCount = await photos.count();
+      for (let i = 0; i < photoCount; i++) {
+        await expect(photos.nth(i)).toHaveAttribute("src", /\/media\/runs\/photos\/[^/]+\/\d+\.webp/);
+      }
 
       const sheet = await card.boundingBox();
       if (viewport.name === "phone") {
@@ -170,7 +188,7 @@ test.describe("runs map", () => {
     });
   }
 
-  test("deep link opens a real run without a photo", async ({ page }) => {
+  test("deep link opens the Humboldt run", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.setViewportSize({ width: 1280, height: 900 });
     const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
@@ -182,7 +200,11 @@ test.describe("runs map", () => {
     await expect(card.locator(".run-type")).toHaveText("Run");
     await expect(card.locator(".run-distance")).toContainText("mi");
     await expect(card.locator(".run-pace")).toContainText("/mi");
-    await expect(card.locator(".photo-strip")).toHaveCount(0);
+    if (run.photos > 0) {
+      await expect(card.locator(".photo-strip img")).toHaveCount(run.photos);
+    } else {
+      await expect(card.locator(".photo-strip")).toHaveCount(0);
+    }
     await expect(page.locator(".section-nav")).toHaveCount(0);
     await expect(page.locator(".sample-tag")).toHaveCount(0);
   });
@@ -207,7 +229,8 @@ test.describe("served lines keep the privacy trim", () => {
     for (const run of manifest.runs) {
       expect(FOOT_SPORTS).toContain(run.type);
       expect(String(run.id)).not.toMatch(/^sample-/);
-      expect(run.photos).toBe(0);
+      expect(Number.isInteger(run.photos)).toBe(true);
+      expect(run.photos).toBeGreaterThanOrEqual(0);
       expect(run.distanceM).toBeGreaterThan(500);
     }
     for (const type of ["Trail Run", "Walk", "Hike"]) {
@@ -225,6 +248,42 @@ test.describe("served lines keep the privacy trim", () => {
     const marathon = manifest.runs.find((run) => run.title.includes("Humboldt"));
     expect(marathon.distanceM).toBeGreaterThan(40000);
   });
+});
+
+test.describe("activity photos", () => {
+  for (const viewport of VIEWPORTS) {
+    test(`${viewport.name} opens a photo strip for a run that has pictures`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
+      const run = manifest.runs.find((item) => item.photos > 0);
+      expect(run).toBeTruthy();
+      const detail = await (await page.request.get(`/media/runs/activities/${run.id}.json`)).json();
+      expect(detail.photos).toHaveLength(run.photos);
+      expect(detail.photos[0].src).toBe(`/media/runs/photos/${run.id}/1.webp`);
+      expect(detail.photos[0].w).toBeGreaterThan(0);
+      expect(detail.photos[0].h).toBeGreaterThan(0);
+      const image = await page.request.get(detail.photos[0].src);
+      expect(image.status()).toBe(200);
+      expect(image.headers()["content-type"] || "").toContain("image");
+
+      await page.goto(`/runs?run=${run.id}`);
+      await ready(page);
+      const card = page.locator(".detail.open");
+      await expect(card.locator("h2")).toHaveText(run.title, { timeout: 30_000 });
+      const strip = card.locator(".photo-strip");
+      await expect(strip.locator("img")).toHaveCount(run.photos);
+      await strip.scrollIntoViewIfNeeded();
+      await expect(strip).toBeVisible();
+      await expect
+        .poll(async () => strip.locator("img").first().evaluate((img) => img.naturalWidth))
+        .toBeGreaterThan(0);
+      const sheet = await card.boundingBox();
+      const photos = await strip.boundingBox();
+      expect(photos.x).toBeGreaterThanOrEqual(sheet.x - 1);
+      expect(photos.x + photos.width).toBeLessThanOrEqual(sheet.x + sheet.width + 1);
+    });
+  }
 });
 
 test.describe("runs stays off the main nav", () => {

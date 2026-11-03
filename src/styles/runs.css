@@ -1,5 +1,6 @@
 /* /runs. Same night-purple and gold family as /diners.
-   Heat is cream → amber → coral → purple. Veins are ink on a gold glow. */
+   Heat is cream → amber → coral → purple, lighter where few runs overlap.
+   Veins are ink on a gold glow. Region chips sit in a drawer. */
 
 html:has(.runs),
 html:has(.runs) body,
@@ -114,18 +115,72 @@ html:has(.runs) #app {
   box-shadow: 0 2px 8px rgba(26, 16, 51, 0.12);
 }
 
-.runs .chips {
+.runs .regions {
   position: absolute;
   z-index: 6;
   top: calc(12px + env(safe-area-inset-top, 0px));
   right: 12px;
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  width: min(440px, calc(100% - 108px));
+  pointer-events: none;
+}
+
+.runs .regions-toggle,
+.runs .chips {
+  pointer-events: auto;
+}
+
+.runs .regions-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 12px 0 14px;
+  border: 1px solid var(--primary);
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(26, 16, 51, 0.12);
+}
+
+.runs .regions-chev {
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.15s ease;
+}
+
+.runs .regions.open .regions-chev {
+  transform: translateY(2px) rotate(225deg);
+}
+
+.runs .regions-toggle:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.runs .chips {
+  display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 6px;
-  max-width: min(72vw, 440px);
+  width: 100%;
+  max-height: min(46dvh, 420px);
   margin: 0;
-  padding: 0;
+  padding: 10px;
+  overflow: auto;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10px 28px rgba(26, 16, 51, 0.18);
 }
 
 .runs .chips button {
@@ -155,7 +210,7 @@ html:has(.runs) #app {
   outline-offset: 2px;
 }
 
-.runs.panel-open .chips {
+.runs.panel-open .regions {
   right: min(424px, calc(100% - 16px));
 }
 
@@ -363,7 +418,11 @@ html:has(.runs) #app {
 }
 
 @media (max-width: 640px) {
-  .runs.panel-open .chips {
+  .runs .regions {
+    width: min(440px, calc(100% - 24px));
+  }
+
+  .runs.panel-open .regions {
     right: 12px;
   }
 
@@ -407,7 +466,8 @@ html:has(.runs) #app {
 
 @media (prefers-reduced-motion: reduce) {
   .runs .detail,
-  .runs .scrim {
+  .runs .scrim,
+  .runs .regions-chev {
     transition: none;
   }
 }
