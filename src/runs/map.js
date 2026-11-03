@@ -1,6 +1,7 @@
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { densityHeat, densityWeight } from "./density.js";
+import { GLOBE_VIEW_ZOOM, globeHandoff } from "./globe.js";
 import { closerZoom } from "./pick.js";
 
 const STYLE = "https://tiles.openfreemap.org/styles/positron";
@@ -205,7 +206,7 @@ function hitsAt(map, point) {
 }
 
 /** Pitched OpenFreeMap map. One city of lines is loaded at a time. */
-export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick }) {
+export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick, onGlobeMode }) {
   const view = camera();
   const map = new maplibregl.Map({
     container: mapEl,
@@ -234,6 +235,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick })
   let runCount = 0;
   let cityId = "";
   let globeOn = false;
+  let handoff = false;
 
   const loaded = new Promise((resolve, reject) => {
     const timer = window.setTimeout(() => reject(new Error("Map style timed out")), 20000);
@@ -292,6 +294,39 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick })
   map.on("move", syncProbe);
   map.on("moveend", syncProbe);
   syncProbe();
+
+  function gestures(enabled) {
+    const controls = [map.scrollZoom, map.touchZoomRotate, map.doubleClickZoom, map.boxZoom, map.keyboard];
+    for (const control of controls) {
+      if (!control) continue;
+      if (enabled) control.enable();
+      else control.disable();
+    }
+  }
+
+  /* User zoom only. Programmatic flights omit originalEvent, so a fly to the
+     globe does not immediately fly back out. The handoff waits until the
+     current zoom frame finishes, or it would resume that same gesture. */
+  function onUserZoom(event) {
+    if (disposed || handoff || !event.originalEvent) return;
+    const action = globeHandoff(globeOn, map.getZoom());
+    if (action === "none") return;
+    handoff = true;
+    gestures(false);
+    const enter = action === "enter";
+    queueMicrotask(() => {
+      if (disposed) return;
+      map.stop();
+      onGlobeMode?.(enter);
+      const release = () => {
+        gestures(true);
+        handoff = false;
+      };
+      if (map.isMoving()) map.once("moveend", release);
+      else queueMicrotask(release);
+    });
+  }
+  map.on("zoom", onUserZoom);
 
   function stopIdleSway() {
     if (swayState === "stopped") return;
@@ -506,6 +541,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick })
       }
       map.getSource("runs-lines").setData(lines);
       map.getSource("runs-heat").setData(densityHeat(lines));
+      if (globeOn) layerVisibility(CITY_LAYERS, false);
       syncProbe();
     },
     highlight(id) {
@@ -595,7 +631,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick })
       }
       return id;
     },
-    setGlobe(on, { reduced, cities } = {}) {
+    setGlobe(on, { reduced, cities, city } = {}) {
       if (disposed) return;
       globeOn = Boolean(on);
       ensureGlobeLayers();
@@ -612,7 +648,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick })
         setSpace(true);
         map.flyTo({
           center: [-100, 36],
-          zoom: 1.55,
+          zoom: GLOBE_VIEW_ZOOM,
           pitch: 0,
           bearing: 0,
           duration: reduced ? 0 : 1100,
@@ -627,6 +663,16 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick })
         layerVisibility(GLOBE_LAYERS, false);
         layerVisibility(CITY_LAYERS, true);
         setSpace(false);
+        if (city) {
+          map.flyTo({
+            center: city.center,
+            zoom: city.zoom,
+            pitch: framedPitch(),
+            bearing: framedBearing(),
+            duration: reduced ? 0 : 1100,
+            essential: true,
+          });
+        }
       }
       syncProbe();
     },

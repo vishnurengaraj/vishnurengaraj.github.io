@@ -352,6 +352,90 @@ test.describe("globe click reaches one run", () => {
   }
 });
 
+async function zoomBy(page, direction) {
+  const map = page.locator("#runs-map");
+  const button = page.locator(direction === "in" ? ".maplibregl-ctrl-zoom-in" : ".maplibregl-ctrl-zoom-out");
+  const before = Number(await map.getAttribute("data-zoom"));
+  await button.click();
+  await expect
+    .poll(async () => {
+      const globe = await map.getAttribute("data-globe");
+      const zoom = Number(await map.getAttribute("data-zoom"));
+      if (direction === "out" && globe === "on") return true;
+      if (direction === "in" && globe === "off" && before < 4) return true;
+      return direction === "out" ? zoom < before - 0.4 : zoom > before + 0.4;
+    }, { timeout: 8000 })
+    .toBe(true);
+}
+
+test.describe("zoom out enters the globe", () => {
+  test.describe.configure({ timeout: 120_000 });
+
+  for (const viewport of VIEWPORTS) {
+    test(`${viewport.name} zoom controls enter and leave the globe`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto("/runs");
+      await ready(page);
+      const map = page.locator("#runs-map");
+      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+      await expect(map).toHaveAttribute("data-globe", "off");
+      await expect(map).toHaveAttribute("data-city", "la");
+      const globeButton = page.getByRole("button", { name: "Globe" });
+      await expect(globeButton).toHaveAttribute("aria-pressed", "false");
+
+      for (let i = 0; i < 16 && (await map.getAttribute("data-globe")) !== "on"; i++) {
+        await zoomBy(page, "out");
+      }
+      await expect(map).toHaveAttribute("data-globe", "on");
+      await expect(globeButton).toHaveAttribute("aria-pressed", "true");
+      await expect(globeButton).toHaveClass(/on/);
+      await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
+      const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
+      const sf = manifest.cities.find((city) => city.id === "sf");
+      await expect
+        .poll(async () => map.evaluate((el, lngLat) => el._runsMap.regionAt(lngLat), sf.center), { timeout: 15000 })
+        .toBe("sf");
+      await expect(page.locator(".detail.open")).toHaveCount(0);
+
+      await zoomBy(page, "in");
+      await expect(map).toHaveAttribute("data-globe", "off");
+      await expect(globeButton).toHaveAttribute("aria-pressed", "false");
+      await expect(map).toHaveAttribute("data-city", "la");
+      await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(8);
+      await expect.poll(async () => Number(await map.getAttribute("data-lng"))).toBeLessThan(-118);
+      await expect.poll(async () => Number(await map.getAttribute("data-lng"))).toBeGreaterThan(-119);
+    });
+  }
+
+  test("desktop wheel zoom-out enters the globe", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto("/runs");
+    await ready(page);
+    const map = page.locator("#runs-map");
+    await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+    const box = await map.boundingBox();
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    for (let i = 0; i < 24 && (await map.getAttribute("data-globe")) !== "on"; i++) {
+      await page.mouse.wheel(0, 400);
+      await page.waitForTimeout(40);
+    }
+    await expect(map).toHaveAttribute("data-globe", "on");
+    await expect(page.getByRole("button", { name: "Globe" })).toHaveAttribute("aria-pressed", "true");
+    await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
+
+    for (let i = 0; i < 8 && (await map.getAttribute("data-globe")) === "on"; i++) {
+      await page.mouse.wheel(0, -400);
+      await page.waitForTimeout(40);
+    }
+    await expect(map).toHaveAttribute("data-globe", "off");
+    await expect(page.getByRole("button", { name: "Globe" })).toHaveAttribute("aria-pressed", "false");
+    await expect(map).toHaveAttribute("data-city", "la");
+    await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(8);
+  });
+});
+
 test.describe("served lines keep the privacy trim", () => {
   test("real routes stay trimmed and foot sports stay on the map", async ({ request }) => {
     const manifest = await (await request.get("/media/runs/manifest.json")).json();
