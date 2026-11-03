@@ -1,0 +1,17 @@
+{
+  "id": "sample-la-mb",
+  "city": "la",
+  "title": "Manhattan Beach easy",
+  "date": "2025-03-02T16:10:00Z",
+  "distanceM": 6284.84,
+  "movingS": 2245,
+  "elevM": 14,
+  "mid": [
+    -118.409837,
+    33.882095
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": true,
+  "elapsedS": 2357
+}

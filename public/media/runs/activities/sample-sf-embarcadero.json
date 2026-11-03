@@ -1,0 +1,17 @@
+{
+  "id": "sample-sf-embarcadero",
+  "city": "sf",
+  "title": "Embarcadero",
+  "date": "2024-02-25T16:15:00Z",
+  "distanceM": 4412.73,
+  "movingS": 1423,
+  "elevM": 14,
+  "mid": [
+    -122.389552,
+    37.804433
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": true,
+  "elapsedS": 1494
+}

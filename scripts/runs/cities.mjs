@@ -1,0 +1,170 @@
+import { haversine } from "./geo.mjs";
+
+/** Camera centers open on the part of town the runs actually use.
+    LA stays on the South Bay strand, not a basin-wide fit. */
+export const METROS = [
+  {
+    id: "la",
+    label: "LA",
+    name: "South Bay",
+    west: -118.85,
+    east: -117.7,
+    south: 33.6,
+    north: 34.2,
+    center: [-118.4016, 33.8622],
+    zoom: 12.35,
+  },
+  {
+    id: "sf",
+    label: "SF",
+    name: "San Francisco",
+    west: -122.55,
+    east: -122.2,
+    south: 37.45,
+    north: 37.95,
+    center: [-122.47, 37.804],
+    zoom: 12.55,
+  },
+  {
+    id: "nyc",
+    label: "NYC",
+    name: "New York",
+    west: -74.08,
+    east: -73.88,
+    south: 40.66,
+    north: 40.84,
+    center: [-73.966, 40.782],
+    zoom: 12.35,
+  },
+  {
+    id: "sd",
+    label: "SD",
+    name: "San Diego",
+    west: -117.3,
+    east: -116.9,
+    south: 32.55,
+    north: 33.15,
+    center: [-117.18, 32.75],
+    zoom: 12,
+  },
+  {
+    id: "sea",
+    label: "SEA",
+    name: "Seattle",
+    west: -122.45,
+    east: -122.2,
+    south: 47.45,
+    north: 47.75,
+    center: [-122.33, 47.61],
+    zoom: 12,
+  },
+  {
+    id: "pdx",
+    label: "PDX",
+    name: "Portland",
+    west: -122.8,
+    east: -122.5,
+    south: 45.4,
+    north: 45.65,
+    center: [-122.68, 45.52],
+    zoom: 12,
+  },
+  {
+    id: "bos",
+    label: "BOS",
+    name: "Boston",
+    west: -71.2,
+    east: -70.95,
+    south: 42.25,
+    north: 42.45,
+    center: [-71.07, 42.36],
+    zoom: 12,
+  },
+  {
+    id: "chi",
+    label: "CHI",
+    name: "Chicago",
+    west: -87.85,
+    east: -87.5,
+    south: 41.7,
+    north: 42.05,
+    center: [-87.65, 41.88],
+    zoom: 12,
+  },
+  {
+    id: "den",
+    label: "DEN",
+    name: "Denver",
+    west: -105.1,
+    east: -104.8,
+    south: 39.6,
+    north: 39.85,
+    center: [-104.98, 39.74],
+    zoom: 12,
+  },
+  {
+    id: "aus",
+    label: "AUS",
+    name: "Austin",
+    west: -97.9,
+    east: -97.6,
+    south: 30.15,
+    north: 30.45,
+    center: [-97.74, 30.27],
+    zoom: 12,
+  },
+];
+
+const PREFERRED = ["la", "sf", "nyc"];
+
+function inMetro(metro, lng, lat) {
+  return lng >= metro.west && lng <= metro.east && lat >= metro.south && lat <= metro.north;
+}
+
+function awayBucket(lng, lat) {
+  const latBin = Math.round(lat / 0.5) * 0.5;
+  const lngBin = Math.round(lng / 0.5) * 0.5;
+  const enc = (n) => `${n < 0 ? "m" : "p"}${String(Math.abs(Math.round(n * 10))).padStart(3, "0")}`;
+  return {
+    id: `away-${enc(latBin)}-${enc(lngBin)}`,
+    center: [lngBin, latBin],
+  };
+}
+
+/** One metro per run. Points just outside a box join the nearest city within 80km.
+    Anything farther gets its own chip so heatmaps never share a world layer. */
+export function assignCity(lng, lat) {
+  for (const metro of METROS) {
+    if (inMetro(metro, lng, lat)) return { ...metro, generated: false };
+  }
+  let nearest = null;
+  let nearestM = Infinity;
+  for (const metro of METROS) {
+    const dist = haversine([lng, lat], metro.center);
+    if (dist < nearestM) {
+      nearest = metro;
+      nearestM = dist;
+    }
+  }
+  if (nearest && nearestM <= 80000) return { ...nearest, generated: false };
+  const bucket = awayBucket(lng, lat);
+  return {
+    id: bucket.id,
+    label: "Away",
+    name: "Away",
+    center: bucket.center,
+    zoom: 12,
+    generated: true,
+  };
+}
+
+export function orderCities(cities) {
+  const rank = (id) => {
+    const index = PREFERRED.indexOf(id);
+    if (index !== -1) return index;
+    const metro = METROS.findIndex((item) => item.id === id);
+    if (metro !== -1) return PREFERRED.length + metro;
+    return 100 + cities.findIndex((item) => item.id === id);
+  };
+  return [...cities].sort((a, b) => rank(a.id) - rank(b.id) || b.count - a.count);
+}

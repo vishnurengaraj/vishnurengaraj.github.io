@@ -11,5 +11,6 @@ export const routes = [
     component: shell,
   },
   { path: "/diners", name: "diners", component: shell },
+  { path: "/runs", name: "runs", component: shell },
   { path: "/:pathMatch(.*)*", redirect: "/" },
 ];
