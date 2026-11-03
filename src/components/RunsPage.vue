@@ -157,15 +157,22 @@ function toggleRegions() {
   regionsOpen.value = !regionsOpen.value;
 }
 
-function toggleGlobe() {
-  if (!mapApi) return;
+function showGlobe(on) {
+  if (!mapApi || globe.value === on) return;
   closeRegions();
-  const next = !globe.value;
-  globe.value = next;
   choices.value = [];
-  if (next) closePanel();
-  mapApi.setGlobe(next, { reduced: prefersReduced(), cities: manifest.cities });
-  if (!next) mapApi.flyCity(cityById.get(activeCity.value), prefersReduced());
+  globe.value = on;
+  if (on) closePanel();
+  const city = cityById.get(activeCity.value);
+  mapApi.setGlobe(on, {
+    reduced: prefersReduced(),
+    cities: manifest.cities,
+    city: on ? null : city,
+  });
+}
+
+function toggleGlobe() {
+  showGlobe(!globe.value);
 }
 
 function onGlobePick(id) {
@@ -244,6 +251,7 @@ async function startMap() {
       zoom: city.zoom,
       onPick,
       onGlobePick,
+      onGlobeMode: showGlobe,
     });
   } catch (error) {
     if (!alive || gen !== mountGen) return;
