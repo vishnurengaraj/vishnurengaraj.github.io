@@ -11,7 +11,7 @@
     "build": "vite-ssg build && node scripts/clean-dist-vite.mjs",
     "preview": "vite preview --host 127.0.0.1 --port 4173",
     "build:runs": "node scripts/build-runs.mjs",
-    "test": "node --test scripts/runs/geo.test.mjs && playwright test",
+    "test": "node --test scripts/runs/*.test.mjs && playwright test",
     "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {

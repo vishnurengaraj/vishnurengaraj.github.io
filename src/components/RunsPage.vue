@@ -25,10 +25,12 @@ const choices = ref([]);
 const motionOn = ref(false);
 const loadError = ref("");
 const globe = ref(false);
+const regionsOpen = ref(false);
 
 const byId = new Map(manifest.runs.map((run) => [run.id, run]));
 const cityById = new Map(manifest.cities.map((city) => [city.id, city]));
 
+const activeLabel = computed(() => cityById.get(activeCity.value)?.label || "Regions");
 const photos = computed(() => (Array.isArray(selected.value?.photos) ? selected.value.photos : []));
 const companions = computed(() =>
   Array.isArray(selected.value?.companions) ? selected.value.companions.filter(Boolean) : [],
@@ -88,6 +90,15 @@ function leaveGlobe() {
   mapApi?.setGlobe(false);
 }
 
+function closeRegions() {
+  regionsOpen.value = false;
+}
+
+function pickRegion(id) {
+  closeRegions();
+  selectCity(id);
+}
+
 async function selectCity(id, { fly = true } = {}) {
   const city = cityById.get(id);
   if (!city || !mapApi) return;
@@ -97,18 +108,12 @@ async function selectCity(id, { fly = true } = {}) {
   choices.value = [];
   loadError.value = "";
   try {
-    const [lines, heat] = await Promise.all([
-      fetch(`/media/runs/cities/${id}.lines.geojson`).then((res) => {
-        if (!res.ok) throw new Error(`lines ${res.status}`);
-        return res.json();
-      }),
-      fetch(`/media/runs/cities/${id}.heat.geojson`).then((res) => {
-        if (!res.ok) throw new Error(`heat ${res.status}`);
-        return res.json();
-      }),
-    ]);
+    const lines = await fetch(`/media/runs/cities/${id}.lines.geojson`).then((res) => {
+      if (!res.ok) throw new Error(`lines ${res.status}`);
+      return res.json();
+    });
     if (!alive || gen !== cityGen) return;
-    mapApi.setCity(id, lines, heat);
+    mapApi.setCity(id, lines);
     if (fly) mapApi.flyCity(city, prefersReduced());
   } catch (error) {
     if (!alive || gen !== cityGen) return;
@@ -121,6 +126,7 @@ async function openRun(id, lngLat) {
   const summary = byId.get(id);
   if (!summary) return;
   const token = ++openToken;
+  closeRegions();
   choices.value = [];
   if (summary.city !== activeCity.value) {
     await selectCity(summary.city, { fly: false });
@@ -146,8 +152,13 @@ function choose(run) {
   openRun(run.id, choiceAt);
 }
 
+function toggleRegions() {
+  regionsOpen.value = !regionsOpen.value;
+}
+
 function toggleGlobe() {
   if (!mapApi) return;
+  closeRegions();
   const next = !globe.value;
   globe.value = next;
   choices.value = [];
@@ -157,12 +168,14 @@ function toggleGlobe() {
 }
 
 function onGlobePick(id) {
+  closeRegions();
   globe.value = false;
   mapApi?.setGlobe(false);
   selectCity(id);
 }
 
 function onPick(runs, lngLat) {
+  closeRegions();
   const items = runs
     .map((run) => byId.get(run.id))
     .filter(Boolean)
@@ -184,6 +197,11 @@ function closePanel() {
 
 function onKey(event) {
   if (event.key !== "Escape") return;
+  if (regionsOpen.value) {
+    event.preventDefault();
+    closeRegions();
+    return;
+  }
   if (choices.value.length) {
     event.preventDefault();
     choices.value = [];
@@ -280,19 +298,32 @@ onUnmounted(() => {
       >
         Globe
       </button>
-      <div class="chips" role="radiogroup" aria-label="Cities">
+      <div class="regions" :class="{ open: regionsOpen }">
         <button
-          v-for="city in manifest.cities"
-          :key="city.id"
+          class="regions-toggle"
           type="button"
-          role="radio"
-          :aria-checked="activeCity === city.id ? 'true' : 'false'"
-          :class="{ on: activeCity === city.id }"
-          :title="`${city.name} · ${city.count} runs`"
-          @click="selectCity(city.id)"
+          :aria-expanded="regionsOpen ? 'true' : 'false'"
+          aria-controls="region-list"
+          :aria-label="`Regions, ${activeLabel} selected`"
+          @click="toggleRegions"
         >
-          {{ city.label }}
+          <span class="regions-name">{{ activeLabel }}</span>
+          <span class="regions-chev" aria-hidden="true"></span>
         </button>
+        <div v-if="regionsOpen" id="region-list" class="chips" role="radiogroup" aria-label="Regions">
+          <button
+            v-for="city in manifest.cities"
+            :key="city.id"
+            type="button"
+            role="radio"
+            :aria-checked="activeCity === city.id ? 'true' : 'false'"
+            :class="{ on: activeCity === city.id }"
+            :title="`${city.name} · ${city.count} runs`"
+            @click="pickRegion(city.id)"
+          >
+            {{ city.label }}
+          </button>
+        </div>
       </div>
       <p v-if="loadError" class="map-error" role="status">{{ loadError }}</p>
       <div v-if="choices.length" class="chooser" role="listbox" aria-label="Runs here">

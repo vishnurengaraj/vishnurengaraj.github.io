@@ -1,8 +1,8 @@
 # Runs
 
-`/runs` is a full-viewport map of runs, sibling to `/diners`. Far zoom is a density heatmap for the open city. Closer in, the heat fades and each run is a translucent hairline, so a path like the Strand builds a bright vein where runs repeat. Click a line (there is an invisible wider hit target) to open the run. Overlapping lines offer a short chooser. City chips fly the camera; only that city's lines are on the map.
+`/runs` is a full-viewport map of runs, sibling to `/diners`. Far zoom is a density heatmap for the open city: light cream where a corridor is run once, coral and purple where runs pile up. Closer in, the heat fades and each run is a translucent hairline, so a path like the Strand builds a bright vein where runs repeat. Click a line (there is an invisible wider hit target) to open the run. Overlapping lines offer a short chooser. The selected region stays on a button at the top right; opening it shows the city chips. Only that city's lines are on the map.
 
-The page does not talk to Strava. `npm run build:runs` writes static files, and the site ships those. The committed files under `public/media/runs/` are a real export with photos left out. A no-flag build replaces that export with the labeled sample.
+The page does not talk to Strava. `npm run build:runs` writes static files, and the site ships those. The committed files under `public/media/runs/` are a real export, including `photos/{activityId}/N.webp` on the run card. A no-flag build replaces that export with the labeled sample.
 
 ## Sample
 

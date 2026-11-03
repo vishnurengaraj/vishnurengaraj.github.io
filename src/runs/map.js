@@ -1,5 +1,6 @@
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { densityHeat } from "./density.js";
 
 const STYLE = "https://tiles.openfreemap.org/styles/positron";
 
@@ -51,22 +52,29 @@ function addBuildings(map) {
   );
 }
 
+/* Cream → amber → coral → purple, spread so low density stays light and
+   only heavy overlap reaches ink. MapLibre's kernel peaks near 0.4×weight×intensity,
+   so intensity tracks zoom against the 110m density cells in density.js. */
 const HEAT_COLOR = [
   "interpolate",
   ["linear"],
   ["heatmap-density"],
   0,
-  "rgba(246, 239, 226, 0)",
-  0.12,
-  "rgba(246, 236, 214, 0.5)",
-  0.32,
-  "rgba(240, 190, 96, 0.75)",
-  0.52,
-  "rgba(232, 120, 86, 0.84)",
-  0.74,
-  "rgba(142, 62, 112, 0.9)",
+  "rgba(255, 214, 150, 0)",
+  0.06,
+  "rgba(255, 196, 110, 0.7)",
+  0.14,
+  "rgba(255, 160, 48, 0.82)",
+  0.28,
+  "rgba(240, 112, 36, 0.88)",
+  0.46,
+  "rgba(214, 72, 52, 0.92)",
+  0.64,
+  "rgba(168, 42, 104, 0.95)",
+  0.82,
+  "rgba(96, 32, 128, 0.97)",
   1,
-  "rgba(45, 29, 122, 0.95)",
+  "rgba(45, 29, 122, 0.98)",
 ];
 
 function addRunLayers(map) {
@@ -78,9 +86,25 @@ function addRunLayers(map) {
     source: "runs-heat",
     maxzoom: 15,
     paint: {
-      "heatmap-weight": ["coalesce", ["get", "w"], 1],
-      "heatmap-intensity": ["interpolate", ["linear"], ["zoom"], 10, 0.55, 12.5, 1.05, 14, 1.2],
-      "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 10, 12, 12.4, 24, 14, 18],
+      "heatmap-weight": ["coalesce", ["get", "w"], 0],
+      "heatmap-intensity": [
+        "interpolate",
+        ["exponential", 2],
+        ["zoom"],
+        8,
+        0.085,
+        10,
+        0.27,
+        12,
+        0.9,
+        12.5,
+        1.18,
+        14,
+        2.4,
+        15.5,
+        5.5,
+      ],
+      "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 8, 8, 10, 10, 11.5, 12, 12.5, 13, 14, 18, 15.5, 22],
       "heatmap-opacity": ["interpolate", ["linear"], ["zoom"], 10, 0.9, 12.2, 0.78, 13.3, 0.32, 14.4, 0],
       "heatmap-color": HEAT_COLOR,
     },
@@ -424,7 +448,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick })
     },
     startIdleSway,
     stopIdleSway,
-    setCity(id, lines, heat) {
+    setCity(id, lines) {
       if (disposed) return;
       cityId = id;
       runCount = lines?.features?.length || 0;
@@ -434,7 +458,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick })
         layersReady = true;
       }
       map.getSource("runs-lines").setData(lines);
-      map.getSource("runs-heat").setData(heat);
+      map.getSource("runs-heat").setData(densityHeat(lines));
       syncProbe();
     },
     highlight(id) {

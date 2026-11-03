@@ -10,7 +10,26 @@
     -118.526592,
     34.031257
   ],
-  "photos": [],
+  "photos": [
+    {
+      "src": "/media/runs/photos/17175975217/1.webp",
+      "w": 1600,
+      "h": 1212,
+      "sample": false
+    },
+    {
+      "src": "/media/runs/photos/17175975217/2.webp",
+      "w": 1600,
+      "h": 900,
+      "sample": false
+    },
+    {
+      "src": "/media/runs/photos/17175975217/3.webp",
+      "w": 1600,
+      "h": 1200,
+      "sample": false
+    }
+  ],
   "companions": [],
   "sample": false,
   "elapsedS": 8970,

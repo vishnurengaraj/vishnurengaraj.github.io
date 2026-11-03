@@ -10,7 +10,32 @@
     -118.330702,
     33.884577
   ],
-  "photos": [],
+  "photos": [
+    {
+      "src": "/media/runs/photos/17904625438/1.webp",
+      "w": 1600,
+      "h": 1600,
+      "sample": false
+    },
+    {
+      "src": "/media/runs/photos/17904625438/2.webp",
+      "w": 1600,
+      "h": 1132,
+      "sample": false
+    },
+    {
+      "src": "/media/runs/photos/17904625438/3.webp",
+      "w": 1280,
+      "h": 1600,
+      "sample": false
+    },
+    {
+      "src": "/media/runs/photos/17904625438/4.webp",
+      "w": 1600,
+      "h": 1600,
+      "sample": false
+    }
+  ],
   "companions": [],
   "sample": false,
   "elapsedS": 4981,
