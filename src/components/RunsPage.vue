@@ -4,6 +4,7 @@ import { useRoute } from "vue-router";
 import { useHead } from "@unhead/vue";
 import manifest from "../data/runs/manifest.json";
 import { formatDate, formatDistance, formatElev, formatPace } from "../runs/format.js";
+import { resolvePick } from "../runs/pick.js";
 import "../styles/runs.css";
 
 useHead({
@@ -180,13 +181,22 @@ function onPick(runs, lngLat) {
     .map((run) => byId.get(run.id))
     .filter(Boolean)
     .sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")) || a.title.localeCompare(b.title));
-  if (items.length > 1) {
+  const decision = resolvePick(
+    items.map((run) => run.id),
+    mapApi?.getZoom?.() ?? 0,
+  );
+  if (decision.action === "zoom") {
+    choices.value = [];
+    mapApi.zoomToward(lngLat);
+    return;
+  }
+  if (decision.action === "choose") {
     choices.value = items;
     choiceAt = lngLat;
     return;
   }
   choices.value = [];
-  if (items.length === 1) openRun(items[0].id, lngLat);
+  if (decision.action === "open") openRun(decision.ids[0], lngLat);
 }
 
 function closePanel() {
