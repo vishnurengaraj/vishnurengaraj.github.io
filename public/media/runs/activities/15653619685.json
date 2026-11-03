@@ -1,0 +1,18 @@
+{
+  "id": "15653619685",
+  "city": "whitney",
+  "title": "Mineral king day 0-.5",
+  "date": "2025-08-28T00:00:00.000Z",
+  "distanceM": 5750,
+  "movingS": 7883,
+  "elevM": 526,
+  "mid": [
+    -118.594758,
+    36.465339
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 8665,
+  "type": "Run"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "9617413847",
+  "city": "la",
+  "title": "Brake dust boogie pt2",
+  "date": "2023-08-09T00:00:00.000Z",
+  "distanceM": 10180,
+  "movingS": 2932,
+  "elevM": 35.1,
+  "mid": [
+    -118.371157,
+    33.910261
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2940,
+  "type": "Run"
+}

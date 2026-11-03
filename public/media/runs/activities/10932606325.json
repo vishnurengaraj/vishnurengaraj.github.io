@@ -1,0 +1,18 @@
+{
+  "id": "10932606325",
+  "city": "la",
+  "title": "Lunch Run",
+  "date": "2024-03-10T00:00:00.000Z",
+  "distanceM": 11660,
+  "movingS": 4031,
+  "elevM": 32,
+  "mid": [
+    -118.335357,
+    33.881762
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 4035,
+  "type": "Run"
+}

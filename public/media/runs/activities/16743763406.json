@@ -1,0 +1,18 @@
+{
+  "id": "16743763406",
+  "city": "la",
+  "title": "Bulldog Loop pt3",
+  "date": "2025-12-14T00:00:00.000Z",
+  "distanceM": 25750,
+  "movingS": 11750,
+  "elevM": 966,
+  "mid": [
+    -118.748106,
+    34.079967
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 12092,
+  "type": "Run"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "15169459704",
+  "city": "sierra",
+  "title": "Morning Run",
+  "date": "2025-07-19T00:00:00.000Z",
+  "distanceM": 8150,
+  "movingS": 2910,
+  "elevM": 168,
+  "mid": [
+    -118.99971,
+    37.631742
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 3022,
+  "type": "Run"
+}

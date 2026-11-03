@@ -1,0 +1,18 @@
+{
+  "id": "16047078501",
+  "city": "baldy",
+  "title": "The Baldy 1.5x",
+  "date": "2025-10-05T00:00:00.000Z",
+  "distanceM": 26400,
+  "movingS": 20935,
+  "elevM": 1802.2,
+  "mid": [
+    -117.639244,
+    34.281659
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 23642,
+  "type": "Run"
+}

@@ -1,18 +1,37 @@
+import { gunzipSync } from "node:zlib";
 import { readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
 import fitMod from "fit-file-parser";
 import { decodePolyline } from "./geo.mjs";
+import { normalizeSport } from "./sports.mjs";
 
 const FitParser = typeof fitMod === "function" ? fitMod : fitMod.default;
 
-const RUN_TYPES = new Set(["run", "trail run", "trailrun"]);
+/** Strava CSV / FIT sport names kept on /runs. */
+export const RUN_TYPES = ["run", "trail run", "trailrun", "walk", "hike", "walking", "hiking"];
+const RUN_TYPE_SET = new Set(RUN_TYPES);
 
 export function isRunType(type) {
-  if (type == null || type === "") return true;
+  if (type == null || String(type).trim() === "") return true;
   const text = String(type).trim().toLowerCase().replace(/[_-]+/g, " ");
   if (text.includes("virtual")) return false;
-  if (RUN_TYPES.has(text)) return true;
+  if (RUN_TYPE_SET.has(text)) return true;
+  if (text.includes("hik")) return true;
+  if (text.includes("walk")) return true;
   return text.endsWith(" run") && !text.includes("ride") && !text.includes("bike");
+}
+
+/** FIT sport or a parsed FIT file. Accepts run, walk, and hike names. */
+export function fitIsRun(nameOrData) {
+  if (nameOrData && typeof nameOrData === "object") {
+    const rows = [...(nameOrData.sports || []), ...(nameOrData.sessions || [])];
+    const names = rows.map((row) => String(row.sport || row.sub_sport || "")).filter((name) => name.trim());
+    if (!names.length) return true;
+    return names.some((name) => fitIsRun(name));
+  }
+  const text = String(nameOrData || "").toLowerCase();
+  if (!text || text.includes("virtual")) return !text.includes("virtual");
+  return text.includes("run") || text.includes("walk") || text.includes("hik");
 }
 
 export function parseCsv(text) {
@@ -134,11 +153,14 @@ function fitCoords(data) {
   return coords;
 }
 
-function fitIsRun(data) {
+function fitSport(data) {
+  if (!fitIsRun(data)) return null;
   const rows = [...(data.sports || []), ...(data.sessions || [])];
-  const names = rows.map((row) => String(row.sport || row.sub_sport || "").toLowerCase());
-  if (!names.length) return true;
-  return names.some((name) => name.includes("run"));
+  for (const row of rows) {
+    const named = normalizeSport(row.sport || row.sub_sport || "");
+    if (named) return named;
+  }
+  return "Run";
 }
 
 function first(obj, keys) {
@@ -271,7 +293,9 @@ export async function loadExport(dir) {
     for (const name of names) {
       const coords = await coordsFromTrackFile(path.join(folder, name));
       if (!coords) continue;
-      const id = path.basename(name, path.extname(name));
+      let base = name;
+      if (base.toLowerCase().endsWith(".gz")) base = base.slice(0, -3);
+      const id = path.basename(base, path.extname(base));
       activities.push({
         id,
         title: "Run",
@@ -290,6 +314,26 @@ export async function loadExport(dir) {
   return activities;
 }
 
+/** GPX, TCX, or FIT bytes. A `.gz` name is inflated first, then parsed as the inner type. */
+export async function coordsFromTrackBytes(filename, buffer) {
+  let name = filename;
+  let body = buffer;
+  if (name.toLowerCase().endsWith(".gz")) {
+    body = gunzipSync(body);
+    name = name.slice(0, -3);
+  }
+  const ext = path.extname(name).toLowerCase();
+  if (ext === ".gpx") return parseGpx(body.toString("utf8"));
+  if (ext === ".tcx") return parseTcx(body.toString("utf8"));
+  if (ext === ".fit") {
+    const data = await parseFit(body);
+    if (!fitSport(data)) return null;
+    const coords = fitCoords(data);
+    return coords.length >= 2 ? coords : null;
+  }
+  return null;
+}
+
 async function coordsFromTrackFile(file) {
   let info;
   try {
@@ -298,16 +342,7 @@ async function coordsFromTrackFile(file) {
     return null;
   }
   if (!info.isFile()) return null;
-  const ext = path.extname(file).toLowerCase();
-  if (ext === ".gpx") return parseGpx(await readFile(file, "utf8"));
-  if (ext === ".tcx") return parseTcx(await readFile(file, "utf8"));
-  if (ext === ".fit") {
-    const data = await parseFit(await readFile(file));
-    if (!fitIsRun(data)) return null;
-    const coords = fitCoords(data);
-    return coords.length >= 2 ? coords : null;
-  }
-  return null;
+  return coordsFromTrackBytes(path.basename(file), await readFile(file));
 }
 
 export function pairsFromMaster(node, pairs = [], seen = new WeakSet()) {
@@ -330,15 +365,16 @@ export function pairsFromMaster(node, pairs = [], seen = new WeakSet()) {
 
 export async function activityFromFit(file, id) {
   const data = await parseFit(await readFile(file));
-  if (!fitIsRun(data)) return null;
+  const sport = fitSport(data);
+  if (!sport) return null;
   const coords = fitCoords(data);
   if (coords.length < 2) return null;
   const session = (data.sessions && data.sessions[0]) || {};
   return {
     id: String(id),
-    title: session.sport ? "Run" : "Run",
+    title: "Run",
     date: parseDate(session.start_time || session.timestamp),
-    type: "Run",
+    type: sport,
     distanceM: num(session.total_distance),
     movingS: num(session.total_timer_time ?? session.total_elapsed_time),
     elapsedS: num(session.total_elapsed_time),

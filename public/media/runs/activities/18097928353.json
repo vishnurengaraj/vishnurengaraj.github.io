@@ -1,0 +1,18 @@
+{
+  "id": "18097928353",
+  "city": "pinnacles",
+  "title": "Pinnacles Pilgrimage",
+  "date": "2026-04-13T00:00:00.000Z",
+  "distanceM": 9200,
+  "movingS": 7426,
+  "elevM": 524.4,
+  "mid": [
+    -121.200513,
+    36.485964
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 8262,
+  "type": "Run"
+}

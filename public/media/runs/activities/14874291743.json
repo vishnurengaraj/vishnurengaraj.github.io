@@ -1,0 +1,18 @@
+{
+  "id": "14874291743",
+  "city": "baldy",
+  "title": "Baldy Bash",
+  "date": "2025-06-21T00:00:00.000Z",
+  "distanceM": 17220,
+  "movingS": 17341,
+  "elevM": 1230,
+  "mid": [
+    -117.63151,
+    34.284457
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 20343,
+  "type": "Run"
+}

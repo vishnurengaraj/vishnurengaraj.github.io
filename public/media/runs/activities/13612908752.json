@@ -1,0 +1,18 @@
+{
+  "id": "13612908752",
+  "city": "fortuna",
+  "title": "1968 lava trail",
+  "date": "2025-02-12T00:00:00.000Z",
+  "distanceM": 5110,
+  "movingS": 7953,
+  "elevM": 189,
+  "mid": [
+    -84.73449,
+    10.473016
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 10390,
+  "type": "Run"
+}

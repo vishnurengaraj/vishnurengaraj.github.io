@@ -1,0 +1,18 @@
+{
+  "id": "17007319943",
+  "city": "la",
+  "title": "3rd Annual Wilson Hike",
+  "date": "2026-01-10T00:00:00.000Z",
+  "distanceM": 25230,
+  "movingS": 23282,
+  "elevM": 1308,
+  "mid": [
+    -118.061658,
+    34.223831
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 26607,
+  "type": "Hike"
+}

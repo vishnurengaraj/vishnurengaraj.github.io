@@ -1,0 +1,18 @@
+{
+  "id": "13967744073",
+  "city": "la",
+  "title": "Chino 15",
+  "date": "2025-03-23T00:00:00.000Z",
+  "distanceM": 24640,
+  "movingS": 9232,
+  "elevM": 523,
+  "mid": [
+    -117.740732,
+    33.917477
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 9745,
+  "type": "Run"
+}

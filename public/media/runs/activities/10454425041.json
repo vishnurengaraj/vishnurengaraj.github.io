@@ -1,0 +1,18 @@
+{
+  "id": "10454425041",
+  "city": "la",
+  "title": "Evening Run",
+  "date": "2023-12-28T00:00:00.000Z",
+  "distanceM": 5450,
+  "movingS": 1752,
+  "elevM": 9.2,
+  "mid": [
+    -118.348297,
+    33.922228
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 1762,
+  "type": "Run"
+}

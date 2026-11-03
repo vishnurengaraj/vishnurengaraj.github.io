@@ -1,0 +1,18 @@
+{
+  "id": "16587960756",
+  "city": "la",
+  "title": "Afternoon Run",
+  "date": "2025-11-27T00:00:00.000Z",
+  "distanceM": 16320,
+  "movingS": 5303,
+  "elevM": 105,
+  "mid": [
+    -118.450268,
+    33.965483
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 5538,
+  "type": "Run"
+}

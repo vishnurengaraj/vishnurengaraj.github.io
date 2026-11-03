@@ -1,0 +1,18 @@
+{
+  "id": "9688304819",
+  "city": "la",
+  "title": "Rain Run",
+  "date": "2023-08-20T00:00:00.000Z",
+  "distanceM": 6940,
+  "movingS": 2654,
+  "elevM": 93.8,
+  "mid": [
+    -118.436487,
+    33.932568
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2687,
+  "type": "Run"
+}

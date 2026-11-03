@@ -1,0 +1,18 @@
+{
+  "id": "9191718746",
+  "city": "la",
+  "title": "Freudian Slip",
+  "date": "2023-06-02T00:00:00.000Z",
+  "distanceM": 6840,
+  "movingS": 2173,
+  "elevM": 13,
+  "mid": [
+    -118.34891,
+    33.914146
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2178,
+  "type": "Run"
+}

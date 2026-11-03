@@ -24,6 +24,7 @@ const selected = ref(null);
 const choices = ref([]);
 const motionOn = ref(false);
 const loadError = ref("");
+const globe = ref(false);
 
 const byId = new Map(manifest.runs.map((run) => [run.id, run]));
 const cityById = new Map(manifest.cities.map((city) => [city.id, city]));
@@ -81,9 +82,16 @@ function initialCity() {
   return manifest.defaultCity;
 }
 
+function leaveGlobe() {
+  if (!globe.value) return;
+  globe.value = false;
+  mapApi?.setGlobe(false);
+}
+
 async function selectCity(id, { fly = true } = {}) {
   const city = cityById.get(id);
   if (!city || !mapApi) return;
+  leaveGlobe();
   const gen = ++cityGen;
   activeCity.value = id;
   choices.value = [];
@@ -136,6 +144,22 @@ async function openRun(id, lngLat) {
 
 function choose(run) {
   openRun(run.id, choiceAt);
+}
+
+function toggleGlobe() {
+  if (!mapApi) return;
+  const next = !globe.value;
+  globe.value = next;
+  choices.value = [];
+  if (next) closePanel();
+  mapApi.setGlobe(next, { reduced: prefersReduced(), cities: manifest.cities });
+  if (!next) mapApi.flyCity(cityById.get(activeCity.value), prefersReduced());
+}
+
+function onGlobePick(id) {
+  globe.value = false;
+  mapApi?.setGlobe(false);
+  selectCity(id);
 }
 
 function onPick(runs, lngLat) {
@@ -191,6 +215,7 @@ async function startMap() {
       center: city.center,
       zoom: city.zoom,
       onPick,
+      onGlobePick,
     });
   } catch (error) {
     if (!alive || gen !== mountGen) return;
@@ -246,6 +271,15 @@ onUnmounted(() => {
     <div class="stage">
       <div id="runs-map" ref="mapEl" role="region" aria-label="Map of runs"></div>
       <p v-if="manifest.sample" class="sample-tag">Sample routes</p>
+      <button
+        class="globe-btn"
+        :class="{ on: globe }"
+        type="button"
+        :aria-pressed="globe ? 'true' : 'false'"
+        @click="toggleGlobe"
+      >
+        Globe
+      </button>
       <div class="chips" role="radiogroup" aria-label="Cities">
         <button
           v-for="city in manifest.cities"
@@ -286,6 +320,7 @@ onUnmounted(() => {
         <div v-if="selected" class="detail-body">
           <div class="d-in">
             <p v-if="selected.sample" class="sample-line">Sample route</p>
+            <p v-if="selected.type" class="run-type">{{ selected.type }}</p>
             <h2>{{ selected.title }}</h2>
             <p v-if="selected.date" class="run-date">{{ formatDate(selected.date) }}</p>
             <div class="stats">

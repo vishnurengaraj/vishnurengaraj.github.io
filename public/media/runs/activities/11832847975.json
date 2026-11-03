@@ -1,0 +1,18 @@
+{
+  "id": "11832847975",
+  "city": "kings",
+  "title": "Rae lakes",
+  "date": "2024-07-04T00:00:00.000Z",
+  "distanceM": 67680,
+  "movingS": 64083,
+  "elevM": 2441.5,
+  "mid": [
+    -118.404073,
+    36.813861
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 264361,
+  "type": "Run"
+}

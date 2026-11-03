@@ -1,0 +1,18 @@
+{
+  "id": "11183093210",
+  "city": "joshua",
+  "title": "Jtree Jam",
+  "date": "2024-04-12T00:00:00.000Z",
+  "distanceM": 57400,
+  "movingS": 41683,
+  "elevM": 974.6,
+  "mid": [
+    -116.169246,
+    33.97692
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 163639,
+  "type": "Run"
+}

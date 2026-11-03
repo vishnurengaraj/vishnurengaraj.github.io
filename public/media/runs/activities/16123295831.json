@@ -1,0 +1,18 @@
+{
+  "id": "16123295831",
+  "city": "baldy",
+  "title": "Baldy and the 4Ts",
+  "date": "2025-10-12T00:00:00.000Z",
+  "distanceM": 28010,
+  "movingS": 31178,
+  "elevM": 2286,
+  "mid": [
+    -117.602205,
+    34.26362
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 36401,
+  "type": "Run"
+}

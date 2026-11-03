@@ -18,6 +18,28 @@ export function moveMeters(coord, eastM, northM) {
   return [coord[0] + eastM / mLng, coord[1] + northM / mLat];
 }
 
+/**
+ * Strava's activities.csv Distance column is meters. Some rebuilds stored
+ * kilometers instead (a marathon shows up as ~42.2, a long run as 11.82).
+ * A sub-200 value with enough moving time to be a real outing, and a
+ * plausible walking/running speed once scaled, is treated as kilometers.
+ */
+export function distanceToMeters(distance, movingSeconds) {
+  if (distance == null || !Number.isFinite(Number(distance)) || Number(distance) <= 0) {
+    return distance == null ? null : Number(distance);
+  }
+  const value = Number(distance);
+  const moving = Number(movingSeconds);
+  if (!(value > 0) || value >= 200 || !Number.isFinite(moving) || moving <= 0) return value;
+  const asMeters = value / moving;
+  const asKilometers = (value * 1000) / moving;
+  // 1.25 m over 398 s is not a walk. 1.25 km over that time is about 8:30 per mile.
+  if (asMeters < 0.4 && asKilometers >= 0.4 && asKilometers <= 7) {
+    return Math.round(value * 1000 * 100) / 100;
+  }
+  return value;
+}
+
 export function pathLength(coords) {
   let total = 0;
   for (let i = 1; i < coords.length; i++) total += haversine(coords[i - 1], coords[i]);

@@ -156,7 +156,7 @@ function hitsAt(map, point) {
 }
 
 /** Pitched OpenFreeMap map. One city of lines is loaded at a time. */
-export async function mountRunsMap(mapEl, { center, zoom, onPick }) {
+export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick }) {
   const view = camera();
   const map = new maplibregl.Map({
     container: mapEl,
@@ -167,10 +167,11 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick }) {
     bearing: view.bearing,
     attributionControl: false,
     maxPitch: 70,
-    minZoom: 10,
+    minZoom: 0.5,
     maxZoom: 17.5,
     fadeDuration: 0,
     hash: false,
+    clickTolerance: 12,
   });
   map.addControl(new maplibregl.NavigationControl({ showCompass: true, visualizePitch: true }), "bottom-right");
   map.addControl(new maplibregl.AttributionControl({ compact: false }), "bottom-left");
@@ -183,6 +184,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick }) {
   let layersReady = false;
   let runCount = 0;
   let cityId = "";
+  let globeOn = false;
 
   const loaded = new Promise((resolve, reject) => {
     const timer = window.setTimeout(() => reject(new Error("Map style timed out")), 20000);
@@ -234,6 +236,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick }) {
     mapEl.dataset.zoom = map.getZoom().toFixed(3);
     mapEl.dataset.city = cityId;
     mapEl.dataset.runs = String(runCount);
+    mapEl.dataset.globe = globeOn ? "on" : "off";
     if (layersReady) mapEl.dataset.map = "ready";
   }
 
@@ -298,12 +301,119 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick }) {
     window.requestAnimationFrame(() => window.requestAnimationFrame(armSway));
   }
 
+  const CITY_LAYERS = ["runs-heat", "runs-vein-glow", "runs-vein", "runs-highlight-casing", "runs-highlight", "runs-hit"];
+
+  function layerVisibility(ids, visible) {
+    for (const id of ids) {
+      if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", visible ? "visible" : "none");
+    }
+  }
+
+  function labelFont() {
+    for (const layer of map.getStyle()?.layers || []) {
+      const font = layer.layout?.["text-font"];
+      if (Array.isArray(font) && font.length) return font;
+    }
+    return ["Noto Sans Regular"];
+  }
+
+  function ensureGlobeLayers() {
+    if (map.getSource("runs-globe")) return;
+    map.addSource("runs-globe", { type: "geojson", data: emptyCollection() });
+    map.addLayer({
+      id: "runs-globe",
+      type: "circle",
+      source: "runs-globe",
+      layout: { visibility: "none" },
+      paint: {
+        "circle-radius": ["interpolate", ["linear"], ["sqrt", ["max", ["get", "count"], 1]], 1, 16, 20, 34],
+        "circle-color": "#2d1d7a",
+        "circle-opacity": 0.92,
+        "circle-stroke-width": 2,
+        "circle-stroke-color": "#ffb020",
+      },
+    });
+    try {
+      map.addLayer({
+        id: "runs-globe-label",
+        type: "symbol",
+        source: "runs-globe",
+        layout: {
+          visibility: "none",
+          "text-field": ["get", "label"],
+          "text-font": labelFont(),
+          "text-size": 12,
+          "text-offset": [0, 1.15],
+          "text-anchor": "top",
+        },
+        paint: {
+          "text-color": "#1a1033",
+          "text-halo-color": "#ffffff",
+          "text-halo-width": 1.4,
+        },
+      });
+    } catch (error) {
+      console.warn("Globe labels skipped", error);
+    }
+  }
+
+  function globeCollection(cities) {
+    return {
+      type: "FeatureCollection",
+      features: [...(cities || [])]
+        .sort((a, b) => (b.count || 1) - (a.count || 1))
+        .map((city) => ({
+        type: "Feature",
+        properties: { id: city.id, label: city.label, count: city.count || 1 },
+        geometry: { type: "Point", coordinates: city.center },
+      })),
+    };
+  }
+
+  function setSpace(on) {
+    try {
+      map.setFog(
+        on
+          ? {
+              color: "rgb(196, 206, 214)",
+              "high-color": "rgb(90, 120, 200)",
+              "horizon-blend": 0.08,
+              "space-color": "#1a1033",
+              "star-intensity": 0.35,
+            }
+          : null,
+      );
+    } catch (error) {
+      console.warn("Globe atmosphere skipped", error);
+    }
+  }
+
   function ensureInteractions() {
     map.on("click", (event) => {
+      if (globeOn && map.getLayer("runs-globe")) {
+        const regions = map.queryRenderedFeatures(event.point, { layers: ["runs-globe"] });
+        let id = "";
+        let best = Infinity;
+        for (const feature of regions) {
+          const coordinates = feature.geometry?.coordinates;
+          if (!coordinates) continue;
+          const projected = map.project(coordinates);
+          const distance = Math.hypot(projected.x - event.point.x, projected.y - event.point.y);
+          if (distance < best) {
+            best = distance;
+            id = String(feature.properties.id);
+          }
+        }
+        if (id) {
+          onGlobePick?.(id);
+          return;
+        }
+      }
       onPick(hitsAt(map, event.point), [event.lngLat.lng, event.lngLat.lat]);
     });
     map.on("mousemove", (event) => {
-      const hit = hitsAt(map, event.point).length > 0;
+      const layers = globeOn && map.getLayer("runs-globe") ? ["runs-globe"] : map.getLayer("runs-hit") ? ["runs-hit"] : [];
+      const hit = layers.length ? map.queryRenderedFeatures(event.point, { layers }).length > 0 : false;
       map.getCanvas().style.cursor = hit ? "pointer" : "";
     });
   }
@@ -365,10 +475,66 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick }) {
       if (!map.getLayer("runs-vein")) return 0;
       const point = map.project(lngLat);
       const box = [
-        [point.x - 2, point.y - 2],
-        [point.x + 2, point.y + 2],
+        [point.x - 10, point.y - 10],
+        [point.x + 10, point.y + 10],
       ];
       return map.queryRenderedFeatures(box, { layers: ["runs-vein"] }).length;
+    },
+    isGlobe() {
+      return globeOn;
+    },
+    regionAt(lngLat) {
+      if (!map.getLayer("runs-globe")) return "";
+      const point = map.project(lngLat);
+      const regions = map.queryRenderedFeatures(point, { layers: ["runs-globe"] });
+      let id = "";
+      let best = Infinity;
+      for (const feature of regions) {
+        const coordinates = feature.geometry?.coordinates;
+        if (!coordinates) continue;
+        const projected = map.project(coordinates);
+        const distance = Math.hypot(projected.x - point.x, projected.y - point.y);
+        if (distance < best) {
+          best = distance;
+          id = String(feature.properties.id);
+        }
+      }
+      return id;
+    },
+    setGlobe(on, { reduced, cities } = {}) {
+      if (disposed) return;
+      globeOn = Boolean(on);
+      ensureGlobeLayers();
+      if (globeOn) {
+        stopIdleSway();
+        try {
+          map.setProjection({ type: "globe" });
+        } catch (error) {
+          console.warn("Globe projection unavailable", error);
+        }
+        map.getSource("runs-globe").setData(globeCollection(cities));
+        layerVisibility(CITY_LAYERS, false);
+        layerVisibility(["runs-globe", "runs-globe-label"], true);
+        setSpace(true);
+        map.flyTo({
+          center: [-100, 36],
+          zoom: 1.55,
+          pitch: 0,
+          bearing: 0,
+          duration: reduced ? 0 : 1100,
+          essential: true,
+        });
+      } else {
+        try {
+          map.setProjection({ type: "mercator" });
+        } catch (error) {
+          console.warn("Mercator projection unavailable", error);
+        }
+        layerVisibility(["runs-globe", "runs-globe-label"], false);
+        layerVisibility(CITY_LAYERS, true);
+        setSpace(false);
+      }
+      syncProbe();
     },
     destroy() {
       disposed = true;

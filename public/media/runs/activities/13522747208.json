@@ -1,0 +1,18 @@
+{
+  "id": "13522747208",
+  "city": "la",
+  "title": "27k for 27 years",
+  "date": "2025-02-02T00:00:00.000Z",
+  "distanceM": 27050,
+  "movingS": 9076,
+  "elevM": 63,
+  "mid": [
+    -118.446042,
+    33.983689
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 9659,
+  "type": "Run"
+}

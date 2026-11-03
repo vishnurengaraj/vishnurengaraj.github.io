@@ -1,0 +1,18 @@
+{
+  "id": "10566564329",
+  "city": "la",
+  "title": "2nd annual Wilson hike",
+  "date": "2024-01-15T00:00:00.000Z",
+  "distanceM": 24870,
+  "movingS": 21294,
+  "elevM": 1818.2,
+  "mid": [
+    -118.057057,
+    34.225534
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 28620,
+  "type": "Hike"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "12361269936",
+  "city": "la",
+  "title": "Dawn Mine",
+  "date": "2024-09-08T00:00:00.000Z",
+  "distanceM": 11470,
+  "movingS": 12213,
+  "elevM": 566.5,
+  "mid": [
+    -118.130501,
+    34.226998
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 13967,
+  "type": "Run"
+}

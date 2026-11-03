@@ -1,0 +1,18 @@
+{
+  "id": "13626025931",
+  "city": "fortuna",
+  "title": "La Fortuna Four",
+  "date": "2025-02-14T00:00:00.000Z",
+  "distanceM": 6440,
+  "movingS": 2070,
+  "elevM": 59,
+  "mid": [
+    -84.642773,
+    10.463566
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2113,
+  "type": "Run"
+}

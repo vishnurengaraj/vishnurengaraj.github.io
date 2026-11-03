@@ -70,10 +70,39 @@ html:has(.runs) #app {
   text-transform: uppercase;
 }
 
+.runs .globe-btn {
+  position: absolute;
+  z-index: 6;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  left: 12px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid rgba(45, 29, 122, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(26, 16, 51, 0.12);
+}
+
+.runs .globe-btn.on {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+}
+
+.runs .globe-btn:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .runs .sample-tag {
   position: absolute;
   z-index: 5;
-  top: calc(12px + env(safe-area-inset-top, 0px));
+  top: calc(56px + env(safe-area-inset-top, 0px));
   left: 12px;
   margin: 0;
   padding: 6px 10px;
@@ -231,11 +260,15 @@ html:has(.runs) #app {
   padding: 22px 22px 28px;
 }
 
-.runs .sample-line {
+.runs .sample-line,
+.runs .run-type {
   margin: 0 0 8px;
   color: var(--primary);
+  font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 10px;
   font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .runs .d-in h2 {

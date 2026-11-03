@@ -1,0 +1,18 @@
+{
+  "id": "14234792782",
+  "city": "la",
+  "title": "The OG",
+  "date": "2025-04-20T00:00:00.000Z",
+  "distanceM": 9790,
+  "movingS": 3106,
+  "elevM": 10,
+  "mid": [
+    -118.399584,
+    33.848326
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 3125,
+  "type": "Run"
+}

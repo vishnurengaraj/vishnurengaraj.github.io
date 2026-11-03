@@ -1,0 +1,18 @@
+{
+  "id": "14024548295",
+  "city": "la",
+  "title": "Chino 22",
+  "date": "2025-03-29T00:00:00.000Z",
+  "distanceM": 35930,
+  "movingS": 14426,
+  "elevM": 915,
+  "mid": [
+    -117.803644,
+    33.914194
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 15118,
+  "type": "Run"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "12649146284",
+  "city": "la",
+  "title": "Afternoon Run",
+  "date": "2024-10-13T00:00:00.000Z",
+  "distanceM": 6840,
+  "movingS": 2307,
+  "elevM": 45.6,
+  "mid": [
+    -118.360092,
+    33.913665
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2335,
+  "type": "Run"
+}

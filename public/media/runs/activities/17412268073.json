@@ -1,0 +1,18 @@
+{
+  "id": "17412268073",
+  "city": "tokyo",
+  "title": "Imperial Palace Prance",
+  "date": "2026-02-16T00:00:00.000Z",
+  "distanceM": 11430,
+  "movingS": 3568,
+  "elevM": 72,
+  "mid": [
+    139.74592,
+    35.680068
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 5238,
+  "type": "Run"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "19199761005",
+  "city": "alps",
+  "title": "TMB Day 7",
+  "date": "2026-07-06T00:00:00.000Z",
+  "distanceM": 16190,
+  "movingS": 15198,
+  "elevM": 1550.1,
+  "mid": [
+    6.827333,
+    45.916128
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 16642,
+  "type": "Run"
+}

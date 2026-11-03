@@ -1,0 +1,18 @@
+{
+  "id": "17434787811",
+  "city": "tokyo",
+  "title": "Ueno Wobble",
+  "date": "2026-02-18T00:00:00.000Z",
+  "distanceM": 8900,
+  "movingS": 2832,
+  "elevM": 33,
+  "mid": [
+    139.769397,
+    35.71962
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 3285,
+  "type": "Run"
+}

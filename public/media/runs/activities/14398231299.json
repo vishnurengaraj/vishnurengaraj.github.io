@@ -1,0 +1,18 @@
+{
+  "id": "14398231299",
+  "city": "la",
+  "title": "Morning Run",
+  "date": "2025-05-06T00:00:00.000Z",
+  "distanceM": 7670,
+  "movingS": 2437,
+  "elevM": 7,
+  "mid": [
+    -118.397866,
+    33.852355
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2437,
+  "type": "Run"
+}

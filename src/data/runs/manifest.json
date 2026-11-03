@@ -1,5 +1,5 @@
 {
-  "sample": true,
+  "sample": false,
   "privacy": {
     "method": "radius",
     "meters": 400
@@ -15,7 +15,7 @@
         33.8622
       ],
       "zoom": 12.35,
-      "count": 14,
+      "count": 416,
       "generated": false
     },
     {
@@ -27,365 +27,8630 @@
         37.804
       ],
       "zoom": 12.55,
+      "count": 2,
+      "generated": false
+    },
+    {
+      "id": "whitney",
+      "label": "Whitney",
+      "name": "Mt Whitney",
+      "center": [
+        -118.55,
+        36.58
+      ],
+      "zoom": 10.2,
+      "count": 8,
+      "generated": false
+    },
+    {
+      "id": "sierra",
+      "label": "Sierra",
+      "name": "Eastern Sierra",
+      "center": [
+        -118.78,
+        37.5
+      ],
+      "zoom": 9.2,
+      "count": 7,
+      "generated": false
+    },
+    {
+      "id": "waco",
+      "label": "Waco",
+      "name": "Waco",
+      "center": [
+        -97.28,
+        31.5
+      ],
+      "zoom": 10.4,
+      "count": 7,
+      "generated": false
+    },
+    {
+      "id": "alps",
+      "label": "Alps",
+      "name": "Mont Blanc",
+      "center": [
+        6.75,
+        45.9
+      ],
+      "zoom": 9.5,
+      "count": 6,
+      "generated": false
+    },
+    {
+      "id": "baldy",
+      "label": "Baldy",
+      "name": "Mt Baldy",
+      "center": [
+        -117.6,
+        34.25
+      ],
+      "zoom": 11.6,
+      "count": 5,
+      "generated": false
+    },
+    {
+      "id": "michigan",
+      "label": "Michigan",
+      "name": "Michigan",
+      "center": [
+        -83.45,
+        42.48
+      ],
+      "zoom": 8.2,
+      "count": 5,
+      "generated": false
+    },
+    {
+      "id": "jacinto",
+      "label": "Jacinto",
+      "name": "San Jacinto",
+      "center": [
+        -116.75,
+        33.95
+      ],
+      "zoom": 10.4,
       "count": 4,
       "generated": false
     },
     {
-      "id": "nyc",
-      "label": "NYC",
-      "name": "New York",
+      "id": "fortuna",
+      "label": "Fortuna",
+      "name": "La Fortuna",
       "center": [
-        -73.966,
-        40.782
+        -84.64,
+        10.47
       ],
-      "zoom": 12.35,
+      "zoom": 12,
       "count": 3,
+      "generated": false
+    },
+    {
+      "id": "yosemite",
+      "label": "Yosemite",
+      "name": "Yosemite",
+      "center": [
+        -119.5,
+        37.77
+      ],
+      "zoom": 10.4,
+      "count": 3,
+      "generated": false
+    },
+    {
+      "id": "pinnacles",
+      "label": "Pinnacles",
+      "name": "Pinnacles",
+      "center": [
+        -121.2,
+        36.49
+      ],
+      "zoom": 11.5,
+      "count": 2,
+      "generated": false
+    },
+    {
+      "id": "tokyo",
+      "label": "Tokyo",
+      "name": "Tokyo",
+      "center": [
+        139.76,
+        35.7
+      ],
+      "zoom": 11.4,
+      "count": 2,
+      "generated": false
+    },
+    {
+      "id": "ynez",
+      "label": "Ynez",
+      "name": "Santa Ynez",
+      "center": [
+        -119.75,
+        34.58
+      ],
+      "zoom": 11.4,
+      "count": 2,
+      "generated": false
+    },
+    {
+      "id": "zion",
+      "label": "Zion",
+      "name": "Zion",
+      "center": [
+        -112.95,
+        37.24
+      ],
+      "zoom": 11.4,
+      "count": 2,
+      "generated": false
+    },
+    {
+      "id": "atlanta",
+      "label": "Atlanta",
+      "name": "Atlanta",
+      "center": [
+        -84.32,
+        33.99
+      ],
+      "zoom": 11.4,
+      "count": 1,
+      "generated": false
+    },
+    {
+      "id": "bigsur",
+      "label": "Big Sur",
+      "name": "Big Sur",
+      "center": [
+        -121.67,
+        36.26
+      ],
+      "zoom": 11.4,
+      "count": 1,
+      "generated": false
+    },
+    {
+      "id": "canyon",
+      "label": "Canyon",
+      "name": "Grand Canyon",
+      "center": [
+        -112.05,
+        36.21
+      ],
+      "zoom": 11,
+      "count": 1,
+      "generated": false
+    },
+    {
+      "id": "geneva",
+      "label": "Geneva",
+      "name": "Geneva",
+      "center": [
+        6.1,
+        46.22
+      ],
+      "zoom": 11.2,
+      "count": 1,
+      "generated": false
+    },
+    {
+      "id": "humboldt",
+      "label": "Humboldt",
+      "name": "Humboldt Redwoods",
+      "center": [
+        -124,
+        40.32
+      ],
+      "zoom": 10.8,
+      "count": 1,
+      "generated": false
+    },
+    {
+      "id": "india",
+      "label": "India",
+      "name": "Kanyakumari",
+      "center": [
+        77.73,
+        8.69
+      ],
+      "zoom": 11,
+      "count": 1,
+      "generated": false
+    },
+    {
+      "id": "channel",
+      "label": "Islands",
+      "name": "Channel Islands",
+      "center": [
+        -119.6,
+        34.04
+      ],
+      "zoom": 11,
+      "count": 1,
+      "generated": false
+    },
+    {
+      "id": "izu",
+      "label": "Izu",
+      "name": "Izu",
+      "center": [
+        138.93,
+        34.81
+      ],
+      "zoom": 11,
+      "count": 1,
+      "generated": false
+    },
+    {
+      "id": "joshua",
+      "label": "JTree",
+      "name": "Joshua Tree",
+      "center": [
+        -116.17,
+        33.98
+      ],
+      "zoom": 11.2,
+      "count": 1,
+      "generated": false
+    },
+    {
+      "id": "kings",
+      "label": "Kings",
+      "name": "Kings Canyon",
+      "center": [
+        -118.4,
+        36.81
+      ],
+      "zoom": 11.4,
+      "count": 1,
+      "generated": false
+    },
+    {
+      "id": "madrid",
+      "label": "Madrid",
+      "name": "Madrid",
+      "center": [
+        -3.72,
+        40.42
+      ],
+      "zoom": 12.2,
+      "count": 1,
+      "generated": false
+    },
+    {
+      "id": "reyes",
+      "label": "Reyes",
+      "name": "Reyes Peak",
+      "center": [
+        -119.29,
+        34.63
+      ],
+      "zoom": 12,
+      "count": 1,
+      "generated": false
+    },
+    {
+      "id": "sonoma",
+      "label": "Sonoma",
+      "name": "Lake Sonoma",
+      "center": [
+        -123.05,
+        38.7
+      ],
+      "zoom": 11.4,
+      "count": 1,
+      "generated": false
+    },
+    {
+      "id": "telescope",
+      "label": "Telescope",
+      "name": "Death Valley",
+      "center": [
+        -117.09,
+        36.17
+      ],
+      "zoom": 11.2,
+      "count": 1,
       "generated": false
     }
   ],
   "runs": [
     {
-      "id": "sample-la-sunrise",
+      "id": "20820511567",
       "city": "la",
-      "title": "Redondo sunrise",
-      "date": "2025-10-05T14:50:00Z",
-      "distanceM": 5192.12,
-      "movingS": 1675,
-      "elevM": 21,
-      "mid": [
-        -118.394527,
-        33.84669
-      ],
-      "photos": 0,
-      "companions": 0,
-      "sample": true
-    },
-    {
-      "id": "sample-la-repeats",
-      "city": "la",
-      "title": "Strand repeats",
-      "date": "2025-09-14T15:05:00Z",
-      "distanceM": 5998.57,
-      "movingS": 1764,
-      "elevM": 24,
-      "mid": [
-        -118.399234,
-        33.856016
-      ],
-      "photos": 0,
-      "companions": 0,
-      "sample": true
-    },
-    {
-      "id": "sample-la-redondo",
-      "city": "la",
-      "title": "Redondo horseshoe",
-      "date": "2025-08-23T14:20:00Z",
-      "distanceM": 5426.69,
-      "movingS": 1779,
-      "elevM": 28,
-      "mid": [
-        -118.394326,
-        33.846585
-      ],
-      "photos": 0,
-      "companions": 0,
-      "sample": true
-    },
-    {
-      "id": "sample-sf-bridge",
-      "city": "sf",
-      "title": "Bridge to the warmup",
-      "date": "2025-07-12T15:20:00Z",
-      "distanceM": 4534.01,
-      "movingS": 1395,
-      "elevM": 18,
-      "mid": [
-        -122.465389,
-        37.803312
-      ],
-      "photos": 0,
-      "companions": 0,
-      "sample": true
-    },
-    {
-      "id": "sample-la-strand",
-      "city": "la",
-      "title": "Strand sunrise",
-      "date": "2025-06-08T15:00:00Z",
-      "distanceM": 10040.88,
-      "movingS": 3188,
-      "elevM": 18,
-      "mid": [
-        -118.403037,
-        33.866368
-      ],
-      "photos": 0,
-      "companions": 0,
-      "sample": true
-    },
-    {
-      "id": "sample-la-saturday",
-      "city": "la",
-      "title": "Saturday strand",
-      "date": "2025-05-17T15:40:00Z",
-      "distanceM": 9143.93,
-      "movingS": 3048,
+      "title": "Morning Run",
+      "date": "2026-11-01T00:00:00.000Z",
+      "distanceM": 11820,
+      "movingS": 3861,
       "elevM": 26,
       "mid": [
-        -118.404278,
-        33.869491
+        -118.392493,
+        33.839333
       ],
       "photos": 0,
       "companions": 0,
-      "sample": true
+      "sample": false,
+      "type": "Run"
     },
     {
-      "id": "sample-la-hermosa",
+      "id": "20798854004",
       "city": "la",
-      "title": "Hermosa out and back",
-      "date": "2025-04-19T15:30:00Z",
-      "distanceM": 10484.31,
-      "movingS": 3554,
+      "title": "Night Run",
+      "date": "2026-10-30T00:00:00.000Z",
+      "distanceM": 8200,
+      "movingS": 2862,
+      "elevM": 29,
+      "mid": [
+        -118.369504,
+        33.914077
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "20774065844",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-10-28T00:00:00.000Z",
+      "distanceM": 8180,
+      "movingS": 2910,
+      "elevM": 7,
+      "mid": [
+        -118.333413,
+        33.893709
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "20746237327",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-10-26T00:00:00.000Z",
+      "distanceM": 7290,
+      "movingS": 2429,
+      "elevM": 6,
+      "mid": [
+        -118.348239,
+        33.929571
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "20707862818",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-10-23T00:00:00.000Z",
+      "distanceM": 8110,
+      "movingS": 2841,
+      "elevM": 5,
+      "mid": [
+        -118.330513,
+        33.890677
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "20683734660",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-10-21T00:00:00.000Z",
+      "distanceM": 8290,
+      "movingS": 2719,
       "elevM": 22,
       "mid": [
-        -118.387244,
-        33.830999
-      ],
-      "photos": 1,
-      "companions": 0,
-      "sample": true
-    },
-    {
-      "id": "sample-nyc-morning",
-      "city": "nyc",
-      "title": "Park morning",
-      "date": "2025-04-06T13:50:00Z",
-      "distanceM": 11817.83,
-      "movingS": 3693,
-      "elevM": 52,
-      "mid": [
-        -73.964433,
-        40.795756
+        -118.369787,
+        33.913658
       ],
       "photos": 0,
       "companions": 0,
-      "sample": true
+      "sample": false,
+      "type": "Run"
     },
     {
-      "id": "sample-la-mb",
+      "id": "20638739661",
       "city": "la",
-      "title": "Manhattan Beach easy",
-      "date": "2025-03-02T16:10:00Z",
-      "distanceM": 6284.84,
-      "movingS": 2245,
-      "elevM": 14,
+      "title": "Morning Run",
+      "date": "2026-10-18T00:00:00.000Z",
+      "distanceM": 15340,
+      "movingS": 5138,
+      "elevM": 23,
       "mid": [
-        -118.409837,
-        33.882095
+        -118.493673,
+        34.007666
       ],
       "photos": 0,
       "companions": 0,
-      "sample": true
+      "sample": false,
+      "type": "Run"
     },
     {
-      "id": "sample-la-recovery",
+      "id": "20547259461",
+      "city": "humboldt",
+      "title": "Humboldt Redwoods Marathon",
+      "date": "2026-10-11T00:00:00.000Z",
+      "distanceM": 42720,
+      "movingS": 16003,
+      "elevM": 266,
+      "mid": [
+        -124.026918,
+        40.342622
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "20450244207",
       "city": "la",
-      "title": "Recovery jog",
-      "date": "2025-02-11T16:00:00Z",
-      "distanceM": 6495.95,
-      "movingS": 2498,
-      "elevM": 15,
+      "title": "Morning Run",
+      "date": "2026-10-04T00:00:00.000Z",
+      "distanceM": 13250,
+      "movingS": 4406,
+      "elevM": 41,
       "mid": [
-        -118.401968,
-        33.863169
+        -118.397218,
+        33.852734
       ],
       "photos": 0,
       "companions": 0,
-      "sample": true
+      "sample": false,
+      "type": "Run"
     },
     {
-      "id": "sample-la-evening",
+      "id": "20427751735",
       "city": "la",
-      "title": "Evening miles",
-      "date": "2025-01-09T15:15:00Z",
-      "distanceM": 5178.67,
-      "movingS": 1918,
-      "elevM": 20,
+      "title": "Night Run",
+      "date": "2026-10-02T00:00:00.000Z",
+      "distanceM": 6570,
+      "movingS": 2067,
+      "elevM": 27,
       "mid": [
-        -118.397155,
-        33.85201
+        -118.360398,
+        33.914509
       ],
       "photos": 0,
       "companions": 0,
-      "sample": true
+      "sample": false,
+      "type": "Run"
     },
     {
-      "id": "sample-la-pier",
+      "id": "20402345828",
       "city": "la",
-      "title": "Pier to pier",
-      "date": "2024-12-21T15:25:00Z",
-      "distanceM": 5736.71,
-      "movingS": 1765,
-      "elevM": 19,
+      "title": "Night Run",
+      "date": "2026-09-30T00:00:00.000Z",
+      "distanceM": 6460,
+      "movingS": 2088,
+      "elevM": 4,
       "mid": [
-        -118.403333,
-        33.867421
+        -118.337557,
+        33.888384
       ],
       "photos": 0,
       "companions": 0,
-      "sample": true
+      "sample": false,
+      "type": "Run"
     },
     {
-      "id": "sample-la-elsegundo",
+      "id": "20355466919",
       "city": "la",
-      "title": "El Segundo to the pier",
-      "date": "2024-11-16T15:45:00Z",
-      "distanceM": 6346.01,
-      "movingS": 1923,
-      "elevM": 16,
+      "title": "Morning Run",
+      "date": "2026-09-27T00:00:00.000Z",
+      "distanceM": 21120,
+      "movingS": 7262,
+      "elevM": 58,
       "mid": [
-        -118.409802,
-        33.881766
+        -118.512288,
+        34.022672
       ],
       "photos": 0,
       "companions": 0,
-      "sample": true
+      "sample": false,
+      "type": "Run"
     },
     {
-      "id": "sample-nyc-park",
-      "city": "nyc",
-      "title": "Central Park loop",
-      "date": "2024-10-13T14:10:00Z",
-      "distanceM": 11756.4,
-      "movingS": 3919,
-      "elevM": 48,
+      "id": "20290248614",
+      "city": "yosemite",
+      "title": "Clouds Rest ☁️ 😴",
+      "date": "2026-09-22T00:00:00.000Z",
+      "distanceM": 20940,
+      "movingS": 20119,
+      "elevM": 955,
       "mid": [
-        -73.962656,
-        40.79662
+        -119.48937,
+        37.767671
       ],
       "photos": 0,
       "companions": 0,
-      "sample": true
+      "sample": false,
+      "type": "Run"
     },
     {
-      "id": "sample-sf-crissy",
-      "city": "sf",
-      "title": "Crissy Field",
-      "date": "2024-08-18T16:00:00Z",
-      "distanceM": 5292.88,
-      "movingS": 1735,
-      "elevM": 12,
+      "id": "20272771247",
+      "city": "sierra",
+      "title": "Crystal Lake 💎 🌊",
+      "date": "2026-09-21T00:00:00.000Z",
+      "distanceM": 6100,
+      "movingS": 6100,
+      "elevM": 294,
       "mid": [
-        -122.461114,
-        37.80366
+        -119.017673,
+        37.592518
       ],
       "photos": 0,
       "companions": 0,
-      "sample": true
+      "sample": false,
+      "type": "Run"
     },
     {
-      "id": "sample-la-long",
+      "id": "20261032623",
+      "city": "sierra",
+      "title": "Duck Pass and Pika Lake 🦆🐿️",
+      "date": "2026-09-20T00:00:00.000Z",
+      "distanceM": 16510,
+      "movingS": 15974,
+      "elevM": 720,
+      "mid": [
+        -118.954201,
+        37.551875
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "20245098810",
       "city": "la",
-      "title": "Long beach path",
-      "date": "2024-07-04T14:00:00Z",
-      "distanceM": 9143.85,
-      "movingS": 2857,
-      "elevM": 31,
+      "title": "Morning Run",
+      "date": "2026-09-19T00:00:00.000Z",
+      "distanceM": 6550,
+      "movingS": 2230,
+      "elevM": 6,
       "mid": [
-        -118.401522,
-        33.861844
+        -118.334592,
+        33.887548
       ],
       "photos": 0,
       "companions": 0,
-      "sample": true
+      "sample": false,
+      "type": "Run"
     },
     {
-      "id": "sample-la-southbay",
+      "id": "20194944092",
       "city": "la",
-      "title": "South Bay long run",
-      "date": "2024-05-26T14:35:00Z",
-      "distanceM": 9903.15,
-      "movingS": 2956,
-      "elevM": 36,
+      "title": "Night Run",
+      "date": "2026-09-15T00:00:00.000Z",
+      "distanceM": 6520,
+      "movingS": 2175,
+      "elevM": 4,
       "mid": [
-        -118.403119,
-        33.866638
+        -118.335072,
+        33.887526
       ],
       "photos": 0,
       "companions": 0,
-      "sample": true
+      "sample": false,
+      "type": "Run"
     },
     {
-      "id": "sample-sf-embarcadero",
-      "city": "sf",
-      "title": "Embarcadero",
-      "date": "2024-02-25T16:15:00Z",
-      "distanceM": 4412.73,
-      "movingS": 1423,
-      "elevM": 14,
+      "id": "20166308283",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2026-09-13T00:00:00.000Z",
+      "distanceM": 32290,
+      "movingS": 11159,
+      "elevM": 71,
       "mid": [
-        -122.389552,
-        37.804433
+        -118.429393,
+        33.918496
       ],
       "photos": 0,
       "companions": 0,
-      "sample": true
+      "sample": false,
+      "type": "Run"
     },
     {
-      "id": "sample-sf-marina",
-      "city": "sf",
-      "title": "Marina loop",
-      "date": "2023-11-04T16:40:00Z",
-      "distanceM": 3887.71,
-      "movingS": 1364,
+      "id": "20138262178",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-09-11T00:00:00.000Z",
+      "distanceM": 6760,
+      "movingS": 2161,
+      "elevM": 6,
+      "mid": [
+        -118.33357,
+        33.887554
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "20125741548",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-09-10T00:00:00.000Z",
+      "distanceM": 8290,
+      "movingS": 2755,
+      "elevM": 24,
+      "mid": [
+        -118.369654,
+        33.913871
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "20112251881",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-09-09T00:00:00.000Z",
+      "distanceM": 7200,
+      "movingS": 2405,
+      "elevM": 3,
+      "mid": [
+        -118.349049,
+        33.930836
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "20098138830",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-09-08T00:00:00.000Z",
+      "distanceM": 6750,
+      "movingS": 2276,
+      "elevM": 5,
+      "mid": [
+        -118.333649,
+        33.887569
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "20069477968",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2026-09-06T00:00:00.000Z",
+      "distanceM": 28170,
+      "movingS": 9834,
+      "elevM": 40,
+      "mid": [
+        -118.495505,
+        34.008601
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "20041274157",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2026-09-04T00:00:00.000Z",
+      "distanceM": 10870,
+      "movingS": 3649,
+      "elevM": 28,
+      "mid": [
+        -118.373413,
+        33.913852
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "20030436025",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-09-03T00:00:00.000Z",
+      "distanceM": 6770,
+      "movingS": 2198,
+      "elevM": 4,
+      "mid": [
+        -118.333511,
+        33.887637
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "20015657286",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-09-02T00:00:00.000Z",
+      "distanceM": 8300,
+      "movingS": 2699,
+      "elevM": 22,
+      "mid": [
+        -118.369795,
+        33.913543
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19967009893",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2026-08-30T00:00:00.000Z",
+      "distanceM": 24170,
+      "movingS": 8968,
+      "elevM": 63,
+      "mid": [
+        -118.526287,
+        34.031106
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19944321070",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-08-28T00:00:00.000Z",
+      "distanceM": 16470,
+      "movingS": 5755,
+      "elevM": 72,
+      "mid": [
+        -118.379109,
+        33.898778
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19903349935",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-08-25T00:00:00.000Z",
+      "distanceM": 8170,
+      "movingS": 2732,
       "elevM": 9,
       "mid": [
-        -122.452572,
-        37.804824
+        -118.33346,
+        33.893239
       ],
       "photos": 0,
       "companions": 0,
-      "sample": true
+      "sample": false,
+      "type": "Run"
     },
     {
-      "id": "sample-la-miles",
+      "id": "19868533678",
       "city": "la",
-      "title": "Hermosa miles",
-      "date": "2023-09-30T15:10:00Z",
-      "distanceM": 5375.79,
-      "movingS": 1854,
-      "elevM": 17,
+      "title": "Morning Run",
+      "date": "2026-08-23T00:00:00.000Z",
+      "distanceM": 20630,
+      "movingS": 7506,
+      "elevM": 123,
       "mid": [
-        -118.400071,
-        33.858288
+        -118.391582,
+        33.800592
       ],
       "photos": 0,
       "companions": 0,
-      "sample": true
+      "sample": false,
+      "type": "Run"
     },
     {
-      "id": "sample-nyc-hudson",
-      "city": "nyc",
-      "title": "Hudson greenway",
-      "date": "2023-06-17T14:30:00Z",
-      "distanceM": 6646.43,
-      "movingS": 2110,
+      "id": "19845261725",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-08-21T00:00:00.000Z",
+      "distanceM": 10360,
+      "movingS": 3370,
+      "elevM": 9,
+      "mid": [
+        -118.331885,
+        33.885304
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19819589718",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-08-19T00:00:00.000Z",
+      "distanceM": 9730,
+      "movingS": 3126,
+      "elevM": 25,
+      "mid": [
+        -118.370605,
+        33.909621
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19775435231",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2026-08-16T00:00:00.000Z",
+      "distanceM": 18540,
+      "movingS": 6145,
+      "elevM": 38,
+      "mid": [
+        -118.463299,
+        33.980968
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19757928678",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-08-14T00:00:00.000Z",
+      "distanceM": 8060,
+      "movingS": 2558,
       "elevM": 11,
       "mid": [
-        -74.009929,
-        40.756872
+        -118.334214,
+        33.881351
       ],
       "photos": 0,
       "companions": 0,
-      "sample": true
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19734082527",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-08-13T00:00:00.000Z",
+      "distanceM": 7640,
+      "movingS": 2431,
+      "elevM": 22,
+      "mid": [
+        -118.366697,
+        33.913744
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19720901523",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-08-12T00:00:00.000Z",
+      "distanceM": 7220,
+      "movingS": 2214,
+      "elevM": 6,
+      "mid": [
+        -118.335703,
+        33.892004
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19671162877",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2026-08-09T00:00:00.000Z",
+      "distanceM": 10330,
+      "movingS": 3488,
+      "elevM": 10,
+      "mid": [
+        -118.326937,
+        33.883834
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19676932063",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-08-09T00:00:00.000Z",
+      "distanceM": 10000,
+      "movingS": 3588,
+      "elevM": 23,
+      "mid": [
+        -118.370658,
+        33.909587
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19649354874",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-08-07T00:00:00.000Z",
+      "distanceM": 8410,
+      "movingS": 2837,
+      "elevM": 23,
+      "mid": [
+        -118.36942,
+        33.914248
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19622095684",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-08-05T00:00:00.000Z",
+      "distanceM": 6590,
+      "movingS": 2124,
+      "elevM": 4,
+      "mid": [
+        -118.347338,
+        33.930834
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19577831867",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2026-08-02T00:00:00.000Z",
+      "distanceM": 21540,
+      "movingS": 7134,
+      "elevM": 126,
+      "mid": [
+        -118.393496,
+        33.901487
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19550898700",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-07-31T00:00:00.000Z",
+      "distanceM": 6730,
+      "movingS": 2173,
+      "elevM": 6,
+      "mid": [
+        -118.333635,
+        33.887551
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19538101383",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-07-30T00:00:00.000Z",
+      "distanceM": 8350,
+      "movingS": 2712,
+      "elevM": 21,
+      "mid": [
+        -118.369848,
+        33.91292
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19478329801",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2026-07-26T00:00:00.000Z",
+      "distanceM": 19580,
+      "movingS": 6545,
+      "elevM": 58,
+      "mid": [
+        -118.505553,
+        34.019702
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19454315792",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-07-24T00:00:00.000Z",
+      "distanceM": 6460,
+      "movingS": 2098,
+      "elevM": 3,
+      "mid": [
+        -118.335514,
+        33.887601
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19412574266",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2026-07-21T00:00:00.000Z",
+      "distanceM": 8100,
+      "movingS": 2484,
+      "elevM": 24,
+      "mid": [
+        -118.369409,
+        33.913733
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19379575271",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2026-07-19T00:00:00.000Z",
+      "distanceM": 8760,
+      "movingS": 2881,
+      "elevM": 7,
+      "mid": [
+        -118.331549,
+        33.884472
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19365624034",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2026-07-18T00:00:00.000Z",
+      "distanceM": 9230,
+      "movingS": 3426,
+      "elevM": 19,
+      "mid": [
+        -118.47548,
+        33.988839
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19290653928",
+      "city": "madrid",
+      "title": "MAD city Scamper",
+      "date": "2026-07-13T00:00:00.000Z",
+      "distanceM": 6570,
+      "movingS": 2300,
+      "elevM": 80,
+      "mid": [
+        -3.72287,
+        40.427314
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19199761005",
+      "city": "alps",
+      "title": "TMB Day 7",
+      "date": "2026-07-06T00:00:00.000Z",
+      "distanceM": 16190,
+      "movingS": 15198,
+      "elevM": 1550.1,
+      "mid": [
+        6.827333,
+        45.916128
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19176123328",
+      "city": "alps",
+      "title": "TMB Day 5",
+      "date": "2026-07-04T00:00:00.000Z",
+      "distanceM": 19370,
+      "movingS": 18021,
+      "elevM": 1003,
+      "mid": [
+        6.712428,
+        45.749495
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19164935360",
+      "city": "alps",
+      "title": "TMB Day 4",
+      "date": "2026-07-03T00:00:00.000Z",
+      "distanceM": 25110,
+      "movingS": 22976,
+      "elevM": 1973,
+      "mid": [
+        6.869666,
+        45.775287
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19151138962",
+      "city": "alps",
+      "title": "TMB Day 3",
+      "date": "2026-07-02T00:00:00.000Z",
+      "distanceM": 26430,
+      "movingS": 23388,
+      "elevM": 1521,
+      "mid": [
+        7.030991,
+        45.854878
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19138582784",
+      "city": "alps",
+      "title": "TMB day 2",
+      "date": "2026-07-01T00:00:00.000Z",
+      "distanceM": 28540,
+      "movingS": 24031,
+      "elevM": 1819,
+      "mid": [
+        7.105921,
+        46.032749
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19126093430",
+      "city": "alps",
+      "title": "TMB Day 1",
+      "date": "2026-06-30T00:00:00.000Z",
+      "distanceM": 27630,
+      "movingS": 26103,
+      "elevM": 1477,
+      "mid": [
+        6.924879,
+        45.998581
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19112345759",
+      "city": "geneva",
+      "title": "Jaunt to Decathlon",
+      "date": "2026-06-29T00:00:00.000Z",
+      "distanceM": 2670,
+      "movingS": 1839,
+      "elevM": 22,
+      "mid": [
+        6.095636,
+        46.222208
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19102444394",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2026-06-28T00:00:00.000Z",
+      "distanceM": 12890,
+      "movingS": 4316,
+      "elevM": 36,
+      "mid": [
+        -118.389727,
+        33.833653
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "19013308096",
+      "city": "la",
+      "title": "Eagle Rock Loop 🦅 🪨 🔁",
+      "date": "2026-06-21T00:00:00.000Z",
+      "distanceM": 15100,
+      "movingS": 6673,
+      "elevM": 518,
+      "mid": [
+        -118.558294,
+        34.10545
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18991994631",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-06-19T00:00:00.000Z",
+      "distanceM": 7340,
+      "movingS": 2492,
+      "elevM": 89,
+      "mid": [
+        -118.438096,
+        33.934358
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18924009078",
+      "city": "la",
+      "title": "Truncated Bulldog Loop",
+      "date": "2026-06-14T00:00:00.000Z",
+      "distanceM": 17730,
+      "movingS": 10032,
+      "elevM": 535,
+      "mid": [
+        -118.763067,
+        34.091998
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18898408260",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-06-12T00:00:00.000Z",
+      "distanceM": 8260,
+      "movingS": 2703,
+      "elevM": 11,
+      "mid": [
+        -118.331453,
+        33.884218
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18860019085",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-06-09T00:00:00.000Z",
+      "distanceM": 6550,
+      "movingS": 1976,
+      "elevM": 5,
+      "mid": [
+        -118.347114,
+        33.916317
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18828220153",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2026-06-07T00:00:00.000Z",
+      "distanceM": 19410,
+      "movingS": 6513,
+      "elevM": 51,
+      "mid": [
+        -118.505484,
+        34.019652
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18746647649",
+      "city": "la",
+      "title": "Eagle Rock + a lil extra",
+      "date": "2026-06-01T00:00:00.000Z",
+      "distanceM": 14850,
+      "movingS": 10626,
+      "elevM": 488,
+      "mid": [
+        -118.552352,
+        34.099906
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18737298319",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-05-31T00:00:00.000Z",
+      "distanceM": 6440,
+      "movingS": 2034,
+      "elevM": 6,
+      "mid": [
+        -118.335222,
+        33.887507
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18641534247",
+      "city": "reyes",
+      "title": "Reyes Peak w/ Randy the Rattlesnake 🐍",
+      "date": "2026-05-24T00:00:00.000Z",
+      "distanceM": 27690,
+      "movingS": 26051,
+      "elevM": 1418,
+      "mid": [
+        -119.286278,
+        34.630079
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18615960695",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2026-05-22T00:00:00.000Z",
+      "distanceM": 8700,
+      "movingS": 2830,
+      "elevM": 23,
+      "mid": [
+        -118.3698,
+        33.912127
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18603820436",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2026-05-21T00:00:00.000Z",
+      "distanceM": 6770,
+      "movingS": 2390,
+      "elevM": 9,
+      "mid": [
+        -118.333531,
+        33.887557
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18562080379",
+      "city": "michigan",
+      "title": "Run Down Memory Lane",
+      "date": "2026-05-18T00:00:00.000Z",
+      "distanceM": 16310,
+      "movingS": 5810,
+      "elevM": 173.5,
+      "mid": [
+        -83.72597,
+        42.294419
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18545573926",
+      "city": "michigan",
+      "title": "Lunch Walk",
+      "date": "2026-05-17T00:00:00.000Z",
+      "distanceM": 5600,
+      "movingS": 3940,
+      "elevM": 45,
+      "mid": [
+        -83.194473,
+        42.695061
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Walk"
+    },
+    {
+      "id": "18455932192",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2026-05-10T00:00:00.000Z",
+      "distanceM": 21090,
+      "movingS": 6896,
+      "elevM": 52,
+      "mid": [
+        -118.505966,
+        34.019384
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18433262656",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-05-08T00:00:00.000Z",
+      "distanceM": 10470,
+      "movingS": 3355,
+      "elevM": 11,
+      "mid": [
+        -118.33123,
+        33.885595
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18362328022",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2026-05-03T00:00:00.000Z",
+      "distanceM": 13570,
+      "movingS": 4379,
+      "elevM": 44,
+      "mid": [
+        -118.390452,
+        33.832729
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18341010399",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-05-01T00:00:00.000Z",
+      "distanceM": 7000,
+      "movingS": 2190,
+      "elevM": 31,
+      "mid": [
+        -118.363382,
+        33.914725
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18315164114",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-04-29T00:00:00.000Z",
+      "distanceM": 6970,
+      "movingS": 2244,
+      "elevM": 10,
+      "mid": [
+        -118.34818,
+        33.930506
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18287395166",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-04-27T00:00:00.000Z",
+      "distanceM": 6730,
+      "movingS": 2230,
+      "elevM": 7,
+      "mid": [
+        -118.333672,
+        33.88753
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18257006497",
+      "city": "la",
+      "title": "Lunch Run",
+      "date": "2026-04-25T00:00:00.000Z",
+      "distanceM": 8310,
+      "movingS": 2616,
+      "elevM": 36,
+      "mid": [
+        -118.369029,
+        33.914592
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18235104080",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-04-23T00:00:00.000Z",
+      "distanceM": 6850,
+      "movingS": 2150,
+      "elevM": 6,
+      "mid": [
+        -118.333669,
+        33.887538
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18152784112",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2026-04-17T00:00:00.000Z",
+      "distanceM": 9310,
+      "movingS": 2875,
+      "elevM": 22,
+      "mid": [
+        -118.370438,
+        33.90955
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18092868604",
+      "city": "sf",
+      "title": "Morning Run",
+      "date": "2026-04-13T00:00:00.000Z",
+      "distanceM": 6490,
+      "movingS": 2202,
+      "elevM": 36,
+      "mid": [
+        -121.968842,
+        37.369646
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "18097928353",
+      "city": "pinnacles",
+      "title": "Pinnacles Pilgrimage",
+      "date": "2026-04-13T00:00:00.000Z",
+      "distanceM": 9200,
+      "movingS": 7426,
+      "elevM": 524.4,
+      "mid": [
+        -121.200513,
+        36.485964
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17991798264",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2026-04-05T00:00:00.000Z",
+      "distanceM": 11340,
+      "movingS": 3670,
+      "elevM": 13,
+      "mid": [
+        -118.390374,
+        33.838059
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17904625438",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2026-03-29T00:00:00.000Z",
+      "distanceM": 14490,
+      "movingS": 4614,
+      "elevM": 13,
+      "mid": [
+        -118.330702,
+        33.884577
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17883578279",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2026-03-27T00:00:00.000Z",
+      "distanceM": 8760,
+      "movingS": 2726,
+      "elevM": 9,
+      "mid": [
+        -118.328531,
+        33.883174
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17819432836",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2026-03-22T00:00:00.000Z",
+      "distanceM": 17840,
+      "movingS": 6030,
+      "elevM": 24,
+      "mid": [
+        -118.501172,
+        34.015192
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17774810433",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2026-03-18T00:00:00.000Z",
+      "distanceM": 3210,
+      "movingS": 1553,
+      "elevM": 2,
+      "mid": [
+        -118.347074,
+        33.923586
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17774971837",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-03-18T00:00:00.000Z",
+      "distanceM": 3380,
+      "movingS": 1051,
+      "elevM": 2,
+      "mid": [
+        -118.347171,
+        33.916311
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17734133488",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2026-03-15T00:00:00.000Z",
+      "distanceM": 14570,
+      "movingS": 4564,
+      "elevM": 60,
+      "mid": [
+        -118.389781,
+        33.823524
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17714712463",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-03-13T00:00:00.000Z",
+      "distanceM": 8250,
+      "movingS": 2612,
+      "elevM": 29,
+      "mid": [
+        -118.36964,
+        33.913851
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17692937366",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2026-03-11T00:00:00.000Z",
+      "distanceM": 8090,
+      "movingS": 3132,
+      "elevM": 6,
+      "mid": [
+        -118.349319,
+        33.917367
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17609469113",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-03-04T00:00:00.000Z",
+      "distanceM": 6920,
+      "movingS": 2128,
+      "elevM": 5,
+      "mid": [
+        -118.339583,
+        33.888215
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17584326992",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-03-02T00:00:00.000Z",
+      "distanceM": 6990,
+      "movingS": 2151,
+      "elevM": 23,
+      "mid": [
+        -118.361275,
+        33.915441
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17548459730",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-02-27T00:00:00.000Z",
+      "distanceM": 7460,
+      "movingS": 2296,
+      "elevM": 5,
+      "mid": [
+        -118.340446,
+        33.887584
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17434787811",
+      "city": "tokyo",
+      "title": "Ueno Wobble",
+      "date": "2026-02-18T00:00:00.000Z",
+      "distanceM": 8900,
+      "movingS": 2832,
+      "elevM": 33,
+      "mid": [
+        139.769397,
+        35.71962
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17412268073",
+      "city": "tokyo",
+      "title": "Imperial Palace Prance",
+      "date": "2026-02-16T00:00:00.000Z",
+      "distanceM": 11430,
+      "movingS": 3568,
+      "elevM": 72,
+      "mid": [
+        139.74592,
+        35.680068
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17400057990",
+      "city": "izu",
+      "title": "Morning Hike",
+      "date": "2026-02-14T00:00:00.000Z",
+      "distanceM": 5710,
+      "movingS": 6161,
+      "elevM": 146,
+      "mid": [
+        138.925728,
+        34.810532
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Hike"
+    },
+    {
+      "id": "17370598929",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-02-11T00:00:00.000Z",
+      "distanceM": 6500,
+      "movingS": 2154,
+      "elevM": 4,
+      "mid": [
+        -118.33548,
+        33.887524
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17313334578",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-02-06T00:00:00.000Z",
+      "distanceM": 13840,
+      "movingS": 4503,
+      "elevM": 34,
+      "mid": [
+        -118.383063,
+        33.911313
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17292196106",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-02-04T00:00:00.000Z",
+      "distanceM": 6430,
+      "movingS": 2079,
+      "elevM": 18,
+      "mid": [
+        -118.355002,
+        33.914497
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17254433401",
+      "city": "la",
+      "title": "28k for 28 Years",
+      "date": "2026-02-01T00:00:00.000Z",
+      "distanceM": 28010,
+      "movingS": 9927,
+      "elevM": 41,
+      "mid": [
+        -118.501279,
+        34.015306
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17224148032",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-01-29T00:00:00.000Z",
+      "distanceM": 6800,
+      "movingS": 2147,
+      "elevM": 5,
+      "mid": [
+        -118.333375,
+        33.887598
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17175975217",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2026-01-25T00:00:00.000Z",
+      "distanceM": 25050,
+      "movingS": 8186,
+      "elevM": 47,
+      "mid": [
+        -118.526592,
+        34.031257
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17156435371",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2026-01-23T00:00:00.000Z",
+      "distanceM": 7030,
+      "movingS": 2352,
+      "elevM": 4,
+      "mid": [
+        -118.345048,
+        33.89131
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17123719516",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2026-01-20T00:00:00.000Z",
+      "distanceM": 8310,
+      "movingS": 2545,
+      "elevM": 22,
+      "mid": [
+        -118.369691,
+        33.913663
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17085349025",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2026-01-17T00:00:00.000Z",
+      "distanceM": 16090,
+      "movingS": 5139,
+      "elevM": 101,
+      "mid": [
+        -118.458056,
+        33.961545
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17042976673",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2026-01-13T00:00:00.000Z",
+      "distanceM": 6790,
+      "movingS": 2187,
+      "elevM": 5,
+      "mid": [
+        -118.333499,
+        33.887839
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "17007319943",
+      "city": "la",
+      "title": "3rd Annual Wilson Hike",
+      "date": "2026-01-10T00:00:00.000Z",
+      "distanceM": 25230,
+      "movingS": 23282,
+      "elevM": 1308,
+      "mid": [
+        -118.061658,
+        34.223831
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Hike"
+    },
+    {
+      "id": "16975678725",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2026-01-07T00:00:00.000Z",
+      "distanceM": 7930,
+      "movingS": 2513,
+      "elevM": 8,
+      "mid": [
+        -118.334014,
+        33.887523
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16952441594",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2026-01-05T00:00:00.000Z",
+      "distanceM": 9570,
+      "movingS": 3202,
+      "elevM": 6,
+      "mid": [
+        -118.335458,
+        33.887659
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16839809246",
+      "city": "la",
+      "title": "Lunch Run",
+      "date": "2025-12-25T00:00:00.000Z",
+      "distanceM": 16690,
+      "movingS": 5396,
+      "elevM": 58,
+      "mid": [
+        -118.390661,
+        33.814992
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16833808991",
+      "city": "la",
+      "title": "Afternoon Run",
+      "date": "2025-12-24T00:00:00.000Z",
+      "distanceM": 10210,
+      "movingS": 3321,
+      "elevM": 22,
+      "mid": [
+        -118.369853,
+        33.909677
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16806756070",
+      "city": "la",
+      "title": "Afternoon Run",
+      "date": "2025-12-21T00:00:00.000Z",
+      "distanceM": 13030,
+      "movingS": 4288,
+      "elevM": 48,
+      "mid": [
+        -118.38962,
+        33.831865
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16796186122",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-12-20T00:00:00.000Z",
+      "distanceM": 9020,
+      "movingS": 2867,
+      "elevM": 9,
+      "mid": [
+        -118.330794,
+        33.883717
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16773633560",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-12-17T00:00:00.000Z",
+      "distanceM": 7000,
+      "movingS": 2289,
+      "elevM": 34,
+      "mid": [
+        -118.363521,
+        33.912878
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16743763406",
+      "city": "la",
+      "title": "Bulldog Loop pt3",
+      "date": "2025-12-14T00:00:00.000Z",
+      "distanceM": 25750,
+      "movingS": 11750,
+      "elevM": 966,
+      "mid": [
+        -118.748106,
+        34.079967
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16727454313",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-12-12T00:00:00.000Z",
+      "distanceM": 8190,
+      "movingS": 2653,
+      "elevM": 33,
+      "mid": [
+        -118.369783,
+        33.913008
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16709892913",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-12-10T00:00:00.000Z",
+      "distanceM": 8140,
+      "movingS": 2579,
+      "elevM": 7,
+      "mid": [
+        -118.330668,
+        33.884425
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16678738992",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-12-07T00:00:00.000Z",
+      "distanceM": 13060,
+      "movingS": 4148,
+      "elevM": 20,
+      "mid": [
+        -118.485957,
+        33.999356
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16644805009",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-12-03T00:00:00.000Z",
+      "distanceM": 7470,
+      "movingS": 2291,
+      "elevM": 4,
+      "mid": [
+        -118.335196,
+        33.887518
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16624085729",
+      "city": "channel",
+      "title": "Channel Islands Scamper",
+      "date": "2025-12-01T00:00:00.000Z",
+      "distanceM": 14470,
+      "movingS": 11421,
+      "elevM": 568,
+      "mid": [
+        -119.596208,
+        34.035743
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16613937315",
+      "city": "la",
+      "title": "Lunch Run",
+      "date": "2025-11-30T00:00:00.000Z",
+      "distanceM": 13100,
+      "movingS": 4208,
+      "elevM": 41,
+      "mid": [
+        -118.389603,
+        33.83413
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16587960756",
+      "city": "la",
+      "title": "Afternoon Run",
+      "date": "2025-11-27T00:00:00.000Z",
+      "distanceM": 16320,
+      "movingS": 5303,
+      "elevM": 105,
+      "mid": [
+        -118.450268,
+        33.965483
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16549412394",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-11-23T00:00:00.000Z",
+      "distanceM": 9980,
+      "movingS": 3325,
+      "elevM": 22,
+      "mid": [
+        -118.370032,
+        33.909688
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16529984998",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-11-21T00:00:00.000Z",
+      "distanceM": 8300,
+      "movingS": 2902,
+      "elevM": 21,
+      "mid": [
+        -118.36968,
+        33.913259
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16511625634",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-11-19T00:00:00.000Z",
+      "distanceM": 6780,
+      "movingS": 1930,
+      "elevM": 5,
+      "mid": [
+        -118.333517,
+        33.887655
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16478874487",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-11-16T00:00:00.000Z",
+      "distanceM": 16490,
+      "movingS": 5435,
+      "elevM": 43,
+      "mid": [
+        -118.445952,
+        33.950443
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16452338378",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-11-13T00:00:00.000Z",
+      "distanceM": 8170,
+      "movingS": 2616,
+      "elevM": 22,
+      "mid": [
+        -118.369662,
+        33.913651
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16442047457",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-11-12T00:00:00.000Z",
+      "distanceM": 10360,
+      "movingS": 3186,
+      "elevM": 8,
+      "mid": [
+        -118.332336,
+        33.886587
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16380584628",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-11-06T00:00:00.000Z",
+      "distanceM": 6820,
+      "movingS": 2249,
+      "elevM": 6,
+      "mid": [
+        -118.333511,
+        33.88777
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16348248860",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-11-03T00:00:00.000Z",
+      "distanceM": 8380,
+      "movingS": 2562,
+      "elevM": 20,
+      "mid": [
+        -118.369927,
+        33.912186
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16324259153",
+      "city": "la",
+      "title": "V vs VRC",
+      "date": "2025-11-01T00:00:00.000Z",
+      "distanceM": 21080,
+      "movingS": 6732,
+      "elevM": 54,
+      "mid": [
+        -118.506607,
+        34.018787
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16308760435",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-10-30T00:00:00.000Z",
+      "distanceM": 7110,
+      "movingS": 2105,
+      "elevM": 4,
+      "mid": [
+        -118.347269,
+        33.930005
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16288526403",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-10-28T00:00:00.000Z",
+      "distanceM": 8050,
+      "movingS": 2577,
+      "elevM": 4,
+      "mid": [
+        -118.333498,
+        33.893095
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16256509909",
+      "city": "jacinto",
+      "title": "Cactus 🌵 to Clouds ☁️",
+      "date": "2025-10-25T00:00:00.000Z",
+      "distanceM": 33380,
+      "movingS": 41074,
+      "elevM": 3358,
+      "mid": [
+        -116.679462,
+        33.814745
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16214850418",
+      "city": "michigan",
+      "title": "Afternoon Run",
+      "date": "2025-10-21T00:00:00.000Z",
+      "distanceM": 10320,
+      "movingS": 3259,
+      "elevM": 44,
+      "mid": [
+        -83.128178,
+        42.678305
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16166229107",
+      "city": "waco",
+      "title": "Night Run",
+      "date": "2025-10-16T00:00:00.000Z",
+      "distanceM": 6960,
+      "movingS": 2060,
+      "elevM": 9,
+      "mid": [
+        -97.148593,
+        31.576995
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16123295831",
+      "city": "baldy",
+      "title": "Baldy and the 4Ts",
+      "date": "2025-10-12T00:00:00.000Z",
+      "distanceM": 28010,
+      "movingS": 31178,
+      "elevM": 2286,
+      "mid": [
+        -117.602205,
+        34.26362
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16101297899",
+      "city": "waco",
+      "title": "Night Run",
+      "date": "2025-10-10T00:00:00.000Z",
+      "distanceM": 7700,
+      "movingS": 2486,
+      "elevM": 12,
+      "mid": [
+        -97.117483,
+        31.548208
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16091937811",
+      "city": "waco",
+      "title": "Night Run",
+      "date": "2025-10-09T00:00:00.000Z",
+      "distanceM": 8850,
+      "movingS": 2828,
+      "elevM": 41,
+      "mid": [
+        -97.111702,
+        31.554882
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16047078501",
+      "city": "baldy",
+      "title": "The Baldy 1.5x",
+      "date": "2025-10-05T00:00:00.000Z",
+      "distanceM": 26400,
+      "movingS": 20935,
+      "elevM": 1802.2,
+      "mid": [
+        -117.639244,
+        34.281659
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16016234699",
+      "city": "waco",
+      "title": "Night Run",
+      "date": "2025-10-02T00:00:00.000Z",
+      "distanceM": 8320,
+      "movingS": 2629,
+      "elevM": 29,
+      "mid": [
+        -97.144299,
+        31.5758
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "16005444499",
+      "city": "waco",
+      "title": "Night Run",
+      "date": "2025-10-01T00:00:00.000Z",
+      "distanceM": 8070,
+      "movingS": 2621,
+      "elevM": 45,
+      "mid": [
+        -97.150565,
+        31.576904
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15968802509",
+      "city": "la",
+      "title": "Chino Half Revisited",
+      "date": "2025-09-28T00:00:00.000Z",
+      "distanceM": 21210,
+      "movingS": 8032,
+      "elevM": 483,
+      "mid": [
+        -117.74077,
+        33.917529
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15948036978",
+      "city": "waco",
+      "title": "Rocket Run",
+      "date": "2025-09-26T00:00:00.000Z",
+      "distanceM": 9050,
+      "movingS": 2837,
+      "elevM": 20,
+      "mid": [
+        -97.445094,
+        31.398049
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15891183633",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-09-21T00:00:00.000Z",
+      "distanceM": 21160,
+      "movingS": 7104,
+      "elevM": 60,
+      "mid": [
+        -118.51255,
+        34.023009
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15879307146",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-09-20T00:00:00.000Z",
+      "distanceM": 10070,
+      "movingS": 3310,
+      "elevM": 23,
+      "mid": [
+        -118.371104,
+        33.909606
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15822517990",
+      "city": "whitney",
+      "title": "Morning Walk to Sherman",
+      "date": "2025-09-15T00:00:00.000Z",
+      "distanceM": 3330,
+      "movingS": 2164,
+      "elevM": 102,
+      "mid": [
+        -118.751252,
+        36.580713
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Walk"
+    },
+    {
+      "id": "15824108266",
+      "city": "whitney",
+      "title": "🍐 🌊 (Pear Lake)",
+      "date": "2025-09-14T00:00:00.000Z",
+      "distanceM": 27950,
+      "movingS": 28029,
+      "elevM": 1185,
+      "mid": [
+        -118.671826,
+        36.605634
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15759809389",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-09-09T00:00:00.000Z",
+      "distanceM": 5290,
+      "movingS": 1644,
+      "elevM": 26,
+      "mid": [
+        -118.354381,
+        33.913574
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15711441097",
+      "city": "waco",
+      "title": "Evening Run",
+      "date": "2025-09-05T00:00:00.000Z",
+      "distanceM": 6540,
+      "movingS": 2166,
+      "elevM": 26,
+      "mid": [
+        -97.141927,
+        31.551138
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15653491783",
+      "city": "whitney",
+      "title": "Mineral King day .5 - 4",
+      "date": "2025-08-28T00:00:00.000Z",
+      "distanceM": 59980,
+      "movingS": 67615,
+      "elevM": 3036,
+      "mid": [
+        -118.561839,
+        36.552827
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15653619685",
+      "city": "whitney",
+      "title": "Mineral king day 0-.5",
+      "date": "2025-08-28T00:00:00.000Z",
+      "distanceM": 5750,
+      "movingS": 7883,
+      "elevM": 526,
+      "mid": [
+        -118.594758,
+        36.465339
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15571730180",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-08-24T00:00:00.000Z",
+      "distanceM": 11370,
+      "movingS": 3625,
+      "elevM": 14,
+      "mid": [
+        -118.392481,
+        33.839615
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15560612103",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-08-23T00:00:00.000Z",
+      "distanceM": 8150,
+      "movingS": 2598,
+      "elevM": 9,
+      "mid": [
+        -118.327585,
+        33.887534
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15543119376",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-08-21T00:00:00.000Z",
+      "distanceM": 6820,
+      "movingS": 2155,
+      "elevM": 5,
+      "mid": [
+        -118.333533,
+        33.887769
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15531841679",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-08-20T00:00:00.000Z",
+      "distanceM": 9300,
+      "movingS": 2995,
+      "elevM": 18,
+      "mid": [
+        -118.37043,
+        33.909583
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15492578627",
+      "city": "la",
+      "title": "HRC 5",
+      "date": "2025-08-17T00:00:00.000Z",
+      "distanceM": 9330,
+      "movingS": 3046,
+      "elevM": 69,
+      "mid": [
+        -118.399018,
+        33.857812
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15482684323",
+      "city": "la",
+      "title": "Lunch Run",
+      "date": "2025-08-16T00:00:00.000Z",
+      "distanceM": 10400,
+      "movingS": 3353,
+      "elevM": 12,
+      "mid": [
+        -118.331299,
+        33.884013
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15463334062",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-08-14T00:00:00.000Z",
+      "distanceM": 8040,
+      "movingS": 2595,
+      "elevM": 7,
+      "mid": [
+        -118.3267,
+        33.887589
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15405346248",
+      "city": "sf",
+      "title": "A Mile in His Shoes",
+      "date": "2025-08-09T00:00:00.000Z",
+      "distanceM": 33790,
+      "movingS": 11578,
+      "elevM": 40,
+      "mid": [
+        -121.966406,
+        37.400278
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15334304640",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-08-03T00:00:00.000Z",
+      "distanceM": 21090,
+      "movingS": 6907,
+      "elevM": 60,
+      "mid": [
+        -118.511341,
+        34.022106
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15305136498",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-07-31T00:00:00.000Z",
+      "distanceM": 7150,
+      "movingS": 2321,
+      "elevM": 10,
+      "mid": [
+        -118.361168,
+        33.912573
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15282947071",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-07-29T00:00:00.000Z",
+      "distanceM": 6740,
+      "movingS": 2235,
+      "elevM": 6,
+      "mid": [
+        -118.333708,
+        33.887538
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15258087694",
+      "city": "whitney",
+      "title": "Alta Meadows with (another) Altimate Crew",
+      "date": "2025-07-26T00:00:00.000Z",
+      "distanceM": 26380,
+      "movingS": 23758,
+      "elevM": 1067,
+      "mid": [
+        -118.676561,
+        36.583876
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15217159478",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-07-23T00:00:00.000Z",
+      "distanceM": 8670,
+      "movingS": 2696,
+      "elevM": 7,
+      "mid": [
+        -118.328611,
+        33.883116
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15169459704",
+      "city": "sierra",
+      "title": "Morning Run",
+      "date": "2025-07-19T00:00:00.000Z",
+      "distanceM": 8150,
+      "movingS": 2910,
+      "elevM": 168,
+      "mid": [
+        -118.99971,
+        37.631742
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15141222516",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-07-16T00:00:00.000Z",
+      "distanceM": 6790,
+      "movingS": 1996,
+      "elevM": 4,
+      "mid": [
+        -118.333481,
+        33.887545
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15103731711",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-07-13T00:00:00.000Z",
+      "distanceM": 21290,
+      "movingS": 6691,
+      "elevM": 56,
+      "mid": [
+        -118.511716,
+        34.022289
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15084990226",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-07-11T00:00:00.000Z",
+      "distanceM": 11880,
+      "movingS": 3772,
+      "elevM": 13,
+      "mid": [
+        -118.334742,
+        33.883545
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "15030000500",
+      "city": "yosemite",
+      "title": "Grand Canyon of Yosemite",
+      "date": "2025-07-04T00:00:00.000Z",
+      "distanceM": 50560,
+      "movingS": 53183,
+      "elevM": 1684,
+      "mid": [
+        -119.528313,
+        37.938471
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14955798928",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-06-29T00:00:00.000Z",
+      "distanceM": 21110,
+      "movingS": 6796,
+      "elevM": 63,
+      "mid": [
+        -118.513164,
+        34.02356
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14928611707",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-06-26T00:00:00.000Z",
+      "distanceM": 6720,
+      "movingS": 2088,
+      "elevM": 7,
+      "mid": [
+        -118.333614,
+        33.887564
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14907860175",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-06-24T00:00:00.000Z",
+      "distanceM": 9280,
+      "movingS": 2739,
+      "elevM": 7,
+      "mid": [
+        -118.341977,
+        33.892774
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14883500078",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-06-22T00:00:00.000Z",
+      "distanceM": 11300,
+      "movingS": 3715,
+      "elevM": 9,
+      "mid": [
+        -118.330649,
+        33.884514
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14874291743",
+      "city": "baldy",
+      "title": "Baldy Bash",
+      "date": "2025-06-21T00:00:00.000Z",
+      "distanceM": 17220,
+      "movingS": 17341,
+      "elevM": 1230,
+      "mid": [
+        -117.63151,
+        34.284457
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14845905993",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-06-18T00:00:00.000Z",
+      "distanceM": 9110,
+      "movingS": 2901,
+      "elevM": 7,
+      "mid": [
+        -118.32683,
+        33.883067
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14810142173",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-06-15T00:00:00.000Z",
+      "distanceM": 21090,
+      "movingS": 7142,
+      "elevM": 123,
+      "mid": [
+        -118.390748,
+        33.803062
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14799279454",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-06-14T00:00:00.000Z",
+      "distanceM": 21300,
+      "movingS": 6757,
+      "elevM": 45,
+      "mid": [
+        -118.502833,
+        34.01784
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14735033617",
+      "city": "atlanta",
+      "title": "Post Marital Jaunt",
+      "date": "2025-06-08T00:00:00.000Z",
+      "distanceM": 8500,
+      "movingS": 2889,
+      "elevM": 88,
+      "mid": [
+        -84.322338,
+        33.992997
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14715621664",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-06-06T00:00:00.000Z",
+      "distanceM": 6560,
+      "movingS": 1987,
+      "elevM": 7,
+      "mid": [
+        -118.347141,
+        33.916342
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14665304319",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-06-01T00:00:00.000Z",
+      "distanceM": 15490,
+      "movingS": 4852,
+      "elevM": 90,
+      "mid": [
+        -118.410155,
+        33.901828
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14647584606",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-05-30T00:00:00.000Z",
+      "distanceM": 8450,
+      "movingS": 2625,
+      "elevM": 23,
+      "mid": [
+        -118.369483,
+        33.914186
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14616940570",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-05-27T00:00:00.000Z",
+      "distanceM": 8210,
+      "movingS": 2590,
+      "elevM": 9,
+      "mid": [
+        -118.33421,
+        33.881377
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14595958208",
+      "city": "pinnacles",
+      "title": "Pinnacles Pit Stop",
+      "date": "2025-05-25T00:00:00.000Z",
+      "distanceM": 13270,
+      "movingS": 7356,
+      "elevM": 579,
+      "mid": [
+        -121.198869,
+        36.481986
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14594708000",
+      "city": "bigsur",
+      "title": "Siked for Sykes, Big Sur Backpacking",
+      "date": "2025-05-23T00:00:00.000Z",
+      "distanceM": 43030,
+      "movingS": 36393,
+      "elevM": 2030,
+      "mid": [
+        -121.668753,
+        36.256067
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14557559656",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-05-21T00:00:00.000Z",
+      "distanceM": 9730,
+      "movingS": 3149,
+      "elevM": 8,
+      "mid": [
+        -118.334538,
+        33.887532
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14521791870",
+      "city": "la",
+      "title": "HRC 9",
+      "date": "2025-05-18T00:00:00.000Z",
+      "distanceM": 14720,
+      "movingS": 4596,
+      "elevM": 19,
+      "mid": [
+        -118.391599,
+        33.811624
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14504295424",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-05-16T00:00:00.000Z",
+      "distanceM": 9350,
+      "movingS": 2940,
+      "elevM": 39,
+      "mid": [
+        -118.355729,
+        33.909861
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14473993108",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-05-13T00:00:00.000Z",
+      "distanceM": 10000,
+      "movingS": 3225,
+      "elevM": 12,
+      "mid": [
+        -118.333525,
+        33.887856
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14448668464",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-05-11T00:00:00.000Z",
+      "distanceM": 8950,
+      "movingS": 3264,
+      "elevM": 60,
+      "mid": [
+        -118.396502,
+        33.859865
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14431362602",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-05-09T00:00:00.000Z",
+      "distanceM": 7150,
+      "movingS": 2209,
+      "elevM": 8,
+      "mid": [
+        -118.362261,
+        33.914724
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14411851860",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-05-07T00:00:00.000Z",
+      "distanceM": 9300,
+      "movingS": 2995,
+      "elevM": 8,
+      "mid": [
+        -118.330854,
+        33.885541
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14398231299",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-05-06T00:00:00.000Z",
+      "distanceM": 7670,
+      "movingS": 2437,
+      "elevM": 7,
+      "mid": [
+        -118.397866,
+        33.852355
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14379730785",
+      "city": "la",
+      "title": "Bulldog pt2",
+      "date": "2025-05-04T00:00:00.000Z",
+      "distanceM": 24740,
+      "movingS": 10860,
+      "elevM": 962,
+      "mid": [
+        -118.748317,
+        34.079995
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14350634994",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-05-01T00:00:00.000Z",
+      "distanceM": 8240,
+      "movingS": 2399,
+      "elevM": 40,
+      "mid": [
+        -118.353525,
+        33.912557
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14339593140",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-04-30T00:00:00.000Z",
+      "distanceM": 8140,
+      "movingS": 2506,
+      "elevM": 5,
+      "mid": [
+        -118.3376,
+        33.88756
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14305747749",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-04-27T00:00:00.000Z",
+      "distanceM": 15300,
+      "movingS": 4845,
+      "elevM": 16,
+      "mid": [
+        -118.329656,
+        33.88722
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14234792782",
+      "city": "la",
+      "title": "The OG",
+      "date": "2025-04-20T00:00:00.000Z",
+      "distanceM": 9790,
+      "movingS": 3106,
+      "elevM": 10,
+      "mid": [
+        -118.399584,
+        33.848326
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14218735799",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-04-18T00:00:00.000Z",
+      "distanceM": 6930,
+      "movingS": 2114,
+      "elevM": 5,
+      "mid": [
+        -118.334148,
+        33.887525
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14180463665",
+      "city": "la",
+      "title": "Afternoon Walk",
+      "date": "2025-04-14T00:00:00.000Z",
+      "distanceM": 5350,
+      "movingS": 4875,
+      "elevM": 101,
+      "mid": [
+        -118.341667,
+        33.323305
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Walk"
+    },
+    {
+      "id": "14160307400",
+      "city": "sonoma",
+      "title": "Lake Sonoma Marathon",
+      "date": "2025-04-12T00:00:00.000Z",
+      "distanceM": 42160,
+      "movingS": 21248,
+      "elevM": 1670,
+      "mid": [
+        -123.084512,
+        38.703123
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14099754365",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-04-06T00:00:00.000Z",
+      "distanceM": 13030,
+      "movingS": 4423,
+      "elevM": 83,
+      "mid": [
+        -118.408044,
+        33.876815
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14083739473",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-04-04T00:00:00.000Z",
+      "distanceM": 6830,
+      "movingS": 2252,
+      "elevM": 5,
+      "mid": [
+        -118.333567,
+        33.887837
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14065325099",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-04-02T00:00:00.000Z",
+      "distanceM": 6820,
+      "movingS": 2194,
+      "elevM": 4,
+      "mid": [
+        -118.347142,
+        33.916301
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14024548295",
+      "city": "la",
+      "title": "Chino 22",
+      "date": "2025-03-29T00:00:00.000Z",
+      "distanceM": 35930,
+      "movingS": 14426,
+      "elevM": 915,
+      "mid": [
+        -117.803644,
+        33.914194
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "14008173969",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-03-27T00:00:00.000Z",
+      "distanceM": 8590,
+      "movingS": 2721,
+      "elevM": 23,
+      "mid": [
+        -118.369948,
+        33.911636
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13998981099",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-03-26T00:00:00.000Z",
+      "distanceM": 10610,
+      "movingS": 3304,
+      "elevM": 7,
+      "mid": [
+        -118.331914,
+        33.885465
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13967744073",
+      "city": "la",
+      "title": "Chino 15",
+      "date": "2025-03-23T00:00:00.000Z",
+      "distanceM": 24640,
+      "movingS": 9232,
+      "elevM": 523,
+      "mid": [
+        -117.740732,
+        33.917477
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13950820908",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-03-21T00:00:00.000Z",
+      "distanceM": 8310,
+      "movingS": 2613,
+      "elevM": 5,
+      "mid": [
+        -118.340994,
+        33.887569
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13942133049",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-03-20T00:00:00.000Z",
+      "distanceM": 8180,
+      "movingS": 2611,
+      "elevM": 3,
+      "mid": [
+        -118.335932,
+        33.89455
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13932785067",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-03-19T00:00:00.000Z",
+      "distanceM": 8720,
+      "movingS": 2781,
+      "elevM": 28,
+      "mid": [
+        -118.369972,
+        33.911434
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13922951240",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-03-18T00:00:00.000Z",
+      "distanceM": 8110,
+      "movingS": 2462,
+      "elevM": 5,
+      "mid": [
+        -118.326739,
+        33.887707
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13902552244",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-03-16T00:00:00.000Z",
+      "distanceM": 29030,
+      "movingS": 9860,
+      "elevM": 64,
+      "mid": [
+        -118.519206,
+        34.027718
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13885391056",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-03-14T00:00:00.000Z",
+      "distanceM": 16120,
+      "movingS": 5333,
+      "elevM": 14,
+      "mid": [
+        -118.330521,
+        33.883363
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13867929496",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-03-12T00:00:00.000Z",
+      "distanceM": 8390,
+      "movingS": 2628,
+      "elevM": 7,
+      "mid": [
+        -118.332099,
+        33.893912
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13858642525",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-03-11T00:00:00.000Z",
+      "distanceM": 8570,
+      "movingS": 2825,
+      "elevM": 18,
+      "mid": [
+        -118.368031,
+        33.910312
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13838193934",
+      "city": "la",
+      "title": "Chino 17",
+      "date": "2025-03-09T00:00:00.000Z",
+      "distanceM": 27370,
+      "movingS": 12168,
+      "elevM": 754,
+      "mid": [
+        -117.707905,
+        33.919974
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13819749366",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-03-07T00:00:00.000Z",
+      "distanceM": 10020,
+      "movingS": 3247,
+      "elevM": 18,
+      "mid": [
+        -118.370652,
+        33.909616
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13811731896",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-03-06T00:00:00.000Z",
+      "distanceM": 6950,
+      "movingS": 2140,
+      "elevM": 19,
+      "mid": [
+        -118.362757,
+        33.913807
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13802561087",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-03-05T00:00:00.000Z",
+      "distanceM": 10550,
+      "movingS": 3379,
+      "elevM": 27,
+      "mid": [
+        -118.330671,
+        33.885553
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13771665553",
+      "city": "la",
+      "title": "Chino ⛰️ Half",
+      "date": "2025-03-02T00:00:00.000Z",
+      "distanceM": 21090,
+      "movingS": 7639,
+      "elevM": 484,
+      "mid": [
+        -117.740918,
+        33.917568
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13747565457",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-02-27T00:00:00.000Z",
+      "distanceM": 10650,
+      "movingS": 3390,
+      "elevM": 10,
+      "mid": [
+        -118.331295,
+        33.885605
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13729758358",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-02-25T00:00:00.000Z",
+      "distanceM": 9330,
+      "movingS": 2983,
+      "elevM": 18,
+      "mid": [
+        -118.370785,
+        33.909608
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13720062431",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-02-24T00:00:00.000Z",
+      "distanceM": 8530,
+      "movingS": 2693,
+      "elevM": 7,
+      "mid": [
+        -118.331483,
+        33.885607
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13699317283",
+      "city": "la",
+      "title": "Bulldog loop",
+      "date": "2025-02-22T00:00:00.000Z",
+      "distanceM": 25200,
+      "movingS": 11996,
+      "elevM": 948,
+      "mid": [
+        -118.751079,
+        34.080322
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13675448987",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-02-19T00:00:00.000Z",
+      "distanceM": 7920,
+      "movingS": 2525,
+      "elevM": 6,
+      "mid": [
+        -118.33663,
+        33.893147
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13666750343",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-02-18T00:00:00.000Z",
+      "distanceM": 8100,
+      "movingS": 2640,
+      "elevM": 8,
+      "mid": [
+        -118.336195,
+        33.893741
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13645831686",
+      "city": "la",
+      "title": "HRC 5",
+      "date": "2025-02-16T00:00:00.000Z",
+      "distanceM": 8050,
+      "movingS": 2536,
+      "elevM": 42,
+      "mid": [
+        -118.401427,
+        33.875631
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13645832657",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-02-16T00:00:00.000Z",
+      "distanceM": 5030,
+      "movingS": 1606,
+      "elevM": 4,
+      "mid": [
+        -118.39782,
+        33.851746
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13626025931",
+      "city": "fortuna",
+      "title": "La Fortuna Four",
+      "date": "2025-02-14T00:00:00.000Z",
+      "distanceM": 6440,
+      "movingS": 2070,
+      "elevM": 59,
+      "mid": [
+        -84.642773,
+        10.463566
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13612908752",
+      "city": "fortuna",
+      "title": "1968 lava trail",
+      "date": "2025-02-12T00:00:00.000Z",
+      "distanceM": 5110,
+      "movingS": 7953,
+      "elevM": 189,
+      "mid": [
+        -84.73449,
+        10.473016
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13613436419",
+      "city": "fortuna",
+      "title": "Evening Run",
+      "date": "2025-02-12T00:00:00.000Z",
+      "distanceM": 7000,
+      "movingS": 2241,
+      "elevM": 71,
+      "mid": [
+        -84.645079,
+        10.471488
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13585933800",
+      "city": "la",
+      "title": "Run - Volleyball - Run",
+      "date": "2025-02-09T00:00:00.000Z",
+      "distanceM": 19770,
+      "movingS": 6454,
+      "elevM": 43,
+      "mid": [
+        -118.390236,
+        33.82143
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13569428221",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-02-07T00:00:00.000Z",
+      "distanceM": 11780,
+      "movingS": 3745,
+      "elevM": 8,
+      "mid": [
+        -118.329406,
+        33.884226
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13552906746",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-02-05T00:00:00.000Z",
+      "distanceM": 8480,
+      "movingS": 2614,
+      "elevM": 25,
+      "mid": [
+        -118.367452,
+        33.910313
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13522747208",
+      "city": "la",
+      "title": "27k for 27 years",
+      "date": "2025-02-02T00:00:00.000Z",
+      "distanceM": 27050,
+      "movingS": 9076,
+      "elevM": 63,
+      "mid": [
+        -118.446042,
+        33.983689
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13507275540",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-02-01T00:00:00.000Z",
+      "distanceM": 6440,
+      "movingS": 2062,
+      "elevM": 5,
+      "mid": [
+        -118.335625,
+        33.887694
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13489824781",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-01-29T00:00:00.000Z",
+      "distanceM": 7420,
+      "movingS": 2290,
+      "elevM": 4,
+      "mid": [
+        -118.340805,
+        33.887581
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13471499722",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-01-27T00:00:00.000Z",
+      "distanceM": 3400,
+      "movingS": 1105,
+      "elevM": 2,
+      "mid": [
+        -118.347141,
+        33.916302
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13460096338",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-01-26T00:00:00.000Z",
+      "distanceM": 16780,
+      "movingS": 5658,
+      "elevM": 41,
+      "mid": [
+        -118.390835,
+        33.814545
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13358982296",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-01-14T00:00:00.000Z",
+      "distanceM": 9680,
+      "movingS": 2895,
+      "elevM": 17,
+      "mid": [
+        -118.370718,
+        33.909613
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13339590525",
+      "city": "la",
+      "title": "Afternoon Walk",
+      "date": "2025-01-12T00:00:00.000Z",
+      "distanceM": 3220,
+      "movingS": 2556,
+      "elevM": 6.6,
+      "mid": [
+        -118.347159,
+        33.915284
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Walk"
+    },
+    {
+      "id": "13340097922",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-01-12T00:00:00.000Z",
+      "distanceM": 9860,
+      "movingS": 3216,
+      "elevM": 30.4,
+      "mid": [
+        -118.37115,
+        33.910273
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13330704947",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2025-01-11T00:00:00.000Z",
+      "distanceM": 10990,
+      "movingS": 3705,
+      "elevM": 31.4,
+      "mid": [
+        -118.330308,
+        33.886161
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13296384341",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2025-01-07T00:00:00.000Z",
+      "distanceM": 8850,
+      "movingS": 2907,
+      "elevM": 30.4,
+      "mid": [
+        -118.330747,
+        33.885242
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13277610681",
+      "city": "la",
+      "title": "Afternoon Run",
+      "date": "2025-01-05T00:00:00.000Z",
+      "distanceM": 8450,
+      "movingS": 2802,
+      "elevM": 22.4,
+      "mid": [
+        -118.330889,
+        33.885136
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13266441143",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2025-01-04T00:00:00.000Z",
+      "distanceM": 17300,
+      "movingS": 5788,
+      "elevM": 77.8,
+      "mid": [
+        -118.390388,
+        33.816465
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13241477782",
+      "city": "la",
+      "title": "Los leones x2",
+      "date": "2025-01-01T00:00:00.000Z",
+      "distanceM": 24160,
+      "movingS": 11247,
+      "elevM": 1018.4,
+      "mid": [
+        -118.57408,
+        34.059326
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13219231983",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-12-29T00:00:00.000Z",
+      "distanceM": 13260,
+      "movingS": 4350,
+      "elevM": 50.4,
+      "mid": [
+        -118.330643,
+        33.884641
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13205365491",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-12-27T00:00:00.000Z",
+      "distanceM": 7280,
+      "movingS": 2180,
+      "elevM": 11.4,
+      "mid": [
+        -118.333469,
+        33.890264
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13188886186",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-12-25T00:00:00.000Z",
+      "distanceM": 16110,
+      "movingS": 5175,
+      "elevM": 75.8,
+      "mid": [
+        -118.390021,
+        33.818611
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13183456989",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-12-24T00:00:00.000Z",
+      "distanceM": 13120,
+      "movingS": 5382,
+      "elevM": 550,
+      "mid": [
+        -118.574112,
+        34.059291
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13163388104",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-12-21T00:00:00.000Z",
+      "distanceM": 24170,
+      "movingS": 8067,
+      "elevM": 96,
+      "mid": [
+        -118.527048,
+        34.031482
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13146319355",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2024-12-18T00:00:00.000Z",
+      "distanceM": 9850,
+      "movingS": 3020,
+      "elevM": 35.8,
+      "mid": [
+        -118.371147,
+        33.909975
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13123785608",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-12-15T00:00:00.000Z",
+      "distanceM": 11990,
+      "movingS": 4923,
+      "elevM": 509.8,
+      "mid": [
+        -118.574489,
+        34.059707
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13116132014",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-12-14T00:00:00.000Z",
+      "distanceM": 13190,
+      "movingS": 4240,
+      "elevM": 46,
+      "mid": [
+        -118.486711,
+        34.000611
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13104653832",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2024-12-12T00:00:00.000Z",
+      "distanceM": 6650,
+      "movingS": 1965,
+      "elevM": 18.8,
+      "mid": [
+        -118.333579,
+        33.887561
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13097502711",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2024-12-11T00:00:00.000Z",
+      "distanceM": 8760,
+      "movingS": 2766,
+      "elevM": 42.2,
+      "mid": [
+        -118.369835,
+        33.911112
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13083645183",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-12-09T00:00:00.000Z",
+      "distanceM": 8060,
+      "movingS": 2503,
+      "elevM": 22,
+      "mid": [
+        -118.333768,
+        33.88125
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13063007283",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-12-06T00:00:00.000Z",
+      "distanceM": 8110,
+      "movingS": 2666,
+      "elevM": 23.2,
+      "mid": [
+        -118.334671,
+        33.881368
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13042617763",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2024-12-03T00:00:00.000Z",
+      "distanceM": 8960,
+      "movingS": 2891,
+      "elevM": 35.4,
+      "mid": [
+        -118.331591,
+        33.884382
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "13004093843",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-11-28T00:00:00.000Z",
+      "distanceM": 21430,
+      "movingS": 7234,
+      "elevM": 120.6,
+      "mid": [
+        -118.395344,
+        33.844151
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12975334607",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-11-24T00:00:00.000Z",
+      "distanceM": 22620,
+      "movingS": 8518,
+      "elevM": 72.2,
+      "mid": [
+        -118.495999,
+        34.009365
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12949043416",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2024-11-20T00:00:00.000Z",
+      "distanceM": 10130,
+      "movingS": 3322,
+      "elevM": 32,
+      "mid": [
+        -118.330849,
+        33.883692
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12934563623",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-11-18T00:00:00.000Z",
+      "distanceM": 7320,
+      "movingS": 2398,
+      "elevM": 21.2,
+      "mid": [
+        -118.361157,
+        33.911552
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12924909160",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-11-17T00:00:00.000Z",
+      "distanceM": 16120,
+      "movingS": 5551,
+      "elevM": 88,
+      "mid": [
+        -118.33158,
+        33.884341
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12911010160",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-11-15T00:00:00.000Z",
+      "distanceM": 11510,
+      "movingS": 3803,
+      "elevM": 37,
+      "mid": [
+        -118.330654,
+        33.884561
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12879800289",
+      "city": "jacinto",
+      "title": "Mt Gorgonio",
+      "date": "2024-11-11T00:00:00.000Z",
+      "distanceM": 34270,
+      "movingS": 28588,
+      "elevM": 1427.3,
+      "mid": [
+        -116.829286,
+        34.094973
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12856582992",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-11-08T00:00:00.000Z",
+      "distanceM": 10130,
+      "movingS": 3284,
+      "elevM": 21,
+      "mid": [
+        -118.371117,
+        33.909694
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12849726538",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-11-07T00:00:00.000Z",
+      "distanceM": 6670,
+      "movingS": 2157,
+      "elevM": 15.6,
+      "mid": [
+        -118.333657,
+        33.887539
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12844316916",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2024-11-06T00:00:00.000Z",
+      "distanceM": 3350,
+      "movingS": 1101,
+      "elevM": 7.4,
+      "mid": [
+        -118.347197,
+        33.916318
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12786693807",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-10-30T00:00:00.000Z",
+      "distanceM": 11110,
+      "movingS": 3407,
+      "elevM": 12.9,
+      "mid": [
+        -118.370266,
+        33.9096
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12750533487",
+      "city": "sierra",
+      "title": "Range of Lights Trail Run 10k",
+      "date": "2024-10-26T00:00:00.000Z",
+      "distanceM": 11720,
+      "movingS": 4304,
+      "elevM": 307.8,
+      "mid": [
+        -118.505026,
+        37.352808
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Trail Run"
+    },
+    {
+      "id": "12730678054",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2024-10-23T00:00:00.000Z",
+      "distanceM": 11330,
+      "movingS": 3830,
+      "elevM": 44.4,
+      "mid": [
+        -118.330214,
+        33.88535
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12695068968",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-10-19T00:00:00.000Z",
+      "distanceM": 21110,
+      "movingS": 6900,
+      "elevM": 106.4,
+      "mid": [
+        -118.506321,
+        34.019089
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12666816155",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-10-15T00:00:00.000Z",
+      "distanceM": 9910,
+      "movingS": 3295,
+      "elevM": 30.4,
+      "mid": [
+        -118.331055,
+        33.885602
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12649146284",
+      "city": "la",
+      "title": "Afternoon Run",
+      "date": "2024-10-13T00:00:00.000Z",
+      "distanceM": 6840,
+      "movingS": 2307,
+      "elevM": 45.6,
+      "mid": [
+        -118.360092,
+        33.913665
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12639432714",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-10-12T00:00:00.000Z",
+      "distanceM": 24460,
+      "movingS": 7895,
+      "elevM": 127.8,
+      "mid": [
+        -118.526838,
+        34.031367
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12626517230",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-10-10T00:00:00.000Z",
+      "distanceM": 8770,
+      "movingS": 2612,
+      "elevM": 18,
+      "mid": [
+        -118.368779,
+        33.911133
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12591185694",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-10-06T00:00:00.000Z",
+      "distanceM": 6740,
+      "movingS": 2178,
+      "elevM": 43.7,
+      "mid": [
+        -118.403315,
+        33.89038
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12582481054",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-10-05T00:00:00.000Z",
+      "distanceM": 21090,
+      "movingS": 7219,
+      "elevM": 92.2,
+      "mid": [
+        -118.50285,
+        34.017912
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12569788011",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-10-03T00:00:00.000Z",
+      "distanceM": 8170,
+      "movingS": 2606,
+      "elevM": 23.3,
+      "mid": [
+        -118.365888,
+        33.912166
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12553755320",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-10-01T00:00:00.000Z",
+      "distanceM": 13040,
+      "movingS": 4121,
+      "elevM": 11.4,
+      "mid": [
+        -118.328823,
+        33.883004
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12534025163",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-09-29T00:00:00.000Z",
+      "distanceM": 12930,
+      "movingS": 4103,
+      "elevM": 55.9,
+      "mid": [
+        -118.390542,
+        33.815697
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12525514272",
+      "city": "la",
+      "title": "Run club reunion",
+      "date": "2024-09-28T00:00:00.000Z",
+      "distanceM": 17900,
+      "movingS": 5921,
+      "elevM": 88.4,
+      "mid": [
+        -118.434159,
+        33.974558
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12525626146",
+      "city": "la",
+      "title": "Wrong cafe :(",
+      "date": "2024-09-28T00:00:00.000Z",
+      "distanceM": 1250,
+      "movingS": 398,
+      "elevM": 16.9,
+      "mid": [
+        -118.446246,
+        33.960177
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12497965729",
+      "city": "la",
+      "title": "Night Run 🍳🗿",
+      "date": "2024-09-24T00:00:00.000Z",
+      "distanceM": 8530,
+      "movingS": 2919,
+      "elevM": 36,
+      "mid": [
+        -118.369822,
+        33.904454
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12477942683",
+      "city": "michigan",
+      "title": "Lunch Run",
+      "date": "2024-09-22T00:00:00.000Z",
+      "distanceM": 10950,
+      "movingS": 3460,
+      "elevM": 91.8,
+      "mid": [
+        -83.195671,
+        42.717001
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12447295565",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2024-09-18T00:00:00.000Z",
+      "distanceM": 6460,
+      "movingS": 1914,
+      "elevM": 26,
+      "mid": [
+        -118.33699,
+        33.919906
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12419139375",
+      "city": "la",
+      "title": "Lunch Run",
+      "date": "2024-09-15T00:00:00.000Z",
+      "distanceM": 13300,
+      "movingS": 4375,
+      "elevM": 9.4,
+      "mid": [
+        -118.331511,
+        33.882961
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12389179741",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-09-11T00:00:00.000Z",
+      "distanceM": 10000,
+      "movingS": 3339,
+      "elevM": 27.4,
+      "mid": [
+        -118.331633,
+        33.884494
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12380770896",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-09-10T00:00:00.000Z",
+      "distanceM": 8170,
+      "movingS": 2846,
+      "elevM": 28.8,
+      "mid": [
+        -118.365585,
+        33.910427
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12361269936",
+      "city": "la",
+      "title": "Dawn Mine",
+      "date": "2024-09-08T00:00:00.000Z",
+      "distanceM": 11470,
+      "movingS": 12213,
+      "elevM": 566.5,
+      "mid": [
+        -118.130501,
+        34.226998
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12351781876",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-09-07T00:00:00.000Z",
+      "distanceM": 19720,
+      "movingS": 6922,
+      "elevM": 87.6,
+      "mid": [
+        -118.390452,
+        33.813929
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12308400668",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-09-02T00:00:00.000Z",
+      "distanceM": 6620,
+      "movingS": 2252,
+      "elevM": 23.8,
+      "mid": [
+        -118.363237,
+        33.912137
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12302817828",
+      "city": "whitney",
+      "title": "Mt Langley",
+      "date": "2024-09-01T00:00:00.000Z",
+      "distanceM": 39370,
+      "movingS": 36206,
+      "elevM": 1535.3,
+      "mid": [
+        -118.240191,
+        36.522123
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12261558249",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-08-27T00:00:00.000Z",
+      "distanceM": 6870,
+      "movingS": 2200,
+      "elevM": 23.4,
+      "mid": [
+        -118.362879,
+        33.913745
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12241020151",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-08-25T00:00:00.000Z",
+      "distanceM": 13350,
+      "movingS": 4356,
+      "elevM": 14.5,
+      "mid": [
+        -118.390381,
+        33.833741
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12183162248",
+      "city": "telescope",
+      "title": "Telescope Peak",
+      "date": "2024-08-18T00:00:00.000Z",
+      "distanceM": 20280,
+      "movingS": 18440,
+      "elevM": 998.7,
+      "mid": [
+        -117.089206,
+        36.169987
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12174168243",
+      "city": "sierra",
+      "title": "White Mountain",
+      "date": "2024-08-17T00:00:00.000Z",
+      "distanceM": 25070,
+      "movingS": 21878,
+      "elevM": 1052.4,
+      "mid": [
+        -118.255683,
+        37.634056
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12122889802",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-08-11T00:00:00.000Z",
+      "distanceM": 21120,
+      "movingS": 7455,
+      "elevM": 77.8,
+      "mid": [
+        -118.45753,
+        33.96178
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12091842879",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2024-08-07T00:00:00.000Z",
+      "distanceM": 8960,
+      "movingS": 2832,
+      "elevM": 27,
+      "mid": [
+        -118.37056,
+        33.909603
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "12061916994",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-08-04T00:00:00.000Z",
+      "distanceM": 11840,
+      "movingS": 3967,
+      "elevM": 16.4,
+      "mid": [
+        -118.392464,
+        33.839249
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11998449853",
+      "city": "whitney",
+      "title": "Mt Whitney, day hike",
+      "date": "2024-07-27T00:00:00.000Z",
+      "distanceM": 34610,
+      "movingS": 44401,
+      "elevM": 2014.5,
+      "mid": [
+        -118.292933,
+        36.578185
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Hike"
+    },
+    {
+      "id": "11916397168",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-07-17T00:00:00.000Z",
+      "distanceM": 10760,
+      "movingS": 3682,
+      "elevM": 29.1,
+      "mid": [
+        -118.37003,
+        33.904754
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11898921584",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-07-15T00:00:00.000Z",
+      "distanceM": 6560,
+      "movingS": 2349,
+      "elevM": 8.2,
+      "mid": [
+        -118.335778,
+        33.887652
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11887994860",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-07-14T00:00:00.000Z",
+      "distanceM": 16520,
+      "movingS": 5721,
+      "elevM": 40.2,
+      "mid": [
+        -118.497554,
+        34.010026
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11864629182",
+      "city": "canyon",
+      "title": "Grand Canyon with a Grand family",
+      "date": "2024-07-11T00:00:00.000Z",
+      "distanceM": 8970,
+      "movingS": 9639,
+      "elevM": 663.8,
+      "mid": [
+        -112.046613,
+        36.207329
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11847792994",
+      "city": "zion",
+      "title": "😇 🛬",
+      "date": "2024-07-09T00:00:00.000Z",
+      "distanceM": 10420,
+      "movingS": 9158,
+      "elevM": 648.9,
+      "mid": [
+        -112.948675,
+        37.269841
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11842777087",
+      "city": "zion",
+      "title": "Zion Sunset Overlook",
+      "date": "2024-07-08T00:00:00.000Z",
+      "distanceM": 2120,
+      "movingS": 3005,
+      "elevM": 113.5,
+      "mid": [
+        -112.945846,
+        37.212994
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11832847975",
+      "city": "kings",
+      "title": "Rae lakes",
+      "date": "2024-07-04T00:00:00.000Z",
+      "distanceM": 67680,
+      "movingS": 64083,
+      "elevM": 2441.5,
+      "mid": [
+        -118.404073,
+        36.813861
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11779527683",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2024-06-30T00:00:00.000Z",
+      "distanceM": 8490,
+      "movingS": 2866,
+      "elevM": 25.4,
+      "mid": [
+        -118.364601,
+        33.907823
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11771264654",
+      "city": "la",
+      "title": "Afternoon Hike",
+      "date": "2024-06-29T00:00:00.000Z",
+      "distanceM": 5160,
+      "movingS": 4641,
+      "elevM": 253.6,
+      "mid": [
+        -118.752686,
+        34.049108
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Hike"
+    },
+    {
+      "id": "11764101564",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-06-28T00:00:00.000Z",
+      "distanceM": 14060,
+      "movingS": 4744,
+      "elevM": 35,
+      "mid": [
+        -118.331509,
+        33.885565
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11749463321",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-06-26T00:00:00.000Z",
+      "distanceM": 8080,
+      "movingS": 2709,
+      "elevM": 30.8,
+      "mid": [
+        -118.371088,
+        33.912652
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11722029403",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-06-23T00:00:00.000Z",
+      "distanceM": 13010,
+      "movingS": 4800,
+      "elevM": 29.8,
+      "mid": [
+        -118.467718,
+        33.980114
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11716321759",
+      "city": "la",
+      "title": "Afternoon Hike",
+      "date": "2024-06-22T00:00:00.000Z",
+      "distanceM": 11190,
+      "movingS": 11157,
+      "elevM": 637,
+      "mid": [
+        -118.546825,
+        34.081997
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Hike"
+    },
+    {
+      "id": "11709230466",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-06-21T00:00:00.000Z",
+      "distanceM": 11270,
+      "movingS": 4063,
+      "elevM": 13,
+      "mid": [
+        -118.371539,
+        33.914505
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11686885863",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-06-18T00:00:00.000Z",
+      "distanceM": 6480,
+      "movingS": 2199,
+      "elevM": 8.6,
+      "mid": [
+        -118.335592,
+        33.887568
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11667734992",
+      "city": "whitney",
+      "title": "Alta Peak",
+      "date": "2024-06-15T00:00:00.000Z",
+      "distanceM": 33310,
+      "movingS": 29686,
+      "elevM": 1652.6,
+      "mid": [
+        -118.664513,
+        36.590301
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11632475792",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-06-11T00:00:00.000Z",
+      "distanceM": 6460,
+      "movingS": 2311,
+      "elevM": 3.8,
+      "mid": [
+        -118.348237,
+        33.929555
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11614236236",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-06-09T00:00:00.000Z",
+      "distanceM": 13280,
+      "movingS": 4790,
+      "elevM": 88,
+      "mid": [
+        -118.387723,
+        33.811231
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11592158247",
+      "city": "la",
+      "title": "Afternoon Run",
+      "date": "2024-06-06T00:00:00.000Z",
+      "distanceM": 6000,
+      "movingS": 2107,
+      "elevM": 19.2,
+      "mid": [
+        -118.336513,
+        33.887335
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11557578807",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-06-02T00:00:00.000Z",
+      "distanceM": 16170,
+      "movingS": 5531,
+      "elevM": 47.4,
+      "mid": [
+        -118.390128,
+        33.818162
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11544606093",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-05-31T00:00:00.000Z",
+      "distanceM": 1680,
+      "movingS": 622,
+      "elevM": 0,
+      "mid": [
+        -118.349441,
+        33.910041
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11544606207",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-05-31T00:00:00.000Z",
+      "distanceM": 5060,
+      "movingS": 1392,
+      "elevM": 5.4,
+      "mid": [
+        -118.346793,
+        33.90981
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11512268412",
+      "city": "la",
+      "title": "Vishnu goes west",
+      "date": "2024-05-27T00:00:00.000Z",
+      "distanceM": 16020,
+      "movingS": 5610,
+      "elevM": 118.2,
+      "mid": [
+        -118.409439,
+        33.888844
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11502447400",
+      "city": "la",
+      "title": "💀🪨",
+      "date": "2024-05-25T00:00:00.000Z",
+      "distanceM": 7710,
+      "movingS": 8170,
+      "elevM": 421.4,
+      "mid": [
+        -118.542813,
+        34.0705
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11495952808",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-05-25T00:00:00.000Z",
+      "distanceM": 13240,
+      "movingS": 4456,
+      "elevM": 52.4,
+      "mid": [
+        -118.390108,
+        33.830926
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11483845430",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-05-23T00:00:00.000Z",
+      "distanceM": 10450,
+      "movingS": 3587,
+      "elevM": 51.2,
+      "mid": [
+        -118.362135,
+        33.902837
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11468425741",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-05-21T00:00:00.000Z",
+      "distanceM": 8860,
+      "movingS": 2937,
+      "elevM": 31.8,
+      "mid": [
+        -118.331001,
+        33.883705
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11441332165",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-05-18T00:00:00.000Z",
+      "distanceM": 11290,
+      "movingS": 3762,
+      "elevM": 39.4,
+      "mid": [
+        -118.331672,
+        33.885603
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11435714868",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2024-05-17T00:00:00.000Z",
+      "distanceM": 7140,
+      "movingS": 2341,
+      "elevM": 14.2,
+      "mid": [
+        -118.349366,
+        33.930257
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11405514425",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2024-05-13T00:00:00.000Z",
+      "distanceM": 9940,
+      "movingS": 3340,
+      "elevM": 15.4,
+      "mid": [
+        -118.329715,
+        33.909122
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11387228583",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-05-11T00:00:00.000Z",
+      "distanceM": 11460,
+      "movingS": 3604,
+      "elevM": 33.9,
+      "mid": [
+        -118.435208,
+        33.928509
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11374781277",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-05-09T00:00:00.000Z",
+      "distanceM": 6910,
+      "movingS": 2278,
+      "elevM": 16.6,
+      "mid": [
+        -118.348171,
+        33.930618
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11358504235",
+      "city": "la",
+      "title": "Freudian slip pt3",
+      "date": "2024-05-07T00:00:00.000Z",
+      "distanceM": 9370,
+      "movingS": 3164,
+      "elevM": 41.4,
+      "mid": [
+        -118.370928,
+        33.909617
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11340026637",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-05-05T00:00:00.000Z",
+      "distanceM": 5390,
+      "movingS": 1989,
+      "elevM": 7.8,
+      "mid": [
+        -118.40189,
+        33.861999
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11332984799",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-05-04T00:00:00.000Z",
+      "distanceM": 12940,
+      "movingS": 4266,
+      "elevM": 37.6,
+      "mid": [
+        -118.390421,
+        33.83309
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11319994549",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-05-02T00:00:00.000Z",
+      "distanceM": 8840,
+      "movingS": 3065,
+      "elevM": 29.4,
+      "mid": [
+        -118.369883,
+        33.909909
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11304226960",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-04-30T00:00:00.000Z",
+      "distanceM": 6580,
+      "movingS": 2159,
+      "elevM": 8.4,
+      "mid": [
+        -118.336332,
+        33.887559
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11270486401",
+      "city": "la",
+      "title": "🦅🗿",
+      "date": "2024-04-26T00:00:00.000Z",
+      "distanceM": 12430,
+      "movingS": 9098,
+      "elevM": 386.9,
+      "mid": [
+        -118.554646,
+        34.10184
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11234017444",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-04-21T00:00:00.000Z",
+      "distanceM": 21580,
+      "movingS": 7303,
+      "elevM": 102.6,
+      "mid": [
+        -118.389737,
+        33.802125
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11200262035",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-04-16T00:00:00.000Z",
+      "distanceM": 6560,
+      "movingS": 2067,
+      "elevM": 13,
+      "mid": [
+        -118.360241,
+        33.911731
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11183093210",
+      "city": "joshua",
+      "title": "Jtree Jam",
+      "date": "2024-04-12T00:00:00.000Z",
+      "distanceM": 57400,
+      "movingS": 41683,
+      "elevM": 974.6,
+      "mid": [
+        -116.169246,
+        33.97692
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11130603261",
+      "city": "ynez",
+      "title": "Morning Hike",
+      "date": "2024-04-07T00:00:00.000Z",
+      "distanceM": 13140,
+      "movingS": 12267,
+      "elevM": 227,
+      "mid": [
+        -119.754289,
+        34.577473
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Hike"
+    },
+    {
+      "id": "11130602217",
+      "city": "ynez",
+      "title": "Morning Hike",
+      "date": "2024-04-06T00:00:00.000Z",
+      "distanceM": 13990,
+      "movingS": 14705,
+      "elevM": 1016,
+      "mid": [
+        -119.753798,
+        34.577789
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Hike"
+    },
+    {
+      "id": "11102771936",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-04-03T00:00:00.000Z",
+      "distanceM": 10100,
+      "movingS": 4221,
+      "elevM": 20.8,
+      "mid": [
+        -118.327542,
+        33.883484
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11078534913",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-03-31T00:00:00.000Z",
+      "distanceM": 16120,
+      "movingS": 6113,
+      "elevM": 59.8,
+      "mid": [
+        -118.446241,
+        33.950901
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11059311104",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-03-28T00:00:00.000Z",
+      "distanceM": 6520,
+      "movingS": 2231,
+      "elevM": 10.8,
+      "mid": [
+        -118.348204,
+        33.929094
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11046356089",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-03-26T00:00:00.000Z",
+      "distanceM": 9920,
+      "movingS": 3489,
+      "elevM": 22.8,
+      "mid": [
+        -118.327355,
+        33.883448
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11030272368",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-03-24T00:00:00.000Z",
+      "distanceM": 11300,
+      "movingS": 3828,
+      "elevM": 77,
+      "mid": [
+        -118.390918,
+        33.84135
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "11012386162",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-03-21T00:00:00.000Z",
+      "distanceM": 7260,
+      "movingS": 2559,
+      "elevM": 12.2,
+      "mid": [
+        -118.347221,
+        33.929216
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10982454266",
+      "city": "la",
+      "title": "LA Marathon 2024",
+      "date": "2024-03-17T00:00:00.000Z",
+      "distanceM": 42330,
+      "movingS": 16125,
+      "elevM": 374.8,
+      "mid": [
+        -118.297046,
+        34.101814
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10932606325",
+      "city": "la",
+      "title": "Lunch Run",
+      "date": "2024-03-10T00:00:00.000Z",
+      "distanceM": 11660,
+      "movingS": 4031,
+      "elevM": 32,
+      "mid": [
+        -118.335357,
+        33.881762
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10920487833",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-03-08T00:00:00.000Z",
+      "distanceM": 5070,
+      "movingS": 1706,
+      "elevM": 9.8,
+      "mid": [
+        -118.352276,
+        33.915788
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10900620088",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-03-05T00:00:00.000Z",
+      "distanceM": 6510,
+      "movingS": 2173,
+      "elevM": 11.4,
+      "mid": [
+        -118.347219,
+        33.916321
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10884158566",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-03-03T00:00:00.000Z",
+      "distanceM": 33810,
+      "movingS": 12681,
+      "elevM": 366.2,
+      "mid": [
+        -118.389043,
+        33.799117
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10872301557",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-03-02T00:00:00.000Z",
+      "distanceM": 9920,
+      "movingS": 3463,
+      "elevM": 21.6,
+      "mid": [
+        -118.33751,
+        33.887561
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10852846533",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-02-27T00:00:00.000Z",
+      "distanceM": 6630,
+      "movingS": 2365,
+      "elevM": 5.4,
+      "mid": [
+        -118.347204,
+        33.916295
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10836799644",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-02-25T00:00:00.000Z",
+      "distanceM": 29060,
+      "movingS": 10868,
+      "elevM": 253.6,
+      "mid": [
+        -118.393405,
+        33.801062
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10824220724",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-02-23T00:00:00.000Z",
+      "distanceM": 10040,
+      "movingS": 3515,
+      "elevM": 14.4,
+      "mid": [
+        -118.338334,
+        33.887597
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10812262175",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-02-21T00:00:00.000Z",
+      "distanceM": 7020,
+      "movingS": 2513,
+      "elevM": 9.8,
+      "mid": [
+        -118.349861,
+        33.916339
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10805408770",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-02-20T00:00:00.000Z",
+      "distanceM": 10190,
+      "movingS": 3687,
+      "elevM": 17.4,
+      "mid": [
+        -118.335771,
+        33.887572
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10789772494",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-02-18T00:00:00.000Z",
+      "distanceM": 24150,
+      "movingS": 8561,
+      "elevM": 174.2,
+      "mid": [
+        -118.391574,
+        33.811513
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10777314607",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-02-16T00:00:00.000Z",
+      "distanceM": 7540,
+      "movingS": 2502,
+      "elevM": 11.2,
+      "mid": [
+        -118.361139,
+        33.914914
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10764699336",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-02-14T00:00:00.000Z",
+      "distanceM": 8850,
+      "movingS": 2962,
+      "elevM": 37.4,
+      "mid": [
+        -118.369924,
+        33.910732
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10751308391",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-02-12T00:00:00.000Z",
+      "distanceM": 8120,
+      "movingS": 2717,
+      "elevM": 25.8,
+      "mid": [
+        -118.369658,
+        33.903976
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10735593842",
+      "city": "la",
+      "title": "River Crossing Rumble",
+      "date": "2024-02-10T00:00:00.000Z",
+      "distanceM": 12280,
+      "movingS": 6680,
+      "elevM": 575.4,
+      "mid": [
+        -118.578893,
+        34.077287
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10725819068",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-02-08T00:00:00.000Z",
+      "distanceM": 6530,
+      "movingS": 2269,
+      "elevM": 9.8,
+      "mid": [
+        -118.347274,
+        33.930683
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10719724270",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-02-07T00:00:00.000Z",
+      "distanceM": 10190,
+      "movingS": 3446,
+      "elevM": 27.8,
+      "mid": [
+        -118.331516,
+        33.884432
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10705487830",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-02-05T00:00:00.000Z",
+      "distanceM": 6530,
+      "movingS": 2182,
+      "elevM": 12.4,
+      "mid": [
+        -118.347181,
+        33.916309
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10689894330",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-02-03T00:00:00.000Z",
+      "distanceM": 21270,
+      "movingS": 7385,
+      "elevM": 52,
+      "mid": [
+        -118.390523,
+        33.817846
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10679037536",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-02-01T00:00:00.000Z",
+      "distanceM": 10060,
+      "movingS": 3421,
+      "elevM": 11.8,
+      "mid": [
+        -118.331972,
+        33.881814
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10665298234",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2024-01-30T00:00:00.000Z",
+      "distanceM": 8210,
+      "movingS": 2696,
+      "elevM": 13,
+      "mid": [
+        -118.34781,
+        33.92916
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10649491839",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-01-28T00:00:00.000Z",
+      "distanceM": 13910,
+      "movingS": 4794,
+      "elevM": 49,
+      "mid": [
+        -118.440463,
+        33.939826
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10618567192",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-01-23T00:00:00.000Z",
+      "distanceM": 6490,
+      "movingS": 2048,
+      "elevM": 6.2,
+      "mid": [
+        -118.351484,
+        33.926986
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10597156768",
+      "city": "la",
+      "title": "Morning Walk",
+      "date": "2024-01-20T00:00:00.000Z",
+      "distanceM": 3530,
+      "movingS": 1765,
+      "elevM": 33.4,
+      "mid": [
+        -118.417741,
+        33.895863
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Walk"
+    },
+    {
+      "id": "10597156806",
+      "city": "la",
+      "title": "Strand Slip n Slide",
+      "date": "2024-01-20T00:00:00.000Z",
+      "distanceM": 9780,
+      "movingS": 3481,
+      "elevM": 35,
+      "mid": [
+        -118.440497,
+        33.93977
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10586630580",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-01-18T00:00:00.000Z",
+      "distanceM": 6460,
+      "movingS": 2252,
+      "elevM": 6,
+      "mid": [
+        -118.34836,
+        33.928844
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10580296614",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-01-17T00:00:00.000Z",
+      "distanceM": 10140,
+      "movingS": 3580,
+      "elevM": 22.8,
+      "mid": [
+        -118.332209,
+        33.881307
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10574227441",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-01-16T00:00:00.000Z",
+      "distanceM": 3340,
+      "movingS": 1092,
+      "elevM": 7,
+      "mid": [
+        -118.347173,
+        33.916299
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10566564329",
+      "city": "la",
+      "title": "2nd annual Wilson hike",
+      "date": "2024-01-15T00:00:00.000Z",
+      "distanceM": 24870,
+      "movingS": 21294,
+      "elevM": 1818.2,
+      "mid": [
+        -118.057057,
+        34.225534
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Hike"
+    },
+    {
+      "id": "10552471635",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-01-13T00:00:00.000Z",
+      "distanceM": 11390,
+      "movingS": 4944,
+      "elevM": 466.6,
+      "mid": [
+        -118.560336,
+        34.107285
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10535608654",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2024-01-10T00:00:00.000Z",
+      "distanceM": 6530,
+      "movingS": 2141,
+      "elevM": 7.6,
+      "mid": [
+        -118.346895,
+        33.923578
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10522341238",
+      "city": "la",
+      "title": "Victor(y) Lap",
+      "date": "2024-01-08T00:00:00.000Z",
+      "distanceM": 6710,
+      "movingS": 2282,
+      "elevM": 11.2,
+      "mid": [
+        -118.336434,
+        33.887632
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10507880588",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2024-01-06T00:00:00.000Z",
+      "distanceM": 12940,
+      "movingS": 4488,
+      "elevM": 59,
+      "mid": [
+        -118.394405,
+        33.845025
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10490106841",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2024-01-03T00:00:00.000Z",
+      "distanceM": 6760,
+      "movingS": 2221,
+      "elevM": 10.8,
+      "mid": [
+        -118.346775,
+        33.914978
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10469994827",
+      "city": "la",
+      "title": "Morning Hike",
+      "date": "2023-12-31T00:00:00.000Z",
+      "distanceM": 8200,
+      "movingS": 7289,
+      "elevM": 366.1,
+      "mid": [
+        -118.542828,
+        34.070472
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Hike"
+    },
+    {
+      "id": "10454425041",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2023-12-28T00:00:00.000Z",
+      "distanceM": 5450,
+      "movingS": 1752,
+      "elevM": 9.2,
+      "mid": [
+        -118.348297,
+        33.922228
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10413124126",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-12-20T00:00:00.000Z",
+      "distanceM": 5050,
+      "movingS": 1646,
+      "elevM": 6.6,
+      "mid": [
+        -118.347701,
+        33.923572
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10403033729",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-12-18T00:00:00.000Z",
+      "distanceM": 5150,
+      "movingS": 1700,
+      "elevM": 26.2,
+      "mid": [
+        -118.367132,
+        33.903072
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10390361736",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-12-16T00:00:00.000Z",
+      "distanceM": 9960,
+      "movingS": 3344,
+      "elevM": 46,
+      "mid": [
+        -118.397896,
+        33.852505
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10377397514",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-12-13T00:00:00.000Z",
+      "distanceM": 5360,
+      "movingS": 1747,
+      "elevM": 8.8,
+      "mid": [
+        -118.3496,
+        33.914169
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10367073887",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-12-11T00:00:00.000Z",
+      "distanceM": 3350,
+      "movingS": 1118,
+      "elevM": 2.8,
+      "mid": [
+        -118.347114,
+        33.916297
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10355394896",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-12-09T00:00:00.000Z",
+      "distanceM": 3290,
+      "movingS": 1071,
+      "elevM": 3.6,
+      "mid": [
+        -118.347154,
+        33.915261
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10355394888",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-12-08T00:00:00.000Z",
+      "distanceM": 3350,
+      "movingS": 1117,
+      "elevM": 6,
+      "mid": [
+        -118.347207,
+        33.916306
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10336243978",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2023-12-05T00:00:00.000Z",
+      "distanceM": 3370,
+      "movingS": 1119,
+      "elevM": 3,
+      "mid": [
+        -118.347207,
+        33.916309
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10214994710",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-11-13T00:00:00.000Z",
+      "distanceM": 5090,
+      "movingS": 1574,
+      "elevM": 15,
+      "mid": [
+        -118.349175,
+        33.916283
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10208184318",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-11-12T00:00:00.000Z",
+      "distanceM": 8190,
+      "movingS": 2746,
+      "elevM": 29,
+      "mid": [
+        -118.377824,
+        33.909593
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10195533063",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-11-10T00:00:00.000Z",
+      "distanceM": 13210,
+      "movingS": 4239,
+      "elevM": 31.6,
+      "mid": [
+        -118.390396,
+        33.830962
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10166427042",
+      "city": "la",
+      "title": "Malibu Half",
+      "date": "2023-11-05T00:00:00.000Z",
+      "distanceM": 21100,
+      "movingS": 6715,
+      "elevM": 156.6,
+      "mid": [
+        -118.924364,
+        34.04688
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10159509351",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-11-04T00:00:00.000Z",
+      "distanceM": 3330,
+      "movingS": 1034,
+      "elevM": 8.4,
+      "mid": [
+        -118.347185,
+        33.916312
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10079150060",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-10-21T00:00:00.000Z",
+      "distanceM": 18650,
+      "movingS": 6133,
+      "elevM": 186.8,
+      "mid": [
+        -118.497419,
+        34.009438
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10044785546",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-10-15T00:00:00.000Z",
+      "distanceM": 10190,
+      "movingS": 3392,
+      "elevM": 24.4,
+      "mid": [
+        -118.399557,
+        33.848331
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10038405754",
+      "city": "la",
+      "title": "VRC vs VRC",
+      "date": "2023-10-14T00:00:00.000Z",
+      "distanceM": 21240,
+      "movingS": 7036,
+      "elevM": 77.4,
+      "mid": [
+        -118.504168,
+        34.016852
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "10003192378",
+      "city": "jacinto",
+      "title": "Afternoon Hike",
+      "date": "2023-10-08T00:00:00.000Z",
+      "distanceM": 22780,
+      "movingS": 20689,
+      "elevM": 577.5,
+      "mid": [
+        -116.698869,
+        33.800471
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Hike"
+    },
+    {
+      "id": "10003192202",
+      "city": "jacinto",
+      "title": "Afternoon Hike",
+      "date": "2023-10-07T00:00:00.000Z",
+      "distanceM": 15350,
+      "movingS": 16696,
+      "elevM": 1293.7,
+      "mid": [
+        -116.70086,
+        33.783578
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Hike"
+    },
+    {
+      "id": "9979709434",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-10-04T00:00:00.000Z",
+      "distanceM": 6440,
+      "movingS": 2058,
+      "elevM": 9.2,
+      "mid": [
+        -118.348602,
+        33.929186
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9946626074",
+      "city": "la",
+      "title": "Vishnu goes back to college",
+      "date": "2023-09-29T00:00:00.000Z",
+      "distanceM": 11320,
+      "movingS": 3798,
+      "elevM": 43.6,
+      "mid": [
+        -118.32903,
+        33.885953
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9935025769",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-09-27T00:00:00.000Z",
+      "distanceM": 6470,
+      "movingS": 1996,
+      "elevM": 7.2,
+      "mid": [
+        -118.347169,
+        33.916313
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9912971558",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-09-24T00:00:00.000Z",
+      "distanceM": 29030,
+      "movingS": 10284,
+      "elevM": 91,
+      "mid": [
+        -118.401131,
+        33.865857
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9896541999",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2023-09-21T00:00:00.000Z",
+      "distanceM": 9990,
+      "movingS": 3172,
+      "elevM": 18.4,
+      "mid": [
+        -118.335319,
+        33.882076
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9877471836",
+      "city": "la",
+      "title": "Vishnu vs the “zone 2” conspiracy",
+      "date": "2023-09-18T00:00:00.000Z",
+      "distanceM": 11040,
+      "movingS": 4637,
+      "elevM": 19.2,
+      "mid": [
+        -118.33369,
+        33.883397
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9862855418",
+      "city": "baldy",
+      "title": "Morning Hike",
+      "date": "2023-09-16T00:00:00.000Z",
+      "distanceM": 9540,
+      "movingS": 8017,
+      "elevM": 58,
+      "mid": [
+        -117.59981,
+        34.241061
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Hike"
+    },
+    {
+      "id": "9862854818",
+      "city": "baldy",
+      "title": "Afternoon Hike",
+      "date": "2023-09-15T00:00:00.000Z",
+      "distanceM": 10730,
+      "movingS": 11836,
+      "elevM": 1250,
+      "mid": [
+        -117.599952,
+        34.241111
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Hike"
+    },
+    {
+      "id": "9851919361",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2023-09-14T00:00:00.000Z",
+      "distanceM": 9030,
+      "movingS": 3868,
+      "elevM": 28.4,
+      "mid": [
+        -118.402279,
+        34.003549
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9835023487",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-09-12T00:00:00.000Z",
+      "distanceM": 6500,
+      "movingS": 1995,
+      "elevM": 11.2,
+      "mid": [
+        -118.347176,
+        33.916303
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9823263698",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-09-10T00:00:00.000Z",
+      "distanceM": 11900,
+      "movingS": 5033,
+      "elevM": 529.4,
+      "mid": [
+        -118.574508,
+        34.059729
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9799958807",
+      "city": "la",
+      "title": "Race against Thursday",
+      "date": "2023-09-06T00:00:00.000Z",
+      "distanceM": 10360,
+      "movingS": 3259,
+      "elevM": 16.4,
+      "mid": [
+        -118.33745,
+        33.887604
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9782537212",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-09-04T00:00:00.000Z",
+      "distanceM": 13160,
+      "movingS": 4223,
+      "elevM": 10.4,
+      "mid": [
+        -118.390392,
+        33.830869
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9756071523",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-08-30T00:00:00.000Z",
+      "distanceM": 8470,
+      "movingS": 2670,
+      "elevM": 39.4,
+      "mid": [
+        -118.369781,
+        33.911725
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9747213753",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-08-29T00:00:00.000Z",
+      "distanceM": 5130,
+      "movingS": 1583,
+      "elevM": 6.8,
+      "mid": [
+        -118.347199,
+        33.916291
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9727938609",
+      "city": "sierra",
+      "title": "Cloudripper ☁️🪦",
+      "date": "2023-08-26T00:00:00.000Z",
+      "distanceM": 18830,
+      "movingS": 22383,
+      "elevM": 2281.3,
+      "mid": [
+        -118.532176,
+        37.151187
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9688304819",
+      "city": "la",
+      "title": "Rain Run",
+      "date": "2023-08-20T00:00:00.000Z",
+      "distanceM": 6940,
+      "movingS": 2654,
+      "elevM": 93.8,
+      "mid": [
+        -118.436487,
+        33.932568
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9682695912",
+      "city": "la",
+      "title": "Hilary really ruining my morning routine",
+      "date": "2023-08-19T00:00:00.000Z",
+      "distanceM": 9720,
+      "movingS": 3076,
+      "elevM": 20,
+      "mid": [
+        -118.347498,
+        33.93826
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9663493120",
+      "city": "la",
+      "title": "Track day pt3",
+      "date": "2023-08-16T00:00:00.000Z",
+      "distanceM": 11720,
+      "movingS": 4261,
+      "elevM": 8,
+      "mid": [
+        -118.402332,
+        34.004383
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9641508073",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-08-13T00:00:00.000Z",
+      "distanceM": 24160,
+      "movingS": 8458,
+      "elevM": 76.6,
+      "mid": [
+        -118.433065,
+        33.975124
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9617413847",
+      "city": "la",
+      "title": "Brake dust boogie pt2",
+      "date": "2023-08-09T00:00:00.000Z",
+      "distanceM": 10180,
+      "movingS": 2932,
+      "elevM": 35.1,
+      "mid": [
+        -118.371157,
+        33.910261
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9596123480",
+      "city": "sierra",
+      "title": "Crater Crawl",
+      "date": "2023-08-06T00:00:00.000Z",
+      "distanceM": 4180,
+      "movingS": 1460,
+      "elevM": 83.4,
+      "mid": [
+        -118.994765,
+        37.68171
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9590667431",
+      "city": "yosemite",
+      "title": "Hoffman Hustle",
+      "date": "2023-08-05T00:00:00.000Z",
+      "distanceM": 9700,
+      "movingS": 10555,
+      "elevM": 609.6,
+      "mid": [
+        -119.509782,
+        37.846949
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9572785646",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2023-08-02T00:00:00.000Z",
+      "distanceM": 9260,
+      "movingS": 3423,
+      "elevM": 39.4,
+      "mid": [
+        -118.402718,
+        34.004496
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9559708868",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-07-31T00:00:00.000Z",
+      "distanceM": 8070,
+      "movingS": 2496,
+      "elevM": 6.3,
+      "mid": [
+        -118.350416,
+        33.920341
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9545615110",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-07-29T00:00:00.000Z",
+      "distanceM": 10100,
+      "movingS": 3475,
+      "elevM": 30.8,
+      "mid": [
+        -118.399449,
+        33.848378
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9535190454",
+      "city": "la",
+      "title": "Brake Dust Boogie",
+      "date": "2023-07-27T00:00:00.000Z",
+      "distanceM": 10140,
+      "movingS": 2952,
+      "elevM": 23.7,
+      "mid": [
+        -118.37114,
+        33.913896
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9510229031",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-07-23T00:00:00.000Z",
+      "distanceM": 5260,
+      "movingS": 1650,
+      "elevM": 9.8,
+      "mid": [
+        -118.344019,
+        33.915683
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9501339142",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-07-22T00:00:00.000Z",
+      "distanceM": 12900,
+      "movingS": 4357,
+      "elevM": 104,
+      "mid": [
+        -118.414281,
+        33.88914
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9463409578",
+      "city": "la",
+      "title": "More like Eagle kicked-my-butt Rock amirite",
+      "date": "2023-07-16T00:00:00.000Z",
+      "distanceM": 10640,
+      "movingS": 4274,
+      "elevM": 381.6,
+      "mid": [
+        -118.558383,
+        34.108028
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9457083603",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-07-15T00:00:00.000Z",
+      "distanceM": 12890,
+      "movingS": 4161,
+      "elevM": 34.2,
+      "mid": [
+        -118.390388,
+        33.833472
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9428235748",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2023-07-10T00:00:00.000Z",
+      "distanceM": 7390,
+      "movingS": 2308,
+      "elevM": 17,
+      "mid": [
+        -118.368882,
+        33.914718
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9413257646",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-07-08T00:00:00.000Z",
+      "distanceM": 9930,
+      "movingS": 3978,
+      "elevM": 390.6,
+      "mid": [
+        -118.55843,
+        34.108043
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9403581163",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-07-06T00:00:00.000Z",
+      "distanceM": 9530,
+      "movingS": 2835,
+      "elevM": 22,
+      "mid": [
+        -118.371108,
+        33.911134
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9365225371",
+      "city": "michigan",
+      "title": "Free organic Canadian smoke!",
+      "date": "2023-06-30T00:00:00.000Z",
+      "distanceM": 11660,
+      "movingS": 3772,
+      "elevM": 82.1,
+      "mid": [
+        -83.1318,
+        42.684148
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9341624163",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2023-06-26T00:00:00.000Z",
+      "distanceM": 8440,
+      "movingS": 2668,
+      "elevM": 43.2,
+      "mid": [
+        -118.361403,
+        33.905369
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9326871594",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-06-24T00:00:00.000Z",
+      "distanceM": 11770,
+      "movingS": 3759,
+      "elevM": 10.2,
+      "mid": [
+        -118.483891,
+        34.002227
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9290912788",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-06-18T00:00:00.000Z",
+      "distanceM": 5790,
+      "movingS": 1880,
+      "elevM": 14.2,
+      "mid": [
+        -118.347126,
+        33.916282
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9283665167",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-06-17T00:00:00.000Z",
+      "distanceM": 11720,
+      "movingS": 3825,
+      "elevM": 14.7,
+      "mid": [
+        -118.392649,
+        33.839916
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9268370572",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-06-14T00:00:00.000Z",
+      "distanceM": 7360,
+      "movingS": 2263,
+      "elevM": 4.2,
+      "mid": [
+        -118.346229,
+        33.930285
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9247694687",
+      "city": "la",
+      "title": "The Real Long Beach Grand Prix",
+      "date": "2023-06-11T00:00:00.000Z",
+      "distanceM": 21190,
+      "movingS": 6878,
+      "elevM": 71.6,
+      "mid": [
+        -118.175263,
+        33.764388
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9230536334",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-06-08T00:00:00.000Z",
+      "distanceM": 6490,
+      "movingS": 1937,
+      "elevM": 12.4,
+      "mid": [
+        -118.347127,
+        33.91633
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9202776490",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-06-04T00:00:00.000Z",
+      "distanceM": 12910,
+      "movingS": 4188,
+      "elevM": 30,
+      "mid": [
+        -118.390421,
+        33.833055
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9191718746",
+      "city": "la",
+      "title": "Freudian Slip",
+      "date": "2023-06-02T00:00:00.000Z",
+      "distanceM": 6840,
+      "movingS": 2173,
+      "elevM": 13,
+      "mid": [
+        -118.34891,
+        33.914146
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9179975536",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-05-31T00:00:00.000Z",
+      "distanceM": 6530,
+      "movingS": 2038,
+      "elevM": 8.6,
+      "mid": [
+        -118.347603,
+        33.887569
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9160463824",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-05-28T00:00:00.000Z",
+      "distanceM": 3350,
+      "movingS": 1073,
+      "elevM": 8.8,
+      "mid": [
+        -118.347116,
+        33.916312
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9151465236",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-05-27T00:00:00.000Z",
+      "distanceM": 21110,
+      "movingS": 7109,
+      "elevM": 50.5,
+      "mid": [
+        -118.467829,
+        33.980208
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9135870940",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-05-24T00:00:00.000Z",
+      "distanceM": 8100,
+      "movingS": 2638,
+      "elevM": 11.8,
+      "mid": [
+        -118.343992,
+        33.882504
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9114535754",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-05-21T00:00:00.000Z",
+      "distanceM": 21080,
+      "movingS": 6973,
+      "elevM": 42.2,
+      "mid": [
+        -118.498041,
+        34.012039
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9103825670",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-05-19T00:00:00.000Z",
+      "distanceM": 8780,
+      "movingS": 2891,
+      "elevM": 19,
+      "mid": [
+        -118.327213,
+        33.923616
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9085898457",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-05-16T00:00:00.000Z",
+      "distanceM": 6440,
+      "movingS": 2048,
+      "elevM": 12.6,
+      "mid": [
+        -118.35226,
+        33.920517
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9064389335",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-05-13T00:00:00.000Z",
+      "distanceM": 16310,
+      "movingS": 5619,
+      "elevM": 43.2,
+      "mid": [
+        -118.498225,
+        34.012452
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9049973089",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-05-10T00:00:00.000Z",
+      "distanceM": 6790,
+      "movingS": 2307,
+      "elevM": 15,
+      "mid": [
+        -118.348733,
+        33.916292
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9029192420",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-05-07T00:00:00.000Z",
+      "distanceM": 21320,
+      "movingS": 7293,
+      "elevM": 71.2,
+      "mid": [
+        -118.446969,
+        33.967341
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9018543858",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-05-05T00:00:00.000Z",
+      "distanceM": 5320,
+      "movingS": 1650,
+      "elevM": 17.4,
+      "mid": [
+        -118.348763,
+        33.9163
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "9007100391",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2023-05-03T00:00:00.000Z",
+      "distanceM": 6940,
+      "movingS": 2145,
+      "elevM": 11,
+      "mid": [
+        -118.352228,
+        33.923544
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8979481810",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-04-29T00:00:00.000Z",
+      "distanceM": 12870,
+      "movingS": 4232,
+      "elevM": 34.2,
+      "mid": [
+        -118.438265,
+        33.935372
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8975468491",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-04-28T00:00:00.000Z",
+      "distanceM": 8090,
+      "movingS": 2633,
+      "elevM": 22.8,
+      "mid": [
+        -118.329949,
+        33.919878
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8975468535",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-04-25T00:00:00.000Z",
+      "distanceM": 5040,
+      "movingS": 1565,
+      "elevM": 7,
+      "mid": [
+        -118.347607,
+        33.91633
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8937722390",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-04-22T00:00:00.000Z",
+      "distanceM": 9970,
+      "movingS": 3149,
+      "elevM": 125.8,
+      "mid": [
+        -118.400636,
+        33.92309
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8922948187",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-04-19T00:00:00.000Z",
+      "distanceM": 6470,
+      "movingS": 2053,
+      "elevM": 43.8,
+      "mid": [
+        -118.347205,
+        33.91632
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8910445181",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2023-04-17T00:00:00.000Z",
+      "distanceM": 6510,
+      "movingS": 2022,
+      "elevM": 45.2,
+      "mid": [
+        -118.36052,
+        33.913605
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8902161222",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-04-16T00:00:00.000Z",
+      "distanceM": 10410,
+      "movingS": 3308,
+      "elevM": 34.9,
+      "mid": [
+        -118.399576,
+        33.848375
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8881628907",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-04-12T00:00:00.000Z",
+      "distanceM": 6470,
+      "movingS": 1996,
+      "elevM": 12,
+      "mid": [
+        -118.347188,
+        33.91631
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8828505423",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-04-03T00:00:00.000Z",
+      "distanceM": 3230,
+      "movingS": 939,
+      "elevM": 10.6,
+      "mid": [
+        -118.34761,
+        33.916312
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8815212494",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-04-01T00:00:00.000Z",
+      "distanceM": 16100,
+      "movingS": 5425,
+      "elevM": 82.4,
+      "mid": [
+        -118.443108,
+        33.945061
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8776172735",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-03-25T00:00:00.000Z",
+      "distanceM": 10060,
+      "movingS": 3244,
+      "elevM": 21.4,
+      "mid": [
+        -118.392494,
+        33.844193
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8761846631",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2023-03-22T00:00:00.000Z",
+      "distanceM": 6490,
+      "movingS": 2054,
+      "elevM": 16,
+      "mid": [
+        -118.347188,
+        33.916319
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8737235057",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-03-18T00:00:00.000Z",
+      "distanceM": 9830,
+      "movingS": 3300,
+      "elevM": 21.8,
+      "mid": [
+        -118.398916,
+        33.848536
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8722010614",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2023-03-15T00:00:00.000Z",
+      "distanceM": 3330,
+      "movingS": 1032,
+      "elevM": 6,
+      "mid": [
+        -118.347382,
+        33.916316
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8612570365",
+      "city": "india",
+      "title": "Morning Walk",
+      "date": "2023-02-24T00:00:00.000Z",
+      "distanceM": 3400,
+      "movingS": 2899,
+      "elevM": 15.4,
+      "mid": [
+        77.729312,
+        8.687019
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Walk"
+    },
+    {
+      "id": "8572874138",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-02-15T00:00:00.000Z",
+      "distanceM": 6470,
+      "movingS": 2120,
+      "elevM": 23.8,
+      "mid": [
+        -118.368541,
+        33.916233
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8557719280",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2023-02-13T00:00:00.000Z",
+      "distanceM": 3250,
+      "movingS": 956,
+      "elevM": 8.8,
+      "mid": [
+        -118.347636,
+        33.916309
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8544260520",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-02-11T00:00:00.000Z",
+      "distanceM": 11380,
+      "movingS": 4014,
+      "elevM": 38.6,
+      "mid": [
+        -118.392023,
+        33.838853
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8542590524",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-02-09T00:00:00.000Z",
+      "distanceM": 3320,
+      "movingS": 1051,
+      "elevM": 5.6,
+      "mid": [
+        -118.34943,
+        33.914339
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8542590786",
+      "city": "la",
+      "title": "Morning Run",
+      "date": "2023-01-29T00:00:00.000Z",
+      "distanceM": 9680,
+      "movingS": 3294,
+      "elevM": 33.8,
+      "mid": [
+        -118.393708,
+        33.846152
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8542590764",
+      "city": "la",
+      "title": "Lunch Run",
+      "date": "2023-01-22T00:00:00.000Z",
+      "distanceM": 5340,
+      "movingS": 1844,
+      "elevM": 36.2,
+      "mid": [
+        -118.35567,
+        33.913584
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8542590737",
+      "city": "la",
+      "title": "Night Run",
+      "date": "2023-01-18T00:00:00.000Z",
+      "distanceM": 3370,
+      "movingS": 1096,
+      "elevM": 6.8,
+      "mid": [
+        -118.347136,
+        33.916308
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
+    },
+    {
+      "id": "8542592842",
+      "city": "la",
+      "title": "Morning Hike",
+      "date": "2023-01-15T00:00:00.000Z",
+      "distanceM": 25750,
+      "movingS": 26159,
+      "elevM": 2060,
+      "mid": [
+        -118.057056,
+        34.225511
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Hike"
+    },
+    {
+      "id": "8542591789",
+      "city": "la",
+      "title": "Evening Run",
+      "date": "2023-01-13T00:00:00.000Z",
+      "distanceM": 3350,
+      "movingS": 1086,
+      "elevM": 2.6,
+      "mid": [
+        -118.347253,
+        33.916306
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": false,
+      "type": "Run"
     }
-  ],
-  "probes": {
-    "overlap": {
-      "lng": -118.4016,
-      "lat": 33.8622,
-      "count": 14
-    }
-  }
+  ]
 }

@@ -1,0 +1,18 @@
+{
+  "id": "10982454266",
+  "city": "la",
+  "title": "LA Marathon 2024",
+  "date": "2024-03-17T00:00:00.000Z",
+  "distanceM": 42330,
+  "movingS": 16125,
+  "elevM": 374.8,
+  "mid": [
+    -118.297046,
+    34.101814
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 16215,
+  "type": "Run"
+}

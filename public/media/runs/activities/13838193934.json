@@ -1,0 +1,18 @@
+{
+  "id": "13838193934",
+  "city": "la",
+  "title": "Chino 17",
+  "date": "2025-03-09T00:00:00.000Z",
+  "distanceM": 27370,
+  "movingS": 12168,
+  "elevM": 754,
+  "mid": [
+    -117.707905,
+    33.919974
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 12344,
+  "type": "Run"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "13645831686",
+  "city": "la",
+  "title": "HRC 5",
+  "date": "2025-02-16T00:00:00.000Z",
+  "distanceM": 8050,
+  "movingS": 2536,
+  "elevM": 42,
+  "mid": [
+    -118.401427,
+    33.875631
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2559,
+  "type": "Run"
+}

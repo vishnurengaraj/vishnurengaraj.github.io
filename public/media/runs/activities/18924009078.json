@@ -1,0 +1,18 @@
+{
+  "id": "18924009078",
+  "city": "la",
+  "title": "Truncated Bulldog Loop",
+  "date": "2026-06-14T00:00:00.000Z",
+  "distanceM": 17730,
+  "movingS": 10032,
+  "elevM": 535,
+  "mid": [
+    -118.763067,
+    34.091998
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 10518,
+  "type": "Run"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "9862855418",
+  "city": "baldy",
+  "title": "Morning Hike",
+  "date": "2023-09-16T00:00:00.000Z",
+  "distanceM": 9540,
+  "movingS": 8017,
+  "elevM": 58,
+  "mid": [
+    -117.59981,
+    34.241061
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 8475,
+  "type": "Hike"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "20547259461",
+  "city": "humboldt",
+  "title": "Humboldt Redwoods Marathon",
+  "date": "2026-10-11T00:00:00.000Z",
+  "distanceM": 42720,
+  "movingS": 16003,
+  "elevM": 266,
+  "mid": [
+    -124.026918,
+    40.342622
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 16063,
+  "type": "Run"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "9596123480",
+  "city": "sierra",
+  "title": "Crater Crawl",
+  "date": "2023-08-06T00:00:00.000Z",
+  "distanceM": 4180,
+  "movingS": 1460,
+  "elevM": 83.4,
+  "mid": [
+    -118.994765,
+    37.68171
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 1460,
+  "type": "Run"
+}
