@@ -360,6 +360,16 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick }) {
       const point = map.project(lngLat);
       return { x: point.x, y: point.y };
     },
+    /* Hairlines queryable at the probe after the heat has faded. */
+    veinHits(lngLat) {
+      if (!map.getLayer("runs-vein")) return 0;
+      const point = map.project(lngLat);
+      const box = [
+        [point.x - 2, point.y - 2],
+        [point.x + 2, point.y + 2],
+      ];
+      return map.queryRenderedFeatures(box, { layers: ["runs-vein"] }).length;
+    },
     destroy() {
       disposed = true;
       swayState = "stopped";

@@ -1,9 +1,12 @@
 /**
- * /runs. Chromium, phone and desktop — the same browser the rest of qa/ uses.
+ * /runs on Chromium and WebKit, phone and desktop.
+ * The WebKit project in playwright.config.js matches this file only.
  *
  * Run: npm test
  */
 import { expect, test } from "@playwright/test";
+import { haversine } from "../scripts/runs/geo.mjs";
+import { buildSampleActivities } from "../scripts/runs/sample.mjs";
 
 const VIEWPORTS = [
   { name: "desktop", width: 1280, height: 900 },
@@ -99,6 +102,8 @@ test.describe("runs map", () => {
 
       await zoomTo(page, 15);
       const probe = manifest.probes.overlap;
+      const veins = await map.evaluate((el, lngLat) => el._runsMap.veinHits(lngLat), [probe.lng, probe.lat]);
+      expect(veins).toBeGreaterThan(1);
       const point = await map.evaluate((el, lngLat) => el._runsMap.project(lngLat), [probe.lng, probe.lat]);
       const box = await map.boundingBox();
       expect(point.x).toBeGreaterThan(8);
@@ -146,6 +151,36 @@ test.describe("runs map", () => {
     await expect(card.locator(".run-pace")).toContainText("/mi");
     await expect(card.locator(".photo-strip img")).toHaveAttribute("alt", "Sample photo");
     await expect(page.locator(".section-nav")).toHaveCount(0);
+  });
+});
+
+test.describe("served lines keep the privacy trim", () => {
+  test("every published point sits outside the end radius", async ({ request }) => {
+    const manifest = await (await request.get("/media/runs/manifest.json")).json();
+    expect(manifest.privacy.method).toBe("radius");
+    expect(manifest.privacy.meters).toBeGreaterThanOrEqual(300);
+    expect(manifest.privacy.meters).toBeLessThanOrEqual(500);
+    expect(manifest.sample).toBe(true);
+
+    const raw = new Map(buildSampleActivities().map((run) => [run.id, run.coords]));
+    for (const city of manifest.cities) {
+      const lines = await (await request.get(`/media/runs/cities/${city.id}.lines.geojson`)).json();
+      expect(lines.features.length).toBe(city.count);
+      for (const feature of lines.features) {
+        const coords = raw.get(feature.properties.id);
+        expect(coords?.length).toBeGreaterThan(1);
+        const start = coords[0];
+        const end = coords[coords.length - 1];
+        const parts =
+          feature.geometry.type === "LineString" ? [feature.geometry.coordinates] : feature.geometry.coordinates;
+        for (const line of parts) {
+          for (const point of line) {
+            expect(haversine(point, start)).toBeGreaterThanOrEqual(manifest.privacy.meters - 1);
+            expect(haversine(point, end)).toBeGreaterThanOrEqual(manifest.privacy.meters - 1);
+          }
+        }
+      }
+    }
   });
 });
 
