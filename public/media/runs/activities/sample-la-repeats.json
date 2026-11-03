@@ -1,0 +1,17 @@
+{
+  "id": "sample-la-repeats",
+  "city": "la",
+  "title": "Strand repeats",
+  "date": "2025-09-14T15:05:00Z",
+  "distanceM": 5998.57,
+  "movingS": 1764,
+  "elevM": 24,
+  "mid": [
+    -118.399234,
+    33.856016
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": true,
+  "elapsedS": 1852
+}

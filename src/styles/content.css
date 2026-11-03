@@ -1097,14 +1097,17 @@ video {
   gap: 1.5rem 2rem;
 }
 
-/* One Diners link is visible at a time. The mid copy sits in the open
-   space between the name and the contact cluster once that gap is wide
-   enough; otherwise it joins LinkedIn, Email, and Resume. */
-.site-footer .footer-diners {
+/* One copy of the offshoot links is visible at a time. The mid group sits
+   in the open space between the name and the contact cluster once that gap
+   is wide enough; otherwise it joins LinkedIn, Email, and Resume. */
+.site-footer .footer-offshoots {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
   white-space: nowrap;
 }
 
-.site-footer .footer-diners-mid {
+.site-footer .footer-offshoots-mid {
   display: none;
 }
 
@@ -1211,12 +1214,12 @@ video {
     grid-template-columns: auto minmax(max-content, 1fr) auto;
   }
 
-  .site-footer .footer-diners-mid {
+  .site-footer .footer-offshoots-mid {
     display: inline-flex;
     justify-self: center;
   }
 
-  .site-footer .footer-diners-inline {
+  .site-footer .footer-offshoots-inline {
     display: none;
   }
 }

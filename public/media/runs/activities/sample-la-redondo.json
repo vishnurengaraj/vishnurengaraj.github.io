@@ -1,0 +1,17 @@
+{
+  "id": "sample-la-redondo",
+  "city": "la",
+  "title": "Redondo horseshoe",
+  "date": "2025-08-23T14:20:00Z",
+  "distanceM": 5426.69,
+  "movingS": 1779,
+  "elevM": 28,
+  "mid": [
+    -118.394326,
+    33.846585
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": true,
+  "elapsedS": 1868
+}

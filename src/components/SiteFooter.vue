@@ -34,11 +34,17 @@ const scrollTo = inject(scrollKey);
           <p class="footer-place">{{ profile.location }}</p>
         </div>
       </div>
-      <!-- Wide screens center this in the gap. Narrow screens use the copy inside the link row. -->
-      <a class="footer-diners footer-diners-mid" href="/diners">Diners</a>
+      <!-- Wide screens center these in the gap. Narrow screens use the copies inside the link row. -->
+      <span class="footer-offshoots footer-offshoots-mid">
+        <a href="/diners">Diners</a>
+        <a href="/runs">Runs</a>
+      </span>
       <div class="footer-actions">
         <nav aria-label="Contact">
-          <a class="footer-diners footer-diners-inline" href="/diners">Diners</a>
+          <span class="footer-offshoots footer-offshoots-inline">
+            <a href="/diners">Diners</a>
+            <a href="/runs">Runs</a>
+          </span>
           <a :href="profile.linkedin" target="_blank" rel="noopener noreferrer me">LinkedIn</a>
           <a :href="`mailto:${profile.email}`">Email</a>
           <a :href="profile.resume" target="_blank" rel="noopener noreferrer">Resume</a>

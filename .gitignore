@@ -11,3 +11,7 @@ test-results/
 playwright-report/
 blob-report/
 .wrangler/
+
+# Local Strava or Garmin drops for scripts/build-runs.mjs
+/runs-export/
+/data/runs-private/

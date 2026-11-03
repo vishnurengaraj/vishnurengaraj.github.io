@@ -1,0 +1,17 @@
+{
+  "id": "sample-la-southbay",
+  "city": "la",
+  "title": "South Bay long run",
+  "date": "2024-05-26T14:35:00Z",
+  "distanceM": 9903.15,
+  "movingS": 2956,
+  "elevM": 36,
+  "mid": [
+    -118.403119,
+    33.866638
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": true,
+  "elapsedS": 3104
+}

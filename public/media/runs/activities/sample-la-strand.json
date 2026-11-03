@@ -1,0 +1,17 @@
+{
+  "id": "sample-la-strand",
+  "city": "la",
+  "title": "Strand sunrise",
+  "date": "2025-06-08T15:00:00Z",
+  "distanceM": 10040.88,
+  "movingS": 3188,
+  "elevM": 18,
+  "mid": [
+    -118.403037,
+    33.866368
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": true,
+  "elapsedS": 3347
+}

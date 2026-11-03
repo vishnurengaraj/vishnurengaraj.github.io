@@ -1,0 +1,391 @@
+{
+  "sample": true,
+  "privacy": {
+    "method": "radius",
+    "meters": 400
+  },
+  "defaultCity": "la",
+  "cities": [
+    {
+      "id": "la",
+      "label": "LA",
+      "name": "South Bay",
+      "center": [
+        -118.4016,
+        33.8622
+      ],
+      "zoom": 12.35,
+      "count": 14,
+      "generated": false
+    },
+    {
+      "id": "sf",
+      "label": "SF",
+      "name": "San Francisco",
+      "center": [
+        -122.47,
+        37.804
+      ],
+      "zoom": 12.55,
+      "count": 4,
+      "generated": false
+    },
+    {
+      "id": "nyc",
+      "label": "NYC",
+      "name": "New York",
+      "center": [
+        -73.966,
+        40.782
+      ],
+      "zoom": 12.35,
+      "count": 3,
+      "generated": false
+    }
+  ],
+  "runs": [
+    {
+      "id": "sample-la-sunrise",
+      "city": "la",
+      "title": "Redondo sunrise",
+      "date": "2025-10-05T14:50:00Z",
+      "distanceM": 5192.12,
+      "movingS": 1675,
+      "elevM": 21,
+      "mid": [
+        -118.394527,
+        33.84669
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-la-repeats",
+      "city": "la",
+      "title": "Strand repeats",
+      "date": "2025-09-14T15:05:00Z",
+      "distanceM": 5998.57,
+      "movingS": 1764,
+      "elevM": 24,
+      "mid": [
+        -118.399234,
+        33.856016
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-la-redondo",
+      "city": "la",
+      "title": "Redondo horseshoe",
+      "date": "2025-08-23T14:20:00Z",
+      "distanceM": 5426.69,
+      "movingS": 1779,
+      "elevM": 28,
+      "mid": [
+        -118.394326,
+        33.846585
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-sf-bridge",
+      "city": "sf",
+      "title": "Bridge to the warmup",
+      "date": "2025-07-12T15:20:00Z",
+      "distanceM": 4534.01,
+      "movingS": 1395,
+      "elevM": 18,
+      "mid": [
+        -122.465389,
+        37.803312
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-la-strand",
+      "city": "la",
+      "title": "Strand sunrise",
+      "date": "2025-06-08T15:00:00Z",
+      "distanceM": 10040.88,
+      "movingS": 3188,
+      "elevM": 18,
+      "mid": [
+        -118.403037,
+        33.866368
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-la-saturday",
+      "city": "la",
+      "title": "Saturday strand",
+      "date": "2025-05-17T15:40:00Z",
+      "distanceM": 9143.93,
+      "movingS": 3048,
+      "elevM": 26,
+      "mid": [
+        -118.404278,
+        33.869491
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-la-hermosa",
+      "city": "la",
+      "title": "Hermosa out and back",
+      "date": "2025-04-19T15:30:00Z",
+      "distanceM": 10484.31,
+      "movingS": 3554,
+      "elevM": 22,
+      "mid": [
+        -118.387244,
+        33.830999
+      ],
+      "photos": 1,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-nyc-morning",
+      "city": "nyc",
+      "title": "Park morning",
+      "date": "2025-04-06T13:50:00Z",
+      "distanceM": 11817.83,
+      "movingS": 3693,
+      "elevM": 52,
+      "mid": [
+        -73.964433,
+        40.795756
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-la-mb",
+      "city": "la",
+      "title": "Manhattan Beach easy",
+      "date": "2025-03-02T16:10:00Z",
+      "distanceM": 6284.84,
+      "movingS": 2245,
+      "elevM": 14,
+      "mid": [
+        -118.409837,
+        33.882095
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-la-recovery",
+      "city": "la",
+      "title": "Recovery jog",
+      "date": "2025-02-11T16:00:00Z",
+      "distanceM": 6495.95,
+      "movingS": 2498,
+      "elevM": 15,
+      "mid": [
+        -118.401968,
+        33.863169
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-la-evening",
+      "city": "la",
+      "title": "Evening miles",
+      "date": "2025-01-09T15:15:00Z",
+      "distanceM": 5178.67,
+      "movingS": 1918,
+      "elevM": 20,
+      "mid": [
+        -118.397155,
+        33.85201
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-la-pier",
+      "city": "la",
+      "title": "Pier to pier",
+      "date": "2024-12-21T15:25:00Z",
+      "distanceM": 5736.71,
+      "movingS": 1765,
+      "elevM": 19,
+      "mid": [
+        -118.403333,
+        33.867421
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-la-elsegundo",
+      "city": "la",
+      "title": "El Segundo to the pier",
+      "date": "2024-11-16T15:45:00Z",
+      "distanceM": 6346.01,
+      "movingS": 1923,
+      "elevM": 16,
+      "mid": [
+        -118.409802,
+        33.881766
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-nyc-park",
+      "city": "nyc",
+      "title": "Central Park loop",
+      "date": "2024-10-13T14:10:00Z",
+      "distanceM": 11756.4,
+      "movingS": 3919,
+      "elevM": 48,
+      "mid": [
+        -73.962656,
+        40.79662
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-sf-crissy",
+      "city": "sf",
+      "title": "Crissy Field",
+      "date": "2024-08-18T16:00:00Z",
+      "distanceM": 5292.88,
+      "movingS": 1735,
+      "elevM": 12,
+      "mid": [
+        -122.461114,
+        37.80366
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-la-long",
+      "city": "la",
+      "title": "Long beach path",
+      "date": "2024-07-04T14:00:00Z",
+      "distanceM": 9143.85,
+      "movingS": 2857,
+      "elevM": 31,
+      "mid": [
+        -118.401522,
+        33.861844
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-la-southbay",
+      "city": "la",
+      "title": "South Bay long run",
+      "date": "2024-05-26T14:35:00Z",
+      "distanceM": 9903.15,
+      "movingS": 2956,
+      "elevM": 36,
+      "mid": [
+        -118.403119,
+        33.866638
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-sf-embarcadero",
+      "city": "sf",
+      "title": "Embarcadero",
+      "date": "2024-02-25T16:15:00Z",
+      "distanceM": 4412.73,
+      "movingS": 1423,
+      "elevM": 14,
+      "mid": [
+        -122.389552,
+        37.804433
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-sf-marina",
+      "city": "sf",
+      "title": "Marina loop",
+      "date": "2023-11-04T16:40:00Z",
+      "distanceM": 3887.71,
+      "movingS": 1364,
+      "elevM": 9,
+      "mid": [
+        -122.452572,
+        37.804824
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-la-miles",
+      "city": "la",
+      "title": "Hermosa miles",
+      "date": "2023-09-30T15:10:00Z",
+      "distanceM": 5375.79,
+      "movingS": 1854,
+      "elevM": 17,
+      "mid": [
+        -118.400071,
+        33.858288
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    },
+    {
+      "id": "sample-nyc-hudson",
+      "city": "nyc",
+      "title": "Hudson greenway",
+      "date": "2023-06-17T14:30:00Z",
+      "distanceM": 6646.43,
+      "movingS": 2110,
+      "elevM": 11,
+      "mid": [
+        -74.009929,
+        40.756872
+      ],
+      "photos": 0,
+      "companions": 0,
+      "sample": true
+    }
+  ],
+  "probes": {
+    "overlap": {
+      "lng": -118.4016,
+      "lat": 33.8622,
+      "count": 14
+    }
+  }
+}

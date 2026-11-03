@@ -1,0 +1,17 @@
+{
+  "id": "sample-sf-bridge",
+  "city": "sf",
+  "title": "Bridge to the warmup",
+  "date": "2025-07-12T15:20:00Z",
+  "distanceM": 4534.01,
+  "movingS": 1395,
+  "elevM": 18,
+  "mid": [
+    -122.465389,
+    37.803312
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": true,
+  "elapsedS": 1465
+}

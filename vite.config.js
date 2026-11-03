@@ -48,6 +48,7 @@ export default defineConfig(({ mode }) => {
           "/resume/clubs",
           "/resume/awards",
           "/diners",
+          "/runs",
         ];
       },
     },

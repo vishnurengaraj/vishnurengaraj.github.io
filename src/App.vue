@@ -12,6 +12,7 @@ import ProjectsSection from "./components/ProjectsSection.vue";
 import ResumeSection from "./components/ResumeSection.vue";
 import SiteFooter from "./components/SiteFooter.vue";
 import DinersPage from "./components/DinersPage.vue";
+import RunsPage from "./components/RunsPage.vue";
 import TitleProto from "./components/TitleProto.vue";
 import { RESUME_PARTS, dockKey, resumeJumpKey, resumePartKey, scrollKey } from "./scroll.js";
 import {
@@ -523,6 +524,10 @@ function queryValue(key) {
   return Array.isArray(raw) ? raw[0] : raw;
 }
 
+function isOffshoot(name = route.name) {
+  return name === "diners" || name === "runs";
+}
+
 function shellTo(path) {
   if (queryValue("proto") !== "1") return path;
   const query = { proto: "1" };
@@ -532,7 +537,7 @@ function shellTo(path) {
 }
 
 function syncSpyUrl(section) {
-  if (route.name === "diners") return;
+  if (isOffshoot()) return;
   if (route.name === "resume") resumePath = route.path;
   const path =
     section === "about" || section === "projects"
@@ -556,7 +561,7 @@ function releaseSpyLock() {
 }
 
 function applySpy() {
-  if (route.name === "diners" || resumePartLocked || jumpGuardOn()) return;
+  if (isOffshoot() || resumePartLocked || jumpGuardOn()) return;
   const next = spyPick();
   if (spyLock) {
     const wanted = spyLock === "top" ? null : spyLock;
@@ -610,7 +615,7 @@ function publishResumePart(next) {
 }
 
 function applyResumePart() {
-  if (route.name === "diners") return;
+  if (isOffshoot()) return;
   const next = resumePartFromScroll();
   if (resumePartLocked) {
     if (next !== resumePartLockTarget) return;
@@ -1877,11 +1882,11 @@ function onResize() {
 let shellStarted = false;
 
 async function startShell() {
-  if (shellStarted || route.name === "diners") return;
+  if (shellStarted || isOffshoot()) return;
   const queued = document.documentElement.dataset.queuedScroll || "";
   if (queued) delete document.documentElement.dataset.queuedScroll;
   await nextTick();
-  if (shellStarted || route.name === "diners") return;
+  if (shellStarted || isOffshoot()) return;
   const root = scroller.value;
   if (!root) return;
   shellStarted = true;
@@ -2003,17 +2008,17 @@ onUnmounted(() => {
 watch(
   () => route.name,
   (name, prev) => {
-    if (name === "diners") {
-      lastKey = "diners";
+    if (isOffshoot(name)) {
+      lastKey = name;
       stopShell();
-    } else if (prev === "diners") startShell();
+    } else if (isOffshoot(prev)) startShell();
   },
 );
 
 watch(
   () => route.fullPath,
   () => {
-    if (route.name === "diners") return;
+    if (isOffshoot()) return;
     if (route.name === "resume") resumePath = route.path;
     if (!ready.value || !scroller.value) return;
     if (protoHold || urlFromSpy || routeFromTween) {
@@ -2030,6 +2035,7 @@ watch(
 
 <template>
   <DinersPage v-if="route.name === 'diners'" />
+  <RunsPage v-else-if="route.name === 'runs'" />
   <template v-else>
   <a class="skip" href="/about" @click="onNav($event, 'about')">Skip to content</a>
   <TitleProto

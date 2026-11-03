@@ -1,0 +1,17 @@
+{
+  "id": "sample-la-long",
+  "city": "la",
+  "title": "Long beach path",
+  "date": "2024-07-04T14:00:00Z",
+  "distanceM": 9143.85,
+  "movingS": 2857,
+  "elevM": 31,
+  "mid": [
+    -118.401522,
+    33.861844
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": true,
+  "elapsedS": 3000
+}
