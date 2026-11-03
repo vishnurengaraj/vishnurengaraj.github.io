@@ -210,6 +210,148 @@ test.describe("runs map", () => {
   });
 });
 
+async function clickLngLat(page, map, lngLat) {
+  const point = await map.evaluate((el, at) => el._runsMap.project(at), lngLat);
+  const box = await map.boundingBox();
+  expect(point.x).toBeGreaterThan(8);
+  expect(point.y).toBeGreaterThan(8);
+  expect(point.x).toBeLessThan(box.width - 8);
+  expect(point.y).toBeLessThan(box.height - 8);
+  await page.mouse.click(box.x + point.x, box.y + point.y);
+  return point;
+}
+
+test.describe("globe click reaches one run", () => {
+  test.describe.configure({ timeout: 120_000 });
+
+  for (const viewport of VIEWPORTS) {
+    test(`${viewport.name} opens the Humboldt run from the globe`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto("/runs");
+      await ready(page);
+
+      const map = page.locator("#runs-map");
+      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+      const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
+      const city = manifest.cities.find((item) => item.id === "humboldt");
+      const run = manifest.runs.find((item) => item.city === "humboldt");
+      expect(run.title).toContain("Humboldt");
+
+      await page.getByRole("button", { name: "Globe" }).click();
+      await expect(map).toHaveAttribute("data-globe", "on");
+      await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
+
+      const ocean = await map.evaluate((el) => {
+        const width = el.clientWidth;
+        const height = el.clientHeight;
+        const candidates = [
+          [-100, -20],
+          [-150, 0],
+          [-40, -10],
+          [20, -30],
+        ];
+        for (const lngLat of candidates) {
+          const point = el._runsMap.project(lngLat);
+          if (point.x < 16 || point.y < 16 || point.x > width - 16 || point.y > height - 16) continue;
+          if (el._runsMap.regionAt(lngLat)) continue;
+          return { lngLat, point };
+        }
+        return null;
+      });
+      expect(ocean).toBeTruthy();
+      const globeBox = await map.boundingBox();
+      await page.mouse.click(globeBox.x + ocean.point.x, globeBox.y + ocean.point.y);
+      await expect(map).toHaveAttribute("data-globe", "on");
+      await expect(page.locator(".detail.open")).toHaveCount(0);
+      await expect(page.locator(".chooser")).toHaveCount(0);
+
+      await expect
+        .poll(async () => map.evaluate((el, lngLat) => el._runsMap.regionAt(lngLat), city.center), { timeout: 15000 })
+        .toBe("humboldt");
+      await clickLngLat(page, map, city.center);
+      await expect(map).toHaveAttribute("data-city", "humboldt");
+      await expect(map).toHaveAttribute("data-globe", "off");
+      await expect(map).toHaveAttribute("data-runs", "1");
+      await expect(page.locator(".detail.open")).toHaveCount(0);
+
+      await expect
+        .poll(async () => map.evaluate((el, lngLat) => el._runsMap.hitIds(lngLat), run.mid), { timeout: 15000 })
+        .toContain(String(run.id));
+
+      const miss = await map.evaluate((el) => {
+        const width = el.clientWidth;
+        const height = el.clientHeight;
+        const samples = [
+          [28, 96],
+          [width - 28, 96],
+          [28, height * 0.45],
+          [width * 0.5, 72],
+        ];
+        for (const [x, y] of samples) {
+          const lngLat = el._runsMap.unproject([x, y]);
+          if (el._runsMap.hitIds(lngLat).length === 0) return { x, y };
+        }
+        return null;
+      });
+      expect(miss).toBeTruthy();
+      const cityBox = await map.boundingBox();
+      await page.mouse.click(cityBox.x + miss.x, cityBox.y + miss.y);
+      await expect(page.locator(".detail.open")).toHaveCount(0);
+
+      await clickLngLat(page, map, run.mid);
+      const card = page.locator(".detail.open");
+      await expect(card).toBeVisible();
+      await expect(card.locator("h2")).toHaveText("Humboldt Redwoods Marathon");
+      await expect(card.locator(".run-type")).toHaveText("Run");
+      await expect(card.locator(".run-distance")).toContainText("mi");
+      await expect(card.locator(".run-pace")).toContainText("/mi");
+      await expect(card.locator(".run-date")).toContainText(/\d{4}/);
+      await expect(card.locator(".run-elev")).toContainText("ft");
+      await expect(card.locator(".run-companions")).toHaveCount(0);
+      await expect(card.locator(".photo-strip img")).toHaveAttribute(
+        "src",
+        new RegExp(`/media/runs/photos/${run.id}/1\\.webp`),
+      );
+      await expect(card.locator(".photo-strip img")).toHaveJSProperty("complete", true);
+
+      const sheet = await card.boundingBox();
+      if (viewport.name === "phone") {
+        expect(sheet.y).toBeGreaterThan(viewport.height * 0.15);
+        expect(sheet.y + sheet.height).toBeGreaterThan(viewport.height - 8);
+        expect(sheet.width).toBeGreaterThan(viewport.width - 4);
+      } else {
+        expect(sheet.x).toBeGreaterThan(viewport.width * 0.45);
+        expect(sheet.y).toBeLessThan(120);
+      }
+    });
+
+    test(`${viewport.name} crowded city click zooms toward routes`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto("/runs");
+      await ready(page);
+      const map = page.locator("#runs-map");
+      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+      await expect(map).toHaveAttribute("data-city", "la");
+      const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
+      const la = manifest.cities.find((item) => item.id === "la");
+      await expect
+        .poll(async () => map.evaluate((el, lngLat) => el._runsMap.hitIds(lngLat).length, la.center), {
+          timeout: 15000,
+        })
+        .toBeGreaterThan(1);
+      const before = Number(await map.getAttribute("data-zoom"));
+      await clickLngLat(page, map, la.center);
+      await expect(page.locator(".detail.open")).toHaveCount(0);
+      await expect(page.locator(".chooser")).toHaveCount(0);
+      await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(before + 1.4);
+      await expect(map).toHaveAttribute("data-globe", "off");
+      await expect(page.getByRole("button", { name: "Globe" })).toBeVisible();
+    });
+  }
+});
+
 test.describe("served lines keep the privacy trim", () => {
   test("real routes stay trimmed and foot sports stay on the map", async ({ request }) => {
     const manifest = await (await request.get("/media/runs/manifest.json")).json();

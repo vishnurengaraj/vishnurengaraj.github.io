@@ -1,6 +1,7 @@
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { densityHeat, densityWeight } from "./density.js";
+import { closerZoom } from "./pick.js";
 
 const STYLE = "https://tiles.openfreemap.org/styles/positron";
 
@@ -173,11 +174,13 @@ function addRunLayers(map) {
     layout: { "line-cap": "round", "line-join": "round" },
     paint: { "line-color": "#ffb020", "line-width": 3.2, "line-opacity": 1 },
   });
+  /* Invisible corridor around each route. Queryable from the city overview,
+     before the ink veins fade in, so a click can land on one activity. */
   map.addLayer({
     id: "runs-hit",
     type: "line",
     source: "runs-lines",
-    minzoom: 13.6,
+    minzoom: 8,
     layout: { "line-cap": "round", "line-join": "round" },
     paint: { "line-color": "#2d1d7a", "line-width": 18, "line-opacity": 0.01 },
   });
@@ -472,10 +475,10 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick })
             id = String(feature.properties.id);
           }
         }
-        if (id) {
-          onGlobePick?.(id);
-          return;
-        }
+        /* Ocean and empty globe stay put. A region flies in; the run itself
+           is a later click on that city's route geometry. */
+        if (id) onGlobePick?.(id);
+        return;
       }
       onPick(hitsAt(map, event.point), [event.lngLat.lng, event.lngLat.lat]);
     });
@@ -537,6 +540,29 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick })
     project(lngLat) {
       const point = map.project(lngLat);
       return { x: point.x, y: point.y };
+    },
+    unproject(pixel) {
+      const lngLat = map.unproject(pixel);
+      return [lngLat.lng, lngLat.lat];
+    },
+    getZoom() {
+      return map.getZoom();
+    },
+    hitIds(lngLat) {
+      if (!lngLat || !map.getLayer("runs-hit")) return [];
+      const point = map.project(lngLat);
+      return hitsAt(map, point).map((run) => run.id);
+    },
+    zoomToward(lngLat) {
+      if (disposed || !lngLat) return;
+      map.easeTo({
+        center: lngLat,
+        zoom: closerZoom(map.getZoom()),
+        pitch: framedPitch(),
+        bearing: framedBearing(),
+        duration: prefersReducedMotion() ? 0 : 700,
+        essential: true,
+      });
     },
     /* Hairlines queryable at the probe after the heat has faded. */
     veinHits(lngLat) {
