@@ -1,0 +1,18 @@
+{
+  "id": "11716321759",
+  "city": "la",
+  "title": "Afternoon Hike",
+  "date": "2024-06-22T00:00:00.000Z",
+  "distanceM": 11190,
+  "movingS": 11157,
+  "elevM": 637,
+  "mid": [
+    -118.546825,
+    34.081997
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 12052,
+  "type": "Hike"
+}

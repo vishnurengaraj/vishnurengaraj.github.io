@@ -1,0 +1,18 @@
+{
+  "id": "11864629182",
+  "city": "canyon",
+  "title": "Grand Canyon with a Grand family",
+  "date": "2024-07-11T00:00:00.000Z",
+  "distanceM": 8970,
+  "movingS": 9639,
+  "elevM": 663.8,
+  "mid": [
+    -112.046613,
+    36.207329
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 12960,
+  "type": "Run"
+}

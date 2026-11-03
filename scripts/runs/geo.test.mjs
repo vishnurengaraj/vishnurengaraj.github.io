@@ -5,9 +5,8 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
 import { assignCity } from "./cities.mjs";
-import { applyPrivacy, decodePolyline, haversine, moveMeters, pathLength } from "./geo.mjs";
-import { coordsFromTrackBytes } from "./parse.mjs";
-import { isFootSport } from "./sports.mjs";
+import { applyPrivacy, decodePolyline, distanceToMeters, haversine, moveMeters, pathLength } from "./geo.mjs";
+import { coordsFromTrackBytes, fitIsRun, isRunType, RUN_TYPES } from "./parse.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -81,12 +80,25 @@ test("city assignment keeps South Bay on LA and names away regions", () => {
   assert.equal(away.generated, true);
 });
 
-test("walk, hike, and trail run are foot sports", () => {
-  for (const type of ["Run", "Trail Run", "Walk", "Hike", "Hiking", "TrailRun"]) {
-    assert.equal(isFootSport(type), true, type);
-  }
-  assert.equal(isFootSport("Ride"), false);
-  assert.equal(isFootSport("Virtual Run"), false);
+test("walk, hike, and trail run are kept", () => {
+  for (const type of RUN_TYPES) assert.equal(isRunType(type), true, type);
+  assert.equal(isRunType("Ride"), false);
+  assert.equal(isRunType("Virtual Run"), false);
+  assert.equal(fitIsRun("running"), true);
+  assert.equal(fitIsRun("trail_running"), true);
+  assert.equal(fitIsRun("walking"), true);
+  assert.equal(fitIsRun("hiking"), true);
+  assert.equal(fitIsRun("cycling"), false);
+  assert.equal(fitIsRun({ sports: [{ sport: "hiking" }] }), true);
+});
+
+test("kilometer distances from a Strava drop become meters", () => {
+  assert.ok(Math.abs(distanceToMeters(11.82, 3861) - 11820) < 1);
+  assert.ok(Math.abs(distanceToMeters(42.195, 16000) - 42195) < 1);
+  assert.equal(distanceToMeters(11820, 3861), 11820);
+  assert.equal(distanceToMeters(150, 90), 150);
+  assert.equal(distanceToMeters(150, 600), 150);
+  assert.equal(distanceToMeters(1.25, 398), 1250);
 });
 
 test("gzipped gpx inflates before parsing", async () => {
@@ -106,8 +118,7 @@ test("shipped routes are one heatmap per named city", () => {
   assert.equal(manifest.privacy.meters, 400);
   assert.ok(manifest.runs.length > 400);
   const types = new Set(manifest.runs.map((run) => run.type));
-  assert.ok(types.has("Run"));
-  assert.ok(types.has("Trail Run"));
+  for (const type of ["Run", "Trail Run", "Walk", "Hike"]) assert.ok(types.has(type), type);
   for (const city of manifest.cities) {
     assert.equal(city.label === "Away" || city.id.startsWith("away-"), false);
     const lines = JSON.parse(

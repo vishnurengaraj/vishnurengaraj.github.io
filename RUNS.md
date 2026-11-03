@@ -18,7 +18,9 @@ Any real source replaces the sample. Add `--sample` only if you also want the sa
 
 Strava bulk export (unzipped). Distances in `activities.csv` are meters, times are seconds. Tracks are the `.gpx`, `.tcx`, or `.fit` files named in the `Filename` column, including `.gpx.gz`, `.tcx.gz`, and `.fit.gz`. Gzip is inflated with Node's zlib, then the inner file is parsed.
 
-Kept sports are **Run, Trail Run, Walk, and Hike** (also FIT `running`, `trail_running`, `walking`, and `hiking`). Rides and virtual activities are skipped. The allow list is `FOOT_SPORTS` in `scripts/runs/sports.mjs`, applied in `scripts/build-runs.mjs`.
+Kept sports are **Run, Trail Run, Walk, and Hike**. `RUN_TYPES` in `scripts/runs/parse.mjs` is `run`, `trail run`, `trailrun`, `walk`, `hike`, `walking`, and `hiking`. `fitIsRun()` also keeps FIT sport names that contain `run`, `walk`, or `hik`. Rides and virtual activities are skipped.
+
+`activities.csv` Distance is meters and is stored as meters. A value under 200 that, with the moving time, is a plausible walk or run only after multiplying by 1000 (a marathon recorded as ~42.2, a long run as 11.82) is treated as kilometers and converted. Pace on the card uses that meter distance and the moving time.
 
 ```bash
 npm run build:runs -- --export ~/Downloads/strava-export --photos /workspace/strava/photos

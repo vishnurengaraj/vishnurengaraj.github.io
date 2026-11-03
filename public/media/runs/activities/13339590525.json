@@ -1,0 +1,18 @@
+{
+  "id": "13339590525",
+  "city": "la",
+  "title": "Afternoon Walk",
+  "date": "2025-01-12T00:00:00.000Z",
+  "distanceM": 3220,
+  "movingS": 2556,
+  "elevM": 6.6,
+  "mid": [
+    -118.347159,
+    33.915284
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2689,
+  "type": "Walk"
+}

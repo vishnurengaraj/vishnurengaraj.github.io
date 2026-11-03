@@ -203,18 +203,20 @@ test.describe("served lines keep the privacy trim", () => {
     expect(isFootSport("Virtual Run")).toBe(false);
 
     const types = new Set(manifest.runs.map((run) => run.type));
-    expect(types.has("Run")).toBe(true);
-    expect(types.has("Trail Run")).toBe(true);
+    for (const type of ["Run", "Trail Run", "Walk", "Hike"]) expect(types.has(type)).toBe(true);
     for (const run of manifest.runs) {
       expect(FOOT_SPORTS).toContain(run.type);
       expect(String(run.id)).not.toMatch(/^sample-/);
       expect(run.photos).toBe(0);
       expect(run.distanceM).toBeGreaterThan(500);
     }
-    const trail = manifest.runs.find((run) => run.type === "Trail Run");
-    const lines = await (await request.get(`/media/runs/cities/${trail.city}.lines.geojson`)).json();
-    expect(lines.features.some((feature) => feature.properties.id === trail.id)).toBe(true);
-    expect(lines.features.find((feature) => feature.properties.id === trail.id).properties.type).toBe("Trail Run");
+    for (const type of ["Trail Run", "Walk", "Hike"]) {
+      const sample = manifest.runs.find((run) => run.type === type);
+      const lines = await (await request.get(`/media/runs/cities/${sample.city}.lines.geojson`)).json();
+      const feature = lines.features.find((item) => item.properties.id === sample.id);
+      expect(feature).toBeTruthy();
+      expect(feature.properties.type).toBe(type);
+    }
 
     for (const city of manifest.cities) {
       const cityLines = await (await request.get(`/media/runs/cities/${city.id}.lines.geojson`)).json();

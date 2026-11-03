@@ -122,15 +122,33 @@ const PREFERRED = ["la", "sf", "nyc"];
     Tokyo's palace and Ueno, Waco's two cells, the eastern Sierra, and
     Ann Arbor with Detroit. */
 export const PLACES = [
+  { id: "kings", label: "Kings", name: "Kings Canyon", center: [-118.4, 36.81], radiusM: 18000, zoom: 11.4 },
+  { id: "whitney", label: "Whitney", name: "Mt Whitney", center: [-118.55, 36.58], radiusM: 42000, zoom: 10.2 },
+  { id: "yosemite", label: "Yosemite", name: "Yosemite", center: [-119.5, 37.77], radiusM: 40000, zoom: 10.4 },
+  { id: "sierra", label: "Sierra", name: "Eastern Sierra", center: [-118.78, 37.5], radiusM: 55000, zoom: 9.2 },
   { id: "humboldt", label: "Humboldt", name: "Humboldt Redwoods", center: [-124.0, 40.32], radiusM: 50000, zoom: 10.8 },
   { id: "madrid", label: "Madrid", name: "Madrid", center: [-3.72, 40.42], radiusM: 40000, zoom: 12.2 },
+  { id: "alps", label: "Alps", name: "Mont Blanc", center: [6.75, 45.9], radiusM: 40000, zoom: 9.5 },
+  { id: "geneva", label: "Geneva", name: "Geneva", center: [6.1, 46.22], radiusM: 30000, zoom: 11.2 },
+  { id: "reyes", label: "Reyes", name: "Reyes Peak", center: [-119.29, 34.63], radiusM: 25000, zoom: 12 },
+  { id: "ynez", label: "Ynez", name: "Santa Ynez", center: [-119.75, 34.58], radiusM: 28000, zoom: 11.4 },
   { id: "michigan", label: "Michigan", name: "Michigan", center: [-83.45, 42.48], radiusM: 85000, zoom: 8.2 },
+  { id: "pinnacles", label: "Pinnacles", name: "Pinnacles", center: [-121.2, 36.49], radiusM: 28000, zoom: 11.5 },
+  { id: "bigsur", label: "Big Sur", name: "Big Sur", center: [-121.67, 36.26], radiusM: 28000, zoom: 11.4 },
   { id: "tokyo", label: "Tokyo", name: "Tokyo", center: [139.76, 35.7], radiusM: 30000, zoom: 11.4 },
+  { id: "izu", label: "Izu", name: "Izu", center: [138.93, 34.81], radiusM: 40000, zoom: 11 },
+  { id: "channel", label: "Islands", name: "Channel Islands", center: [-119.6, 34.04], radiusM: 30000, zoom: 11 },
+  { id: "jacinto", label: "Jacinto", name: "San Jacinto", center: [-116.75, 33.95], radiusM: 40000, zoom: 10.4 },
+  { id: "joshua", label: "JTree", name: "Joshua Tree", center: [-116.17, 33.98], radiusM: 30000, zoom: 11.2 },
   { id: "waco", label: "Waco", name: "Waco", center: [-97.28, 31.5], radiusM: 50000, zoom: 10.4 },
-  { id: "sierra", label: "Sierra", name: "Eastern Sierra", center: [-118.75, 37.5], radiusM: 60000, zoom: 9.1 },
+  { id: "baldy", label: "Baldy", name: "Mt Baldy", center: [-117.6, 34.25], radiusM: 22000, zoom: 11.6 },
   { id: "atlanta", label: "Atlanta", name: "Atlanta", center: [-84.32, 33.99], radiusM: 40000, zoom: 11.4 },
   { id: "sonoma", label: "Sonoma", name: "Lake Sonoma", center: [-123.05, 38.7], radiusM: 40000, zoom: 11.4 },
   { id: "fortuna", label: "Fortuna", name: "La Fortuna", center: [-84.64, 10.47], radiusM: 40000, zoom: 12 },
+  { id: "telescope", label: "Telescope", name: "Death Valley", center: [-117.09, 36.17], radiusM: 35000, zoom: 11.2 },
+  { id: "canyon", label: "Canyon", name: "Grand Canyon", center: [-112.05, 36.21], radiusM: 40000, zoom: 11 },
+  { id: "zion", label: "Zion", name: "Zion", center: [-112.95, 37.24], radiusM: 25000, zoom: 11.4 },
+  { id: "india", label: "India", name: "Kanyakumari", center: [77.73, 8.69], radiusM: 40000, zoom: 11 },
 ];
 
 function inMetro(metro, lng, lat) {

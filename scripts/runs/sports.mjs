@@ -1,4 +1,4 @@
-/** Foot sports shown on /runs. Strava labels them this way in activities.csv. */
+/** Display names for the sports kept by RUN_TYPES in parse.mjs. */
 export const FOOT_SPORTS = ["Run", "Trail Run", "Walk", "Hike"];
 
 /** Map a Strava or FIT sport string onto a foot sport, or null when it is not one. */

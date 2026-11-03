@@ -1,0 +1,18 @@
+{
+  "id": "8612570365",
+  "city": "india",
+  "title": "Morning Walk",
+  "date": "2023-02-24T00:00:00.000Z",
+  "distanceM": 3400,
+  "movingS": 2899,
+  "elevM": 15.4,
+  "mid": [
+    77.729312,
+    8.687019
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 3046,
+  "type": "Walk"
+}

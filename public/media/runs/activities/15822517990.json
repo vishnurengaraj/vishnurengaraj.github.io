@@ -1,0 +1,18 @@
+{
+  "id": "15822517990",
+  "city": "whitney",
+  "title": "Morning Walk to Sherman",
+  "date": "2025-09-15T00:00:00.000Z",
+  "distanceM": 3330,
+  "movingS": 2164,
+  "elevM": 102,
+  "mid": [
+    -118.751252,
+    36.580713
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2699,
+  "type": "Walk"
+}

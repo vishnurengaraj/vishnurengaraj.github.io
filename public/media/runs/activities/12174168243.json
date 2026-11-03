@@ -1,0 +1,18 @@
+{
+  "id": "12174168243",
+  "city": "sierra",
+  "title": "White Mountain",
+  "date": "2024-08-17T00:00:00.000Z",
+  "distanceM": 25070,
+  "movingS": 21878,
+  "elevM": 1052.4,
+  "mid": [
+    -118.255683,
+    37.634056
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 25893,
+  "type": "Run"
+}

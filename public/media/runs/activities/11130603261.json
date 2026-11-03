@@ -1,0 +1,18 @@
+{
+  "id": "11130603261",
+  "city": "ynez",
+  "title": "Morning Hike",
+  "date": "2024-04-07T00:00:00.000Z",
+  "distanceM": 13140,
+  "movingS": 12267,
+  "elevM": 227,
+  "mid": [
+    -119.754289,
+    34.577473
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 15907,
+  "type": "Hike"
+}

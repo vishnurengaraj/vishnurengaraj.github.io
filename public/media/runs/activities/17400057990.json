@@ -1,0 +1,18 @@
+{
+  "id": "17400057990",
+  "city": "izu",
+  "title": "Morning Hike",
+  "date": "2026-02-14T00:00:00.000Z",
+  "distanceM": 5710,
+  "movingS": 6161,
+  "elevM": 146,
+  "mid": [
+    138.925728,
+    34.810532
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 78876,
+  "type": "Hike"
+}

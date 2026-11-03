@@ -20,6 +20,7 @@ import { assignCity, orderCities } from "./runs/cities.mjs";
 import {
   applyPrivacy,
   distanceToLine,
+  distanceToMeters,
   lineMidpoint,
   pathLength,
   roundCoord,
@@ -29,6 +30,7 @@ import {
   activitiesFromGeojson,
   activityFromFit,
   activityFromRecord,
+  isRunType,
   listPhotoFiles,
   loadExport,
   pairsFromMaster,
@@ -36,7 +38,7 @@ import {
   resolveFitFile,
 } from "./runs/parse.mjs";
 import { SAMPLE_PIER, buildSampleActivities } from "./runs/sample.mjs";
-import { FOOT_SPORTS, isFootSport, normalizeSport } from "./runs/sports.mjs";
+import { FOOT_SPORTS, normalizeSport } from "./runs/sports.mjs";
 
 export { FOOT_SPORTS };
 
@@ -209,7 +211,7 @@ async function main() {
   }
 
   // Run, Trail Run, Walk, and Hike. Rides and virtual activities are dropped.
-  const loaded = (await loadSources(flags)).filter((activity) => isFootSport(activity.type));
+  const loaded = (await loadSources(flags)).filter((activity) => isRunType(activity.type));
   await rm(OUT_DIR, { recursive: true, force: true });
   await mkdir(path.dirname(MANIFEST_PATH), { recursive: true });
   await mkdir(path.join(OUT_DIR, "cities"), { recursive: true });
@@ -246,7 +248,7 @@ async function main() {
     const longest = parts.reduce((best, line) => (pathLength(line) > pathLength(best) ? line : best));
     const mid = lineMidpoint(longest);
     const city = assignCity(mid[0], mid[1]);
-    const distanceM = activity.distanceM ?? pathLength(raw);
+    const distanceM = distanceToMeters(activity.distanceM ?? pathLength(raw), activity.movingS);
     const movingS = activity.movingS;
     const photos = await writePhotos({ ...activity, id }, photosDir);
     const summary = {

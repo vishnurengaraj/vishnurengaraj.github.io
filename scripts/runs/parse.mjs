@@ -3,13 +3,35 @@ import { readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
 import fitMod from "fit-file-parser";
 import { decodePolyline } from "./geo.mjs";
-import { isFootSport, normalizeSport } from "./sports.mjs";
+import { normalizeSport } from "./sports.mjs";
 
 const FitParser = typeof fitMod === "function" ? fitMod : fitMod.default;
 
-/** @deprecated Use isFootSport. Run, Trail Run, Walk, and Hike are all kept. */
+/** Strava CSV / FIT sport names kept on /runs. */
+export const RUN_TYPES = ["run", "trail run", "trailrun", "walk", "hike", "walking", "hiking"];
+const RUN_TYPE_SET = new Set(RUN_TYPES);
+
 export function isRunType(type) {
-  return isFootSport(type);
+  if (type == null || String(type).trim() === "") return true;
+  const text = String(type).trim().toLowerCase().replace(/[_-]+/g, " ");
+  if (text.includes("virtual")) return false;
+  if (RUN_TYPE_SET.has(text)) return true;
+  if (text.includes("hik")) return true;
+  if (text.includes("walk")) return true;
+  return text.endsWith(" run") && !text.includes("ride") && !text.includes("bike");
+}
+
+/** FIT sport or a parsed FIT file. Accepts run, walk, and hike names. */
+export function fitIsRun(nameOrData) {
+  if (nameOrData && typeof nameOrData === "object") {
+    const rows = [...(nameOrData.sports || []), ...(nameOrData.sessions || [])];
+    const names = rows.map((row) => String(row.sport || row.sub_sport || "")).filter((name) => name.trim());
+    if (!names.length) return true;
+    return names.some((name) => fitIsRun(name));
+  }
+  const text = String(nameOrData || "").toLowerCase();
+  if (!text || text.includes("virtual")) return !text.includes("virtual");
+  return text.includes("run") || text.includes("walk") || text.includes("hik");
 }
 
 export function parseCsv(text) {
@@ -132,14 +154,13 @@ function fitCoords(data) {
 }
 
 function fitSport(data) {
+  if (!fitIsRun(data)) return null;
   const rows = [...(data.sports || []), ...(data.sessions || [])];
   for (const row of rows) {
     const named = normalizeSport(row.sport || row.sub_sport || "");
     if (named) return named;
   }
-  const names = rows.map((row) => String(row.sport || row.sub_sport || "").trim()).filter(Boolean);
-  if (!names.length) return "Run";
-  return null;
+  return "Run";
 }
 
 function first(obj, keys) {

@@ -1,0 +1,18 @@
+{
+  "id": "19151138962",
+  "city": "alps",
+  "title": "TMB Day 3",
+  "date": "2026-07-02T00:00:00.000Z",
+  "distanceM": 26430,
+  "movingS": 23388,
+  "elevM": 1521,
+  "mid": [
+    7.030991,
+    45.854878
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 29217,
+  "type": "Run"
+}

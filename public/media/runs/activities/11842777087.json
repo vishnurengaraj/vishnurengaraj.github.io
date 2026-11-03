@@ -1,0 +1,18 @@
+{
+  "id": "11842777087",
+  "city": "zion",
+  "title": "Zion Sunset Overlook",
+  "date": "2024-07-08T00:00:00.000Z",
+  "distanceM": 2120,
+  "movingS": 3005,
+  "elevM": 113.5,
+  "mid": [
+    -112.945846,
+    37.212994
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 4623,
+  "type": "Run"
+}

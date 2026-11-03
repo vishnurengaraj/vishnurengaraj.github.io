@@ -1,0 +1,18 @@
+{
+  "id": "8542592842",
+  "city": "la",
+  "title": "Morning Hike",
+  "date": "2023-01-15T00:00:00.000Z",
+  "distanceM": 25750,
+  "movingS": 26159,
+  "elevM": 2060,
+  "mid": [
+    -118.057056,
+    34.225511
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 30942,
+  "type": "Hike"
+}
