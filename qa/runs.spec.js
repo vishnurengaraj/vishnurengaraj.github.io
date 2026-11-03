@@ -434,6 +434,108 @@ test.describe("zoom out enters the globe", () => {
     await expect(map).toHaveAttribute("data-city", "la");
     await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(8);
   });
+
+  test("phone drag after zoom-out stays on the globe", async ({ page, browserName }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/runs");
+    await ready(page);
+    const map = page.locator("#runs-map");
+    await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+    for (let i = 0; i < 16 && (await map.getAttribute("data-globe")) !== "on"; i++) {
+      await zoomBy(page, "out");
+    }
+    await expect(map).toHaveAttribute("data-globe", "on");
+    await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
+    const before = await map.evaluate((el) => ({
+      lng: Number(el.dataset.lng),
+      lat: Number(el.dataset.lat),
+    }));
+
+    const box = await map.boundingBox();
+    const start = { x: box.x + box.width * 0.55, y: box.y + box.height * 0.42 };
+    const end = { x: start.x - 90, y: start.y + 70 };
+    if (browserName === "chromium") {
+      const client = await page.context().newCDPSession(page);
+      await client.send("Input.dispatchTouchEvent", {
+        type: "touchStart",
+        touchPoints: [{ x: start.x, y: start.y, id: 1 }],
+      });
+      for (let i = 1; i <= 8; i++) {
+        await client.send("Input.dispatchTouchEvent", {
+          type: "touchMove",
+          touchPoints: [
+            {
+              x: start.x + ((end.x - start.x) * i) / 8,
+              y: start.y + ((end.y - start.y) * i) / 8,
+              id: 1,
+            },
+          ],
+        });
+      }
+      await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+      await client.detach();
+    } else {
+      await page.mouse.move(start.x, start.y);
+      await page.mouse.down();
+      await page.mouse.move(end.x, end.y, { steps: 8 });
+      await page.mouse.up();
+    }
+    await page.waitForTimeout(400);
+
+    await expect(map).toHaveAttribute("data-globe", "on");
+    await expect(page.getByRole("button", { name: "Globe" })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator(".detail.open")).toHaveCount(0);
+    await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
+    const after = await map.evaluate((el) => ({
+      lng: Number(el.dataset.lng),
+      lat: Number(el.dataset.lat),
+    }));
+    expect(Math.hypot(after.lng - before.lng, after.lat - before.lat)).toBeGreaterThan(2);
+  });
+
+  test("phone pinch that opens the globe does not snap back as the fingers spread", async ({ page, browserName }) => {
+    test.skip(browserName !== "chromium", "two-finger pinch is sent with CDP");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/runs");
+    await ready(page);
+    const map = page.locator("#runs-map");
+    await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+    for (let i = 0; i < 16; i++) {
+      if ((await map.getAttribute("data-globe")) === "on") break;
+      const zoom = Number(await map.getAttribute("data-zoom"));
+      if (zoom < 4.3) break;
+      await zoomBy(page, "out");
+    }
+    await expect(map).toHaveAttribute("data-globe", "off");
+
+    const client = await page.context().newCDPSession(page);
+    let left = { x: 40, y: 220, id: 1 };
+    let right = { x: 350, y: 680, id: 2 };
+    await client.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [left, right] });
+    for (let i = 1; i <= 10 && (await map.getAttribute("data-globe")) !== "on"; i++) {
+      left = { x: 40 + i * 10, y: 220 + i * 12, id: 1 };
+      right = { x: 350 - i * 10, y: 680 - i * 12, id: 2 };
+      await client.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [left, right] });
+      await page.waitForTimeout(40);
+    }
+    await expect(map).toHaveAttribute("data-globe", "on");
+    for (let i = 1; i <= 8; i++) {
+      left = { x: left.x - 14, y: left.y - 16, id: 1 };
+      right = { x: right.x + 14, y: right.y + 16, id: 2 };
+      await client.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [left, right] });
+      await page.waitForTimeout(30);
+    }
+    await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await client.detach();
+    await page.waitForTimeout(600);
+
+    await expect(map).toHaveAttribute("data-globe", "on");
+    await expect(page.getByRole("button", { name: "Globe" })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator(".detail.open")).toHaveCount(0);
+    await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
+  });
 });
 
 test.describe("served lines keep the privacy trim", () => {

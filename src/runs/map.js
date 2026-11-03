@@ -1,7 +1,7 @@
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { densityHeat, densityWeight } from "./density.js";
-import { GLOBE_VIEW_ZOOM, globeHandoff } from "./globe.js";
+import { GLOBE_VIEW_ZOOM, canLeaveGlobe, globeHandoff } from "./globe.js";
 import { closerZoom } from "./pick.js";
 
 const STYLE = "https://tiles.openfreemap.org/styles/positron";
@@ -238,6 +238,10 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick, o
   let cityId = "";
   let globeOn = false;
   let handoff = false;
+  let gestureId = 0;
+  let blockedGesture = 0;
+  let activeTouches = 0;
+  let swallowClick = false;
 
   const loaded = new Promise((resolve, reject) => {
     const timer = window.setTimeout(() => reject(new Error("Map style timed out")), 20000);
@@ -298,7 +302,16 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick, o
   syncProbe();
 
   function gestures(enabled) {
-    const controls = [map.scrollZoom, map.touchZoomRotate, map.doubleClickZoom, map.boxZoom, map.keyboard];
+    const controls = [
+      map.scrollZoom,
+      map.touchZoomRotate,
+      map.doubleClickZoom,
+      map.boxZoom,
+      map.keyboard,
+      map.dragPan,
+      map.dragRotate,
+      map.touchPitch,
+    ];
     for (const control of controls) {
       if (!control) continue;
       if (enabled) control.enable();
@@ -306,13 +319,52 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick, o
     }
   }
 
+  function rememberTouches(event) {
+    const touches = event.touches?.length || 0;
+    if (touches > 0 && activeTouches === 0) gestureId += 1;
+    activeTouches = touches;
+    if (touches === 0 && blockedGesture) {
+      const token = blockedGesture;
+      const clear = () => {
+        if (blockedGesture === token && activeTouches === 0) blockedGesture = 0;
+      };
+      if (map.isMoving()) map.once("moveend", clear);
+      else queueMicrotask(clear);
+    }
+  }
+  const surface = map.getCanvasContainer();
+  surface.addEventListener("touchstart", rememberTouches, { passive: true });
+  surface.addEventListener("touchmove", rememberTouches, { passive: true });
+  surface.addEventListener("touchend", rememberTouches, { passive: true });
+  surface.addEventListener("touchcancel", rememberTouches, { passive: true });
+
   /* User zoom only. Programmatic flights omit originalEvent, so a fly to the
-     globe does not immediately fly back out. The handoff waits until the
-     current zoom frame finishes, or it would resume that same gesture. */
+     globe does not immediately fly back out. The pinch that crossed into the
+     globe is still the same gesture: it must not zoom back out of the globe,
+     and neither does a one-finger drag. A later pinch, wheel, or + button can. */
   function onUserZoom(event) {
     if (disposed || handoff || !event.originalEvent) return;
+    const raw = event.originalEvent;
     const action = globeHandoff(globeOn, map.getZoom());
     if (action === "none") return;
+    if (
+      action === "leave" &&
+      !canLeaveGlobe({
+        sameGesture: blockedGesture !== 0 && gestureId === blockedGesture,
+        eventType: raw.type,
+        touchCount: raw.touches?.length || 0,
+      })
+    ) {
+      return;
+    }
+    if (action === "enter" && (raw.type || "").startsWith("touch")) {
+      if (activeTouches === 0) {
+        gestureId += 1;
+        activeTouches = raw.touches?.length || 1;
+      }
+      blockedGesture = gestureId;
+      swallowClick = true;
+    }
     handoff = true;
     gestures(false);
     const enter = action === "enter";
@@ -498,6 +550,10 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick, o
 
   function ensureInteractions() {
     map.on("click", (event) => {
+      if (swallowClick) {
+        swallowClick = false;
+        return;
+      }
       if (globeOn && map.getLayer("runs-globe")) {
         const regions = map.queryRenderedFeatures(event.point, { layers: ["runs-globe"] });
         let id = "";

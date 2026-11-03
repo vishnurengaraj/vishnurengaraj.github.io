@@ -10,3 +10,12 @@ export function globeHandoff(isGlobe, zoom) {
   if (isGlobe && zoom >= GLOBE_EXIT_ZOOM) return "leave";
   return "none";
 }
+
+/** A finger still finishing the zoom-out, or a one-finger drag, must not leave.
+    A later pinch, wheel, or zoom button may. */
+export function canLeaveGlobe({ sameGesture, eventType, touchCount }) {
+  if (sameGesture) return false;
+  const type = eventType || "";
+  if (type.startsWith("touch") && (touchCount || 0) < 2) return false;
+  return true;
+}
