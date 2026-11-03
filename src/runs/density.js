@@ -2,9 +2,11 @@
 
 Each activity increments a cell once, no matter how many GPS samples fall in it.
 Weight is sqrt(count / hot), so one pass stays on the cool end of the ramp and
-repeated corridors climb toward 1. Map paint in map.js is tuned for CELL_M. */
+repeated corridors climb toward 1. Cells are small enough that MapLibre's
+Gaussian kernels overlap into a continuous trail. Paint in map.js is tuned
+for CELL_M. */
 
-export const CELL_M = 110;
+export const CELL_M = 50;
 export const DENSITY_HOT = 80;
 
 const M_PER_DEG_LAT = 111320;

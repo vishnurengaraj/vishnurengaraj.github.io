@@ -54,9 +54,11 @@ function addBuildings(map) {
   );
 }
 
-/* Cream → amber → coral → purple. City intensity tracks zoom against the
-   110m cells in density.js. The globe ramp is wider so one kernel glows
-   instead of reading as a flat disc. MapLibre's peak is ~0.4×weight×intensity. */
+/* Cream → amber → coral → purple. Alpha stays low until the kernel has
+   actually piled up, so a trail feathers out instead of drawing a hard disc.
+   Radius stays wide relative to the 50m cells so neighboring kernels blend.
+   MapLibre's peak is ~0.4×weight×intensity. The globe ramp is the same family,
+   wider, so one city glows instead of reading as a flat disc. */
 const GLOBE_HEAT_COLOR = [
   "interpolate",
   ["linear"],
@@ -85,20 +87,20 @@ const HEAT_COLOR = [
   ["heatmap-density"],
   0,
   "rgba(255, 214, 150, 0)",
-  0.06,
-  "rgba(255, 196, 110, 0.7)",
-  0.14,
-  "rgba(255, 160, 48, 0.82)",
-  0.28,
-  "rgba(240, 112, 36, 0.88)",
-  0.46,
-  "rgba(214, 72, 52, 0.92)",
+  0.08,
+  "rgba(255, 220, 160, 0.04)",
+  0.18,
+  "rgba(255, 198, 110, 0.16)",
+  0.32,
+  "rgba(255, 168, 64, 0.36)",
+  0.48,
+  "rgba(236, 112, 46, 0.56)",
   0.64,
-  "rgba(168, 42, 104, 0.95)",
-  0.82,
-  "rgba(96, 32, 128, 0.97)",
+  "rgba(196, 58, 72, 0.72)",
+  0.8,
+  "rgba(130, 36, 112, 0.84)",
   1,
-  "rgba(45, 29, 122, 0.98)",
+  "rgba(45, 29, 122, 0.92)",
 ];
 
 function addRunLayers(map) {
@@ -113,22 +115,22 @@ function addRunLayers(map) {
       "heatmap-weight": ["coalesce", ["get", "w"], 0],
       "heatmap-intensity": [
         "interpolate",
-        ["exponential", 2],
+        ["linear"],
         ["zoom"],
         8,
-        0.085,
-        10,
-        0.27,
-        12,
         0.9,
-        12.5,
-        1.18,
-        14,
-        2.4,
-        15.5,
-        5.5,
+        10,
+        0.62,
+        11.4,
+        0.42,
+        12.3,
+        0.32,
+        13.4,
+        0.34,
+        14.4,
+        0.48,
       ],
-      "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 8, 8, 10, 10, 11.5, 12, 12.5, 13, 14, 18, 15.5, 22],
+      "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 8, 14, 10, 22, 11.4, 36, 12.3, 58, 13.2, 72, 14.2, 64, 15.2, 44],
       "heatmap-opacity": ["interpolate", ["linear"], ["zoom"], 10, 0.9, 12.2, 0.78, 13.3, 0.32, 14.4, 0],
       "heatmap-color": HEAT_COLOR,
     },
