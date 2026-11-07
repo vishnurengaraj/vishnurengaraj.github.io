@@ -304,16 +304,27 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
     if (city) cityId = city.id;
   }
 
-  let fittingPitch = false;
-  map.on("zoom", (event) => {
-    if (fittingPitch || !event.originalEvent) return;
+  /* Pitch eases down only after the gesture ends. setPitch/jumpTo during a
+     pinch calls stop(), which resets the touch handler and the zoom snaps back. */
+  let pitching = false;
+  function easePitchDown() {
+    if (pitching || map.isMoving()) return;
     const cap = pitchForZoom(map.getZoom(), camera().pitch);
-    if (map.getPitch() > cap + 0.5) {
-      fittingPitch = true;
-      map.setPitch(cap);
-      fittingPitch = false;
+    if (map.getPitch() <= cap + 0.5) return;
+    pitching = true;
+    map.easeTo({
+      pitch: cap,
+      duration: prefersReducedMotion() ? 0 : 280,
+      essential: true,
+    });
+    if (map.isMoving()) {
+      map.once("moveend", () => {
+        pitching = false;
+      });
+    } else {
+      pitching = false;
     }
-  });
+  }
 
   map.on("move", syncProbe);
   map.on("moveend", () => {
@@ -321,6 +332,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
     syncProbe();
     const current = map.getCenter();
     onView?.([current.lng, current.lat], map.getZoom());
+    easePitchDown();
   });
   syncProbe();
 

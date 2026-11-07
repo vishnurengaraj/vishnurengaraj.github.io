@@ -285,6 +285,58 @@ test.describe("one continuous map", () => {
       await expect(card.locator(".run-pace")).toContainText("/mi");
     });
   }
+
+  test("phone pinch-out from LA reaches the world without snapping back", async ({ page, browserName }) => {
+    test.skip(browserName !== "chromium", "pinch uses CDP touch events");
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/runs");
+    await ready(page);
+    const map = page.locator("#runs-map");
+    await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+    await expect(map).toHaveAttribute("data-city", "la");
+    await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(10);
+
+    const client = await page.context().newCDPSession(page);
+    async function pinchOut() {
+      let left = { x: 40, y: 250, id: 1 };
+      let right = { x: 350, y: 620, id: 2 };
+      await client.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [left, right] });
+      let lowest = Infinity;
+      for (let i = 1; i <= 14; i++) {
+        left = { x: 40 + i * 9, y: 250 + i * 10, id: 1 };
+        right = { x: 350 - i * 9, y: 620 - i * 10, id: 2 };
+        await client.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [left, right] });
+        await page.waitForTimeout(30);
+        lowest = Math.min(lowest, Number(await map.getAttribute("data-zoom")));
+      }
+      const during = Number(await map.getAttribute("data-zoom"));
+      await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+      await page.waitForTimeout(500);
+      const after = Number(await map.getAttribute("data-zoom"));
+      return { lowest, during, after };
+    }
+
+    let zoom = Number(await map.getAttribute("data-zoom"));
+    for (let n = 0; n < 8 && zoom > 2.5; n++) {
+      const step = await pinchOut();
+      expect(step.after).toBeLessThan(zoom - 0.8);
+      expect(step.after).toBeLessThanOrEqual(step.lowest + 0.35);
+      zoom = step.after;
+    }
+    expect(zoom).toBeLessThan(2.5);
+    await expect(page.locator(".detail.open")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Regions, LA selected" })).toBeVisible();
+    const humboldt = await map.evaluate((el) => el._runsMap.project([-124, 40.32]));
+    const tokyo = await map.evaluate((el) => el._runsMap.project([139.76, 35.7]));
+    const box = await map.boundingBox();
+    for (const point of [humboldt, tokyo]) {
+      expect(point.x).toBeGreaterThan(0);
+      expect(point.y).toBeGreaterThan(0);
+      expect(point.x).toBeLessThan(box.width);
+      expect(point.y).toBeLessThan(box.height);
+    }
+    await client.detach();
+  });
 });
 
 test.describe("served lines keep the privacy trim", () => {
