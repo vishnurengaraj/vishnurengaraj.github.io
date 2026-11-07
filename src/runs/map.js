@@ -1,7 +1,7 @@
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { densityHeat, densityWeight } from "./density.js";
-import { GLOBE_VIEW_ZOOM, canLeaveGlobe, globeHandoff } from "./globe.js";
+import { densityHeat } from "./density.js";
+import { REGION_ZOOM, WORLD_CENTER, WORLD_ZOOM, nearestCity, pitchForZoom } from "./globe.js";
 import { closerZoom } from "./pick.js";
 
 const STYLE = "https://tiles.openfreemap.org/styles/positron";
@@ -57,30 +57,7 @@ function addBuildings(map) {
 /* Cream → amber → coral → purple. Alpha stays low until the kernel has
    actually piled up, so a trail feathers out instead of drawing a hard disc.
    Radius stays wide relative to the 50m cells so neighboring kernels blend.
-   MapLibre's peak is ~0.4×weight×intensity. The globe ramp is the same family,
-   wider, so one city glows instead of reading as a flat disc. */
-const GLOBE_HEAT_COLOR = [
-  "interpolate",
-  ["linear"],
-  ["heatmap-density"],
-  0,
-  "rgba(255, 214, 150, 0)",
-  0.05,
-  "rgba(255, 206, 130, 0.28)",
-  0.16,
-  "rgba(255, 170, 64, 0.5)",
-  0.34,
-  "rgba(240, 112, 40, 0.7)",
-  0.52,
-  "rgba(214, 72, 56, 0.82)",
-  0.7,
-  "rgba(150, 42, 112, 0.9)",
-  0.86,
-  "rgba(88, 32, 128, 0.94)",
-  1,
-  "rgba(45, 29, 122, 0.97)",
-];
-
+   The same heat is on the map from a city all the way out to the world. */
 const HEAT_COLOR = [
   "interpolate",
   ["linear"],
@@ -117,6 +94,10 @@ function addRunLayers(map) {
         "interpolate",
         ["linear"],
         ["zoom"],
+        1.2,
+        0.45,
+        5,
+        0.6,
         8,
         0.9,
         10,
@@ -130,8 +111,32 @@ function addRunLayers(map) {
         14.4,
         0.48,
       ],
-      "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 8, 14, 10, 22, 11.4, 36, 12.3, 58, 13.2, 72, 14.2, 64, 15.2, 44],
-      "heatmap-opacity": ["interpolate", ["linear"], ["zoom"], 10, 0.9, 12.2, 0.78, 13.3, 0.32, 14.4, 0],
+      "heatmap-radius": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        1.2,
+        8,
+        4,
+        16,
+        6,
+        20,
+        8,
+        16,
+        10,
+        22,
+        11.4,
+        36,
+        12.3,
+        58,
+        13.2,
+        72,
+        14.2,
+        64,
+        15.2,
+        44,
+      ],
+      "heatmap-opacity": ["interpolate", ["linear"], ["zoom"], 1.2, 0.88, 10, 0.9, 12.2, 0.78, 13.3, 0.32, 14.4, 0],
       "heatmap-color": HEAT_COLOR,
     },
   });
@@ -207,8 +212,8 @@ function hitsAt(map, point) {
   return runs;
 }
 
-/** Pitched OpenFreeMap map. One city of lines is loaded at a time. */
-export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick, onGlobeMode }) {
+/** One pitched map of every region. Zooming out reveals the world on the same layers. */
+export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
   const view = camera();
   const map = new maplibregl.Map({
     container: mapEl,
@@ -236,12 +241,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick, o
   let layersReady = false;
   let runCount = 0;
   let cityId = "";
-  let globeOn = false;
-  let handoff = false;
-  let gestureId = 0;
-  let blockedGesture = 0;
-  let activeTouches = 0;
-  let swallowClick = false;
+  let regions = [];
 
   const loaded = new Promise((resolve, reject) => {
     const timer = window.setTimeout(() => reject(new Error("Map style timed out")), 20000);
@@ -266,6 +266,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick, o
 
   try {
     addBuildings(map);
+    map.setProjection({ type: "globe" });
     map.setLight({
       anchor: "viewport",
       color: "#ffffff",
@@ -293,94 +294,35 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick, o
     mapEl.dataset.zoom = map.getZoom().toFixed(3);
     mapEl.dataset.city = cityId;
     mapEl.dataset.runs = String(runCount);
-    mapEl.dataset.globe = globeOn ? "on" : "off";
     if (layersReady) mapEl.dataset.map = "ready";
   }
 
+  function followRegion() {
+    if (map.getZoom() < REGION_ZOOM || !regions.length) return;
+    const current = map.getCenter();
+    const city = nearestCity(regions, [current.lng, current.lat]);
+    if (city) cityId = city.id;
+  }
+
+  let fittingPitch = false;
+  map.on("zoom", (event) => {
+    if (fittingPitch || !event.originalEvent) return;
+    const cap = pitchForZoom(map.getZoom(), camera().pitch);
+    if (map.getPitch() > cap + 0.5) {
+      fittingPitch = true;
+      map.setPitch(cap);
+      fittingPitch = false;
+    }
+  });
+
   map.on("move", syncProbe);
-  map.on("moveend", syncProbe);
+  map.on("moveend", () => {
+    followRegion();
+    syncProbe();
+    const current = map.getCenter();
+    onView?.([current.lng, current.lat], map.getZoom());
+  });
   syncProbe();
-
-  function gestures(enabled) {
-    const controls = [
-      map.scrollZoom,
-      map.touchZoomRotate,
-      map.doubleClickZoom,
-      map.boxZoom,
-      map.keyboard,
-      map.dragPan,
-      map.dragRotate,
-      map.touchPitch,
-    ];
-    for (const control of controls) {
-      if (!control) continue;
-      if (enabled) control.enable();
-      else control.disable();
-    }
-  }
-
-  function rememberTouches(event) {
-    const touches = event.touches?.length || 0;
-    if (touches > 0 && activeTouches === 0) gestureId += 1;
-    activeTouches = touches;
-    if (touches === 0 && blockedGesture) {
-      const token = blockedGesture;
-      const clear = () => {
-        if (blockedGesture === token && activeTouches === 0) blockedGesture = 0;
-      };
-      if (map.isMoving()) map.once("moveend", clear);
-      else queueMicrotask(clear);
-    }
-  }
-  const surface = map.getCanvasContainer();
-  surface.addEventListener("touchstart", rememberTouches, { passive: true });
-  surface.addEventListener("touchmove", rememberTouches, { passive: true });
-  surface.addEventListener("touchend", rememberTouches, { passive: true });
-  surface.addEventListener("touchcancel", rememberTouches, { passive: true });
-
-  /* User zoom only. Programmatic flights omit originalEvent, so a fly to the
-     globe does not immediately fly back out. The pinch that crossed into the
-     globe is still the same gesture: it must not zoom back out of the globe,
-     and neither does a one-finger drag. A later pinch, wheel, or + button can. */
-  function onUserZoom(event) {
-    if (disposed || handoff || !event.originalEvent) return;
-    const raw = event.originalEvent;
-    const action = globeHandoff(globeOn, map.getZoom());
-    if (action === "none") return;
-    if (
-      action === "leave" &&
-      !canLeaveGlobe({
-        sameGesture: blockedGesture !== 0 && gestureId === blockedGesture,
-        eventType: raw.type,
-        touchCount: raw.touches?.length || 0,
-      })
-    ) {
-      return;
-    }
-    if (action === "enter" && (raw.type || "").startsWith("touch")) {
-      if (activeTouches === 0) {
-        gestureId += 1;
-        activeTouches = raw.touches?.length || 1;
-      }
-      blockedGesture = gestureId;
-      swallowClick = true;
-    }
-    handoff = true;
-    gestures(false);
-    const enter = action === "enter";
-    queueMicrotask(() => {
-      if (disposed) return;
-      map.stop();
-      onGlobeMode?.(enter);
-      const release = () => {
-        gestures(true);
-        handoff = false;
-      };
-      if (map.isMoving()) map.once("moveend", release);
-      else queueMicrotask(release);
-    });
-  }
-  map.on("zoom", onUserZoom);
 
   function stopIdleSway() {
     if (swayState === "stopped") return;
@@ -439,14 +381,6 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick, o
     window.requestAnimationFrame(() => window.requestAnimationFrame(armSway));
   }
 
-  const CITY_LAYERS = ["runs-heat", "runs-vein-glow", "runs-vein", "runs-highlight-casing", "runs-highlight", "runs-hit"];
-
-  function layerVisibility(ids, visible) {
-    for (const id of ids) {
-      if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", visible ? "visible" : "none");
-    }
-  }
-
   function labelFont() {
     for (const layer of map.getStyle()?.layers || []) {
       const font = layer.layout?.["text-font"];
@@ -455,129 +389,54 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick, o
     return ["Noto Sans Regular"];
   }
 
-  const GLOBE_LAYERS = ["runs-globe-heat", "runs-globe", "runs-globe-label"];
-
-  function ensureGlobeLayers() {
-    if (map.getSource("runs-globe")) return;
-    map.addSource("runs-globe", { type: "geojson", data: emptyCollection() });
-    /* One weighted point per region. The kernel is the same thermal ramp as the
-       city map, wide enough that a cluster like California blends instead of
-       stacking as separate discs. */
-    map.addLayer({
-      id: "runs-globe-heat",
-      type: "heatmap",
-      source: "runs-globe",
-      layout: { visibility: "none" },
-      paint: {
-        "heatmap-weight": ["coalesce", ["get", "w"], 0],
-        "heatmap-intensity": 1.85,
-        "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 0.8, 28, 1.55, 48, 3.2, 72],
-        "heatmap-opacity": 0.95,
-        "heatmap-color": GLOBE_HEAT_COLOR,
-      },
-    });
-    map.addLayer({
-      id: "runs-globe",
-      type: "circle",
-      source: "runs-globe",
-      layout: { visibility: "none" },
-      paint: {
-        "circle-radius": ["interpolate", ["linear"], ["zoom"], 0.8, 22, 1.55, 34, 3.2, 52],
-        "circle-color": "#2d1d7a",
-        "circle-opacity": 0.01,
-        "circle-stroke-width": 0,
-      },
-    });
-    try {
-      map.addLayer({
-        id: "runs-globe-label",
-        type: "symbol",
-        source: "runs-globe",
-        layout: {
-          visibility: "none",
-          "text-field": ["get", "label"],
-          "text-font": labelFont(),
-          "text-size": 12,
-          "text-offset": [0, 1.15],
-          "text-anchor": "top",
-        },
-        paint: {
-          "text-color": "#1a1033",
-          "text-halo-color": "#ffffff",
-          "text-halo-width": 1.4,
-        },
-      });
-    } catch (error) {
-      console.warn("Globe labels skipped", error);
-    }
-  }
-
-  function globeCollection(cities) {
-    return {
+  function ensureRegionLabels(cities) {
+    const data = {
       type: "FeatureCollection",
-      features: [...(cities || [])]
-        .sort((a, b) => (b.count || 1) - (a.count || 1))
-        .map((city) => ({
+      features: (cities || []).map((city) => ({
         type: "Feature",
-        properties: {
-          id: city.id,
-          label: city.label,
-          count: city.count || 1,
-          w: densityWeight(city.count || 1),
-        },
+        properties: { id: city.id, label: city.label },
         geometry: { type: "Point", coordinates: city.center },
       })),
     };
-  }
-
-  function setSpace(on) {
-    try {
-      map.setFog(
-        on
-          ? {
-              color: "rgb(196, 206, 214)",
-              "high-color": "rgb(90, 120, 200)",
-              "horizon-blend": 0.08,
-              "space-color": "#1a1033",
-              "star-intensity": 0.35,
-            }
-          : null,
-      );
-    } catch (error) {
-      console.warn("Globe atmosphere skipped", error);
+    if (!map.getSource("runs-regions")) {
+      map.addSource("runs-regions", { type: "geojson", data });
+      try {
+        map.addLayer({
+          id: "runs-region-label",
+          type: "symbol",
+          source: "runs-regions",
+          maxzoom: 5.5,
+          layout: {
+            "text-field": ["get", "label"],
+            "text-font": labelFont(),
+            "text-size": ["interpolate", ["linear"], ["zoom"], 1.2, 11, 4.5, 13],
+            "text-offset": [0, 0.6],
+            "text-anchor": "top",
+            "text-padding": 2,
+          },
+          paint: {
+            "text-color": "#1a1033",
+            "text-halo-color": "#ffffff",
+            "text-halo-width": 1.3,
+            "text-opacity": ["interpolate", ["linear"], ["zoom"], 4.2, 1, 5.5, 0],
+          },
+        });
+      } catch (error) {
+        console.warn("Region labels skipped", error);
+      }
+      return;
     }
+    map.getSource("runs-regions").setData(data);
   }
 
   function ensureInteractions() {
     map.on("click", (event) => {
-      if (swallowClick) {
-        swallowClick = false;
-        return;
-      }
-      if (globeOn && map.getLayer("runs-globe")) {
-        const regions = map.queryRenderedFeatures(event.point, { layers: ["runs-globe"] });
-        let id = "";
-        let best = Infinity;
-        for (const feature of regions) {
-          const coordinates = feature.geometry?.coordinates;
-          if (!coordinates) continue;
-          const projected = map.project(coordinates);
-          const distance = Math.hypot(projected.x - event.point.x, projected.y - event.point.y);
-          if (distance < best) {
-            best = distance;
-            id = String(feature.properties.id);
-          }
-        }
-        /* Ocean and empty globe stay put. A region flies in; the run itself
-           is a later click on that city's route geometry. */
-        if (id) onGlobePick?.(id);
-        return;
-      }
       onPick(hitsAt(map, event.point), [event.lngLat.lng, event.lngLat.lat]);
     });
     map.on("mousemove", (event) => {
-      const layers = globeOn && map.getLayer("runs-globe") ? ["runs-globe"] : map.getLayer("runs-hit") ? ["runs-hit"] : [];
-      const hit = layers.length ? map.queryRenderedFeatures(event.point, { layers }).length > 0 : false;
+      const hit = map.getLayer("runs-hit")
+        ? map.queryRenderedFeatures(event.point, { layers: ["runs-hit"] }).length > 0
+        : false;
       map.getCanvas().style.cursor = hit ? "pointer" : "";
     });
   }
@@ -588,9 +447,9 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick, o
     },
     startIdleSway,
     stopIdleSway,
-    setCity(id, lines) {
+    setLines(lines, id) {
       if (disposed) return;
-      cityId = id;
+      if (id) cityId = id;
       runCount = lines?.features?.length || 0;
       if (!layersReady) {
         addRunLayers(map);
@@ -599,7 +458,13 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick, o
       }
       map.getSource("runs-lines").setData(lines);
       map.getSource("runs-heat").setData(densityHeat(lines));
-      if (globeOn) layerVisibility(CITY_LAYERS, false);
+      syncProbe();
+    },
+    setRegions(cities) {
+      if (disposed) return;
+      regions = cities || [];
+      ensureRegionLabels(regions);
+      followRegion();
       syncProbe();
     },
     highlight(id) {
@@ -610,12 +475,26 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick, o
     },
     flyCity(city, reduced) {
       if (disposed || !city) return;
+      cityId = city.id;
+      syncProbe();
       map.flyTo({
         center: city.center,
         zoom: city.zoom,
-        pitch: framedPitch(),
-        bearing: framedBearing(),
+        pitch: camera().pitch,
+        bearing: camera().bearing,
         duration: reduced ? 0 : 1200,
+        essential: true,
+      });
+    },
+    frameWorld(reduced) {
+      if (disposed) return;
+      stopIdleSway();
+      map.flyTo({
+        center: WORLD_CENTER,
+        zoom: WORLD_ZOOM,
+        pitch: 0,
+        bearing: 0,
+        duration: reduced ? 0 : 1400,
         essential: true,
       });
     },
@@ -668,71 +547,8 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onGlobePick, o
       ];
       return map.queryRenderedFeatures(box, { layers: ["runs-vein"] }).length;
     },
-    isGlobe() {
-      return globeOn;
-    },
-    regionAt(lngLat) {
-      if (!map.getLayer("runs-globe")) return "";
-      const point = map.project(lngLat);
-      const regions = map.queryRenderedFeatures(point, { layers: ["runs-globe"] });
-      let id = "";
-      let best = Infinity;
-      for (const feature of regions) {
-        const coordinates = feature.geometry?.coordinates;
-        if (!coordinates) continue;
-        const projected = map.project(coordinates);
-        const distance = Math.hypot(projected.x - point.x, projected.y - point.y);
-        if (distance < best) {
-          best = distance;
-          id = String(feature.properties.id);
-        }
-      }
-      return id;
-    },
-    setGlobe(on, { reduced, cities, city } = {}) {
-      if (disposed) return;
-      globeOn = Boolean(on);
-      ensureGlobeLayers();
-      if (globeOn) {
-        stopIdleSway();
-        try {
-          map.setProjection({ type: "globe" });
-        } catch (error) {
-          console.warn("Globe projection unavailable", error);
-        }
-        map.getSource("runs-globe").setData(globeCollection(cities));
-        layerVisibility(CITY_LAYERS, false);
-        layerVisibility(GLOBE_LAYERS, true);
-        setSpace(true);
-        map.flyTo({
-          center: [-100, 36],
-          zoom: GLOBE_VIEW_ZOOM,
-          pitch: 0,
-          bearing: 0,
-          duration: reduced ? 0 : 1100,
-          essential: true,
-        });
-      } else {
-        try {
-          map.setProjection({ type: "mercator" });
-        } catch (error) {
-          console.warn("Mercator projection unavailable", error);
-        }
-        layerVisibility(GLOBE_LAYERS, false);
-        layerVisibility(CITY_LAYERS, true);
-        setSpace(false);
-        if (city) {
-          map.flyTo({
-            center: city.center,
-            zoom: city.zoom,
-            pitch: framedPitch(),
-            bearing: framedBearing(),
-            duration: reduced ? 0 : 1100,
-            essential: true,
-          });
-        }
-      }
-      syncProbe();
+    nearestAt(lngLat) {
+      return nearestCity(regions, lngLat)?.id || "";
     },
     destroy() {
       disposed = true;

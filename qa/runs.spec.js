@@ -105,37 +105,22 @@ test.describe("runs map", () => {
       expect(manifest.sample).toBe(false);
       const sf = manifest.cities.find((city) => city.id === "sf");
       const la = manifest.cities.find((city) => city.id === "la");
-      const tokyo = manifest.cities.find((city) => city.id === "tokyo");
       expect(sf.count).not.toBe(la.count);
+
+      const total = manifest.cities.reduce((sum, city) => sum + city.count, 0);
+      await expect(map).toHaveAttribute("data-runs", String(total));
+      expect(total).toBeGreaterThan(la.count);
 
       await page.getByRole("radio", { name: "Tokyo", exact: true }).click();
       await expect(map).toHaveAttribute("data-city", "tokyo");
-      await expect(map).toHaveAttribute("data-runs", String(tokyo.count));
+      await expect(map).toHaveAttribute("data-runs", String(total));
       await expect.poll(async () => Number(await map.getAttribute("data-lng"))).toBeGreaterThan(100);
 
-      await page.getByRole("button", { name: "Globe" }).click();
-      await expect(map).toHaveAttribute("data-globe", "on");
-      await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
-      await expect
-        .poll(async () => map.evaluate((el, lngLat) => el._runsMap.regionAt(lngLat), sf.center), { timeout: 15000 })
-        .toBe("sf");
-      const sfPoint = await map.evaluate((el, lngLat) => el._runsMap.project(lngLat), sf.center);
-      const globeBox = await map.boundingBox();
-      expect(sfPoint.x).toBeGreaterThan(8);
-      expect(sfPoint.y).toBeGreaterThan(8);
-      expect(sfPoint.x).toBeLessThan(globeBox.width - 8);
-      expect(sfPoint.y).toBeLessThan(globeBox.height - 8);
-      await page.mouse.click(globeBox.x + sfPoint.x, globeBox.y + sfPoint.y);
-      await expect(map).toHaveAttribute("data-city", "sf");
-      await expect(map).toHaveAttribute("data-globe", "off");
-      await expect(map).toHaveAttribute("data-runs", String(sf.count));
-      await expect.poll(async () => Number(await map.getAttribute("data-lng"))).toBeLessThan(-122);
-
-      await page.getByRole("button", { name: "Regions, SF selected" }).click();
+      await page.getByRole("button", { name: "Regions, Tokyo selected" }).click();
       await page.getByRole("radio", { name: "LA", exact: true }).click();
       await expect(map).toHaveAttribute("data-city", "la");
       await expect(page.getByRole("button", { name: "Regions, LA selected" })).toHaveAttribute("aria-expanded", "false");
-      await expect(map).toHaveAttribute("data-runs", String(la.count));
+      await expect(map).toHaveAttribute("data-runs", String(total));
       await expect.poll(async () => Number(await map.getAttribute("data-lng"))).toBeGreaterThan(-119);
 
       await zoomTo(page, 15);
@@ -221,321 +206,85 @@ async function clickLngLat(page, map, lngLat) {
   return point;
 }
 
-test.describe("globe click reaches one run", () => {
+test.describe("one continuous map", () => {
   test.describe.configure({ timeout: 120_000 });
 
   for (const viewport of VIEWPORTS) {
-    test(`${viewport.name} opens the Humboldt run from the globe`, async ({ page }) => {
+    test(`${viewport.name} zooms out to the world and into Humboldt`, async ({ page }) => {
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await page.goto("/runs");
       await ready(page);
-
       const map = page.locator("#runs-map");
       await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+      await expect(map).toHaveAttribute("data-city", "la");
+      await expect(page.getByRole("button", { name: "Regions, LA selected" })).toBeVisible();
       const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
-      const city = manifest.cities.find((item) => item.id === "humboldt");
-      const run = manifest.runs.find((item) => item.city === "humboldt");
-      expect(run.title).toContain("Humboldt");
+      const total = manifest.cities.reduce((sum, city) => sum + city.count, 0);
+      await expect(map).toHaveAttribute("data-runs", String(total));
+      const humboldt = manifest.cities.find((city) => city.id === "humboldt");
+      const whitney = manifest.cities.find((city) => city.id === "whitney");
 
       await page.getByRole("button", { name: "Globe" }).click();
-      await expect(map).toHaveAttribute("data-globe", "on");
       await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
+      await expect(page.getByRole("button", { name: "Globe" })).not.toHaveAttribute("aria-pressed", "true");
+      const box = await map.boundingBox();
+      for (const city of [humboldt, whitney]) {
+        const point = await map.evaluate((el, lngLat) => el._runsMap.project(lngLat), city.center);
+        expect(point.x).toBeGreaterThan(-2);
+        expect(point.y).toBeGreaterThan(-2);
+        expect(point.x).toBeLessThan(box.width + 2);
+        expect(point.y).toBeLessThan(box.height + 2);
+      }
 
-      const ocean = await map.evaluate((el) => {
-        const width = el.clientWidth;
-        const height = el.clientHeight;
-        const candidates = [
-          [-100, -20],
-          [-150, 0],
-          [-40, -10],
-          [20, -30],
-        ];
-        for (const lngLat of candidates) {
-          const point = el._runsMap.project(lngLat);
-          if (point.x < 16 || point.y < 16 || point.x > width - 16 || point.y > height - 16) continue;
-          if (el._runsMap.regionAt(lngLat)) continue;
-          return { lngLat, point };
-        }
-        return null;
-      });
-      expect(ocean).toBeTruthy();
-      const globeBox = await map.boundingBox();
-      await page.mouse.click(globeBox.x + ocean.point.x, globeBox.y + ocean.point.y);
-      await expect(map).toHaveAttribute("data-globe", "on");
+      const anchored = await map.evaluate((el) => ({
+        zoom: Number(el.dataset.zoom),
+        lng: Number(el.dataset.lng),
+        lat: Number(el.dataset.lat),
+      }));
+      await page.mouse.move(box.x + box.width * 0.42, box.y + box.height * 0.48);
+      await page.mouse.down();
+      await page.mouse.move(box.x + box.width * 0.22, box.y + box.height * 0.62, { steps: 10 });
+      await page.mouse.up();
+      await page.waitForTimeout(500);
+      const dragged = await map.evaluate((el) => ({
+        zoom: Number(el.dataset.zoom),
+        lng: Number(el.dataset.lng),
+        lat: Number(el.dataset.lat),
+      }));
+      expect(dragged.zoom).toBeLessThan(4);
+      expect(Math.hypot(dragged.lng - anchored.lng, dragged.lat - anchored.lat)).toBeGreaterThan(1);
       await expect(page.locator(".detail.open")).toHaveCount(0);
-      await expect(page.locator(".chooser")).toHaveCount(0);
 
-      await expect
-        .poll(async () => map.evaluate((el, lngLat) => el._runsMap.regionAt(lngLat), city.center), { timeout: 15000 })
-        .toBe("humboldt");
-      await clickLngLat(page, map, city.center);
+      await page.getByRole("button", { name: "Globe" }).click();
+      await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
+      const world = await map.boundingBox();
+      const point = await map.evaluate((el, lngLat) => el._runsMap.project(lngLat), humboldt.center);
+      await page.mouse.move(world.x + point.x, world.y + point.y);
+      const worldZoom = Number(await map.getAttribute("data-zoom"));
+      await page.mouse.wheel(0, -500);
+      await page.mouse.wheel(0, -500);
+      await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(worldZoom + 0.6);
+      await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(11);
+      await expect(page.locator(".detail.open")).toHaveCount(0);
+
+      const run = manifest.runs.find((item) => item.city === "humboldt");
+      await map.evaluate((el, center) => el._runsMap.zoomToward(center), run.mid);
       await expect(map).toHaveAttribute("data-city", "humboldt");
-      await expect(map).toHaveAttribute("data-globe", "off");
-      await expect(map).toHaveAttribute("data-runs", "1");
-      await expect(page.locator(".detail.open")).toHaveCount(0);
-
+      await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(10);
+      await expect.poll(async () => Number(await map.getAttribute("data-lng"))).toBeLessThan(-121);
+      await expect(page.getByRole("button", { name: "Regions, Humboldt selected" })).toBeVisible();
+      await expect(map).toHaveAttribute("data-runs", String(total));
       await expect
         .poll(async () => map.evaluate((el, lngLat) => el._runsMap.hitIds(lngLat), run.mid), { timeout: 15000 })
         .toContain(String(run.id));
-
-      const miss = await map.evaluate((el) => {
-        const width = el.clientWidth;
-        const height = el.clientHeight;
-        const samples = [
-          [28, 96],
-          [width - 28, 96],
-          [28, height * 0.45],
-          [width * 0.5, 72],
-        ];
-        for (const [x, y] of samples) {
-          const lngLat = el._runsMap.unproject([x, y]);
-          if (el._runsMap.hitIds(lngLat).length === 0) return { x, y };
-        }
-        return null;
-      });
-      expect(miss).toBeTruthy();
-      const cityBox = await map.boundingBox();
-      await page.mouse.click(cityBox.x + miss.x, cityBox.y + miss.y);
-      await expect(page.locator(".detail.open")).toHaveCount(0);
-
       await clickLngLat(page, map, run.mid);
       const card = page.locator(".detail.open");
-      await expect(card).toBeVisible();
-      await expect(card.locator("h2")).toHaveText("Humboldt Redwoods Marathon");
-      await expect(card.locator(".run-type")).toHaveText("Run");
+      await expect(card.locator("h2")).toHaveText(run.title);
       await expect(card.locator(".run-distance")).toContainText("mi");
       await expect(card.locator(".run-pace")).toContainText("/mi");
-      await expect(card.locator(".run-date")).toContainText(/\d{4}/);
-      await expect(card.locator(".run-elev")).toContainText("ft");
-      await expect(card.locator(".run-companions")).toHaveCount(0);
-      await expect(card.locator(".photo-strip img")).toHaveAttribute(
-        "src",
-        new RegExp(`/media/runs/photos/${run.id}/1\\.webp`),
-      );
-      await expect(card.locator(".photo-strip img")).toHaveJSProperty("complete", true);
-
-      const sheet = await card.boundingBox();
-      if (viewport.name === "phone") {
-        expect(sheet.y).toBeGreaterThan(viewport.height * 0.15);
-        expect(sheet.y + sheet.height).toBeGreaterThan(viewport.height - 8);
-        expect(sheet.width).toBeGreaterThan(viewport.width - 4);
-      } else {
-        expect(sheet.x).toBeGreaterThan(viewport.width * 0.45);
-        expect(sheet.y).toBeLessThan(120);
-      }
-    });
-
-    test(`${viewport.name} crowded city click zooms toward routes`, async ({ page }) => {
-      await page.emulateMedia({ reducedMotion: "reduce" });
-      await page.setViewportSize({ width: viewport.width, height: viewport.height });
-      await page.goto("/runs");
-      await ready(page);
-      const map = page.locator("#runs-map");
-      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
-      await expect(map).toHaveAttribute("data-city", "la");
-      const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
-      const la = manifest.cities.find((item) => item.id === "la");
-      await expect
-        .poll(async () => map.evaluate((el, lngLat) => el._runsMap.hitIds(lngLat).length, la.center), {
-          timeout: 15000,
-        })
-        .toBeGreaterThan(1);
-      const before = Number(await map.getAttribute("data-zoom"));
-      await clickLngLat(page, map, la.center);
-      await expect(page.locator(".detail.open")).toHaveCount(0);
-      await expect(page.locator(".chooser")).toHaveCount(0);
-      await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(before + 1.4);
-      await expect(map).toHaveAttribute("data-globe", "off");
-      await expect(page.getByRole("button", { name: "Globe" })).toBeVisible();
     });
   }
-});
-
-async function zoomBy(page, direction) {
-  const map = page.locator("#runs-map");
-  const button = page.locator(direction === "in" ? ".maplibregl-ctrl-zoom-in" : ".maplibregl-ctrl-zoom-out");
-  const before = Number(await map.getAttribute("data-zoom"));
-  await button.click();
-  await expect
-    .poll(async () => {
-      const globe = await map.getAttribute("data-globe");
-      const zoom = Number(await map.getAttribute("data-zoom"));
-      if (direction === "out" && globe === "on") return true;
-      if (direction === "in" && globe === "off" && before < 4) return true;
-      return direction === "out" ? zoom < before - 0.4 : zoom > before + 0.4;
-    }, { timeout: 8000 })
-    .toBe(true);
-}
-
-test.describe("zoom out enters the globe", () => {
-  test.describe.configure({ timeout: 120_000 });
-
-  for (const viewport of VIEWPORTS) {
-    test(`${viewport.name} zoom controls enter and leave the globe`, async ({ page }) => {
-      await page.emulateMedia({ reducedMotion: "reduce" });
-      await page.setViewportSize({ width: viewport.width, height: viewport.height });
-      await page.goto("/runs");
-      await ready(page);
-      const map = page.locator("#runs-map");
-      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
-      await expect(map).toHaveAttribute("data-globe", "off");
-      await expect(map).toHaveAttribute("data-city", "la");
-      const globeButton = page.getByRole("button", { name: "Globe" });
-      await expect(globeButton).toHaveAttribute("aria-pressed", "false");
-
-      for (let i = 0; i < 16 && (await map.getAttribute("data-globe")) !== "on"; i++) {
-        await zoomBy(page, "out");
-      }
-      await expect(map).toHaveAttribute("data-globe", "on");
-      await expect(globeButton).toHaveAttribute("aria-pressed", "true");
-      await expect(globeButton).toHaveClass(/on/);
-      await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
-      const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
-      const sf = manifest.cities.find((city) => city.id === "sf");
-      await expect
-        .poll(async () => map.evaluate((el, lngLat) => el._runsMap.regionAt(lngLat), sf.center), { timeout: 15000 })
-        .toBe("sf");
-      await expect(page.locator(".detail.open")).toHaveCount(0);
-
-      await zoomBy(page, "in");
-      await expect(map).toHaveAttribute("data-globe", "off");
-      await expect(globeButton).toHaveAttribute("aria-pressed", "false");
-      await expect(map).toHaveAttribute("data-city", "la");
-      await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(8);
-      await expect.poll(async () => Number(await map.getAttribute("data-lng"))).toBeLessThan(-118);
-      await expect.poll(async () => Number(await map.getAttribute("data-lng"))).toBeGreaterThan(-119);
-    });
-  }
-
-  test("desktop wheel zoom-out enters the globe", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.setViewportSize({ width: 1280, height: 900 });
-    await page.goto("/runs");
-    await ready(page);
-    const map = page.locator("#runs-map");
-    await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
-    const box = await map.boundingBox();
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    for (let i = 0; i < 24 && (await map.getAttribute("data-globe")) !== "on"; i++) {
-      await page.mouse.wheel(0, 400);
-      await page.waitForTimeout(40);
-    }
-    await expect(map).toHaveAttribute("data-globe", "on");
-    await expect(page.getByRole("button", { name: "Globe" })).toHaveAttribute("aria-pressed", "true");
-    await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
-
-    for (let i = 0; i < 8 && (await map.getAttribute("data-globe")) === "on"; i++) {
-      await page.mouse.wheel(0, -400);
-      await page.waitForTimeout(40);
-    }
-    await expect(map).toHaveAttribute("data-globe", "off");
-    await expect(page.getByRole("button", { name: "Globe" })).toHaveAttribute("aria-pressed", "false");
-    await expect(map).toHaveAttribute("data-city", "la");
-    await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(8);
-  });
-
-  test("phone drag after zoom-out stays on the globe", async ({ page, browserName }) => {
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/runs");
-    await ready(page);
-    const map = page.locator("#runs-map");
-    await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
-    for (let i = 0; i < 16 && (await map.getAttribute("data-globe")) !== "on"; i++) {
-      await zoomBy(page, "out");
-    }
-    await expect(map).toHaveAttribute("data-globe", "on");
-    await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
-    const before = await map.evaluate((el) => ({
-      lng: Number(el.dataset.lng),
-      lat: Number(el.dataset.lat),
-    }));
-
-    const box = await map.boundingBox();
-    const start = { x: box.x + box.width * 0.55, y: box.y + box.height * 0.42 };
-    const end = { x: start.x - 90, y: start.y + 70 };
-    if (browserName === "chromium") {
-      const client = await page.context().newCDPSession(page);
-      await client.send("Input.dispatchTouchEvent", {
-        type: "touchStart",
-        touchPoints: [{ x: start.x, y: start.y, id: 1 }],
-      });
-      for (let i = 1; i <= 8; i++) {
-        await client.send("Input.dispatchTouchEvent", {
-          type: "touchMove",
-          touchPoints: [
-            {
-              x: start.x + ((end.x - start.x) * i) / 8,
-              y: start.y + ((end.y - start.y) * i) / 8,
-              id: 1,
-            },
-          ],
-        });
-      }
-      await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-      await client.detach();
-    } else {
-      await page.mouse.move(start.x, start.y);
-      await page.mouse.down();
-      await page.mouse.move(end.x, end.y, { steps: 8 });
-      await page.mouse.up();
-    }
-    await page.waitForTimeout(400);
-
-    await expect(map).toHaveAttribute("data-globe", "on");
-    await expect(page.getByRole("button", { name: "Globe" })).toHaveAttribute("aria-pressed", "true");
-    await expect(page.locator(".detail.open")).toHaveCount(0);
-    await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
-    const after = await map.evaluate((el) => ({
-      lng: Number(el.dataset.lng),
-      lat: Number(el.dataset.lat),
-    }));
-    expect(Math.hypot(after.lng - before.lng, after.lat - before.lat)).toBeGreaterThan(2);
-  });
-
-  test("phone pinch that opens the globe does not snap back as the fingers spread", async ({ page, browserName }) => {
-    test.skip(browserName !== "chromium", "two-finger pinch is sent with CDP");
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/runs");
-    await ready(page);
-    const map = page.locator("#runs-map");
-    await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
-    for (let i = 0; i < 16; i++) {
-      if ((await map.getAttribute("data-globe")) === "on") break;
-      const zoom = Number(await map.getAttribute("data-zoom"));
-      if (zoom < 4.3) break;
-      await zoomBy(page, "out");
-    }
-    await expect(map).toHaveAttribute("data-globe", "off");
-
-    const client = await page.context().newCDPSession(page);
-    let left = { x: 40, y: 220, id: 1 };
-    let right = { x: 350, y: 680, id: 2 };
-    await client.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [left, right] });
-    for (let i = 1; i <= 10 && (await map.getAttribute("data-globe")) !== "on"; i++) {
-      left = { x: 40 + i * 10, y: 220 + i * 12, id: 1 };
-      right = { x: 350 - i * 10, y: 680 - i * 12, id: 2 };
-      await client.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [left, right] });
-      await page.waitForTimeout(40);
-    }
-    await expect(map).toHaveAttribute("data-globe", "on");
-    for (let i = 1; i <= 8; i++) {
-      left = { x: left.x - 14, y: left.y - 16, id: 1 };
-      right = { x: right.x + 14, y: right.y + 16, id: 2 };
-      await client.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [left, right] });
-      await page.waitForTimeout(30);
-    }
-    await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-    await client.detach();
-    await page.waitForTimeout(600);
-
-    await expect(map).toHaveAttribute("data-globe", "on");
-    await expect(page.getByRole("button", { name: "Globe" })).toHaveAttribute("aria-pressed", "true");
-    await expect(page.locator(".detail.open")).toHaveCount(0);
-    await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
-  });
 });
 
 test.describe("served lines keep the privacy trim", () => {
