@@ -4,6 +4,7 @@ import { useRoute } from "vue-router";
 import { useHead } from "@unhead/vue";
 import manifest from "../data/runs/manifest.json";
 import { formatDate, formatDistance, formatElev, formatPace } from "../runs/format.js";
+import { REGION_ZOOM, nearestCity } from "../runs/globe.js";
 import { resolvePick } from "../runs/pick.js";
 import "../styles/runs.css";
 
@@ -25,7 +26,6 @@ const selected = ref(null);
 const choices = ref([]);
 const motionOn = ref(false);
 const loadError = ref("");
-const globe = ref(false);
 const regionsOpen = ref(false);
 
 const byId = new Map(manifest.runs.map((run) => [run.id, run]));
@@ -85,12 +85,6 @@ function initialCity() {
   return manifest.defaultCity;
 }
 
-function leaveGlobe() {
-  if (!globe.value) return;
-  globe.value = false;
-  mapApi?.setGlobe(false);
-}
-
 function closeRegions() {
   regionsOpen.value = false;
 }
@@ -100,22 +94,32 @@ function pickRegion(id) {
   selectCity(id);
 }
 
-async function selectCity(id, { fly = true } = {}) {
+function selectCity(id, { fly = true } = {}) {
   const city = cityById.get(id);
   if (!city || !mapApi) return;
-  leaveGlobe();
-  const gen = ++cityGen;
   activeCity.value = id;
   choices.value = [];
+  if (fly) mapApi.flyCity(city, prefersReduced());
+}
+
+async function loadLines() {
+  const gen = ++cityGen;
   loadError.value = "";
   try {
-    const lines = await fetch(`/media/runs/cities/${id}.lines.geojson`).then((res) => {
-      if (!res.ok) throw new Error(`lines ${res.status}`);
-      return res.json();
-    });
-    if (!alive || gen !== cityGen) return;
-    mapApi.setCity(id, lines);
-    if (fly) mapApi.flyCity(city, prefersReduced());
+    const parts = await Promise.all(
+      manifest.cities.map(async (city) => {
+        const res = await fetch(`/media/runs/cities/${city.id}.lines.geojson`);
+        if (!res.ok) throw new Error(`lines ${res.status}`);
+        const data = await res.json();
+        return (data.features || []).map((feature) => ({
+          ...feature,
+          properties: { ...(feature.properties || {}), city: city.id },
+        }));
+      }),
+    );
+    if (!alive || gen !== cityGen || !mapApi) return;
+    mapApi.setLines({ type: "FeatureCollection", features: parts.flat() }, activeCity.value);
+    mapApi.setRegions(manifest.cities);
   } catch (error) {
     if (!alive || gen !== cityGen) return;
     loadError.value = "Couldn’t load this city.";
@@ -129,10 +133,7 @@ async function openRun(id, lngLat) {
   const token = ++openToken;
   closeRegions();
   choices.value = [];
-  if (summary.city !== activeCity.value) {
-    await selectCity(summary.city, { fly: false });
-    if (!alive || token !== openToken) return;
-  }
+  if (summary.city) activeCity.value = summary.city;
   selected.value = { ...summary, companions: [], photos: [] };
   panel.value = true;
   mapApi?.highlight(id);
@@ -157,29 +158,18 @@ function toggleRegions() {
   regionsOpen.value = !regionsOpen.value;
 }
 
-function showGlobe(on) {
-  if (!mapApi || globe.value === on) return;
+function frameWorld() {
+  if (!mapApi) return;
   closeRegions();
   choices.value = [];
-  globe.value = on;
-  if (on) closePanel();
-  const city = cityById.get(activeCity.value);
-  mapApi.setGlobe(on, {
-    reduced: prefersReduced(),
-    cities: manifest.cities,
-    city: on ? null : city,
-  });
+  closePanel();
+  mapApi.frameWorld(prefersReduced());
 }
 
-function toggleGlobe() {
-  showGlobe(!globe.value);
-}
-
-function onGlobePick(id) {
-  closeRegions();
-  globe.value = false;
-  mapApi?.setGlobe(false);
-  selectCity(id);
+function onView(center, zoom) {
+  if (zoom < REGION_ZOOM) return;
+  const city = nearestCity(manifest.cities, center);
+  if (city) activeCity.value = city.id;
 }
 
 function onPick(runs, lngLat) {
@@ -250,8 +240,7 @@ async function startMap() {
       center: city.center,
       zoom: city.zoom,
       onPick,
-      onGlobePick,
-      onGlobeMode: showGlobe,
+      onView,
     });
   } catch (error) {
     if (!alive || gen !== mountGen) return;
@@ -264,7 +253,7 @@ async function startMap() {
     return;
   }
   mapApi = created;
-  await selectCity(city.id, { fly: false });
+  await loadLines();
   if (!alive || gen !== mountGen) return;
   const deep = queryValue("run");
   if (deep && byId.get(deep)) await openRun(deep);
@@ -307,15 +296,7 @@ onUnmounted(() => {
     <div class="stage">
       <div id="runs-map" ref="mapEl" role="region" aria-label="Map of runs"></div>
       <p v-if="manifest.sample" class="sample-tag">Sample routes</p>
-      <button
-        class="globe-btn"
-        :class="{ on: globe }"
-        type="button"
-        :aria-pressed="globe ? 'true' : 'false'"
-        @click="toggleGlobe"
-      >
-        Globe
-      </button>
+      <button class="globe-btn" type="button" @click="frameWorld">Globe</button>
       <div class="regions" :class="{ open: regionsOpen }">
         <button
           class="regions-toggle"

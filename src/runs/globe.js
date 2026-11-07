@@ -1,21 +1,35 @@
-/** Flat world hands off to the globe below this zoom. The globe camera rests
-    lower, and a zoom-in past the exit line returns to the regional map. */
-export const GLOBE_ENTER_ZOOM = 3.25;
-export const GLOBE_EXIT_ZOOM = 2.2;
-export const GLOBE_VIEW_ZOOM = 1.55;
+/** One map. The world view is just the camera pulled back, not a second mode. */
 
-export function globeHandoff(isGlobe, zoom) {
-  if (!Number.isFinite(zoom)) return "none";
-  if (!isGlobe && zoom <= GLOBE_ENTER_ZOOM) return "enter";
-  if (isGlobe && zoom >= GLOBE_EXIT_ZOOM) return "leave";
-  return "none";
+export const WORLD_ZOOM = 1.55;
+export const WORLD_CENTER = [-100, 36];
+/** Chip follows the camera once a region fills the view. */
+export const REGION_ZOOM = 6.5;
+
+export function cityDistance(a, b) {
+  if (!a || !b) return Infinity;
+  const mid = ((a[1] + b[1]) / 2) * (Math.PI / 180);
+  const mLng = 111320 * Math.cos(mid);
+  return Math.hypot((a[0] - b[0]) * mLng, (a[1] - b[1]) * 111320);
 }
 
-/** A finger still finishing the zoom-out, or a one-finger drag, must not leave.
-    A later pinch, wheel, or zoom button may. */
-export function canLeaveGlobe({ sameGesture, eventType, touchCount }) {
-  if (sameGesture) return false;
-  const type = eventType || "";
-  if (type.startsWith("touch") && (touchCount || 0) < 2) return false;
-  return true;
+export function nearestCity(cities, lngLat) {
+  let best = null;
+  let bestDistance = Infinity;
+  for (const city of cities || []) {
+    if (!city?.center) continue;
+    const distance = cityDistance(city.center, lngLat);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      best = city;
+    }
+  }
+  return best;
+}
+
+/** Pitch eases down as the camera pulls back, so the world stays in frame. */
+export function pitchForZoom(zoom, fullPitch) {
+  if (!Number.isFinite(zoom) || !Number.isFinite(fullPitch)) return 0;
+  if (zoom >= 8) return fullPitch;
+  if (zoom <= 3) return 0;
+  return (fullPitch * (zoom - 3)) / 5;
 }
