@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { listPhotoFiles } from "./parse.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const MEDIA = path.join(ROOT, "public/media/runs");
@@ -25,7 +27,7 @@ test("shipped photos match activity cards and both manifests", () => {
   for (const id of photoDirs) {
     const files = readdirSync(path.join(MEDIA, "photos", id))
       .filter((name) => /^\d+\.webp$/.test(name))
-      .sort((a, b) => Number(a) - Number(b));
+      .sort((a, b) => Number.parseInt(a, 10) - Number.parseInt(b, 10));
     const activityPath = path.join(MEDIA, "activities", `${id}.json`);
     if (!statExists(activityPath)) continue;
     const activity = readJson(activityPath);
@@ -51,6 +53,24 @@ test("shipped photos match activity cards and both manifests", () => {
     const activity = readJson(path.join(MEDIA, "activities", `${run.id}.json`));
     assert.equal(activity.photos.length, run.photos, run.id);
     assert.equal(Array.isArray(activity.photos), true);
+  }
+});
+
+test("listPhotoFiles keeps a 10-still activity in numeric order", async () => {
+  const root = mkdtempSync(path.join(tmpdir(), "run-photos-"));
+  const id = "18828220153";
+  const dir = path.join(root, id);
+  try {
+    mkdirSync(dir);
+    for (let n = 1; n <= 17; n++) writeFileSync(path.join(dir, `${n}.jpg`), "x");
+    writeFileSync(path.join(dir, "notes.txt"), "skip");
+    const files = await listPhotoFiles(root, id);
+    assert.deepEqual(
+      files.map((file) => path.basename(file)),
+      Array.from({ length: 16 }, (_, index) => `${index + 1}.jpg`),
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
   }
 });
 

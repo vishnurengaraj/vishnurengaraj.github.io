@@ -40,6 +40,12 @@
       "w": 1600,
       "h": 1200,
       "sample": false
+    },
+    {
+      "src": "/media/runs/photos/18562080379/6.webp",
+      "w": 1200,
+      "h": 1600,
+      "sample": false
     }
   ],
   "companions": [],

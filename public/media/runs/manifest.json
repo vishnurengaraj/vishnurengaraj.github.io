@@ -385,7 +385,7 @@
         -118.369504,
         33.914077
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -572,7 +572,7 @@
         -119.48937,
         37.767671
       ],
-      "photos": 0,
+      "photos": 4,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -589,7 +589,7 @@
         -119.017673,
         37.592518
       ],
-      "photos": 0,
+      "photos": 2,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -606,7 +606,7 @@
         -118.954201,
         37.551875
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -1201,7 +1201,7 @@
         6.827333,
         45.916128
       ],
-      "photos": 0,
+      "photos": 4,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -1218,7 +1218,7 @@
         6.712428,
         45.749495
       ],
-      "photos": 0,
+      "photos": 4,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -1235,7 +1235,7 @@
         6.869666,
         45.775287
       ],
-      "photos": 0,
+      "photos": 4,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -1252,7 +1252,7 @@
         7.030991,
         45.854878
       ],
-      "photos": 0,
+      "photos": 4,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -1269,7 +1269,7 @@
         7.105921,
         46.032749
       ],
-      "photos": 0,
+      "photos": 5,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -1286,7 +1286,7 @@
         6.924879,
         45.998581
       ],
-      "photos": 0,
+      "photos": 4,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -1422,7 +1422,7 @@
         -118.505484,
         34.019652
       ],
-      "photos": 5,
+      "photos": 10,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -1439,7 +1439,7 @@
         -118.552352,
         34.099906
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -1473,7 +1473,7 @@
         -119.286278,
         34.630079
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -1524,7 +1524,7 @@
         -83.72597,
         42.294419
       ],
-      "photos": 5,
+      "photos": 6,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -1541,7 +1541,7 @@
         -83.194473,
         42.695061
       ],
-      "photos": 0,
+      "photos": 1,
       "companions": 0,
       "sample": false,
       "type": "Walk"
@@ -1728,7 +1728,7 @@
         -121.200513,
         36.485964
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -1983,7 +1983,7 @@
         138.925728,
         34.810532
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Hike"
@@ -2170,7 +2170,7 @@
         -118.061658,
         34.223831
       ],
-      "photos": 0,
+      "photos": 4,
       "companions": 0,
       "sample": false,
       "type": "Hike"
@@ -2391,7 +2391,7 @@
         -119.596208,
         34.035743
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -2629,7 +2629,7 @@
         -116.679462,
         33.814745
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -2680,7 +2680,7 @@
         -117.602205,
         34.26362
       ],
-      "photos": 0,
+      "photos": 4,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -2731,7 +2731,7 @@
         -117.639244,
         34.281659
       ],
-      "photos": 0,
+      "photos": 4,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -2850,7 +2850,7 @@
         -118.751252,
         36.580713
       ],
-      "photos": 0,
+      "photos": 2,
       "companions": 0,
       "sample": false,
       "type": "Walk"
@@ -2867,7 +2867,7 @@
         -118.671826,
         36.605634
       ],
-      "photos": 0,
+      "photos": 4,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -2918,7 +2918,7 @@
         -118.561839,
         36.552827
       ],
-      "photos": 0,
+      "photos": 5,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -2935,7 +2935,7 @@
         -118.594758,
         36.465339
       ],
-      "photos": 0,
+      "photos": 2,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -3139,7 +3139,7 @@
         -118.676561,
         36.583876
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -3241,7 +3241,7 @@
         -119.528313,
         37.938471
       ],
-      "photos": 0,
+      "photos": 5,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -3326,7 +3326,7 @@
         -117.63151,
         34.284457
       ],
-      "photos": 0,
+      "photos": 2,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -3479,7 +3479,7 @@
         -121.198869,
         36.481986
       ],
-      "photos": 0,
+      "photos": 4,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -3496,7 +3496,7 @@
         -121.668753,
         36.256067
       ],
-      "photos": 0,
+      "photos": 4,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -3751,7 +3751,7 @@
         -118.341667,
         33.323305
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Walk"
@@ -4278,7 +4278,7 @@
         -84.73449,
         10.473016
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -4907,7 +4907,7 @@
         -116.829286,
         34.094973
       ],
-      "photos": 0,
+      "photos": 2,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -5332,7 +5332,7 @@
         -118.130501,
         34.226998
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -5383,7 +5383,7 @@
         -118.240191,
         36.522123
       ],
-      "photos": 0,
+      "photos": 4,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -5434,7 +5434,7 @@
         -117.089206,
         36.169987
       ],
-      "photos": 0,
+      "photos": 5,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -5451,7 +5451,7 @@
         -118.255683,
         37.634056
       ],
-      "photos": 0,
+      "photos": 5,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -5519,7 +5519,7 @@
         -118.292933,
         36.578185
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Hike"
@@ -5587,7 +5587,7 @@
         -112.046613,
         36.207329
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -5604,7 +5604,7 @@
         -112.948675,
         37.269841
       ],
-      "photos": 0,
+      "photos": 2,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -5621,7 +5621,7 @@
         -112.945846,
         37.212994
       ],
-      "photos": 0,
+      "photos": 2,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -5638,7 +5638,7 @@
         -118.404073,
         36.813861
       ],
-      "photos": 0,
+      "photos": 4,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -5672,7 +5672,7 @@
         -118.752686,
         34.049108
       ],
-      "photos": 0,
+      "photos": 2,
       "companions": 0,
       "sample": false,
       "type": "Hike"
@@ -5740,7 +5740,7 @@
         -118.546825,
         34.081997
       ],
-      "photos": 0,
+      "photos": 1,
       "companions": 0,
       "sample": false,
       "type": "Hike"
@@ -5791,7 +5791,7 @@
         -118.664513,
         36.590301
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -5927,7 +5927,7 @@
         -118.542813,
         34.0705
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -6165,7 +6165,7 @@
         -118.554646,
         34.10184
       ],
-      "photos": 0,
+      "photos": 1,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -6216,7 +6216,7 @@
         -116.169246,
         33.97692
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Run"
@@ -6862,7 +6862,7 @@
         -118.057057,
         34.225534
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Hike"
@@ -6964,7 +6964,7 @@
         -118.542828,
         34.070472
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Hike"
@@ -7270,7 +7270,7 @@
         -116.698869,
         33.800471
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Hike"
@@ -7406,7 +7406,7 @@
         -117.59981,
         34.241061
       ],
-      "photos": 0,
+      "photos": 2,
       "companions": 0,
       "sample": false,
       "type": "Hike"
@@ -7423,7 +7423,7 @@
         -117.599952,
         34.241111
       ],
-      "photos": 0,
+      "photos": 3,
       "companions": 0,
       "sample": false,
       "type": "Hike"
@@ -7559,7 +7559,7 @@
         -118.532176,
         37.151187
       ],
-      "photos": 0,
+      "photos": 4,
       "companions": 0,
       "sample": false,
       "type": "Run"
