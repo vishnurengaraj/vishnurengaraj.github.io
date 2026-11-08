@@ -422,6 +422,8 @@ export async function listPhotoFiles(root, id) {
   } catch (error) {
     if (error.code !== "ENOENT") throw error;
   }
-  found.sort((a, b) => path.basename(a).localeCompare(path.basename(b)));
-  return found.slice(0, 8);
+  found.sort((a, b) => path.basename(a).localeCompare(path.basename(b), "en", { numeric: true }));
+  // 10.jpg sorts before 2.jpg in plain lexicographic order, so a cap of 8
+  // kept the tenth still and dropped 8.jpg and 9.jpg. Morning Run has 10.
+  return found.slice(0, 16);
 }
