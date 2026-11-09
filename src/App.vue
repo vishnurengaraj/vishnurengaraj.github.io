@@ -1715,58 +1715,160 @@ function focusOffscreen(root, el) {
   const rect = el.getBoundingClientRect();
   const rootRect = root.getBoundingClientRect();
   if (rect.width < 1 && rect.height < 1) return false;
-  return rect.bottom <= rootRect.top + 4 || rect.top >= rootRect.bottom - 4;
+  return rect.top < rootRect.top - 1 || rect.bottom > rootRect.bottom + 1;
 }
 
-/* Tabbing out of the title used to leave focus on a control thousands of
-   pixels down the page: the intro tween held scrollTop at the hero.
-   Release that lock and bring the focused control into the scroller. */
-function revealFocused(root, el) {
+function docTop(root, el) {
+  return el.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop;
+}
+
+/* Nav links live in the sunrise, between the title and the About anchor.
+   A nearest scroll stops in that band, and the intro then leaves them
+   just under the fold. Finish the trip the way a Learn more press does. */
+function focusBeforeAbout(root, el) {
+  if (el.closest?.("#top")) return false;
+  if (el.closest?.(".section-nav")) return true;
+  const about = anchorFor("about");
+  if (!about) return false;
+  return docTop(root, el) <= docTop(root, about) + 32;
+}
+
+function pinScroller(root, top) {
+  const max = Math.max(0, root.scrollHeight - root.clientHeight);
+  const dest = Math.min(max, Math.max(0, Math.round(top)));
+  const previous = root.style.scrollBehavior;
+  root.style.scrollBehavior = "auto";
+  drivingScroll = true;
+  root.scrollTop = dest;
+  lastScrollY = dest;
+  lastProgrammatic = dest;
+  root.style.scrollBehavior = previous;
+  /* Hold the landing. A sticky nav link's own focus scroll, and the
+     parallax class change at the end of the sunrise, both nudge
+     scrollTop again on the next frames. */
+  scrollFightUntil = performance.now() + 600;
+  syncParallax(root);
+  scheduleChrome();
+}
+
+function finishAboutFocus() {
+  const root = scroller.value;
+  if (!root) return;
+  measureStatic();
+  pinScroller(root, cachedAbout || aboutAnchor());
+  armedDown = false;
+  armedUp = true;
+  wasInReturn = true;
+}
+
+function revealToAbout(root) {
   cancelTween();
   jumpGuard = null;
   scrollbarArmed = null;
   resumePartLocked = false;
   endNativeScroll();
   beginNativeScroll();
-  const inTitle = !!el.closest?.("#top");
+  measureStatic();
+  const dest = cachedAbout || aboutAnchor();
+  const y = root.scrollTop;
+  if (prefersReduced() || !dest || Math.abs(y - dest) < 2) {
+    finishAboutFocus();
+    requestAnimationFrame(finishAboutFocus);
+    return;
+  }
+  armedDown = false;
+  tweenBetween(
+    y,
+    dest,
+    () => {
+      armedDown = true;
+      wasInReturn = false;
+    },
+    () => {
+      armedUp = true;
+      wasInReturn = true;
+      measureStatic();
+      finishAboutFocus();
+      requestAnimationFrame(() => {
+        finishAboutFocus();
+        requestAnimationFrame(finishAboutFocus);
+      });
+    },
+  );
+}
+
+function nudgeIntoView(root, el) {
+  const rootRect = root.getBoundingClientRect();
+  const rect = el.getBoundingClientRect();
+  if (rect.width < 1 && rect.height < 1) return false;
+  const bar = root.querySelector(".section-nav .nav-inner");
+  const cover = bar ? Math.max(rootRect.top, bar.getBoundingClientRect().bottom) : rootRect.top;
+  let delta = 0;
+  if (rect.top < cover + 8) delta = rect.top - (cover + 12);
+  else if (rect.bottom > rootRect.bottom - 8) delta = rect.bottom - (rootRect.bottom - 12);
+  if (Math.abs(delta) < 2) return false;
+  const max = Math.max(0, root.scrollHeight - root.clientHeight);
+  const next = Math.min(max, Math.max(0, root.scrollTop + delta));
   const previous = root.style.scrollBehavior;
   root.style.scrollBehavior = "auto";
-  if (inTitle) {
-    drivingScroll = true;
-    root.scrollTop = 0;
-    lastScrollY = 0;
-    lastProgrammatic = 0;
+  drivingScroll = true;
+  root.scrollTop = next;
+  lastScrollY = next;
+  lastProgrammatic = next;
+  root.style.scrollBehavior = previous;
+  scrollFightUntil = performance.now() + 400;
+  return true;
+}
+
+/* Tabbing out of the title used to leave focus on a control thousands of
+   pixels down the page: the intro tween held scrollTop at the hero.
+   Release that lock and bring the focused control into the scroller. */
+function revealFocused(root, el) {
+  if (el.closest?.("#top")) {
+    cancelTween();
+    jumpGuard = null;
+    scrollbarArmed = null;
+    resumePartLocked = false;
+    endNativeScroll();
+    beginNativeScroll();
+    pinScroller(root, 0);
     armedDown = true;
     armedUp = false;
     wasInReturn = false;
-  } else {
-    armedDown = false;
-    armedUp = root.scrollTop > 48;
-    wasInReturn = true;
-    try {
-      el.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "instant" });
-    } catch {
-      el.scrollIntoView(false);
-    }
-    const rootRect = root.getBoundingClientRect();
-    const rect = el.getBoundingClientRect();
-    const bar = root.querySelector(".section-nav .nav-inner");
-    const cover = bar ? bar.getBoundingClientRect().bottom : rootRect.top;
-    let delta = 0;
-    if (rect.top < cover + 8) delta = rect.top - (cover + 12);
-    else if (rect.bottom > rootRect.bottom - 8) delta = rect.bottom - (rootRect.bottom - 12);
-    if (Math.abs(delta) > 2) {
-      const max = Math.max(0, root.scrollHeight - root.clientHeight);
-      const next = Math.min(max, Math.max(0, root.scrollTop + delta));
-      drivingScroll = true;
-      root.scrollTop = next;
-    }
-    lastScrollY = root.scrollTop;
-    lastProgrammatic = root.scrollTop;
+    return;
+  }
+  if (focusBeforeAbout(root, el)) {
+    revealToAbout(root);
+    return;
+  }
+  cancelTween();
+  jumpGuard = null;
+  scrollbarArmed = null;
+  resumePartLocked = false;
+  endNativeScroll();
+  beginNativeScroll();
+  armedDown = false;
+  armedUp = root.scrollTop > 48;
+  wasInReturn = true;
+  const previous = root.style.scrollBehavior;
+  root.style.scrollBehavior = "auto";
+  try {
+    el.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "instant" });
+  } catch {
+    el.scrollIntoView(false);
   }
   root.style.scrollBehavior = previous;
-  syncParallax(root);
-  scheduleChrome();
+  const correct = () => {
+    if (!root.isConnected || document.activeElement !== el) return;
+    nudgeIntoView(root, el);
+    syncParallax(root);
+    scheduleChrome();
+  };
+  correct();
+  requestAnimationFrame(() => {
+    correct();
+    requestAnimationFrame(correct);
+  });
 }
 
 function onFocusIn(event) {

@@ -63,6 +63,51 @@ test.describe("personal site", () => {
       expect(sawAbout).toBe(true);
       expect(sawProjects).toBe(true);
       expect(sawMore).toBe(true);
+
+      const leadRatio = await page.locator(".lead").evaluate((el) => {
+        const style = getComputedStyle(el);
+        return parseFloat(style.lineHeight) / parseFloat(style.fontSize);
+      });
+      expect(leadRatio).toBeGreaterThanOrEqual(1.3);
+    });
+  }
+
+  for (const viewport of VIEWPORTS) {
+    test(`${viewport.name} normal motion keeps tabbed controls in view`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto("/");
+      await ready(page);
+
+      const want = ["About", "Projects", "Resume", "More"];
+      const seen = new Set();
+      for (let i = 0; i < 20 && seen.size < want.length; i++) {
+        await page.keyboard.press("Tab");
+        const box = await page.waitForFunction(() => {
+          const el = document.activeElement;
+          const root = document.querySelector(".prlx");
+          if (!el || !root || el === document.body) return null;
+          const rect = el.getBoundingClientRect();
+          const rootRect = root.getBoundingClientRect();
+          const fully =
+            rect.width > 0 &&
+            rect.height > 0 &&
+            rect.top >= rootRect.top - 1 &&
+            rect.bottom <= rootRect.bottom + 1;
+          if (!fully) return null;
+          const text = (el.innerText || el.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim();
+          return {
+            text,
+            top: Math.round(rect.top - rootRect.top),
+            bottom: Math.round(rect.bottom - rootRect.top),
+          };
+        }, null, { timeout: 6000 });
+        const info = await box.jsonValue();
+        expect(info.top).toBeGreaterThanOrEqual(-1);
+        expect(info.bottom).toBeLessThanOrEqual(viewport.height + 1);
+        if (want.includes(info.text)) seen.add(info.text);
+      }
+      expect([...seen]).toEqual(expect.arrayContaining(want));
     });
   }
 
