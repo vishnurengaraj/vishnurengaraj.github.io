@@ -193,6 +193,59 @@ test.describe("runs map", () => {
     await expect(page.locator(".section-nav")).toHaveCount(0);
     await expect(page.locator(".sample-tag")).toHaveCount(0);
   });
+
+  for (const viewport of [
+    { name: "desktop", width: 1440, height: 900 },
+    { name: "phone", width: 390, height: 844 },
+  ]) {
+    test(`${viewport.name} keyboard opens a run and escape returns focus`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto("/runs");
+      await ready(page);
+
+      const description = await page.locator('meta[name="description"]').getAttribute("content");
+      expect(description).toBeTruthy();
+      expect(description).not.toMatch(/https?:\/\/|vishnu\.rengaraj\.com/);
+      expect(description.length).toBeGreaterThan(40);
+
+      const opener = page.getByRole("button", { name: /^Runs in LA \(/ });
+      await opener.focus();
+      await page.keyboard.press("Enter");
+      const chooser = page.locator("#run-chooser");
+      await expect(chooser).toBeVisible();
+      const option = chooser.getByRole("option").first();
+      await expect(option).toBeFocused();
+      await page.keyboard.press("Enter");
+      const card = page.locator(".detail.open");
+      await expect(card).toBeVisible();
+      await expect(card.locator("h2")).not.toBeEmpty();
+      const labelSize = await card.locator(".stats span").first().evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+      expect(labelSize).toBeGreaterThanOrEqual(12);
+      const labelCase = await card.locator(".stats span").first().evaluate((el) => getComputedStyle(el).textTransform);
+      expect(labelCase).toBe("none");
+      const border = await card.evaluate((el) => getComputedStyle(el).borderLeftWidth);
+      expect(parseFloat(border)).toBe(0);
+
+      await page.keyboard.press("Escape");
+      await expect(card).toBeHidden();
+      await expect(option).toBeFocused();
+      await page.keyboard.press("Escape");
+      await expect(chooser).toBeHidden();
+      await expect(opener).toBeFocused();
+    });
+  }
+
+  test("phone region chips align to the start of the row", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/runs");
+    await ready(page);
+    await page.getByRole("button", { name: "Regions, LA selected" }).click();
+    const align = await page.locator(".chips").evaluate((el) => getComputedStyle(el).justifyContent);
+    expect(align).toBe("flex-start");
+    await expect(page.locator(".map-key h1")).toHaveText("Runs");
+    await expect(page.locator(".heat-key")).toContainText("activity density");
+  });
 });
 
 async function clickLngLat(page, map, lngLat) {

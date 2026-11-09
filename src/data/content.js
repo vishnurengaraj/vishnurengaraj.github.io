@@ -38,22 +38,10 @@ export const profile = {
 };
 
 export const bio = [
-  { text: "Hey there! My name is " },
-  { text: "Vishnu Rengaraj", strong: true },
-  { text: ". I'm a " },
+  { text: "I'm a " },
   { text: "Sr. Development Test Engineer", strong: true },
-  { text: " at " },
-  { text: "SpaceX", strong: true },
   {
-    text: " in Hawthorne, California, where I design novel test equipment for quick and accurate aerospace qualification. I completed an ",
-  },
-  { text: "M.S.E. in Mechanical Engineering", strong: true },
-  { text: " at the " },
-  { text: "University of Michigan", strong: true },
-  { text: " (computational mechanics) and a " },
-  { text: "B.S.E. in Mechanical Engineering", strong: true },
-  {
-    text: " with a minor in computer science. Here are some recent milestones:",
+    text: " at SpaceX in Hawthorne, California. I completed an M.S.E. in Mechanical Engineering at the University of Michigan (computational mechanics) and a B.S.E. in Mechanical Engineering with a minor in computer science. Here are some recent milestones:",
   },
 ];
 
@@ -64,8 +52,7 @@ export const timeline = [
     title: "SpaceX — Test Development",
     category: "Full time",
     tone: "work",
-    description:
-      "Sr. Development Test Engineer. Design novel test equipment for quick and accurate aerospace qualification.",
+    description: "Sr. Development Test Engineer.",
   },
   {
     datetime: "2020-09",
@@ -175,8 +162,6 @@ export const experience = [
     title: "SpaceX",
     date: "June 2020 – Present",
     subtitle: "Sr. Development Test Engineer · Hawthorne, California",
-    about:
-      "SpaceX designs, manufactures and launches advanced rockets and spacecraft. The company was founded in 2002 to revolutionize space technology, with the ultimate goal of enabling people to live on other planets.",
     link: "https://www.spacex.com/",
     media: [{ kind: "logo", image: media.img.spacex, alt: "SpaceX logo" }],
     bullets: [
@@ -234,8 +219,6 @@ export const experience = [
     title: "Tesla",
     date: "2019",
     subtitle: "Body Design Intern",
-    about:
-      "Tesla was founded in 2003 by a group of engineers who wanted to prove that people didn’t need to compromise to drive electric – that electric vehicles can be better, quicker and more fun to drive than gasoline cars. Today, Tesla builds not only all-electric vehicles but also infinitely scalable clean energy generation and storage products. Tesla believes the faster the world stops relying on fossil fuels and moves towards a zero-emission future, the better..",
     link: "https://www.tesla.com/",
     media: [
       { kind: "logo", image: media.img.tesla, alt: "Tesla logo" },
@@ -264,8 +247,6 @@ export const experience = [
     title: "Altair",
     date: "2018",
     subtitle: "Modeling/Visualization Intern",
-    about:
-      "Altair is a leading provider of enterprise-class engineering software enabling innovation, reduced development times, and lower costs through the entire product lifecycle from concept design to in-service operation.",
     link: "https://www.altair.com/",
     media: [{ kind: "logo", image: media.img.altair, alt: "Altair logo" }],
     after: [

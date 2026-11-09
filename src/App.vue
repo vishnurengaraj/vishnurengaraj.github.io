@@ -3,7 +3,6 @@ import { computed, nextTick, onMounted, onUnmounted, provide, reactive, ref, wat
 import { useRoute, useRouter } from "vue-router";
 import { useHead } from "@unhead/vue";
 import monoBold from "@fontsource/roboto-mono/files/roboto-mono-latin-700-normal.woff2?url";
-import headingBlack from "./fonts/roboto-900-headings.woff2?url";
 import Stars from "./components/Stars.vue";
 import Hero from "./components/Hero.vue";
 import Headlamps from "./components/Headlamps.vue";
@@ -107,13 +106,6 @@ useHead({
       as: "font",
       type: "font/woff2",
       href: monoBold,
-      crossorigin: "anonymous",
-    },
-    {
-      rel: "preload",
-      as: "font",
-      type: "font/woff2",
-      href: headingBlack,
       crossorigin: "anonymous",
     },
   ],
@@ -376,7 +368,7 @@ function scrollToEl(id, behavior, extraGap = 0, focusLanding = true) {
     prepareJumpDock(id);
     armJumpGuard(id, 0);
     root.scrollTo({ top: 0, behavior: mode });
-    if (focusLanding) document.getElementById("top")?.focus({ preventScroll: true });
+    if (focusLanding) focusWithoutScroll(document.getElementById("top"));
     if (mode === "smooth") root.addEventListener("scrollend", landed, { once: true });
     else landed();
     return;
@@ -416,7 +408,7 @@ function scrollToEl(id, behavior, extraGap = 0, focusLanding = true) {
       window.setTimeout(pinLanding, 1600);
     } else landed();
   }
-  if (focusLanding) document.getElementById(id)?.focus({ preventScroll: true });
+  if (focusLanding) focusWithoutScroll(document.getElementById(id));
 }
 
 function targetForRoute() {
@@ -741,9 +733,8 @@ provide(resumeJumpKey, jumpResumePart);
 const dockState = reactive({ docked: false, open: false, joined: false });
 provide(dockKey, dockState);
 
-/* Matches the pill morph. A little longer than the 400ms ease so the
-   tabs are fully collapsed before they move back inline. */
-const NAV_MORPH_MS = 480;
+/* Matches the pill fade (transform and opacity, 250ms). */
+const NAV_MORPH_MS = 250;
 /* Extra air under the pill when the end-cap sends you back, so the
    heading sits just below the bar instead of under About. */
 const RESUME_BACK_GAP = 24;
@@ -828,7 +819,7 @@ function scheduleOpen(tries = 0) {
    comes back under the bar. The desktop Experience landing only has
    about 100px of runway, so a mouse wheel arrives sooner than
    TUCK_MIN_MS. A flick snaps. */
-const TUCK_MS = 450;
+const TUCK_MS = 250;
 /* Below this the names used to snap and Resume jumped in one frame.
    A steady wheel from the Experience landing is often 70–140ms. */
 const TUCK_MIN_MS = 64;
@@ -1285,13 +1276,13 @@ function playDown() {
     () => {
       armedDown = true;
       wasInReturn = false;
-      document.getElementById("top")?.focus({ preventScroll: true });
+      focusWithoutScroll(document.getElementById("top"));
     },
     () => {
       armedUp = true;
       wasInReturn = true;
       measureStatic();
-      document.getElementById("about")?.focus({ preventScroll: true });
+      focusWithoutScroll(document.getElementById("about"));
     },
   );
 }
@@ -1308,12 +1299,12 @@ function playUp() {
       armedUp = true;
       wasInReturn = true;
       measureStatic();
-      document.getElementById("about")?.focus({ preventScroll: true });
+      focusWithoutScroll(document.getElementById("about"));
     },
     () => {
       armedDown = true;
       wasInReturn = false;
-      document.getElementById("top")?.focus({ preventScroll: true });
+      focusWithoutScroll(document.getElementById("top"));
     },
   );
 }
@@ -1558,6 +1549,14 @@ function onIntroScroll() {
   }
   if (correctNavPressScroll(root, y)) return;
   if (correctJumpFight(root, y)) return;
+  /* A sticky nav link is already visible. Eat the focus scroll WebKit
+     adds for a few frames, and leave real wheel and touch alone after. */
+  if (!animating && performance.now() < scrollFightUntil && Math.abs(y - lastProgrammatic) > 1) {
+    drivingScroll = true;
+    root.scrollTop = lastProgrammatic;
+    lastScrollY = lastProgrammatic;
+    return;
+  }
   if (animating) {
     const delta = y - lastProgrammatic;
     if (titleLocked.value) {
@@ -1702,71 +1701,95 @@ function onIntroKey(event) {
   }
 }
 
-/* Tabbing from Learn more into the nav (or Shift+Tab back up to the
-   title) moves focus across the sunrise. The browser's own scroll to
-   the focused element used to leave the page part way, with the sky
-   bands showing. Finish the trip instead, and keep focus where it is. */
+/* Scripted jumps focus a landmark with preventScroll. A Tab from the
+   title into the sheet must not be treated as one of those. */
+let focusScrollSuppressUntil = 0;
+
+function focusWithoutScroll(el) {
+  if (!el) return;
+  focusScrollSuppressUntil = performance.now() + 160;
+  el.focus({ preventScroll: true });
+}
+
+function focusOffscreen(root, el) {
+  const rect = el.getBoundingClientRect();
+  const rootRect = root.getBoundingClientRect();
+  if (rect.width < 1 && rect.height < 1) return false;
+  return rect.bottom <= rootRect.top + 4 || rect.top >= rootRect.bottom - 4;
+}
+
+/* Tabbing out of the title used to leave focus on a control thousands of
+   pixels down the page: the intro tween held scrollTop at the hero.
+   Release that lock and bring the focused control into the scroller. */
+function revealFocused(root, el) {
+  cancelTween();
+  jumpGuard = null;
+  scrollbarArmed = null;
+  resumePartLocked = false;
+  endNativeScroll();
+  beginNativeScroll();
+  const inTitle = !!el.closest?.("#top");
+  const previous = root.style.scrollBehavior;
+  root.style.scrollBehavior = "auto";
+  if (inTitle) {
+    drivingScroll = true;
+    root.scrollTop = 0;
+    lastScrollY = 0;
+    lastProgrammatic = 0;
+    armedDown = true;
+    armedUp = false;
+    wasInReturn = false;
+  } else {
+    armedDown = false;
+    armedUp = root.scrollTop > 48;
+    wasInReturn = true;
+    try {
+      el.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "instant" });
+    } catch {
+      el.scrollIntoView(false);
+    }
+    const rootRect = root.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
+    const bar = root.querySelector(".section-nav .nav-inner");
+    const cover = bar ? bar.getBoundingClientRect().bottom : rootRect.top;
+    let delta = 0;
+    if (rect.top < cover + 8) delta = rect.top - (cover + 12);
+    else if (rect.bottom > rootRect.bottom - 8) delta = rect.bottom - (rootRect.bottom - 12);
+    if (Math.abs(delta) > 2) {
+      const max = Math.max(0, root.scrollHeight - root.clientHeight);
+      const next = Math.min(max, Math.max(0, root.scrollTop + delta));
+      drivingScroll = true;
+      root.scrollTop = next;
+    }
+    lastScrollY = root.scrollTop;
+    lastProgrammatic = root.scrollTop;
+  }
+  root.style.scrollBehavior = previous;
+  syncParallax(root);
+  scheduleChrome();
+}
+
 function onFocusIn(event) {
   const root = scroller.value;
   const target = event.target;
-  if (!root || !target || animating || target === root) return;
-  const about = cachedAbout || aboutAnchor();
-  if (!about) return;
+  if (!root || !target || target === root) return;
+  if (!root.contains(target)) return;
   requestAnimationFrame(() => {
-    if (animating) return;
-    /* Use the element that is focused now. WebKit delivers the title
-       button's focus event after Tab has already moved to the nav, and
-       acting on the stale target rewound the trip. */
+    if (performance.now() < focusScrollSuppressUntil) return;
+    /* Use the element that is focused now. WebKit can deliver the title
+       button's focus event after Tab has already moved on. */
     const current = document.activeElement;
     if (!current || current === root || !root.contains(current)) return;
-    const y = root.scrollTop;
-    const inTitle = !!current.closest?.("#top");
-    let dest = null;
-    if (inTitle && y > 2 && y < about + 2) dest = 0;
-    else if (!inTitle && y < about - 2) dest = about;
-    if (dest === null) return;
-    endNativeScroll();
-    if (prefersReduced()) {
-      root.style.scrollBehavior = "auto";
-      drivingScroll = true;
-      root.scrollTop = dest;
-      lastScrollY = dest;
-      root.style.scrollBehavior = "";
-      armedDown = dest === 0;
-      armedUp = dest !== 0;
+    if (!focusOffscreen(root, current)) {
+      /* A sticky nav link is already on screen. Hold the scroll for a
+         couple of frames so WebKit's focus scroll does not fling it. */
+      if (current.closest?.(".section-nav")) {
+        scrollFightUntil = performance.now() + 140;
+        lastProgrammatic = root.scrollTop;
+      }
       return;
     }
-    scrollFightUntil = performance.now() + 700;
-    if (dest === about) {
-      armedDown = false;
-      tweenBetween(
-        y,
-        about,
-        () => {
-          armedDown = true;
-          wasInReturn = false;
-        },
-        () => {
-          armedUp = true;
-          wasInReturn = true;
-          measureStatic();
-        },
-      );
-    } else {
-      armedUp = false;
-      tweenBetween(
-        y,
-        0,
-        () => {
-          armedUp = true;
-          wasInReturn = true;
-        },
-        () => {
-          armedDown = true;
-          wasInReturn = false;
-        },
-      );
-    }
+    revealFocused(root, current);
   });
 }
 
@@ -2037,7 +2060,7 @@ watch(
   <DinersPage v-if="route.name === 'diners'" />
   <RunsPage v-else-if="route.name === 'runs'" />
   <template v-else>
-  <a class="skip" href="/about" @click="onNav($event, 'about')">Skip to content</a>
+  <a class="skip" href="#about" @click="onNav($event, 'about')">Skip to content</a>
   <TitleProto
     v-if="protoReady"
     ref="protoPanel"

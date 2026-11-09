@@ -96,8 +96,10 @@ onMounted(() => revealCurrent(current.value));
         </header>
         <p class="role">{{ job.subtitle }}</p>
         <MediaFrame v-for="(item, i) in job.media" :key="`m-${i}`" :item="item" />
-        <h4>About the company</h4>
-        <p>{{ job.about }}</p>
+        <template v-if="job.about">
+          <h4>About the company</h4>
+          <p>{{ job.about }}</p>
+        </template>
         <h4>What I did</h4>
         <BulletTree :items="job.bullets" />
         <MediaFrame v-for="(item, i) in job.after || []" :key="`a-${i}`" :item="item" />

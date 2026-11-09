@@ -193,21 +193,28 @@ html:has(.diners) #app {
   display: flex;
   background: var(--bg2);
   border-right: 1px solid var(--line);
-  width: 48px;
-  transition: width 0.25s ease;
+  width: clamp(380px, 36vw, 520px);
+  transform: translateX(calc(-100% + 48px));
+  transition: transform 0.25s ease;
   overflow: hidden;
   box-shadow: 4px 0 16px rgba(26, 16, 51, 0.08);
+  pointer-events: none;
 }
 
 .diners .panel.open {
-  width: clamp(380px, 36vw, 520px);
+  transform: translateX(0);
   box-shadow: 12px 0 36px rgba(26, 16, 51, 0.18);
+  pointer-events: auto;
 }
 
 .diners .rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
   width: 48px;
   flex-shrink: 0;
-  background: none;
+  background: var(--bg2);
   border: 0;
   color: var(--text);
   cursor: pointer;
@@ -217,6 +224,7 @@ html:has(.diners) #app {
   gap: 12px;
   padding: 18px 0;
   font: 700 13px Roboto, sans-serif;
+  pointer-events: auto;
 }
 
 .diners .rail:hover {
@@ -238,8 +246,8 @@ html:has(.diners) #app {
 
 .diners .rail-lbl {
   writing-mode: vertical-rl;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--primary);
   font-family: var(--mono);
 }
@@ -366,13 +374,12 @@ html:has(.diners) #app {
 }
 
 .diners .card.hot {
-  box-shadow: inset 3px 0 0 var(--sec);
+  background: #f6efe8;
 }
 
 .diners .card.sel {
   border-color: var(--primary);
-  background: var(--primary-tint);
-  box-shadow: inset 3px 0 0 var(--primary);
+  background: #f3eef8;
 }
 
 .diners .card .thumb {
@@ -403,23 +410,17 @@ html:has(.diners) #app {
 }
 
 .diners .cert-pill {
-  position: absolute;
-  top: auto;
-  bottom: 4px;
-  left: 4px;
-  right: auto;
-  max-width: calc(100% - 8px);
-  white-space: nowrap;
-  font: 700 7px/1 var(--mono), Roboto, sans-serif;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  margin-top: 4px;
+  font: 700 12px/1.2 var(--mono), Roboto, sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
   color: #1a1033;
-  background: linear-gradient(180deg, #ffd27a, #ffb020);
+  background: #ffb020;
   border: 1px solid rgba(45, 29, 122, 0.35);
-  padding: 2px 4px;
+  padding: 2px 6px;
   border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 0 0 0 rgba(255, 176, 32, 0.55);
-  animation: cert-glow 2.4s ease-in-out infinite;
 }
 
 .diners .cert-banner {
@@ -427,28 +428,14 @@ html:has(.diners) #app {
   top: 12px;
   left: 12px;
   right: auto;
-  font: 700 11px/1 var(--mono), Roboto, sans-serif;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font: 700 12px/1.2 var(--mono), Roboto, sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
   color: #1a1033;
-  background: linear-gradient(180deg, #ffd27a, #ffb020);
-  border: 1.5px solid rgba(45, 29, 122, 0.45);
+  background: #ffb020;
+  border: 1px solid rgba(45, 29, 122, 0.35);
   padding: 6px 10px;
   border-radius: 999px;
-  box-shadow: 0 2px 8px rgba(26, 16, 51, 0.25), 0 0 0 0 rgba(255, 176, 32, 0.5);
-  animation: cert-glow 2.4s ease-in-out infinite;
-}
-
-@keyframes cert-glow {
-  0%,
-  100% {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 0 0 0 rgba(255, 176, 32, 0.55);
-    filter: brightness(1);
-  }
-  50% {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 0 10px 2px rgba(255, 176, 32, 0.65);
-    filter: brightness(1.08);
-  }
 }
 
 .diners .ph {
@@ -489,8 +476,14 @@ html:has(.diners) #app {
   display: flex;
   gap: 10px;
   margin-top: 6px;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.diners .card .mini abbr {
+  text-decoration: none;
+  cursor: help;
 }
 
 .diners .card .mini b {
@@ -509,14 +502,9 @@ html:has(.diners) #app {
   align-items: center;
   justify-content: center;
   font: 700 14px Roboto, sans-serif;
+  font-variant-numeric: tabular-nums;
   color: var(--primary);
   background: #fff;
-}
-
-.diners .card .score small {
-  font: 700 7px Roboto, sans-serif;
-  letter-spacing: 0.08em;
-  color: var(--muted);
 }
 
 .diners .fab {
@@ -530,15 +518,15 @@ html:has(.diners) #app {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: var(--drawer-left);
+  left: 0;
   width: min(480px, calc(100% - var(--drawer-left) - max(72px, 12vw)));
   max-width: calc(100% - var(--drawer-left) - 24px);
   background: var(--bg2);
   border-right: 2px solid var(--sec);
   border-radius: 0 18px 18px 0;
   z-index: 740;
-  transform: translateX(calc(-100% - 72px));
-  transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), left 0.25s ease;
+  transform: translateX(calc(var(--drawer-left) - 100% - 72px));
+  transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
   overflow: hidden;
   pointer-events: none;
   box-shadow: 16px 0 40px rgba(26, 16, 51, 0.16);
@@ -551,17 +539,17 @@ html:has(.diners) #app {
 }
 
 .diners .detail.peek {
-  transform: translateX(calc(-100% + var(--drawer-peek)));
+  transform: translateX(calc(var(--drawer-left) - 100% + var(--drawer-peek)));
   z-index: 760;
 }
 
 .diners .detail.open {
-  transform: translateX(0);
+  transform: translateX(var(--drawer-left));
   z-index: 760;
 }
 
 .diners .detail.behind {
-  transform: translateX(var(--drawer-behind));
+  transform: translateX(calc(var(--drawer-left) + var(--drawer-behind)));
   z-index: 745;
   box-shadow:
     -10px 0 16px rgba(26, 16, 51, 0.12),
@@ -574,17 +562,17 @@ html:has(.diners) #app {
 
 .diners .detail.leaving,
 .diners .detail.arriving {
-  transition: transform 0.62s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
 }
 
 .diners .detail.leaving {
-  transform: translateX(calc(-100% - 72px));
+  transform: translateX(calc(var(--drawer-left) - 100% - 72px));
   z-index: 770;
 }
 
 .diners .detail.arriving {
-  transform: translateX(0);
+  transform: translateX(var(--drawer-left));
   z-index: 750;
 }
 
@@ -593,12 +581,13 @@ html:has(.diners) #app {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: var(--drawer-left);
+  left: 0;
   width: 26px;
   z-index: 790;
   pointer-events: none;
   opacity: 0;
-  transition: left 0.25s ease, opacity 0.25s ease;
+  transform: translateX(var(--drawer-left));
+  transition: transform 0.25s ease, opacity 0.25s ease;
   background: linear-gradient(
     90deg,
     rgba(45, 29, 122, 0.4) 0%,
@@ -694,16 +683,18 @@ html:has(.diners) #app {
 
 .diners .ph .credit {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 16px 12px 8px;
+  left: 8px;
+  right: auto;
+  bottom: 8px;
+  max-width: calc(100% - 16px);
+  padding: 4px 8px;
+  border-radius: 6px;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.35;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   color: #fff;
-  background: linear-gradient(transparent, rgba(26, 16, 51, 0.82));
+  background: rgba(26, 16, 51, 0.9);
 }
 
 .diners .d-in {
@@ -723,26 +714,15 @@ html:has(.diners) #app {
 }
 
 .diners .big {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 18px;
-  padding: 14px 16px;
-  border: 1px solid rgba(45, 29, 122, 0.25);
-  background: var(--cream);
-  border-radius: 12px;
-  box-shadow: inset 0 -3px 0 var(--sec);
+  margin: 0 0 18px;
 }
 
 .diners .big b {
   font-size: 38px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
   color: var(--primary);
   line-height: 1;
-}
-
-.diners .big span {
-  color: var(--muted);
-  font-size: 13px;
 }
 
 .diners .bar {
@@ -754,6 +734,10 @@ html:has(.diners) #app {
   justify-content: space-between;
   font-size: 13px;
   margin-bottom: 5px;
+}
+
+.diners .bar .lbl b {
+  font-variant-numeric: tabular-nums;
 }
 
 .diners .bar .lbl em {
@@ -854,7 +838,8 @@ html:has(.diners) #app {
     top: 0;
     left: 0;
     bottom: 0;
-    width: 0;
+    width: min(360px, calc(100% - 48px));
+    transform: translateX(-100%);
     border-right: 0;
     box-shadow: none;
     z-index: 1100;
@@ -865,8 +850,7 @@ html:has(.diners) #app {
   }
 
   .diners .panel.open {
-    width: calc(100% - 48px);
-    max-width: 360px;
+    transform: translateX(0);
     border-right: 1px solid var(--line);
     box-shadow: 12px 0 32px rgba(30, 35, 41, 0.15);
   }
@@ -958,7 +942,7 @@ html:has(.diners) #app {
 
   /* Keep a phone map clear if the list was painted open without ?list=open. */
   .diners.no-anim:not(.force-open) .panel.open {
-    width: 0;
+    transform: translateX(-100%);
     border-right: 0;
     box-shadow: none;
   }
@@ -981,8 +965,4 @@ html:has(.diners) #app {
     transition: none;
   }
 
-  .diners .cert-pill,
-  .diners .cert-banner {
-    animation: none;
-  }
 }

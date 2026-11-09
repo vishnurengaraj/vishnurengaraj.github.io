@@ -35,39 +35,18 @@ onMounted(() => {
   if (reduce) return;
 
   animate.value = true;
-  let role = 0;
+  const word = profile.roles[0];
   let length = 0;
-  let mode = "type";
   const tick = () => {
-    const word = profile.roles[role];
-    if (mode === "type") {
-      length = Math.min(word.length, length + 1);
-      typed.value = word.slice(0, length);
-      fit();
-      if (length === word.length) {
-        mode = "hold";
-        timer = window.setTimeout(tick, 1400);
-        return;
-      }
-      timer = window.setTimeout(tick, 58);
-      return;
-    }
-    if (mode === "hold") {
-      mode = "delete";
-      tick();
-      return;
-    }
-    length = Math.max(0, length - 1);
+    length = Math.min(word.length, length + 1);
     typed.value = word.slice(0, length);
-    if (length === 0) {
-      role = (role + 1) % profile.roles.length;
-      mode = "type";
-      timer = window.setTimeout(tick, 260);
+    fit();
+    if (length === word.length) {
+      animate.value = false;
       return;
     }
-    timer = window.setTimeout(tick, 30);
+    timer = window.setTimeout(tick, 58);
   };
-  length = 0;
   typed.value = "";
   timer = window.setTimeout(tick, 350);
 });
@@ -156,6 +135,11 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
+.hero :focus-visible {
+  outline: 2px solid #ffb020;
+  outline-offset: 3px;
+}
+
 .caret {
   display: inline-block;
   width: 2px;
@@ -163,18 +147,6 @@ onUnmounted(() => {
   margin-left: 3px;
   background: currentColor;
   vertical-align: text-bottom;
-  animation: caret-blink 1s steps(1, end) infinite;
-}
-
-@keyframes caret-blink {
-  0%,
-  45% {
-    opacity: 1;
-  }
-  50%,
-  100% {
-    opacity: 0;
-  }
 }
 
 .socials {
@@ -201,10 +173,6 @@ onUnmounted(() => {
   .icon-link:hover {
     color: var(--md-sys-color-primary-container);
     border-color: var(--md-sys-color-primary-container);
-  }
-
-  .learn:hover {
-    animation-play-state: paused;
   }
 
   .learn:hover::before {
@@ -235,7 +203,8 @@ onUnmounted(() => {
   cursor: pointer;
   box-shadow: var(--shadow-rest);
   transform: translateX(-50%);
-  animation: learn-hint 2.4s ease-in-out infinite;
+  transition: transform 160ms ease-out;
+  animation: learn-enter 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s 1 backwards;
 }
 
 .learn svg {
@@ -263,13 +232,20 @@ onUnmounted(() => {
   outline-offset: 3px;
 }
 
-@keyframes learn-hint {
-  0%,
-  100% {
-    transform: translateX(-50%) translateY(0);
+@media (prefers-reduced-motion: no-preference) {
+  .learn:active {
+    transform: translateX(-50%) scale(0.97);
   }
-  50% {
-    transform: translateX(-50%) translateY(6px);
+}
+
+@keyframes learn-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
 }
 
@@ -336,12 +312,12 @@ onUnmounted(() => {
 
 @media (prefers-reduced-motion: reduce) {
   .caret {
-    animation: none;
     display: none;
   }
 
   .learn {
     animation: none;
+    transition: none;
   }
 }
 </style>

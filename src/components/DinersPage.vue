@@ -10,12 +10,14 @@ useHead({
   meta: [
     {
       name: "description",
-      content: "South Bay Sunday breakfast rankings — vishnu.rengaraj.com/diners",
+      content:
+        "Sunday breakfast spots around the South Bay, ranked on taste, price, atmosphere, and service.",
     },
     { property: "og:title", content: "Diners · Vishnu Rengaraj" },
     {
       property: "og:description",
-      content: "South Bay Sunday breakfast rankings — vishnu.rengaraj.com/diners",
+      content:
+        "Sunday breakfast spots around the South Bay, ranked on taste, price, atmosphere, and service.",
     },
   ],
 });
@@ -37,7 +39,7 @@ const slots = reactive([
   { place: null, role: "tucked" },
 ]);
 
-const SHUFFLE_MS = 680;
+const SHUFFLE_MS = 420;
 
 const weightLegend = [
   ["Taste", WEIGHTS.taste],
@@ -450,8 +452,8 @@ onUnmounted(() => {
         <div id="panel-body" class="panel-body">
           <div class="panel-head">
             <div>
-              <div class="ph-title">Ranked list</div>
-              <div class="ph-sub">{{ DINERS.length }} visits · ranked by weighted score</div>
+              <h2 class="ph-title">Ranked list</h2>
+              <div class="ph-sub">{{ DINERS.length }} visits</div>
             </div>
             <button class="collapse" type="button" aria-label="Collapse list" title="Collapse list" @click="setPanel(false)">
               ‹
@@ -494,19 +496,31 @@ onUnmounted(() => {
                   @error="onPhotoError(place.id)"
                 />
                 <span class="rank">#{{ rankOf(place) }}</span>
-                <span v-if="place.certified" class="cert-pill">Certified</span>
               </div>
               <div>
                 <h3>{{ place.name }}</h3>
                 <div class="hood">{{ place.hood }}</div>
+                <span v-if="place.certified" class="cert-pill" title="Certified">Certified</span>
                 <div class="mini">
-                  <span><b>{{ place.taste }}</b>T</span>
-                  <span><b>{{ place.price }}</b>P</span>
-                  <span><b>{{ place.atmosphere }}</b>A</span>
-                  <span><b>{{ place.service }}</b>S</span>
+                  <span class="mini-stat" :aria-label="`Taste ${place.taste}`">
+                    <b aria-hidden="true">{{ place.taste }}</b>
+                    <abbr title="Taste" aria-hidden="true">T</abbr>
+                  </span>
+                  <span class="mini-stat" :aria-label="`Price ${place.price}`">
+                    <b aria-hidden="true">{{ place.price }}</b>
+                    <abbr title="Price" aria-hidden="true">P</abbr>
+                  </span>
+                  <span class="mini-stat" :aria-label="`Atmosphere ${place.atmosphere}`">
+                    <b aria-hidden="true">{{ place.atmosphere }}</b>
+                    <abbr title="Atmosphere" aria-hidden="true">A</abbr>
+                  </span>
+                  <span class="mini-stat" :aria-label="`Service ${place.service}`">
+                    <b aria-hidden="true">{{ place.service }}</b>
+                    <abbr title="Service" aria-hidden="true">S</abbr>
+                  </span>
                 </div>
               </div>
-              <div class="score">{{ place.weighted.toFixed(2) }}<small>SCORE</small></div>
+              <div class="score" :aria-label="`Score ${place.weighted.toFixed(2)}`">{{ place.weighted.toFixed(2) }}</div>
             </li>
           </ol>
         </div>
@@ -557,15 +571,12 @@ onUnmounted(() => {
               />
               <span v-if="!photoSrc(layer.place)" class="demo">PHOTO COMING SOON</span>
               <span v-else-if="layer.place.photoCredit" class="credit">{{ layer.place.photoCredit }}</span>
-              <span v-if="layer.place.certified" class="cert-banner">Certified</span>
+              <span v-if="layer.place.certified" class="cert-banner" title="Certified">Certified</span>
             </div>
             <div class="d-in">
               <h2>{{ layer.place.name }}</h2>
               <div class="hood">{{ layer.place.hood }} · Rank #{{ rankOf(layer.place) }} of {{ DINERS.length }}</div>
-              <div class="big">
-                <b>{{ layer.place.weighted.toFixed(2) }}</b>
-                <span>weighted score<br>visited · out of 10</span>
-              </div>
+              <p class="big"><b>{{ layer.place.weighted.toFixed(2) }}</b></p>
               <div v-for="[label, key] in bars" :key="key" class="bar">
                 <div class="lbl">
                   <span>{{ label }}<em>{{ Math.round(WEIGHTS[key] * 100) }}%</em></span>
