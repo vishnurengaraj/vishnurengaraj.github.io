@@ -43,8 +43,8 @@
 }
 
 .nav-inner {
-  --nav-dur: 400ms;
-  --nav-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --nav-dur: 250ms;
+  --nav-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --nav-pad-y: 8px;
   --nav-pad-x: 4px;
   --tab-pad: 16px;
@@ -61,9 +61,7 @@
   border-radius: 999px;
   box-shadow: var(--shadow-rest);
   pointer-events: auto;
-  transition:
-    gap var(--nav-dur) var(--nav-ease),
-    padding var(--nav-dur) var(--nav-ease);
+  position: relative;
 }
 
 .nav-inner :focus-visible {
@@ -86,8 +84,6 @@
   color: #2d1d7a;
   transform: translateX(6px);
   transition:
-    max-width var(--nav-dur) var(--nav-ease),
-    margin-right var(--nav-dur) var(--nav-ease),
     opacity var(--nav-dur) var(--nav-ease),
     transform var(--nav-dur) var(--nav-ease);
 }
@@ -116,10 +112,7 @@
   background: #e6e1f0;
   opacity: 0;
   pointer-events: none;
-  transition:
-    width var(--nav-dur) var(--nav-ease),
-    margin var(--nav-dur) var(--nav-ease),
-    opacity var(--nav-dur) var(--nav-ease);
+  transition: opacity var(--nav-dur) var(--nav-ease);
 }
 
 .section-nav.is-open .nav-divider {
@@ -172,12 +165,8 @@
   pointer-events: none;
   white-space: nowrap;
   transition:
-    max-width var(--nav-dur) var(--nav-ease),
-    padding var(--nav-dur) var(--nav-ease),
-    opacity calc(var(--nav-dur) * 0.6) var(--nav-ease),
-    transform var(--nav-dur) var(--nav-ease),
-    background-color var(--nav-dur) var(--nav-ease),
-    color var(--nav-dur) var(--nav-ease);
+    opacity var(--nav-dur) var(--nav-ease),
+    transform var(--nav-dur) var(--nav-ease);
 }
 
 .section-nav.is-open .nav-subs .tablist a {
@@ -304,8 +293,18 @@
   outline-offset: 3px;
 }
 
-.home-return:active {
-  filter: brightness(0.96);
+@media (prefers-reduced-motion: no-preference) {
+  .pill,
+  .more,
+  .home-return {
+    transition: transform 160ms ease-out;
+  }
+
+  .pill:active,
+  .more:active,
+  .home-return:active {
+    transform: scale(0.97);
+  }
 }
 
 @media (max-height: 560px) and (orientation: landscape) {
@@ -405,30 +404,13 @@
   white-space: nowrap;
   text-decoration: none;
   transition:
-    max-width var(--nav-dur, 400ms) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
-    padding var(--nav-dur, 400ms) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
-    margin var(--nav-dur, 400ms) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
-    min-height var(--nav-dur, 400ms) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
-    opacity calc(var(--nav-dur, 400ms) * 0.6) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
-    border-radius var(--nav-dur, 400ms) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
-    transform var(--nav-dur, 400ms) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
-    background-color var(--md-sys-motion-duration-short) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
-    color var(--md-sys-motion-duration-short) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1));
+    opacity var(--nav-dur, 250ms) var(--nav-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+    transform var(--nav-dur, 250ms) var(--nav-ease, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
-/* Main labels return a beat after the tabs leave, so the two don't overlap
-   and blow the pill wider than the row. Highlight color stays immediate. */
+/* Main labels return a beat after the tabs leave, so the two don't overlap. */
 .section-nav:not(.is-open) a.nav-link {
-  transition-delay:
-    calc(var(--nav-dur, 400ms) * 0.15),
-    calc(var(--nav-dur, 400ms) * 0.15),
-    calc(var(--nav-dur, 400ms) * 0.15),
-    calc(var(--nav-dur, 400ms) * 0.15),
-    calc(var(--nav-dur, 400ms) * 0.15),
-    calc(var(--nav-dur, 400ms) * 0.15),
-    calc(var(--nav-dur, 400ms) * 0.15),
-    0s,
-    0s;
+  transition-delay: 40ms, 40ms;
 }
 
 /* Resting max-width matches the label. A loose 11rem stays above the
@@ -443,12 +425,11 @@
 }
 
 .section-nav.is-open a.nav-link:not(.nav-resume) {
-  max-width: 0;
-  min-height: 0;
-  padding-left: 0;
-  padding-right: 0;
+  position: absolute;
+  left: 8px;
+  max-width: none;
   opacity: 0;
-  transform: scale(0.92);
+  transform: translateX(-8px);
   pointer-events: none;
 }
 
@@ -487,8 +468,8 @@
 }
 
 .section-title {
-  font-family: "Roboto Heading", var(--font);
-  font-weight: 900;
+  font-family: var(--font);
+  font-weight: 700;
   font-size: clamp(2rem, 1.2rem + 2.2vw, 2.75rem);
   line-height: 1.15;
   letter-spacing: -0.02em;
@@ -507,7 +488,7 @@
 
 .lead {
   font-size: 1.375rem;
-  line-height: 1.75rem;
+  line-height: 1.4;
   font-weight: 400;
   margin: 0 0 1.5rem;
   padding: 1.35rem 1.5rem;
@@ -580,8 +561,8 @@
   border-radius: var(--md-sys-shape-corner-full);
   font-size: 0.75rem;
   line-height: 1rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   font-weight: 700;
 }
 
@@ -682,8 +663,8 @@ video {
   font-weight: 700;
   font-size: 0.75rem;
   line-height: 1rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   text-decoration: none;
   border-radius: var(--md-sys-shape-corner-full);
   padding: 0 12px;
@@ -753,8 +734,8 @@ video {
   font-size: 0.75rem;
   font-weight: 700;
   line-height: 1rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   cursor: pointer;
 }
 
@@ -796,7 +777,6 @@ video {
   list-style: none;
   margin: 0 0 1rem;
   padding: 1rem 1.1rem;
-  border-left: 4px solid var(--md-sys-color-primary-container);
 }
 
 .skills li {
@@ -830,7 +810,7 @@ video {
 /* Section names wipe out from behind the Resume chip. The chip stays the
    same size it is when Resume is selected in the resting bar. */
 .section-nav {
-  --pull-dur: 420ms;
+  --pull-dur: 250ms;
   --pull-overlap: 8px;
   --dock-tab-pad: 12px;
 }
@@ -863,9 +843,11 @@ video {
   overflow: hidden;
   max-width: 0;
   margin-left: calc(var(--pull-overlap) * -1);
+  opacity: 0;
+  transform: translateX(10px);
   transition:
-    max-width var(--pull-dur) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1)),
-    margin-left var(--pull-dur) var(--nav-ease, cubic-bezier(0.4, 0, 0.2, 1));
+    opacity var(--pull-dur, 250ms) var(--nav-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+    transform var(--pull-dur, 250ms) var(--nav-ease, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
 .section-nav.is-open .nav-subs {
@@ -874,6 +856,8 @@ video {
      behind the chip. Once open, that overlap lets the gold section
      pill show through the chip's rounded corners. Sit clear of it. */
   margin-left: 4px;
+  opacity: 1;
+  transform: none;
 }
 
 .nav-subs .tablist {
@@ -1041,7 +1025,6 @@ video {
 
 .coursework {
   background: #ffffff;
-  border-left: 4px solid var(--md-sys-color-primary-container);
   border-radius: var(--card-radius);
   padding: 1rem 1.15rem;
   margin: 0 0 1rem;
@@ -1062,6 +1045,17 @@ video {
 .card-compact h3 {
   font-size: 1.125rem;
   line-height: 1.5rem;
+}
+
+.lead,
+.timeline p,
+.project p,
+.subhead,
+.card p,
+.prose p,
+.coursework p,
+.bullets {
+  max-width: 68ch;
 }
 
 .lead,
@@ -1398,7 +1392,10 @@ video {
   }
 
   .nav-subs,
-  .nav-subs .tablist a {
+  .nav-subs .tablist a,
+  .pill,
+  .more,
+  .home-return {
     transition: none;
   }
 }

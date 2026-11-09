@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useHead } from "@unhead/vue";
 import manifest from "../data/runs/manifest.json";
@@ -11,9 +11,17 @@ import "../styles/runs.css";
 useHead({
   title: "Runs · Vishnu Rengaraj",
   meta: [
-    { name: "description", content: "Runs — vishnu.rengaraj.com/runs" },
+    {
+      name: "description",
+      content:
+        "A heatmap of Vishnu Rengaraj’s runs and hikes, from Los Angeles to the places he has traveled. Brighter color means more activity on that ground.",
+    },
     { property: "og:title", content: "Runs · Vishnu Rengaraj" },
-    { property: "og:description", content: "Runs — vishnu.rengaraj.com/runs" },
+    {
+      property: "og:description",
+      content:
+        "A heatmap of Vishnu Rengaraj’s runs and hikes. Brighter color means more activity on that ground.",
+    },
   ],
 });
 
@@ -32,6 +40,11 @@ const byId = new Map(manifest.runs.map((run) => [run.id, run]));
 const cityById = new Map(manifest.cities.map((city) => [city.id, city]));
 
 const activeLabel = computed(() => cityById.get(activeCity.value)?.label || "Regions");
+const activeCount = computed(() => cityById.get(activeCity.value)?.count || 0);
+const chooserLabel = ref("Runs here");
+const fromList = ref(false);
+let listOpener = null;
+let runOpener = null;
 const photos = computed(() => (Array.isArray(selected.value?.photos) ? selected.value.photos : []));
 const companions = computed(() =>
   Array.isArray(selected.value?.companions) ? selected.value.companions.filter(Boolean) : [],
@@ -94,11 +107,30 @@ function pickRegion(id) {
   selectCity(id);
 }
 
+function runsInCity(id) {
+  return manifest.runs
+    .filter((run) => run.city === id)
+    .sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")) || a.title.localeCompare(b.title));
+}
+
+function focusEl(el) {
+  if (!el || typeof el.focus !== "function") return;
+  el.focus({ preventScroll: true });
+}
+
+function closeChoices({ restore = true } = {}) {
+  choices.value = [];
+  fromList.value = false;
+  const el = listOpener;
+  listOpener = null;
+  if (restore) requestAnimationFrame(() => focusEl(el));
+}
+
 function selectCity(id, { fly = true } = {}) {
   const city = cityById.get(id);
   if (!city || !mapApi) return;
   activeCity.value = id;
-  choices.value = [];
+  closeChoices({ restore: false });
   if (fly) mapApi.flyCity(city, prefersReduced());
 }
 
@@ -132,7 +164,6 @@ async function openRun(id, lngLat) {
   if (!summary) return;
   const token = ++openToken;
   closeRegions();
-  choices.value = [];
   if (summary.city) activeCity.value = summary.city;
   selected.value = { ...summary, companions: [], photos: [] };
   panel.value = true;
@@ -150,8 +181,26 @@ async function openRun(id, lngLat) {
   }
 }
 
-function choose(run) {
+function choose(run, event) {
+  runOpener = event?.currentTarget || null;
   openRun(run.id, choiceAt);
+  nextTick(() => {
+    if (!panel.value) return;
+    focusEl(pageEl.value?.querySelector(".detail.open .close"));
+  });
+}
+
+function toggleCityList(event) {
+  if (fromList.value && choices.value.length) {
+    closeChoices();
+    return;
+  }
+  listOpener = event.currentTarget;
+  fromList.value = true;
+  chooserLabel.value = `Runs in ${activeLabel.value}`;
+  choiceAt = cityById.get(activeCity.value)?.center || null;
+  choices.value = runsInCity(activeCity.value);
+  nextTick(() => focusEl(pageEl.value?.querySelector("#run-chooser button")));
 }
 
 function toggleRegions() {
@@ -161,8 +210,8 @@ function toggleRegions() {
 function frameWorld() {
   if (!mapApi) return;
   closeRegions();
-  choices.value = [];
-  closePanel();
+  closeChoices({ restore: false });
+  closePanel({ restore: false });
   mapApi.frameWorld(prefersReduced());
 }
 
@@ -183,23 +232,30 @@ function onPick(runs, lngLat) {
     mapApi?.getZoom?.() ?? 0,
   );
   if (decision.action === "zoom") {
-    choices.value = [];
+    closeChoices({ restore: false });
     mapApi.zoomToward(lngLat);
     return;
   }
   if (decision.action === "choose") {
+    fromList.value = false;
+    chooserLabel.value = "Runs here";
+    listOpener = mapEl.value;
     choices.value = items;
     choiceAt = lngLat;
     return;
   }
-  choices.value = [];
+  closeChoices({ restore: false });
+  runOpener = mapEl.value;
   if (decision.action === "open") openRun(decision.ids[0], lngLat);
 }
 
-function closePanel() {
+function closePanel({ restore = true } = {}) {
   openToken += 1;
   panel.value = false;
   mapApi?.highlight(null);
+  const el = runOpener;
+  runOpener = null;
+  if (restore) requestAnimationFrame(() => focusEl(el));
 }
 
 function onKey(event) {
@@ -207,16 +263,17 @@ function onKey(event) {
   if (regionsOpen.value) {
     event.preventDefault();
     closeRegions();
-    return;
-  }
-  if (choices.value.length) {
-    event.preventDefault();
-    choices.value = [];
+    focusEl(pageEl.value?.querySelector(".regions-toggle"));
     return;
   }
   if (panel.value) {
     event.preventDefault();
     closePanel();
+    return;
+  }
+  if (choices.value.length) {
+    event.preventDefault();
+    closeChoices();
   }
 }
 
@@ -292,11 +349,26 @@ onUnmounted(() => {
 
 <template>
   <div ref="pageEl" class="runs" :class="{ 'no-anim': !motionOn, 'panel-open': panel }">
-    <h1 class="sr-only">Runs</h1>
     <div class="stage">
-      <div id="runs-map" ref="mapEl" role="region" aria-label="Map of runs"></div>
+      <div id="runs-map" ref="mapEl" tabindex="-1" role="region" aria-label="Map of runs"></div>
       <p v-if="manifest.sample" class="sample-tag">Sample routes</p>
       <button class="globe-btn" type="button" @click="frameWorld">Globe</button>
+      <button
+        class="run-index"
+        type="button"
+        :aria-expanded="fromList && choices.length ? 'true' : 'false'"
+        aria-controls="run-chooser"
+        @click="toggleCityList"
+      >
+        Runs in {{ activeLabel }} ({{ activeCount }})
+      </button>
+      <div class="map-key">
+        <h1>Runs</h1>
+        <p class="heat-key">
+          <span class="heat-swatch" aria-hidden="true"></span>
+          Low to high activity density
+        </p>
+      </div>
       <div class="regions" :class="{ open: regionsOpen }">
         <button
           class="regions-toggle"
@@ -325,14 +397,14 @@ onUnmounted(() => {
         </div>
       </div>
       <p v-if="loadError" class="map-error" role="status">{{ loadError }}</p>
-      <div v-if="choices.length" class="chooser" role="listbox" aria-label="Runs here">
-        <p class="chooser-label">Runs here</p>
+      <div v-if="choices.length" id="run-chooser" class="chooser" role="listbox" :aria-label="chooserLabel">
+        <p class="chooser-label">{{ chooserLabel }}</p>
         <button
           v-for="run in choices"
           :key="run.id"
           type="button"
           role="option"
-          @click="choose(run)"
+          @click="choose(run, $event)"
         >
           <span class="chooser-title">{{ run.title }}</span>
           <span class="chooser-meta">{{ formatDate(run.date) }} · {{ formatDistance(run.distanceM) }}</span>
@@ -356,11 +428,11 @@ onUnmounted(() => {
             <div class="stats">
               <div>
                 <b class="run-distance">{{ formatDistance(selected.distanceM) }}</b>
-                <span>distance</span>
+                <span>Distance</span>
               </div>
               <div v-if="formatPace(selected.distanceM, selected.movingS)">
                 <b class="run-pace">{{ formatPace(selected.distanceM, selected.movingS) }}</b>
-                <span>pace</span>
+                <span>Pace</span>
               </div>
             </div>
             <p v-if="selected.elevM != null" class="run-elev">{{ formatElev(selected.elevM) }} elevation</p>
