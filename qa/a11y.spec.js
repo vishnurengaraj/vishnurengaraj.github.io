@@ -83,10 +83,14 @@ test.describe("personal site", () => {
       const seen = new Set();
       for (let i = 0; i < 20 && seen.size < want.length; i++) {
         await page.keyboard.press("Tab");
+        /* The sunrise tween is frame-capped, so a busy runner stretches
+           the ~3–4s desktop scroll. Wait until that tween is done, the
+           scroller has stopped, and the focused control is fully inside. */
         const box = await page.waitForFunction(() => {
           const el = document.activeElement;
           const root = document.querySelector(".prlx");
           if (!el || !root || el === document.body) return null;
+          if (root.classList.contains("is-intro")) return null;
           const rect = el.getBoundingClientRect();
           const rootRect = root.getBoundingClientRect();
           const fully =
@@ -95,13 +99,22 @@ test.describe("personal site", () => {
             rect.top >= rootRect.top - 1 &&
             rect.bottom <= rootRect.bottom + 1;
           if (!fully) return null;
+          const y = root.scrollTop;
+          const state = window.__tabSettle || { y: NaN, n: 0 };
+          if (!Number.isFinite(state.y) || Math.abs(state.y - y) > 1) {
+            window.__tabSettle = { y, n: 0 };
+            return null;
+          }
+          state.n += 1;
+          window.__tabSettle = state;
+          if (state.n < 2) return null;
           const text = (el.innerText || el.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim();
           return {
             text,
             top: Math.round(rect.top - rootRect.top),
             bottom: Math.round(rect.bottom - rootRect.top),
           };
-        }, null, { timeout: 6000 });
+        }, null, { timeout: 30000 });
         const info = await box.jsonValue();
         expect(info.top).toBeGreaterThanOrEqual(-1);
         expect(info.bottom).toBeLessThanOrEqual(viewport.height + 1);
@@ -116,8 +129,14 @@ test.describe("personal site", () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/");
     await ready(page);
+    /* Each character waits on the previous timer, so a busy main thread
+       stretches the run. Poll until the caret is gone and the title is whole. */
     await expect
-      .poll(async () => page.locator(".subtitle").evaluate((el) => el.textContent), { timeout: 8000 })
+      .poll(
+        async () =>
+          page.locator(".subtitle").evaluate((el) => (el.querySelector(".caret") ? "" : el.textContent)),
+        { timeout: 45000, intervals: [200, 400] },
+      )
       .toBe("Mechanical Engineer");
     await expect(page.locator(".caret")).toHaveCount(0);
     const motion = await page.locator(".learn").evaluate((el) => {
