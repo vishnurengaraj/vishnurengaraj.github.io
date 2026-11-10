@@ -5,7 +5,7 @@ import { useHead } from "@unhead/vue";
 import manifest from "../data/runs/manifest.json";
 import { occlusionPadding } from "../runs/frame.js";
 import { formatDate, formatDistance, formatElev, formatPace } from "../runs/format.js";
-import { REGION_ZOOM, nearestCity } from "../runs/globe.js";
+import { REGION_ZOOM, WORLD_CENTER, WORLD_ZOOM, nearestCity } from "../runs/globe.js";
 import { resolvePick } from "../runs/pick.js";
 import { activitySharePath, plainRunsBehind, stravaActivityUrl } from "../runs/share.js";
 import "../styles/runs.css";
@@ -71,7 +71,7 @@ let mountGen = 0;
 let cityGen = 0;
 let openToken = 0;
 let alive = true;
-let swayBlocked = false;
+let cameraHeld = false;
 let pageNode = null;
 let resizeTimer = 0;
 let choiceAt = null;
@@ -130,7 +130,7 @@ function prefersReduced() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-function dismissSway(event) {
+function holdCamera(event) {
   if (event?.type === "keydown") {
     const key = event.key;
     const dismisses =
@@ -143,8 +143,8 @@ function dismissSway(event) {
       key.startsWith("Arrow");
     if (!dismisses) return;
   }
-  swayBlocked = true;
-  mapApi?.stopIdleSway();
+  cameraHeld = true;
+  mapApi?.cancelArrival();
 }
 
 function activityIdFromRoute() {
@@ -493,6 +493,9 @@ async function startMap() {
   const cityId = initialCity();
   const city = cityById.get(cityId) || manifest.cities[0];
   activeCity.value = city?.id || null;
+  const deepId = activityIdFromRoute();
+  const deep = Boolean(deepId && byId.has(deepId));
+  const skipIntro = prefersReduced() || deep || cameraHeld;
   const { mountRunsMap } = await import("../runs/map.js");
   if (!alive || gen !== mountGen) return;
   const el = mapEl.value;
@@ -500,8 +503,9 @@ async function startMap() {
   let created;
   try {
     created = await mountRunsMap(el, {
-      center: city.center,
-      zoom: city.zoom,
+      center: skipIntro ? city.center : WORLD_CENTER,
+      zoom: skipIntro ? city.zoom : WORLD_ZOOM,
+      arrival: skipIntro ? null : { center: city.center, zoom: city.zoom },
       onPick,
       onView,
     });
@@ -519,11 +523,11 @@ async function startMap() {
   await loadLines();
   if (!alive || gen !== mountGen) return;
   mapReady = true;
-  const deep = activityIdFromRoute();
-  if (deep && byId.has(deep)) await openRun(deep);
-  else if (deep) clearUnknownActivity();
-  if (swayBlocked || panel.value) created.stopIdleSway();
-  else created.startIdleSway();
+  if (deep) await openRun(deepId);
+  else if (deepId) clearUnknownActivity();
+  if (!alive || gen !== mountGen) return;
+  if (cameraHeld || panel.value) created.cancelArrival();
+  else created.beginArrival();
 }
 
 watch(
@@ -546,9 +550,9 @@ watch(
 onMounted(() => {
   syncShareKind();
   pageNode = pageEl.value;
-  pageNode?.addEventListener("pointerdown", dismissSway, true);
-  pageNode?.addEventListener("wheel", dismissSway, { capture: true, passive: true });
-  pageNode?.addEventListener("keydown", dismissSway, true);
+  pageNode?.addEventListener("pointerdown", holdCamera, true);
+  pageNode?.addEventListener("wheel", holdCamera, { capture: true, passive: true });
+  pageNode?.addEventListener("keydown", holdCamera, true);
   window.addEventListener("keydown", onKey);
   window.addEventListener("resize", onResize);
   startMap();
@@ -565,9 +569,9 @@ onUnmounted(() => {
   navToken += 1;
   window.clearTimeout(resizeTimer);
   window.clearTimeout(copyTimer);
-  pageNode?.removeEventListener("pointerdown", dismissSway, true);
-  pageNode?.removeEventListener("wheel", dismissSway, true);
-  pageNode?.removeEventListener("keydown", dismissSway, true);
+  pageNode?.removeEventListener("pointerdown", holdCamera, true);
+  pageNode?.removeEventListener("wheel", holdCamera, true);
+  pageNode?.removeEventListener("keydown", holdCamera, true);
   window.removeEventListener("keydown", onKey);
   window.removeEventListener("resize", onResize);
   mapApi?.destroy();

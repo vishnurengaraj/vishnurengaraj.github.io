@@ -6,31 +6,40 @@ import { REGION_ZOOM, WORLD_CENTER, WORLD_ZOOM, nearestCity, pitchForZoom } from
 import { closerZoom } from "./pick.js";
 
 const ROUTE_EASE_MS = 850;
+/* Approach stays flat so the globe does not tilt. The settle is the existing LA pitch. */
+const ARRIVE_ZOOM_MS = 1500;
+const ARRIVE_TILT_MS = 700;
 
 const STYLE = "https://tiles.openfreemap.org/styles/positron";
-
-/* Idle motion matches /diners: yaw ±13° and pitch ±1.5° on one 84s sine.
-   The first 700ms ramps in from rest. Zoom stays put. */
-const SWAY_AMPLITUDE_DEG = 13;
-const SWAY_PERIOD_MS = 84000;
-const PITCH_FLOAT_DEG = 1.5;
-const SWAY_RAMP_MS = 700;
-const SWAY_SESSION_MS = SWAY_PERIOD_MS * 686;
 
 function camera() {
   const phone = window.matchMedia("(max-width: 640px)").matches;
   return phone ? { pitch: 58, bearing: -16 } : { pitch: 64, bearing: -20 };
 }
 
-function prefersReducedMotion() {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+/* Same settle as the run drawer: cubic-bezier(0.22, 1, 0.36, 1). Starts moving at once. */
+function drawerEase(x) {
+  const cx = 0.66;
+  const bx = -0.24;
+  const ax = 0.58;
+  const cy = 3;
+  const by = -3;
+  const ay = 1;
+  const sampleX = (t) => ((ax * t + bx) * t + cx) * t;
+  const sampleY = (t) => ((ay * t + by) * t + cy) * t;
+  const slope = (t) => (3 * ax * t + 2 * bx) * t + cx;
+  let t = x;
+  for (let i = 0; i < 6; i++) {
+    const dx = sampleX(t) - x;
+    const d = slope(t);
+    if (Math.abs(dx) < 1e-5 || Math.abs(d) < 1e-6) break;
+    t = Math.min(1, Math.max(0, t - dx / d));
+  }
+  return sampleY(t);
 }
 
-function swayScale(elapsedMs) {
-  const ramp = Math.min(1, elapsedMs / SWAY_RAMP_MS);
-  const envelope = ramp * ramp * (3 - 2 * ramp);
-  const phase = (elapsedMs / SWAY_PERIOD_MS) * Math.PI * 2;
-  return envelope * Math.sin(phase);
+function prefersReducedMotion() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 function addBuildings(map) {
@@ -215,9 +224,10 @@ function hitsAt(map, point) {
   return runs;
 }
 
-/** One pitched map of every region. Zooming out reveals the world on the same layers. */
-export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
-  const view = camera();
+/** One pitched map of every region. Zooming out reveals the world on the same layers.
+    `arrival` is the one-time globe-to-city flight. Null skips it (reduced motion or a shared run). */
+export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick, onView }) {
+  const view = arrival ? { pitch: 0, bearing: 0 } : camera();
   const map = new maplibregl.Map({
     container: mapEl,
     style: STYLE,
@@ -237,17 +247,22 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
   map.addControl(new maplibregl.AttributionControl({ compact: false }), "bottom-left");
 
   let disposed = false;
-  let swayState = "idle";
   const geometryById = new Map();
-  let restingBearing = null;
-  let restingPitch = null;
-  let removeMotionListener = null;
+  let arrivalState = arrival ? "globe" : "skipped";
+  let arrivalTimer = 0;
   let layersReady = false;
   let runCount = 0;
   let cityId = "";
   let regions = [];
   let highlighted = "";
   mapEl.dataset.highlight = "";
+  mapEl.dataset.intro = arrivalState;
+  if (arrival) {
+    mapEl.dataset.zoom = Number(zoom).toFixed(3);
+    mapEl.dataset.pitch = "0.00";
+    mapEl.dataset.bearing = "0.00";
+    mapEl.dataset.pad = "0,0,0,0";
+  }
 
   const loaded = new Promise((resolve, reject) => {
     const timer = window.setTimeout(() => reject(new Error("Map style timed out")), 20000);
@@ -284,13 +299,15 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
   }
 
   function framedBearing() {
-    if (swayState === "stopped") return map.getBearing();
-    return camera().bearing;
+    return map.getBearing();
   }
 
   function framedPitch() {
-    if (swayState === "stopped") return map.getPitch();
-    return camera().pitch;
+    return map.getPitch();
+  }
+
+  function syncIntro() {
+    mapEl.dataset.intro = arrivalState;
   }
 
   function syncProbe() {
@@ -322,11 +339,9 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
   let suppressPitch = false;
   /* A finger drag or pinch after the run was chosen owns the camera. */
   let gestureSinceArm = false;
-  map.on("movestart", (event) => {
-    if (event.originalEvent) gestureSinceArm = true;
-  });
   function easePitchDown() {
     if (suppressPitch || pitching || map.isMoving()) return;
+    if (arrivalState === "globe" || arrivalState === "playing") return;
     const cap = pitchForZoom(map.getZoom(), camera().pitch);
     if (map.getPitch() <= cap + 0.5) return;
     pitching = true;
@@ -354,61 +369,82 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
   });
   syncProbe();
 
-  function stopIdleSway() {
-    if (swayState === "stopped") return;
-    swayState = "stopped";
-    removeMotionListener?.();
-    removeMotionListener = null;
-    if (!disposed) map.stop();
+  /* A gesture stops the flight. Calling map.stop() from movestart resets the
+     touch handler, so the gesture itself ends the ease and we only drop the
+     second half. */
+  map.on("movestart", (event) => {
+    if (!event.originalEvent) return;
+    gestureSinceArm = true;
+    cancelArrival({ stop: false });
+  });
+
+  function cancelArrival({ stop = true } = {}) {
+    if (arrivalState === "done" || arrivalState === "skipped") return;
+    const playing = arrivalState === "playing";
+    arrivalState = "done";
+    syncIntro();
+    window.clearTimeout(arrivalTimer);
+    if (stop && playing && !disposed) map.stop();
   }
 
-  function runSway() {
-    if (disposed || swayState === "stopped") return;
-    if (restingBearing == null) restingBearing = map.getBearing();
-    if (restingPitch == null) restingPitch = map.getPitch();
-    swayState = "running";
+  function playArrival() {
+    if (disposed || arrivalState !== "globe" || !arrival) return;
+    arrivalState = "playing";
+    syncIntro();
+    const target = arrival;
     map.easeTo({
-      bearing: restingBearing + SWAY_AMPLITUDE_DEG,
-      pitch: restingPitch + PITCH_FLOAT_DEG,
-      duration: SWAY_SESSION_MS,
-      easing(t) {
-        return swayScale(t * SWAY_SESSION_MS);
-      },
+      center: target.center,
+      zoom: target.zoom,
+      pitch: 0,
+      bearing: 0,
+      padding: { top: 0, right: 0, bottom: 0, left: 0 },
+      duration: ARRIVE_ZOOM_MS,
+      easing: drawerEase,
+      essential: true,
     });
     map.once("moveend", () => {
-      if (disposed || swayState !== "running") return;
-      swayState = "arming";
-      window.requestAnimationFrame(() => window.requestAnimationFrame(armSway));
+      if (disposed || arrivalState !== "playing") return;
+      const tilt = camera();
+      map.easeTo({
+        center: target.center,
+        zoom: target.zoom,
+        pitch: tilt.pitch,
+        bearing: tilt.bearing,
+        duration: ARRIVE_TILT_MS,
+        easing: drawerEase,
+        essential: true,
+      });
+      map.once("moveend", () => {
+        if (arrivalState !== "playing") return;
+        arrivalState = "done";
+        syncIntro();
+      });
     });
   }
 
-  function armSway() {
-    if (disposed || swayState === "stopped") return;
-    if (prefersReducedMotion()) {
-      stopIdleSway();
+  function beginArrival() {
+    if (disposed) return;
+    if (!arrival) {
+      arrivalState = "skipped";
+      syncIntro();
       return;
     }
-    swayState = "arming";
-    if (map.isMoving()) {
-      map.once("moveend", armSway);
-      return;
-    }
-    runSway();
-  }
-
-  function startIdleSway() {
-    if (disposed || swayState !== "idle") return;
-    if (prefersReducedMotion()) {
-      swayState = "stopped";
-      return;
-    }
-    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onMotion = () => {
-      if (motion.matches) stopIdleSway();
+    if (arrivalState === "done") return;
+    arrivalState = "globe";
+    syncIntro();
+    const armed = () => {
+      if (arrivalState !== "globe") return;
+      window.clearTimeout(arrivalTimer);
+      /* One still beat so the loaded globe is on screen before the zoom. */
+      arrivalTimer = window.setTimeout(() => {
+        if (arrivalState === "globe") playArrival();
+      }, 450);
     };
-    motion.addEventListener("change", onMotion);
-    removeMotionListener = () => motion.removeEventListener("change", onMotion);
-    window.requestAnimationFrame(() => window.requestAnimationFrame(armSway));
+    const tilesReady =
+      map.loaded() && !map.isMoving() && (typeof map.areTilesLoaded !== "function" || map.areTilesLoaded());
+    if (tilesReady) armed();
+    else map.once("idle", armed);
+    arrivalTimer = window.setTimeout(armed, 4000);
   }
 
   function labelFont() {
@@ -525,7 +561,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
     };
     const framed = routeCamera(bounds, { width: canvas.clientWidth, height: canvas.clientHeight }, pad);
     if (!framed) return;
-    stopIdleSway();
+    cancelArrival();
     map.easeTo({
       center: framed.center,
       zoom: framed.zoom,
@@ -541,8 +577,8 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
     resize() {
       map.resize();
     },
-    startIdleSway,
-    stopIdleSway,
+    beginArrival,
+    cancelArrival,
     setLines(lines, id) {
       if (disposed) return;
       if (id) cityId = id;
@@ -571,6 +607,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
     },
     flyCity(city, reduced) {
       if (disposed || !city) return;
+      cancelArrival();
       cityId = city.id;
       syncProbe();
       map.flyTo({
@@ -584,8 +621,8 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
     },
     frameWorld(reduced) {
       if (disposed) return;
+      cancelArrival();
       releaseFrame();
-      stopIdleSway();
       map.flyTo({
         center: WORLD_CENTER,
         zoom: WORLD_ZOOM,
@@ -619,6 +656,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
     },
     zoomToward(lngLat) {
       if (disposed || !lngLat) return;
+      cancelArrival();
       map.easeTo({
         center: lngLat,
         zoom: closerZoom(map.getZoom()),
@@ -643,9 +681,8 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
     },
     destroy() {
       disposed = true;
-      swayState = "stopped";
-      removeMotionListener?.();
-      removeMotionListener = null;
+      arrivalState = "done";
+      window.clearTimeout(arrivalTimer);
       map.remove();
     },
   };
