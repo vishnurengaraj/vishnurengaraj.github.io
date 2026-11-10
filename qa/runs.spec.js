@@ -903,7 +903,24 @@ test.describe("globe arrival", () => {
       expect(Math.abs(placed.dx)).toBeLessThan(24);
       expect(Math.abs(placed.dy)).toBeLessThan(24);
 
-      await expect(map).toHaveAttribute("data-intro", "done", { timeout: 20_000 });
+      let flatWhileZooming = false;
+      let leanedWhileZooming = false;
+      await expect
+        .poll(
+          async () => {
+            const intro = await map.getAttribute("data-intro");
+            const zoomNow = Number(await map.getAttribute("data-zoom"));
+            const pitchNow = Number(await map.getAttribute("data-pitch"));
+            if (intro === "playing" && zoomNow > 2.2 && zoomNow < 4.5 && pitchNow < 1) flatWhileZooming = true;
+            if (intro === "playing" && zoomNow > 7.5 && zoomNow < 11 && pitchNow > 8 && pitchNow < 60) {
+              leanedWhileZooming = true;
+            }
+            if (intro !== "done") return "flying";
+            return flatWhileZooming && leanedWhileZooming ? "blended" : "missed";
+          },
+          { timeout: 25_000, intervals: [80] },
+        )
+        .toBe("blended");
       await expect(map).toHaveAttribute("data-city", "la");
       const zoom = Number(await map.getAttribute("data-zoom"));
       const pitch = Number(await map.getAttribute("data-pitch"));
@@ -913,10 +930,18 @@ test.describe("globe arrival", () => {
       expect(pitch).toBeLessThan(70);
       expect(bearing).toBeGreaterThan(10);
       expect(bearing).toBeLessThan(30);
-      await page.waitForTimeout(1200);
-      expect(Number(await map.getAttribute("data-pitch"))).toBeCloseTo(pitch, 1);
-      expect(Math.abs(Number(await map.getAttribute("data-bearing")))).toBeCloseTo(bearing, 1);
-      expect(Number(await map.getAttribute("data-zoom"))).toBeCloseTo(zoom, 2);
+      const settledAt = Date.now();
+      await expect
+        .poll(
+          async () => {
+            const pitchNow = Number(await map.getAttribute("data-pitch"));
+            const zoomNow = Number(await map.getAttribute("data-zoom"));
+            if (Math.abs(pitchNow - pitch) > 0.4 || Math.abs(zoomNow - zoom) > 0.05) return "moved";
+            return Date.now() - settledAt > 1000 ? "steady" : "waiting";
+          },
+          { timeout: 4000, intervals: [150] },
+        )
+        .toBe("steady");
       await expect(map).toHaveAttribute("data-intro", "done");
     });
 
@@ -932,10 +957,17 @@ test.describe("globe arrival", () => {
       await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.6, { steps: 8 });
       await page.mouse.up();
       await expect(map).toHaveAttribute("data-intro", "done");
-      expect(Number(await map.getAttribute("data-zoom"))).toBeLessThan(4);
-      await page.waitForTimeout(2800);
-      expect(Number(await map.getAttribute("data-zoom"))).toBeLessThan(4);
-      await expect(map).toHaveAttribute("data-intro", "done");
+      const droppedAt = Date.now();
+      await expect
+        .poll(
+          async () => {
+            const zoomNow = Number(await map.getAttribute("data-zoom"));
+            if (zoomNow >= 4) return "flew";
+            return Date.now() - droppedAt > 1200 ? "held" : "waiting";
+          },
+          { timeout: 4000, intervals: [150] },
+        )
+        .toBe("held");
 
       await page.goto("/runs");
       await ready(page);
@@ -948,10 +980,19 @@ test.describe("globe arrival", () => {
       await expect.poll(async () => Number(await map.getAttribute("data-lng")), { timeout: 15_000 }).toBeLessThan(-120);
       await expect(map).toHaveAttribute("data-intro", "done");
       const sfZoom = Number(await map.getAttribute("data-zoom"));
-      await page.waitForTimeout(2800);
-      await expect(map).toHaveAttribute("data-city", "sf");
-      expect(Number(await map.getAttribute("data-lng"))).toBeLessThan(-120);
-      expect(Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(sfZoom - 0.4);
+      const sfAt = Date.now();
+      await expect
+        .poll(
+          async () => {
+            const city = await map.getAttribute("data-city");
+            const lng = Number(await map.getAttribute("data-lng"));
+            const zoomNow = Number(await map.getAttribute("data-zoom"));
+            if (city !== "sf" || lng >= -120 || zoomNow < sfZoom - 0.4) return "left";
+            return Date.now() - sfAt > 1200 ? "held" : "waiting";
+          },
+          { timeout: 5000, intervals: [150] },
+        )
+        .toBe("held");
     });
   }
 
@@ -987,10 +1028,115 @@ test.describe("globe arrival", () => {
     await expect(map).toHaveAttribute("data-city", "la");
     expect(Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(10);
     expect(Number(await map.getAttribute("data-pitch"))).toBeGreaterThan(45);
-    await page.waitForTimeout(600);
-    expect(Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(10);
-    await expect(map).toHaveAttribute("data-intro", "skipped");
+    const openedAt = Date.now();
+    await expect
+      .poll(
+        async () => {
+          const zoomNow = Number(await map.getAttribute("data-zoom"));
+          const intro = await map.getAttribute("data-intro");
+          if (zoomNow <= 10 || intro !== "skipped") return "flew";
+          return Date.now() - openedAt > 700 ? "held" : "waiting";
+        },
+        { timeout: 3000, intervals: [100] },
+      )
+      .toBe("held");
   });
+});
+
+function boxesOverlap(a, b) {
+  return a.x < b.x + b.width - 1 && a.x + a.width > b.x + 1 && a.y < b.y + b.height - 1 && a.y + a.height > b.y + 1;
+}
+
+test.describe("random activity", () => {
+  test.describe.configure({ timeout: 120_000 });
+
+  for (const viewport of [
+    { name: "desktop", width: 1440, height: 900 },
+    { name: "phone", width: 390, height: 844 },
+  ]) {
+    test(`${viewport.name} dice opens a different run from the full set and returns focus`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto("/runs");
+      await ready(page);
+      const map = page.locator("#runs-map");
+      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+      const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
+      const dice = page.getByRole("button", { name: "Open a random activity" });
+      await expect(dice).toBeVisible();
+      await expect(dice).toHaveAttribute("title", "Open a random activity");
+      await expect(dice.locator("svg")).toHaveAttribute("aria-hidden", "true");
+      const diceBox = await dice.boundingBox();
+      expect(diceBox.width).toBeGreaterThanOrEqual(44);
+      expect(diceBox.height).toBeGreaterThanOrEqual(44);
+      const globe = await page.getByRole("button", { name: "Globe" }).boundingBox();
+      const regions = await page.getByRole("button", { name: /Regions, / }).boundingBox();
+      const index = await page.getByRole("button", { name: /^Runs in / }).boundingBox();
+      const zoomIn = await page.locator(".maplibregl-ctrl-zoom-in").boundingBox();
+      for (const other of [globe, regions, index, zoomIn]) {
+        expect(boxesOverlap(diceBox, other)).toBe(false);
+      }
+
+      await page.getByRole("button", { name: "Globe" }).focus();
+      await page.keyboard.press("Tab");
+      await expect(dice).toBeFocused();
+      const focusRing = await dice.evaluate((el) => {
+        const style = getComputedStyle(el);
+        return { width: parseFloat(style.outlineWidth), style: style.outlineStyle };
+      });
+      expect(focusRing.width).toBeGreaterThanOrEqual(3);
+      expect(focusRing.style).not.toBe("none");
+      await page.keyboard.press("Enter");
+      const card = page.locator(".detail.open");
+      await expect(card).toBeVisible();
+      await expect.poll(() => new URL(page.url()).searchParams.get("activity")).toBeTruthy();
+      const firstId = new URL(page.url()).searchParams.get("activity");
+      const first = manifest.runs.find((run) => String(run.id) === firstId);
+      expect(first).toBeTruthy();
+      await expectRouteInView(page, first);
+      await expect(card.getByRole("button", { name: "Close" })).toBeFocused();
+      await page.keyboard.press("Escape");
+      await expect(card).toHaveCount(0);
+      await expect(dice).toBeFocused();
+
+      await dice.click();
+      await expect.poll(() => new URL(page.url()).searchParams.get("activity")).not.toBe(firstId);
+      const secondId = new URL(page.url()).searchParams.get("activity");
+      const second = manifest.runs.find((run) => String(run.id) === secondId);
+      expect(second).toBeTruthy();
+      await expectRouteInView(page, second);
+      await expect(map).toHaveAttribute("data-highlight", secondId);
+    });
+
+    test(`${viewport.name} dice during the arrival cancels it and keeps that run`, async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto("/runs");
+      await ready(page);
+      const map = page.locator("#runs-map");
+      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+      await expect(map).toHaveAttribute("data-intro", "globe");
+      const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
+      await page.getByRole("button", { name: "Open a random activity" }).click();
+      await expect(map).toHaveAttribute("data-intro", "done");
+      await expect.poll(() => new URL(page.url()).searchParams.get("activity")).toBeTruthy();
+      const id = new URL(page.url()).searchParams.get("activity");
+      const run = manifest.runs.find((item) => String(item.id) === id);
+      await expectRouteInView(page, run);
+      const openedAt = Date.now();
+      await expect
+        .poll(
+          async () => {
+            const intro = await map.getAttribute("data-intro");
+            const pitch = Number(await map.getAttribute("data-pitch"));
+            const urlId = new URL(page.url()).searchParams.get("activity");
+            if (intro !== "done" || urlId !== id || pitch > 1.5) return "snapped";
+            return Date.now() - openedAt > 1200 ? "held" : "waiting";
+          },
+          { timeout: 5000, intervals: [150] },
+        )
+        .toBe("held");
+    });
+  }
 });
 
 test.describe("runs stays off the main nav", () => {

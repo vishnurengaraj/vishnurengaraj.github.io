@@ -7,6 +7,7 @@ import { occlusionPadding } from "../runs/frame.js";
 import { formatDate, formatDistance, formatElev, formatPace } from "../runs/format.js";
 import { REGION_ZOOM, WORLD_CENTER, WORLD_ZOOM, nearestCity } from "../runs/globe.js";
 import { resolvePick } from "../runs/pick.js";
+import { pickRandomRun } from "../runs/random.js";
 import { activitySharePath, plainRunsBehind, stravaActivityUrl } from "../runs/share.js";
 import "../styles/runs.css";
 
@@ -72,6 +73,7 @@ let cityGen = 0;
 let openToken = 0;
 let alive = true;
 let cameraHeld = false;
+let pendingFrame = "";
 let pageNode = null;
 let resizeTimer = 0;
 let choiceAt = null;
@@ -100,7 +102,7 @@ function framePadding() {
   let right = 0;
   let bottom = 0;
   let left = 0;
-  for (const el of root.querySelectorAll(".globe-btn, .run-index, .regions-toggle")) {
+  for (const el of root.querySelectorAll(".globe-btn, .dice-btn, .run-index, .regions-toggle")) {
     const box = el.getBoundingClientRect();
     top = Math.max(top, box.bottom - mapBox.top);
   }
@@ -374,7 +376,23 @@ async function openRun(id, _lngLat, { skipUrl = false } = {}) {
   }
   await nextTick();
   if (!alive || token !== openToken || !panel.value) return;
-  mapApi?.frameRoute(id, framePadding(), prefersReduced());
+  if (!mapApi) {
+    pendingFrame = String(id);
+    return;
+  }
+  pendingFrame = "";
+  mapApi.frameRoute(id, framePadding(), prefersReduced());
+}
+
+function openRandom(event) {
+  const run = pickRandomRun(manifest.runs, selected.value?.id);
+  if (!run) return;
+  runOpener = event?.currentTarget || pageEl.value?.querySelector(".dice-btn") || null;
+  openRun(run.id);
+  nextTick(() => {
+    if (!panel.value) return;
+    focusEl(pageEl.value?.querySelector(".detail.open .close"));
+  });
 }
 
 function choose(run, event) {
@@ -526,6 +544,12 @@ async function startMap() {
   if (deep) await openRun(deepId);
   else if (deepId) clearUnknownActivity();
   if (!alive || gen !== mountGen) return;
+  if (pendingFrame && panel.value && String(selected.value?.id) === pendingFrame) {
+    created.highlight(pendingFrame);
+    created.armFrame();
+    created.frameRoute(pendingFrame, framePadding(), prefersReduced());
+    pendingFrame = "";
+  }
   if (cameraHeld || panel.value) created.cancelArrival();
   else created.beginArrival();
 }
@@ -584,7 +608,25 @@ onUnmounted(() => {
     <div class="stage">
       <div id="runs-map" ref="mapEl" tabindex="-1" role="region" aria-label="Map of runs"></div>
       <p v-if="manifest.sample" class="sample-tag">Sample routes</p>
-      <button class="globe-btn" type="button" @click="frameWorld">Globe</button>
+      <div class="map-tools">
+        <button class="globe-btn" type="button" @click="frameWorld">Globe</button>
+        <button
+          class="dice-btn"
+          type="button"
+          title="Open a random activity"
+          aria-label="Open a random activity"
+          @click="openRandom"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <rect x="3.5" y="3.5" width="17" height="17" rx="3.2" fill="none" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="8.2" cy="8.2" r="1.25" fill="currentColor" />
+            <circle cx="15.8" cy="8.2" r="1.25" fill="currentColor" />
+            <circle cx="12" cy="12" r="1.25" fill="currentColor" />
+            <circle cx="8.2" cy="15.8" r="1.25" fill="currentColor" />
+            <circle cx="15.8" cy="15.8" r="1.25" fill="currentColor" />
+          </svg>
+        </button>
+      </div>
       <button
         class="run-index"
         type="button"
