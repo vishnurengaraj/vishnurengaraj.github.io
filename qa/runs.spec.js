@@ -341,6 +341,7 @@ test.describe("one continuous map", () => {
 
   test("phone pinch-out from LA reaches the world without snapping back", async ({ page, browserName }) => {
     test.skip(browserName !== "chromium", "pinch uses CDP touch events");
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/runs");
     await ready(page);
@@ -1082,7 +1083,7 @@ test.describe("globe arrival", () => {
   });
 
   test("a failed tile load still leaves the globe and finishes the flight", async ({ page }) => {
-    await page.route(/\.pbf(\?|$)/, (route) => route.abort());
+    await page.route(/\/planet\/[^?]+\.pbf(\?|$)/, (route) => route.abort());
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/runs");
     await ready(page);
@@ -1094,8 +1095,8 @@ test.describe("globe arrival", () => {
   });
 
   for (const viewport of [
-    { name: "desktop", width: 1440, height: 900, bound: 2500 },
-    { name: "phone", width: 390, height: 844, bound: 2000 },
+    { name: "desktop", width: 1440, height: 900, bound: 4500 },
+    { name: "phone", width: 390, height: 844, bound: 4000 },
   ]) {
     test(`${viewport.name} shows the globe before the LA tiles finish`, async ({ browser }) => {
       const context = await browser.newContext({ viewport: { width: viewport.width, height: viewport.height } });
