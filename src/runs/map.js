@@ -242,6 +242,8 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
   let runCount = 0;
   let cityId = "";
   let regions = [];
+  let highlighted = "";
+  mapEl.dataset.highlight = "";
 
   const loaded = new Promise((resolve, reject) => {
     const timer = window.setTimeout(() => reject(new Error("Map style timed out")), 20000);
@@ -441,6 +443,14 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
     map.getSource("runs-regions").setData(data);
   }
 
+  function applyHighlight() {
+    mapEl.dataset.highlight = highlighted;
+    if (disposed || !map.getLayer("runs-highlight")) return;
+    const filter = ["==", ["get", "id"], highlighted || ""];
+    map.setFilter("runs-highlight", filter);
+    map.setFilter("runs-highlight-casing", filter);
+  }
+
   function ensureInteractions() {
     map.on("click", (event) => {
       onPick(hitsAt(map, event.point), [event.lngLat.lng, event.lngLat.lat]);
@@ -470,6 +480,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
       }
       map.getSource("runs-lines").setData(lines);
       map.getSource("runs-heat").setData(densityHeat(lines));
+      applyHighlight();
       syncProbe();
     },
     setRegions(cities) {
@@ -480,10 +491,8 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
       syncProbe();
     },
     highlight(id) {
-      if (disposed || !map.getLayer("runs-highlight")) return;
-      const filter = ["==", ["get", "id"], id || ""];
-      map.setFilter("runs-highlight", filter);
-      map.setFilter("runs-highlight-casing", filter);
+      highlighted = id || "";
+      applyHighlight();
     },
     flyCity(city, reduced) {
       if (disposed || !city) return;

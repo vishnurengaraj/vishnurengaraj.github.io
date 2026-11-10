@@ -62,4 +62,6 @@ Tracks outside the metro list are named (Tokyo, Madrid, Michigan, Waco, the east
 
 Files live under `/media/runs/` so they do not collide with the flat `runs.html` page. Companions stay empty unless a source provides names. Strava's API does not, and the card hides the row when the list is empty.
 
+A run keeps `stravaId` when the source is a Strava activity id: the Activity ID column, a Strava-shaped record, or a Garmin file matched to a Strava id in `exercise_master.json`. Sample routes and Garmin-only activities omit it. The drawer links to `https://www.strava.com/activities/{stravaId}` only when that field is present. Opening a run sets `/runs?activity={id}`. `?run=` still opens the same activity.
+
 Re-run the script before `npm run build` when the data changes. The committed sample is what the site serves until then.

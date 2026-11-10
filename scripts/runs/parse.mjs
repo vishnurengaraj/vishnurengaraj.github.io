@@ -170,6 +170,49 @@ function first(obj, keys) {
   return null;
 }
 
+const STRAVA_ID_KEYS = ["strava_id", "stravaId", "strava_activity_id", "stravaActivityId"];
+const GARMIN_ID_KEYS = ["garmin_id", "garminId", "garmin_activity_id", "garminActivityId"];
+
+/** Strava activity ids are positive integers with no leading zero. */
+export function numericActivityId(value) {
+  if (value == null || value === "") return null;
+  const text = String(value).trim();
+  if (!/^[1-9]\d*$/.test(text)) return null;
+  return text;
+}
+
+/**
+ * Strava id for one source record.
+ * A string means the record named a Strava activity.
+ * null means the record is Garmin-only or otherwise not a Strava activity.
+ * undefined means this record did not say, so a Strava file may still claim its id.
+ */
+export function stravaIdFromRecord(record) {
+  if (!record || typeof record !== "object") return null;
+  const explicit = numericActivityId(first(record, STRAVA_ID_KEYS));
+  if (explicit) return explicit;
+  const garmin = first(record, GARMIN_ID_KEYS);
+  if (garmin != null && String(garmin).trim() !== "") return null;
+  const markers = ["start_date", "start_date_local", "moving_time", "upload_id", "athlete", "resource_state", "Activity ID"];
+  const looksStrava = markers.some((key) => record[key] != null && record[key] !== "");
+  if (!looksStrava) return undefined;
+  return numericActivityId(first(record, ["id", "activity_id", "activityId", "Activity ID"]));
+}
+
+/** Fill stravaId from a numeric activity id. Does not override an explicit null. */
+export function claimStravaId(activity) {
+  if (!activity || activity.sample) return activity;
+  if (activity.stravaId) return activity;
+  if (activity.stravaId === null) return activity;
+  activity.stravaId = numericActivityId(activity.id);
+  return activity;
+}
+
+export function publicStravaId(activity) {
+  if (!activity || activity.sample) return null;
+  return numericActivityId(activity.stravaId);
+}
+
 function coordsFromUnknown(record) {
   if (Array.isArray(record.latlng) && record.latlng.length > 1 && Array.isArray(record.latlng[0])) {
     return record.latlng
@@ -195,6 +238,7 @@ export function activityFromRecord(record) {
   const coords = coordsFromUnknown(record);
   return {
     id: String(id),
+    stravaId: stravaIdFromRecord(record),
     title: String(first(record, ["name", "title", "Activity Name"]) || "Run"),
     date: parseDate(first(record, ["start_date", "start_date_local", "date", "Activity Date"])),
     type: type ? String(type) : "Run",
@@ -270,6 +314,7 @@ export async function loadExport(dir) {
     }
     activities.push({
       id: String(id),
+      stravaId: numericActivityId(id),
       title: row["Activity Name"] || "Run",
       date: parseDate(row["Activity Date"]),
       type: row["Activity Type"] || "Run",
@@ -363,7 +408,7 @@ export function pairsFromMaster(node, pairs = [], seen = new WeakSet()) {
   return pairs;
 }
 
-export async function activityFromFit(file, id) {
+export async function activityFromFit(file, id, options = {}) {
   const data = await parseFit(await readFile(file));
   const sport = fitSport(data);
   if (!sport) return null;
@@ -372,6 +417,7 @@ export async function activityFromFit(file, id) {
   const session = (data.sessions && data.sessions[0]) || {};
   return {
     id: String(id),
+    stravaId: numericActivityId(options.stravaId),
     title: "Run",
     date: parseDate(session.start_time || session.timestamp),
     type: sport,
