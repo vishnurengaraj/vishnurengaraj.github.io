@@ -1,10 +1,14 @@
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { ARRIVE_MS, arrivalFrame } from "./arrive.js";
 import { densityHeat } from "./density.js";
 import { boundsFromGeometry, routeCamera } from "./frame.js";
 import { REGION_ZOOM, WORLD_CENTER, WORLD_ZOOM, nearestCity, pitchForZoom } from "./globe.js";
 import { closerZoom } from "./pick.js";
+import { approachTiles, expandTileURL } from "./warm.js";
+
+/* One geographic flight. MapLibre couples the pan and the zoom; pitch and
+   bearing ride that same clock. Long enough to descend into LA, not a rush. */
+const FLY_MS = 5000;
 
 const ROUTE_EASE_MS = 850;
 
@@ -219,7 +223,9 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
     fadeDuration: 0,
     hash: false,
     clickTolerance: 12,
+    maxTileCacheZoomLevels: 16,
   });
+  if (arrival) map.getCanvas().style.visibility = "hidden";
   map.addControl(new maplibregl.NavigationControl({ showCompass: true, visualizePitch: true }), "bottom-right");
   map.addControl(new maplibregl.AttributionControl({ compact: false }), "bottom-left");
 
@@ -227,7 +233,7 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
   const geometryById = new Map();
   let arrivalState = arrival ? "globe" : "skipped";
   let arrivalTimer = 0;
-  let arrivalFrameId = 0;
+  let restoreWarm = null;
   let layersReady = false;
   let runCount = 0;
   let cityId = "";
@@ -235,6 +241,7 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
   let highlighted = "";
   mapEl.dataset.highlight = "";
   mapEl.dataset.intro = arrivalState;
+  mapEl.dataset.warm = arrival ? "idle" : "skipped";
   if (arrival) {
     mapEl.dataset.zoom = Number(zoom).toFixed(3);
     mapEl.dataset.pitch = "0.00";
@@ -337,12 +344,16 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
     }
   }
 
+  /* The hidden LA visit must not retitle the region chip or ease the pitch. */
+  let quietCamera = false;
   map.on("move", syncProbe);
   map.on("moveend", () => {
-    followRegion();
+    if (!quietCamera) followRegion();
     syncProbe();
-    const current = map.getCenter();
-    onView?.([current.lng, current.lat], map.getZoom());
+    if (!quietCamera) {
+      const current = map.getCenter();
+      onView?.([current.lng, current.lat], map.getZoom());
+    }
     easePitchDown();
   });
   syncProbe();
@@ -360,77 +371,157 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
     arrivalState = "done";
     syncIntro();
     window.clearTimeout(arrivalTimer);
-    window.cancelAnimationFrame(arrivalFrameId);
+    restoreWarm?.();
+    restoreWarm = null;
     if (stop && playing && !disposed) map.stop();
+  }
+
+  /* Wait until the camera we just jumped to has rendered. A same-turn
+     areTilesLoaded() still describes the previous view, so the check
+     happens on the next frame. The timeout keeps a failed fetch from
+     holding the globe. */
+  function whenSettled(ms) {
+    return new Promise((resolve) => {
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        resolve();
+      };
+      window.setTimeout(finish, ms);
+      window.requestAnimationFrame(() => {
+        if (settled || disposed) {
+          finish();
+          return;
+        }
+        const tilesReady = typeof map.areTilesLoaded !== "function" || map.areTilesLoaded();
+        if (map.loaded() && !map.isMoving() && tilesReady) {
+          finish();
+          return;
+        }
+        map.once("idle", finish);
+      });
+    });
+  }
+
+  /* Bytes for the zooms the dive crosses. The arrival view itself is visited
+     below, because a fetch never enters the source cache. */
+  function prefetchApproach(canvas) {
+    const templates = map.getSource("openmaptiles")?.tiles || [];
+    const template = templates.find((url) => String(url).includes("{z}"));
+    if (!template) return;
+    const home = map.getCenter();
+    const tiles = approachTiles({
+      from: [home.lng, home.lat],
+      to: [arrival.center[0], arrival.center[1], arrival.zoom],
+      width: canvas.clientWidth,
+      height: canvas.clientHeight,
+    }).filter((tile) => tile.z >= 6 && tile.z <= 10);
+    for (const tile of tiles) {
+      fetch(expandTileURL(template, tile)).catch(() => {});
+    }
+  }
+
+  /* Visit the arrival camera while the canvas is hidden so those tiles enter
+     the source cache, then return to the globe. */
+  async function warmDestination() {
+    mapEl.dataset.warm = "warming";
+    const home = map.getCenter();
+    const canvas = map.getCanvas();
+    mapEl.dataset.warmTiles = String(
+      approachTiles({
+        from: [home.lng, home.lat],
+        to: [arrival.center[0], arrival.center[1], arrival.zoom],
+        width: canvas.clientWidth,
+        height: canvas.clientHeight,
+      }).length,
+    );
+    const homePose = {
+      center: [home.lng, home.lat],
+      zoom: map.getZoom(),
+      pitch: 0,
+      bearing: 0,
+      padding: { top: 0, right: 0, bottom: 0, left: 0 },
+    };
+    const reveal = () => {
+      if (disposed) return;
+      suppressPitch = true;
+      map.jumpTo(homePose);
+      suppressPitch = false;
+      canvas.style.visibility = "";
+      quietCamera = false;
+      restoreWarm = null;
+    };
+    restoreWarm = reveal;
+    canvas.style.visibility = "hidden";
+    quietCamera = true;
+    const tilt = camera();
+    suppressPitch = true;
+    map.jumpTo({
+      center: arrival.center,
+      zoom: arrival.zoom,
+      pitch: tilt.pitch,
+      bearing: tilt.bearing,
+      padding: { top: 0, right: 0, bottom: 0, left: 0 },
+    });
+    suppressPitch = false;
+    await whenSettled(2500);
+    if (disposed) return;
+    /* A region or a drag during the visit already owns the camera.
+       Jumping home again would wipe that move. */
+    if (arrivalState !== "globe") {
+      mapEl.dataset.warm = "failed";
+      if (canvas.style.visibility === "hidden") reveal();
+      return;
+    }
+    const laLoaded = typeof map.areTilesLoaded !== "function" || map.areTilesLoaded();
+    reveal();
+    prefetchApproach(canvas);
+    await whenSettled(2000);
+    if (arrivalState === "globe") mapEl.dataset.warm = laLoaded ? "ready" : "timeout";
   }
 
   function playArrival() {
     if (disposed || arrivalState !== "globe" || !arrival) return;
     arrivalState = "playing";
     syncIntro();
-    const target = arrival;
     const tilt = camera();
-    const fromCenter = map.getCenter();
-    const from = {
-      lng: fromCenter.lng,
-      lat: fromCenter.lat,
-      zoom: map.getZoom(),
-      pitch: map.getPitch(),
-      bearing: map.getBearing(),
-    };
-    const to = {
-      lng: target.center[0],
-      lat: target.center[1],
-      zoom: target.zoom,
+    /* minZoom would replace the flight curve and zoom out before the dive.
+       The default curve keeps the turn toward LA on the way down. */
+    map.flyTo({
+      center: arrival.center,
+      zoom: arrival.zoom,
       pitch: tilt.pitch,
       bearing: tilt.bearing,
-    };
-    const started = performance.now();
-    const step = (now) => {
-      if (disposed || arrivalState !== "playing") return;
-      const frame = arrivalFrame(now - started, ARRIVE_MS, from, to);
-      suppressPitch = true;
-      map.jumpTo({
-        center: [frame.lng, frame.lat],
-        zoom: frame.zoom,
-        pitch: frame.pitch,
-        bearing: frame.bearing,
-        padding: { top: 0, right: 0, bottom: 0, left: 0 },
-      });
-      suppressPitch = false;
-      if (frame.raw >= 1) {
-        arrivalState = "done";
-        syncIntro();
-        return;
-      }
-      arrivalFrameId = window.requestAnimationFrame(step);
-    };
-    arrivalFrameId = window.requestAnimationFrame(step);
+      padding: { top: 0, right: 0, bottom: 0, left: 0 },
+      duration: FLY_MS,
+      essential: true,
+    });
+    map.once("moveend", () => {
+      if (arrivalState !== "playing") return;
+      arrivalState = "done";
+      syncIntro();
+    });
   }
 
   function beginArrival() {
     if (disposed) return;
     if (!arrival) {
       arrivalState = "skipped";
+      mapEl.dataset.warm = "skipped";
       syncIntro();
       return;
     }
     if (arrivalState === "done") return;
     arrivalState = "globe";
     syncIntro();
-    const armed = () => {
-      if (arrivalState !== "globe") return;
+    warmDestination().then(() => {
+      if (disposed || arrivalState !== "globe") return;
       window.clearTimeout(arrivalTimer);
-      /* One still beat so the loaded globe is on screen before the zoom. */
       arrivalTimer = window.setTimeout(() => {
         if (arrivalState === "globe") playArrival();
-      }, 450);
-    };
-    const tilesReady =
-      map.loaded() && !map.isMoving() && (typeof map.areTilesLoaded !== "function" || map.areTilesLoaded());
-    if (tilesReady) armed();
-    else map.once("idle", armed);
-    arrivalTimer = window.setTimeout(armed, 4000);
+      }, 1200);
+    });
   }
 
   function labelFont() {
@@ -669,7 +760,7 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
       disposed = true;
       arrivalState = "done";
       window.clearTimeout(arrivalTimer);
-      window.cancelAnimationFrame(arrivalFrameId);
+      restoreWarm?.();
       map.remove();
     },
   };

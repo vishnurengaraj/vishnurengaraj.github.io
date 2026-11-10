@@ -889,11 +889,37 @@ test.describe("globe arrival", () => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await page.goto("/runs");
       await ready(page);
+      const recorded = recordArrival(page);
       const map = page.locator("#runs-map");
       await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
-      await expect(map).toHaveAttribute("data-intro", "globe");
-      await expect.poll(async () => Number(await map.getAttribute("data-pitch"))).toBeLessThan(1);
-      await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
+      const samples = await recorded;
+      const playAt = samples.findIndex((sample) => sample.intro === "playing");
+      const holdAt = samples.findIndex(
+        (sample, index) =>
+          index < playAt &&
+          sample.intro === "globe" &&
+          /^(ready|failed|timeout)$/.test(sample.warm) &&
+          sample.zoom < 3 &&
+          sample.pitch < 1 &&
+          !sample.hidden &&
+          sample.tiles > 0,
+      );
+      expect(holdAt, JSON.stringify(samples.filter((sample) => sample.intro === "globe").slice(-4))).toBeGreaterThanOrEqual(0);
+      const playing = samples.filter((sample) => sample.intro === "playing");
+      expect(playing.length).toBeGreaterThanOrEqual(3);
+      const approach = playing.find((sample) => sample.zoom > 4.5 && sample.zoom < 8.5);
+      expect(approach, JSON.stringify(playing.slice(0, 10))).toBeTruthy();
+      expect(approach.lng).toBeLessThan(-112);
+      expect(approach.pitch).toBeGreaterThan(8);
+      expect(approach.pitch).toBeLessThan(50);
+      const turned = playing.find((sample) => sample.lng < -112);
+      expect(turned.zoom).toBeLessThan(8);
+      const leaned = playing.find((sample) => sample.pitch > 20);
+      expect(leaned.zoom).toBeGreaterThan(4);
+      expect(leaned.zoom).toBeLessThan(11);
+      for (let i = 1; i < playing.length; i++) {
+        expect(playing[i].zoom).toBeGreaterThan(playing[i - 1].zoom - 0.45);
+      }
       await expect(map).toHaveAttribute("data-pad", "0,0,0,0");
       await expect.poll(async () => Number(await map.getAttribute("data-runs"))).toBeGreaterThan(100);
       const placed = await map.evaluate((el) => {
@@ -902,25 +928,6 @@ test.describe("globe arrival", () => {
       });
       expect(Math.abs(placed.dx)).toBeLessThan(24);
       expect(Math.abs(placed.dy)).toBeLessThan(24);
-
-      let flatWhileZooming = false;
-      let leanedWhileZooming = false;
-      await expect
-        .poll(
-          async () => {
-            const intro = await map.getAttribute("data-intro");
-            const zoomNow = Number(await map.getAttribute("data-zoom"));
-            const pitchNow = Number(await map.getAttribute("data-pitch"));
-            if (intro === "playing" && zoomNow > 2.2 && zoomNow < 4.5 && pitchNow < 1) flatWhileZooming = true;
-            if (intro === "playing" && zoomNow > 7.5 && zoomNow < 11 && pitchNow > 8 && pitchNow < 60) {
-              leanedWhileZooming = true;
-            }
-            if (intro !== "done") return "flying";
-            return flatWhileZooming && leanedWhileZooming ? "blended" : "missed";
-          },
-          { timeout: 25_000, intervals: [80] },
-        )
-        .toBe("blended");
       await expect(map).toHaveAttribute("data-city", "la");
       const zoom = Number(await map.getAttribute("data-zoom"));
       const pitch = Number(await map.getAttribute("data-pitch"));
@@ -950,19 +957,48 @@ test.describe("globe arrival", () => {
       await page.goto("/runs");
       await ready(page);
       const map = page.locator("#runs-map");
-      await expect(map).toHaveAttribute("data-intro", "globe", { timeout: 30_000 });
+      const held = await page.evaluate(
+        () =>
+          new Promise((resolve) => {
+            const map = document.querySelector("#runs-map");
+            const started = performance.now();
+            const id = window.setInterval(() => {
+              const warm = map.dataset.warm || "";
+              const hidden = map.querySelector("canvas")?.style.visibility === "hidden";
+              const zoom = Number(map.dataset.zoom);
+              const pitch = Number(map.dataset.pitch);
+              if (
+                map.dataset.intro === "globe" &&
+                /^(ready|failed|timeout)$/.test(warm) &&
+                !hidden &&
+                zoom < 3 &&
+                pitch < 1
+              ) {
+                window.clearInterval(id);
+                resolve("holding");
+                return;
+              }
+              if (performance.now() - started > 20000) {
+                window.clearInterval(id);
+                resolve(map.dataset.intro || "timeout");
+              }
+            }, 20);
+          }),
+      );
+      expect(held).toBe("holding");
       const box = await map.boundingBox();
       await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.45);
       await page.mouse.down();
       await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.6, { steps: 8 });
       await page.mouse.up();
       await expect(map).toHaveAttribute("data-intro", "done");
+      const droppedZoom = Number(await map.getAttribute("data-zoom"));
       const droppedAt = Date.now();
       await expect
         .poll(
           async () => {
             const zoomNow = Number(await map.getAttribute("data-zoom"));
-            if (zoomNow >= 4) return "flew";
+            if (zoomNow > droppedZoom + 0.6) return "flew";
             return Date.now() - droppedAt > 1200 ? "held" : "waiting";
           },
           { timeout: 4000, intervals: [150] },
@@ -971,7 +1007,8 @@ test.describe("globe arrival", () => {
 
       await page.goto("/runs");
       await ready(page);
-      await expect(map).toHaveAttribute("data-intro", "globe", { timeout: 30_000 });
+      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+      await expect(map).toHaveAttribute("data-intro", "globe");
       await page.getByRole("button", { name: /Regions, / }).click();
       const sf = page.getByRole("radio", { name: "SF", exact: true });
       await sf.scrollIntoViewIfNeeded();
@@ -1005,6 +1042,7 @@ test.describe("globe arrival", () => {
     const map = page.locator("#runs-map");
     await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
     await expect(map).toHaveAttribute("data-intro", "skipped");
+    await expect(map).toHaveAttribute("data-warm", "skipped");
     await expectRouteInView(page, sonoma);
     expect(Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(8);
 
@@ -1025,6 +1063,7 @@ test.describe("globe arrival", () => {
     const map = page.locator("#runs-map");
     await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
     await expect(map).toHaveAttribute("data-intro", "skipped");
+    await expect(map).toHaveAttribute("data-warm", "skipped");
     await expect(map).toHaveAttribute("data-city", "la");
     expect(Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(10);
     expect(Number(await map.getAttribute("data-pitch"))).toBeGreaterThan(45);
@@ -1041,7 +1080,54 @@ test.describe("globe arrival", () => {
       )
       .toBe("held");
   });
+
+  test("a failed tile load still leaves the globe and finishes the flight", async ({ page }) => {
+    await page.route(/\.pbf(\?|$)/, (route) => route.abort());
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/runs");
+    await ready(page);
+    const map = page.locator("#runs-map");
+    await expect(map).toHaveAttribute("data-intro", "done", { timeout: 30_000 });
+    const hidden = await map.evaluate((el) => el.querySelector("canvas")?.style.visibility || "");
+    expect(hidden).not.toBe("hidden");
+    expect(Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(10);
+  });
 });
+
+function recordArrival(page) {
+  return page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        const map = document.querySelector("#runs-map");
+        const samples = [];
+        const started = performance.now();
+        const id = window.setInterval(() => {
+          samples.push({
+            intro: map.dataset.intro || "",
+            warm: map.dataset.warm || "",
+            zoom: Number(map.dataset.zoom),
+            lng: Number(map.dataset.lng),
+            pitch: Number(map.dataset.pitch),
+            tiles: Number(map.dataset.warmTiles || 0),
+            hidden: map.querySelector("canvas")?.style.visibility === "hidden",
+          });
+          const last = samples[samples.length - 1];
+          const sawHold = samples.some(
+            (sample) =>
+              sample.intro === "globe" &&
+              /^(ready|failed|timeout)$/.test(sample.warm) &&
+              sample.zoom < 3 &&
+              sample.pitch < 1 &&
+              !sample.hidden,
+          );
+          if ((last.intro === "done" && sawHold) || performance.now() - started > 24000) {
+            window.clearInterval(id);
+            resolve(samples);
+          }
+        }, 40);
+      }),
+  );
+}
 
 function boxesOverlap(a, b) {
   return a.x < b.x + b.width - 1 && a.x + a.width > b.x + 1 && a.y < b.y + b.height - 1 && a.y + a.height > b.y + 1;
