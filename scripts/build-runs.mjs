@@ -19,10 +19,13 @@ import sharp from "sharp";
 import { assignCity, orderCities } from "./runs/cities.mjs";
 import {
   applyPrivacy,
+  densify,
   distanceToLine,
   distanceToMeters,
   lineMidpoint,
   pathLength,
+  pointInZones,
+  privacyWindow,
   roundCoord,
   sampleHeat,
 } from "./runs/geo.mjs";
@@ -240,14 +243,21 @@ async function main() {
     const id = safeId(activity.id);
     const stravaId = publicStravaId(activity);
     const flat = parts.flat();
-    const start = raw[0];
-    const end = raw[raw.length - 1];
-    for (const point of flat) {
-      const fromStart = distanceToPoint(point, start);
-      const fromEnd = distanceToPoint(point, end);
-      if (fromStart < radiusM - 1 || fromEnd < radiusM - 1) {
-        throw new Error(`${id} published a point inside the ${radiusM}m privacy radius`);
-      }
+    // Nothing from the start or finish stretch inside the radius may be
+    // published. Published points are a subset of the densified track, so
+    // compare them exactly. Later laps may pass back near the start, and a
+    // coordinate recorded both in a hidden stretch and mid-run is allowed.
+    const dense = densify(raw, 12);
+    const { head, tail } = privacyWindow(dense, radiusM);
+    const key = (point) => point.join(",");
+    const published = new Set(flat.map(key));
+    const kept = new Set(dense.slice(head, tail + 1).map(key));
+    const hiddenEnds = [...dense.slice(0, head), ...dense.slice(tail + 1)].map(key);
+    if (hiddenEnds.some((point) => published.has(point) && !kept.has(point))) {
+      throw new Error(`${id} published part of its start or finish inside the ${radiusM}m privacy radius`);
+    }
+    if (zones && flat.some((point) => pointInZones(point, zones))) {
+      throw new Error(`${id} published a point inside a privacy zone`);
     }
     const longest = parts.reduce((best, line) => (pathLength(line) > pathLength(best) ? line : best));
     const mid = lineMidpoint(longest);
@@ -373,15 +383,6 @@ async function main() {
   console.log(
     `runs: ${summaries.length} (${counts || "none"})\nprivacy: ${radiusM}m radius, ${dropped} dropped, ${missingGps} without GPS\noutput: public/media/runs`,
   );
-}
-
-function distanceToPoint(a, b) {
-  const φ1 = (a[1] * Math.PI) / 180;
-  const φ2 = (b[1] * Math.PI) / 180;
-  const dφ = ((b[1] - a[1]) * Math.PI) / 180;
-  const dλ = ((b[0] - a[0]) * Math.PI) / 180;
-  const s = Math.sin(dφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(dλ / 2) ** 2;
-  return 2 * 6371000 * Math.asin(Math.min(1, Math.sqrt(s)));
 }
 
 function round(value) {
