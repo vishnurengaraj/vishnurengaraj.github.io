@@ -346,9 +346,14 @@ test.describe("one continuous map", () => {
     await ready(page);
     const map = page.locator("#runs-map");
     await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
-    await map.evaluate((el) => el._runsMap.stopIdleSway());
+    await expect
+      .poll(async () => {
+        const intro = await map.getAttribute("data-intro");
+        if (intro !== "done" && intro !== "skipped") return 0;
+        return Number(await map.getAttribute("data-zoom"));
+      }, { timeout: 25_000 })
+      .toBeGreaterThan(10);
     await expect(map).toHaveAttribute("data-city", "la");
-    await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(10);
 
     const client = await page.context().newCDPSession(page);
     const humboldtAt = [-124, 40.32];
@@ -871,6 +876,121 @@ test.describe("open run frames the whole route", () => {
       expect(tinyZoom).toBeGreaterThan(14.5);
     });
   }
+});
+
+test.describe("globe arrival", () => {
+  test.describe.configure({ timeout: 120_000 });
+
+  for (const viewport of [
+    { name: "desktop", width: 1440, height: 900 },
+    { name: "phone", width: 390, height: 844 },
+  ]) {
+    test(`${viewport.name} starts on a flat globe and settles on tilted LA once`, async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto("/runs");
+      await ready(page);
+      const map = page.locator("#runs-map");
+      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+      await expect(map).toHaveAttribute("data-intro", "globe");
+      await expect.poll(async () => Number(await map.getAttribute("data-pitch"))).toBeLessThan(1);
+      await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
+      await expect(map).toHaveAttribute("data-pad", "0,0,0,0");
+      await expect.poll(async () => Number(await map.getAttribute("data-runs"))).toBeGreaterThan(100);
+      const placed = await map.evaluate((el) => {
+        const point = el._runsMap.project([Number(el.dataset.lng), Number(el.dataset.lat)]);
+        return { dx: point.x - el.clientWidth / 2, dy: point.y - el.clientHeight / 2 };
+      });
+      expect(Math.abs(placed.dx)).toBeLessThan(24);
+      expect(Math.abs(placed.dy)).toBeLessThan(24);
+
+      await expect(map).toHaveAttribute("data-intro", "done", { timeout: 20_000 });
+      await expect(map).toHaveAttribute("data-city", "la");
+      const zoom = Number(await map.getAttribute("data-zoom"));
+      const pitch = Number(await map.getAttribute("data-pitch"));
+      const bearing = Math.abs(Number(await map.getAttribute("data-bearing")));
+      expect(zoom).toBeGreaterThan(11);
+      expect(pitch).toBeGreaterThan(45);
+      expect(pitch).toBeLessThan(70);
+      expect(bearing).toBeGreaterThan(10);
+      expect(bearing).toBeLessThan(30);
+      await page.waitForTimeout(1200);
+      expect(Number(await map.getAttribute("data-pitch"))).toBeCloseTo(pitch, 1);
+      expect(Math.abs(Number(await map.getAttribute("data-bearing")))).toBeCloseTo(bearing, 1);
+      expect(Number(await map.getAttribute("data-zoom"))).toBeCloseTo(zoom, 2);
+      await expect(map).toHaveAttribute("data-intro", "done");
+    });
+
+    test(`${viewport.name} drops the arrival on a drag or a region choice and does not resume`, async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto("/runs");
+      await ready(page);
+      const map = page.locator("#runs-map");
+      await expect(map).toHaveAttribute("data-intro", "globe", { timeout: 30_000 });
+      const box = await map.boundingBox();
+      await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.45);
+      await page.mouse.down();
+      await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.6, { steps: 8 });
+      await page.mouse.up();
+      await expect(map).toHaveAttribute("data-intro", "done");
+      expect(Number(await map.getAttribute("data-zoom"))).toBeLessThan(4);
+      await page.waitForTimeout(2800);
+      expect(Number(await map.getAttribute("data-zoom"))).toBeLessThan(4);
+      await expect(map).toHaveAttribute("data-intro", "done");
+
+      await page.goto("/runs");
+      await ready(page);
+      await expect(map).toHaveAttribute("data-intro", "globe", { timeout: 30_000 });
+      await page.getByRole("button", { name: /Regions, / }).click();
+      const sf = page.getByRole("radio", { name: "SF", exact: true });
+      await sf.scrollIntoViewIfNeeded();
+      await sf.click();
+      await expect(map).toHaveAttribute("data-city", "sf", { timeout: 15_000 });
+      await expect.poll(async () => Number(await map.getAttribute("data-lng")), { timeout: 15_000 }).toBeLessThan(-120);
+      await expect(map).toHaveAttribute("data-intro", "done");
+      const sfZoom = Number(await map.getAttribute("data-zoom"));
+      await page.waitForTimeout(2800);
+      await expect(map).toHaveAttribute("data-city", "sf");
+      expect(Number(await map.getAttribute("data-lng"))).toBeLessThan(-120);
+      expect(Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(sfZoom - 0.4);
+    });
+  }
+
+  test("a shared activity and a legacy run link skip the globe", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
+    const sonoma = manifest.runs.find((run) => run.title === "Lake Sonoma Marathon");
+    await page.goto(`/runs?activity=${sonoma.id}`);
+    await ready(page);
+    const map = page.locator("#runs-map");
+    await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+    await expect(map).toHaveAttribute("data-intro", "skipped");
+    await expectRouteInView(page, sonoma);
+    expect(Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(8);
+
+    const humboldt = manifest.runs.find((run) => run.title.includes("Humboldt"));
+    await page.goto(`/runs?run=${humboldt.id}`);
+    await ready(page);
+    await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+    await expect(map).toHaveAttribute("data-intro", "skipped");
+    await expectRouteInView(page, humboldt);
+    await expect(page.locator(".detail.open h2")).toHaveText(humboldt.title);
+  });
+
+  test("reduced motion opens on tilted LA with no flight", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/runs");
+    await ready(page);
+    const map = page.locator("#runs-map");
+    await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+    await expect(map).toHaveAttribute("data-intro", "skipped");
+    await expect(map).toHaveAttribute("data-city", "la");
+    expect(Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(10);
+    expect(Number(await map.getAttribute("data-pitch"))).toBeGreaterThan(45);
+    await page.waitForTimeout(600);
+    expect(Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(10);
+    await expect(map).toHaveAttribute("data-intro", "skipped");
+  });
 });
 
 test.describe("runs stays off the main nav", () => {
