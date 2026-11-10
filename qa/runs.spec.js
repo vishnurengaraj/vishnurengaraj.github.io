@@ -346,10 +346,54 @@ test.describe("one continuous map", () => {
     await ready(page);
     const map = page.locator("#runs-map");
     await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+    await map.evaluate((el) => el._runsMap.stopIdleSway());
     await expect(map).toHaveAttribute("data-city", "la");
     await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(10);
 
     const client = await page.context().newCDPSession(page);
+    const humboldtAt = [-124, 40.32];
+    const tokyoAt = [139.76, 35.7];
+
+    async function frame() {
+      await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+    }
+
+    /* Pitch eases only after the fingers lift, and the globe matrix updates
+       a frame later. Both move the projected points without a zoom change. */
+    async function waitForCamera() {
+      await page.evaluate(() => {
+        window.__runsCamKey = "";
+        window.__runsCamAt = 0;
+      });
+      await page.waitForFunction(
+        ({ humboldtAt, tokyoAt }) => {
+          const el = document.querySelector("#runs-map");
+          const api = el?._runsMap;
+          if (!api) return false;
+          const humboldt = api.project(humboldtAt);
+          const tokyo = api.project(tokyoAt);
+          const key = [
+            el.dataset.zoom,
+            el.dataset.lng,
+            el.dataset.lat,
+            humboldt.x.toFixed(1),
+            humboldt.y.toFixed(1),
+            tokyo.x.toFixed(1),
+            tokyo.y.toFixed(1),
+          ].join("|");
+          const now = performance.now();
+          if (key !== window.__runsCamKey) {
+            window.__runsCamKey = key;
+            window.__runsCamAt = now;
+            return false;
+          }
+          return now - window.__runsCamAt >= 200;
+        },
+        { humboldtAt, tokyoAt },
+        { timeout: 8000 },
+      );
+    }
+
     async function pinchOut() {
       let left = { x: 40, y: 250, id: 1 };
       let right = { x: 350, y: 620, id: 2 };
@@ -359,22 +403,35 @@ test.describe("one continuous map", () => {
         left = { x: 40 + i * 9, y: 250 + i * 10, id: 1 };
         right = { x: 350 - i * 9, y: 620 - i * 10, id: 2 };
         await client.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [left, right] });
-        await page.waitForTimeout(30);
+        await frame();
         lowest = Math.min(lowest, Number(await map.getAttribute("data-zoom")));
       }
       const during = Number(await map.getAttribute("data-zoom"));
       await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-      await page.waitForTimeout(500);
+      await waitForCamera();
       const after = Number(await map.getAttribute("data-zoom"));
       return { lowest, during, after };
     }
 
+    async function worldInView() {
+      const box = await map.boundingBox();
+      const points = await map.evaluate(
+        (el, at) => [el._runsMap.project(at[0]), el._runsMap.project(at[1])],
+        [humboldtAt, tokyoAt],
+      );
+      return points.every(
+        (point) => point.x > 0 && point.y > 0 && point.x < box.width && point.y < box.height,
+      );
+    }
+
     let zoom = Number(await map.getAttribute("data-zoom"));
-    for (let n = 0; n < 8 && zoom > 2.5; n++) {
+    let framed = false;
+    for (let n = 0; n < 10 && !framed; n++) {
       const step = await pinchOut();
       expect(step.after).toBeLessThan(zoom - 0.8);
       expect(step.after).toBeLessThanOrEqual(step.lowest + 0.35);
       zoom = step.after;
+      framed = zoom < 2.5 && (await worldInView());
     }
     expect(zoom).toBeLessThan(2.5);
     await expect(page.locator(".detail.open")).toHaveCount(0);
