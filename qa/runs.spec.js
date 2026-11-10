@@ -1092,6 +1092,128 @@ test.describe("globe arrival", () => {
     expect(hidden).not.toBe("hidden");
     expect(Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(10);
   });
+
+  for (const viewport of [
+    { name: "desktop", width: 1440, height: 900, bound: 2500 },
+    { name: "phone", width: 390, height: 844, bound: 2000 },
+  ]) {
+    test(`${viewport.name} shows the globe before the LA tiles finish`, async ({ browser }) => {
+      const context = await browser.newContext({ viewport: { width: viewport.width, height: viewport.height } });
+      const page = await context.newPage();
+      await page.addInitScript(() => {
+        window.__nav = performance.now();
+        window.__hid = false;
+      });
+      await page.goto("http://127.0.0.1:5173/runs", { waitUntil: "commit" });
+      await page.evaluate(() => {
+        const watch = () => {
+          const map = document.querySelector("#runs-map");
+          if (!map) {
+            requestAnimationFrame(watch);
+            return;
+          }
+          const note = () => {
+            const canvas = map.querySelector("canvas");
+            if (canvas && canvas.style.visibility === "hidden") window.__hid = true;
+          };
+          note();
+          new MutationObserver(note).observe(map, { attributes: true, subtree: true, attributeFilter: ["style"] });
+        };
+        watch();
+      });
+      await page.waitForFunction(() => document.querySelector("#runs-map")?.dataset.globe === "shown", null, {
+        timeout: 15000,
+      });
+      const elapsed = await page.evaluate(() => performance.now() - window.__nav);
+      const hidden = await page.evaluate(() => window.__hid);
+      expect(hidden).toBe(false);
+      expect(elapsed).toBeLessThan(viewport.bound);
+      const map = page.locator("#runs-map");
+      expect(Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
+      expect(Number(await map.getAttribute("data-pitch"))).toBeLessThan(1);
+      await context.close();
+    });
+  }
+
+  test("dice, escape, and a region during preload leave a visible map", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/runs");
+    await ready(page);
+    const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
+    await page.getByRole("button", { name: "Open a random activity" }).click();
+    const map = page.locator("#runs-map");
+    await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+    const hidden = await map.evaluate((el) => el.querySelector("canvas")?.style.visibility || "");
+    expect(hidden).not.toBe("hidden");
+    await expect(map).toHaveAttribute("data-intro", "done");
+    await expect.poll(() => new URL(page.url()).searchParams.get("activity")).toBeTruthy();
+    const id = new URL(page.url()).searchParams.get("activity");
+    const run = manifest.runs.find((item) => String(item.id) === id);
+    await expectRouteInView(page, run);
+    const openedAt = Date.now();
+    await expect
+      .poll(
+        async () => {
+          const intro = await map.getAttribute("data-intro");
+          const pitch = Number(await map.getAttribute("data-pitch"));
+          const vis = await map.evaluate((el) => el.querySelector("canvas")?.style.visibility || "");
+          if (intro !== "done" || pitch > 1.5 || vis === "hidden") return "snapped";
+          return Date.now() - openedAt > 1200 ? "held" : "waiting";
+        },
+        { timeout: 5000, intervals: [150] },
+      )
+      .toBe("held");
+
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/runs");
+    await ready(page);
+    await expect(map).toHaveAttribute("data-intro", "globe");
+    await page.getByRole("button", { name: "Globe" }).focus();
+    await page.keyboard.press("Escape");
+    await expect(map).toHaveAttribute("data-intro", "done");
+    const escapeHidden = await map.evaluate((el) => el.querySelector("canvas")?.style.visibility || "");
+    expect(escapeHidden).not.toBe("hidden");
+    const escapeZoom = Number(await map.getAttribute("data-zoom"));
+    expect(escapeZoom).toBeLessThan(3);
+    const escapeAt = Date.now();
+    await expect
+      .poll(
+        async () => {
+          const zoomNow = Number(await map.getAttribute("data-zoom"));
+          if (zoomNow > escapeZoom + 0.6) return "flew";
+          return Date.now() - escapeAt > 1000 ? "held" : "waiting";
+        },
+        { timeout: 4000, intervals: [100] },
+      )
+      .toBe("held");
+
+    await page.goto("/runs");
+    await ready(page);
+    await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+    await expect(map).toHaveAttribute("data-intro", "globe");
+    await page.getByRole("button", { name: /Regions, / }).click();
+    const sf = page.getByRole("radio", { name: "SF", exact: true });
+    await sf.scrollIntoViewIfNeeded();
+    await sf.click();
+    await expect(map).toHaveAttribute("data-city", "sf", { timeout: 15_000 });
+    const regionHidden = await map.evaluate((el) => el.querySelector("canvas")?.style.visibility || "");
+    expect(regionHidden).not.toBe("hidden");
+    await expect.poll(async () => Number(await map.getAttribute("data-lng")), { timeout: 15_000 }).toBeLessThan(-120);
+    const sfZoom = Number(await map.getAttribute("data-zoom"));
+    const sfAt = Date.now();
+    await expect
+      .poll(
+        async () => {
+          const zoomNow = Number(await map.getAttribute("data-zoom"));
+          const lng = Number(await map.getAttribute("data-lng"));
+          const vis = await map.evaluate((el) => el.querySelector("canvas")?.style.visibility || "");
+          if (vis === "hidden" || lng >= -120 || zoomNow < sfZoom - 0.5) return "snapped";
+          return Date.now() - sfAt > 1000 ? "held" : "waiting";
+        },
+        { timeout: 4000, intervals: [100] },
+      )
+      .toBe("held");
+  });
 });
 
 function recordArrival(page) {

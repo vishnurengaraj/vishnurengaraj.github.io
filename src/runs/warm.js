@@ -1,5 +1,5 @@
-/** Slippy-map tiles along the approach into a city. The map loads them by
-    visiting that camera; this is the footprint of the visit. */
+/** Slippy-map tiles along the approach into a city. The page fetches these
+    while the globe stays on screen, so the dive does not wait on the network. */
 
 function clamp(n, min, max) {
   return Math.min(max, Math.max(min, n));
