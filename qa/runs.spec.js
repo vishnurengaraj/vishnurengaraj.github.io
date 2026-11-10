@@ -378,6 +378,12 @@ test.describe("one continuous map", () => {
     }
     expect(zoom).toBeLessThan(2.5);
     await expect(page.locator(".detail.open")).toHaveCount(0);
+    const placed = await map.evaluate((el) => {
+      const point = el._runsMap.project([Number(el.dataset.lng), Number(el.dataset.lat)]);
+      return { dx: point.x - el.clientWidth / 2, dy: point.y - el.clientHeight / 2 };
+    });
+    expect(Math.abs(placed.dx)).toBeLessThan(24);
+    expect(Math.abs(placed.dy)).toBeLessThan(24);
     await expect(page.getByRole("button", { name: "Regions, LA selected" })).toBeVisible();
     const humboldt = await map.evaluate((el) => el._runsMap.project([-124, 40.32]));
     const tokyo = await map.evaluate((el) => el._runsMap.project([139.76, 35.7]));
@@ -477,20 +483,115 @@ async function plainRuns(page) {
     .toBe(true);
 }
 
-async function expectFramed(page, run) {
+function northUp(bearing) {
+  const wrapped = ((Number(bearing) % 360) + 360) % 360;
+  return Math.min(wrapped, 360 - wrapped);
+}
+
+function sampleCoords(geometry) {
+  const all = [];
+  const visit = (coords) => {
+    if (!coords) return;
+    if (typeof coords[0] === "number") {
+      all.push([coords[0], coords[1]]);
+      return;
+    }
+    for (const child of coords) visit(child);
+  };
+  visit(geometry?.coordinates);
+  if (!all.length) return [];
+  let west = all[0];
+  let east = all[0];
+  let south = all[0];
+  let north = all[0];
+  for (const point of all) {
+    if (point[0] < west[0]) west = point;
+    if (point[0] > east[0]) east = point;
+    if (point[1] < south[1]) south = point;
+    if (point[1] > north[1]) north = point;
+  }
+  const step = Math.max(1, Math.floor(all.length / 60));
+  const sample = [west, east, south, north];
+  for (let i = 0; i < all.length; i += step) sample.push(all[i]);
+  return sample;
+}
+
+async function routeSample(page, run) {
+  const lines = await (await page.request.get(`/media/runs/cities/${run.city}.lines.geojson`)).json();
+  const feature = lines.features.find((item) => String(item.properties.id) === String(run.id));
+  expect(feature).toBeTruthy();
+  return sampleCoords(feature.geometry);
+}
+
+/** Whole route inside the map area the drawer and top controls do not cover. Pitch is flat and north is up. */
+async function expectRouteInView(page, run) {
   const map = page.locator("#runs-map");
   const card = page.locator(".detail.open");
   await expect(card.locator("h2")).toHaveText(run.title);
   await expect(map).toHaveAttribute("data-highlight", String(run.id));
-  await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeGreaterThanOrEqual(14.5);
-  await expect.poll(async () => Number(await map.getAttribute("data-lng"))).toBeCloseTo(run.mid[0], 1);
-  await expect.poll(async () => Number(await map.getAttribute("data-lat"))).toBeCloseTo(run.mid[1], 1);
-  const point = await map.evaluate((el, lngLat) => el._runsMap.project(lngLat), run.mid);
-  const box = await map.boundingBox();
-  expect(point.x).toBeGreaterThan(8);
-  expect(point.y).toBeGreaterThan(8);
-  expect(point.x).toBeLessThan(box.width - 8);
-  expect(point.y).toBeLessThan(box.height - 8);
+  const sample = await routeSample(page, run);
+  await expect
+    .poll(async () => {
+      const pitch = Number(await map.getAttribute("data-pitch"));
+      const bearing = northUp(await map.getAttribute("data-bearing"));
+      if (!(pitch < 1) || !(bearing < 1.5)) return `pose ${pitch} ${bearing}`;
+      return map.evaluate((el, coords) => {
+        const mapRect = el.getBoundingClientRect();
+        const phone = window.matchMedia("(max-width: 640px)").matches;
+        let top = 0;
+        for (const node of document.querySelectorAll(".globe-btn, .run-index, .regions-toggle")) {
+          top = Math.max(top, node.getBoundingClientRect().bottom - mapRect.top);
+        }
+        const drawer = document.querySelector(".detail.open");
+        let bottom = mapRect.height;
+        let right = mapRect.width;
+        if (drawer) {
+          const box = drawer.getBoundingClientRect();
+          if (phone) bottom = box.top - mapRect.top;
+          else right = box.left - mapRect.left;
+        }
+        const legend = document.querySelector(".map-key");
+        if (legend) {
+          const box = legend.getBoundingClientRect();
+          const legendTop = box.top - mapRect.top;
+          if (legendTop < bottom - 1 && box.left - mapRect.left < right - 1) bottom = Math.min(bottom, legendTop);
+        }
+        const slack = 4;
+        let outside = 0;
+        let worst = null;
+        for (const lngLat of coords) {
+          const point = el._runsMap.project(lngLat);
+          const bad =
+            point.x < slack ||
+            point.y < top + slack ||
+            point.x > right - slack ||
+            point.y > bottom - slack;
+          if (bad) {
+            outside += 1;
+            worst = { x: Math.round(point.x), y: Math.round(point.y), top, right, bottom };
+          }
+        }
+        return outside === 0 ? "ok" : `outside ${outside} ${JSON.stringify(worst)}`;
+      }, sample);
+    }, { timeout: 15000 })
+    .toBe("ok");
+}
+
+async function expectFramed(page, run) {
+  await expectRouteInView(page, run);
+}
+
+async function expectGlobeCentered(page) {
+  const map = page.locator("#runs-map");
+  await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
+  await expect.poll(async () => Number(await map.getAttribute("data-pitch"))).toBeLessThan(1);
+  await expect(map).toHaveAttribute("data-pad", "0,0,0,0");
+  const placed = await map.evaluate((el) => {
+    const point = el._runsMap.project([Number(el.dataset.lng), Number(el.dataset.lat)]);
+    return { dx: point.x - el.clientWidth / 2, dy: point.y - el.clientHeight / 2 };
+  });
+  expect(Math.abs(placed.dx)).toBeLessThan(24);
+  expect(Math.abs(placed.dy)).toBeLessThan(24);
 }
 
 test.describe("activity link and share url", () => {
@@ -616,6 +717,101 @@ test.describe("activity link and share url", () => {
       await expect(page.locator(".detail.open")).toHaveCount(0);
       await expect(map).toHaveAttribute("data-city", "la");
       await expect(map).toHaveAttribute("data-highlight", "");
+    });
+  }
+});
+
+test.describe("open run frames the whole route", () => {
+  test.describe.configure({ timeout: 120_000 });
+
+  for (const viewport of [
+    { name: "desktop", width: 1440, height: 900 },
+    { name: "phone", width: 390, height: 844 },
+  ]) {
+    test(`${viewport.name} fits a route from the map, the list, and a shared url, then recenters the globe`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto("/runs");
+      await ready(page);
+      const map = page.locator("#runs-map");
+      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+
+      if (viewport.name === "phone") {
+        const zoomOut = page.locator(".maplibregl-ctrl-zoom-out");
+        for (let i = 0; i < 14; i++) {
+          const zoom = Number(await map.getAttribute("data-zoom"));
+          if (zoom < 3) break;
+          await zoomOut.click();
+          await expect
+            .poll(async () => Number(await map.getAttribute("data-zoom")), { timeout: 8000 })
+            .toBeLessThan(zoom - 0.4);
+        }
+      } else {
+        await page.getByRole("button", { name: "Globe" }).click();
+      }
+      await expectGlobeCentered(page);
+
+      const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
+      const sonoma = manifest.runs.find((run) => run.title === "Lake Sonoma Marathon");
+      const tiny = manifest.runs.find((run) => run.title === "Zion Sunset Overlook");
+      expect(sonoma.city).toBe("sonoma");
+      expect(tiny.distanceM).toBeLessThan(3000);
+
+      await page.goto(`/runs?activity=${sonoma.id}`);
+      await ready(page);
+      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+      await expectRouteInView(page, sonoma);
+      await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(14.75);
+      await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeGreaterThan(9);
+      const openPad = (await map.getAttribute("data-pad")).split(",").map(Number);
+      if (viewport.name === "phone") expect(openPad[2]).toBeGreaterThan(160);
+      else expect(openPad[1]).toBeGreaterThan(280);
+      await expect(page.locator(".detail.open").getByRole("link", { name: "View on Strava" })).toHaveAttribute(
+        "href",
+        `https://www.strava.com/activities/${sonoma.stravaId}`,
+      );
+
+      const beforeClose = await map.evaluate((el, lngLat) => el._runsMap.project(lngLat), sonoma.mid);
+      await page.getByRole("button", { name: "Close" }).click();
+      await expect(page.locator(".detail.open")).toHaveCount(0);
+      await expect(map).toHaveAttribute("data-highlight", "");
+      await expect(map).toHaveAttribute("data-pad", "0,0,0,0");
+      const afterClose = await map.evaluate((el, lngLat) => el._runsMap.project(lngLat), sonoma.mid);
+      expect(Math.hypot(afterClose.x - beforeClose.x, afterClose.y - beforeClose.y)).toBeLessThan(8);
+
+      await page.getByRole("button", { name: "Globe" }).click();
+      await expectGlobeCentered(page);
+
+      await page.getByRole("button", { name: /Regions, / }).click();
+      await page.getByRole("radio", { name: "Sonoma", exact: true }).click();
+      await expect(map).toHaveAttribute("data-city", "sonoma");
+      await page.getByRole("button", { name: /^Runs in Sonoma \(/ }).click();
+      await page.locator("#run-chooser").getByRole("option", { name: /Lake Sonoma Marathon/ }).click();
+      await expectRouteInView(page, sonoma);
+      await page.keyboard.press("Escape");
+      await expect(page.locator(".detail.open")).toHaveCount(0);
+      await page.keyboard.press("Escape");
+      await expect(page.locator("#run-chooser")).toHaveCount(0);
+
+      await page.getByRole("button", { name: /Regions, / }).click();
+      await page.getByRole("radio", { name: "Sonoma", exact: true }).click();
+      await expect
+        .poll(async () => map.evaluate((el, lngLat) => el._runsMap.hitIds(lngLat), sonoma.mid), { timeout: 15000 })
+        .toContain(String(sonoma.id));
+      await clickLngLat(page, map, sonoma.mid);
+      await expectRouteInView(page, sonoma);
+      await page.getByRole("button", { name: "Close" }).click();
+      await expect(map).toHaveAttribute("data-pad", "0,0,0,0");
+
+      await page.goto(`/runs?activity=${tiny.id}`);
+      await ready(page);
+      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+      await expectRouteInView(page, tiny);
+      const tinyZoom = Number(await map.getAttribute("data-zoom"));
+      expect(tinyZoom).toBeLessThanOrEqual(15.05);
+      expect(tinyZoom).toBeGreaterThan(14.5);
     });
   }
 });

@@ -1,8 +1,11 @@
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { densityHeat } from "./density.js";
+import { boundsFromGeometry, routeCamera } from "./frame.js";
 import { REGION_ZOOM, WORLD_CENTER, WORLD_ZOOM, nearestCity, pitchForZoom } from "./globe.js";
 import { closerZoom } from "./pick.js";
+
+const ROUTE_EASE_MS = 850;
 
 const STYLE = "https://tiles.openfreemap.org/styles/positron";
 
@@ -235,6 +238,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
 
   let disposed = false;
   let swayState = "idle";
+  const geometryById = new Map();
   let restingBearing = null;
   let restingPitch = null;
   let removeMotionListener = null;
@@ -291,9 +295,15 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
 
   function syncProbe() {
     const current = map.getCenter();
+    const pad = map.getPadding() || {};
     mapEl.dataset.lng = current.lng.toFixed(5);
     mapEl.dataset.lat = current.lat.toFixed(5);
     mapEl.dataset.zoom = map.getZoom().toFixed(3);
+    mapEl.dataset.pitch = map.getPitch().toFixed(2);
+    mapEl.dataset.bearing = map.getBearing().toFixed(2);
+    mapEl.dataset.pad = [pad.top || 0, pad.right || 0, pad.bottom || 0, pad.left || 0]
+      .map((n) => Math.round(n))
+      .join(",");
     mapEl.dataset.city = cityId;
     mapEl.dataset.runs = String(runCount);
     if (layersReady) mapEl.dataset.map = "ready";
@@ -309,8 +319,14 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
   /* Pitch eases down only after the gesture ends. setPitch/jumpTo during a
      pinch calls stop(), which resets the touch handler and the zoom snaps back. */
   let pitching = false;
+  let suppressPitch = false;
+  /* A finger drag or pinch after the run was chosen owns the camera. */
+  let gestureSinceArm = false;
+  map.on("movestart", (event) => {
+    if (event.originalEvent) gestureSinceArm = true;
+  });
   function easePitchDown() {
-    if (pitching || map.isMoving()) return;
+    if (suppressPitch || pitching || map.isMoving()) return;
     const cap = pitchForZoom(map.getZoom(), camera().pitch);
     if (map.getPitch() <= cap + 0.5) return;
     pitching = true;
@@ -463,6 +479,64 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
     });
   }
 
+  function indexLines(lines) {
+    geometryById.clear();
+    for (const feature of lines?.features || []) {
+      const id = feature?.properties?.id;
+      if (id == null || !feature.geometry) continue;
+      geometryById.set(String(id), feature.geometry);
+    }
+  }
+
+  function paddingClear() {
+    const pad = map.getPadding() || {};
+    return (pad.top || 0) < 0.5 && (pad.right || 0) < 0.5 && (pad.bottom || 0) < 0.5 && (pad.left || 0) < 0.5;
+  }
+
+  /* Drop drawer padding without moving the pixels. The geographic point under
+     the canvas center stays there, so closing the sheet does not snap the map. */
+  function releaseFrame() {
+    if (disposed || paddingClear()) return;
+    const canvas = map.getCanvas();
+    const visual = map.unproject([canvas.clientWidth / 2, canvas.clientHeight / 2]);
+    suppressPitch = true;
+    try {
+      map.jumpTo({
+        center: [visual.lng, visual.lat],
+        zoom: map.getZoom(),
+        pitch: map.getPitch(),
+        bearing: map.getBearing(),
+        padding: { top: 0, right: 0, bottom: 0, left: 0 },
+      });
+    } finally {
+      suppressPitch = false;
+    }
+  }
+
+  function frameRoute(id, padding, reduced) {
+    if (disposed || gestureSinceArm) return;
+    const bounds = boundsFromGeometry(geometryById.get(String(id)));
+    const canvas = map.getCanvas();
+    const pad = {
+      top: padding?.top || 0,
+      right: padding?.right || 0,
+      bottom: padding?.bottom || 0,
+      left: padding?.left || 0,
+    };
+    const framed = routeCamera(bounds, { width: canvas.clientWidth, height: canvas.clientHeight }, pad);
+    if (!framed) return;
+    stopIdleSway();
+    map.easeTo({
+      center: framed.center,
+      zoom: framed.zoom,
+      pitch: 0,
+      bearing: 0,
+      padding: pad,
+      duration: reduced ? 0 : ROUTE_EASE_MS,
+      essential: true,
+    });
+  }
+
   const api = {
     resize() {
       map.resize();
@@ -478,6 +552,7 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
         ensureInteractions();
         layersReady = true;
       }
+      indexLines(lines);
       map.getSource("runs-lines").setData(lines);
       map.getSource("runs-heat").setData(densityHeat(lines));
       applyHighlight();
@@ -509,28 +584,23 @@ export async function mountRunsMap(mapEl, { center, zoom, onPick, onView }) {
     },
     frameWorld(reduced) {
       if (disposed) return;
+      releaseFrame();
       stopIdleSway();
       map.flyTo({
         center: WORLD_CENTER,
         zoom: WORLD_ZOOM,
         pitch: 0,
         bearing: 0,
+        padding: { top: 0, right: 0, bottom: 0, left: 0 },
         duration: reduced ? 0 : 1400,
         essential: true,
       });
     },
-    focus(lngLat, { reduced, phone }) {
-      if (disposed || !lngLat) return;
-      map.easeTo({
-        center: lngLat,
-        zoom: Math.max(map.getZoom(), 14.8),
-        pitch: framedPitch(),
-        bearing: framedBearing(),
-        padding: phone ? { top: 24, bottom: 320, left: 16, right: 16 } : { top: 48, bottom: 24, left: 24, right: 440 },
-        duration: reduced ? 0 : 650,
-        essential: true,
-      });
+    armFrame() {
+      gestureSinceArm = false;
     },
+    frameRoute,
+    releaseFrame,
     project(lngLat) {
       const point = map.project(lngLat);
       return { x: point.x, y: point.y };

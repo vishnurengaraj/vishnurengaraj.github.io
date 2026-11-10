@@ -3,6 +3,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useHead } from "@unhead/vue";
 import manifest from "../data/runs/manifest.json";
+import { occlusionPadding } from "../runs/frame.js";
 import { formatDate, formatDistance, formatElev, formatPace } from "../runs/format.js";
 import { REGION_ZOOM, nearestCity } from "../runs/globe.js";
 import { resolvePick } from "../runs/pick.js";
@@ -86,6 +87,43 @@ function queryValue(key) {
 
 function isPhone() {
   return window.matchMedia("(max-width: 640px)").matches;
+}
+
+/* Top controls, the open drawer, and any corner chrome that still sticks into
+   the visible map. Layout size, not the drawer's slide transform. */
+function framePadding() {
+  const map = mapEl.value;
+  const root = pageEl.value;
+  if (!map || !root) return occlusionPadding({ width: 0, height: 0 });
+  const mapBox = map.getBoundingClientRect();
+  let top = 0;
+  let right = 0;
+  let bottom = 0;
+  let left = 0;
+  for (const el of root.querySelectorAll(".globe-btn, .run-index, .regions-toggle")) {
+    const box = el.getBoundingClientRect();
+    top = Math.max(top, box.bottom - mapBox.top);
+  }
+  const drawer = root.querySelector(".detail.open");
+  if (drawer) {
+    if (isPhone()) bottom = Math.max(bottom, drawer.offsetHeight);
+    else right = Math.max(right, drawer.offsetWidth + (parseFloat(getComputedStyle(drawer).right) || 0));
+  }
+  const visibleBottom = mapBox.bottom - bottom;
+  const visibleRight = mapBox.right - right;
+  for (const el of root.querySelectorAll(".map-key, .maplibregl-ctrl-bottom-right, .maplibregl-ctrl-bottom-left")) {
+    const box = el.getBoundingClientRect();
+    if (box.top >= visibleBottom - 1 || box.left >= visibleRight - 1) continue;
+    bottom = Math.max(bottom, mapBox.bottom - box.top);
+  }
+  return occlusionPadding({
+    width: mapBox.width,
+    height: mapBox.height,
+    top,
+    right,
+    bottom,
+    left,
+  });
 }
 
 function prefersReduced() {
@@ -306,7 +344,7 @@ async function shareActivity() {
   showCopyStatus(ok ? "Copied" : "Copy failed");
 }
 
-async function openRun(id, lngLat, { skipUrl = false } = {}) {
+async function openRun(id, _lngLat, { skipUrl = false } = {}) {
   const summary = byId.get(id);
   if (!summary) return;
   const token = ++openToken;
@@ -317,22 +355,26 @@ async function openRun(id, lngLat, { skipUrl = false } = {}) {
   selected.value = { ...summary, companions: [], photos: [] };
   panel.value = true;
   mapApi?.highlight(id);
-  const at = lngLat || summary.mid;
-  mapApi?.focus(at, { reduced: prefersReduced(), phone: isPhone() });
+  mapApi?.armFrame();
   if (!skipUrl) publishActivity(id);
+  let detail = null;
   try {
     const res = await fetch(`/media/runs/activities/${encodeURIComponent(id)}.json`);
-    if (!res.ok || !alive || token !== openToken) return;
-    const detail = await res.json();
-    if (!alive || token !== openToken) return;
+    if (res.ok) detail = await res.json();
+  } catch {
+    detail = null;
+  }
+  if (!alive || token !== openToken) return;
+  if (detail) {
     selected.value = {
       ...summary,
       ...detail,
       stravaId: detail.stravaId || summary.stravaId || null,
     };
-  } catch {
-    /* Distance and pace already came from the index. */
   }
+  await nextTick();
+  if (!alive || token !== openToken || !panel.value) return;
+  mapApi?.frameRoute(id, framePadding(), prefersReduced());
 }
 
 function choose(run, event) {
@@ -407,6 +449,7 @@ function closePanel({ restore = true, skipUrl = false } = {}) {
   openToken += 1;
   panel.value = false;
   mapApi?.highlight(null);
+  mapApi?.releaseFrame();
   window.clearTimeout(copyTimer);
   copyStatus.value = "";
   const el = runOpener;
@@ -437,7 +480,12 @@ function onKey(event) {
 function onResize() {
   syncShareKind();
   window.clearTimeout(resizeTimer);
-  resizeTimer = window.setTimeout(() => mapApi?.resize(), 150);
+  resizeTimer = window.setTimeout(() => {
+    mapApi?.resize();
+    if (panel.value && selected.value?.id) {
+      mapApi.frameRoute(selected.value.id, framePadding(), prefersReduced());
+    }
+  }, 150);
 }
 
 async function startMap() {
@@ -474,7 +522,7 @@ async function startMap() {
   const deep = activityIdFromRoute();
   if (deep && byId.has(deep)) await openRun(deep);
   else if (deep) clearUnknownActivity();
-  if (swayBlocked) created.stopIdleSway();
+  if (swayBlocked || panel.value) created.stopIdleSway();
   else created.startIdleSway();
 }
 
