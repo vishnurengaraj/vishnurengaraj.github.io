@@ -71,11 +71,17 @@ html:has(.runs) #app {
   text-transform: uppercase;
 }
 
-.runs .globe-btn {
+.runs .map-tools {
   position: absolute;
   z-index: 6;
   top: calc(12px + env(safe-area-inset-top, 0px));
   left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.runs .globe-btn {
   min-height: 36px;
   padding: 0 14px;
   border: 1px solid rgba(45, 29, 122, 0.18);
@@ -89,13 +95,37 @@ html:has(.runs) #app {
   box-shadow: 0 2px 8px rgba(26, 16, 51, 0.12);
 }
 
+.runs .dice-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(45, 29, 122, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--primary);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(26, 16, 51, 0.12);
+}
+
+.runs .dice-btn svg {
+  display: block;
+}
+
+.runs .dice-btn:hover {
+  background: rgba(45, 29, 122, 0.06);
+}
+
 .runs .globe-btn.on {
   background: var(--primary);
   border-color: var(--primary);
   color: var(--on-primary);
 }
 
-.runs .globe-btn:focus-visible {
+.runs .globe-btn:focus-visible,
+.runs .dice-btn:focus-visible {
   outline: 3px solid var(--primary);
   outline-offset: 2px;
 }
@@ -233,7 +263,7 @@ html:has(.runs) #app {
 .runs .run-index {
   position: absolute;
   z-index: 6;
-  top: calc(56px + env(safe-area-inset-top, 0px));
+  top: calc(68px + env(safe-area-inset-top, 0px));
   left: 12px;
   max-width: min(280px, calc(100% - 24px));
   min-height: 36px;
