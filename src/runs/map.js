@@ -225,7 +225,6 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
     clickTolerance: 12,
     maxTileCacheZoomLevels: 16,
   });
-  if (arrival) map.getCanvas().style.visibility = "hidden";
   map.addControl(new maplibregl.NavigationControl({ showCompass: true, visualizePitch: true }), "bottom-right");
   map.addControl(new maplibregl.AttributionControl({ compact: false }), "bottom-left");
 
@@ -233,7 +232,7 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
   const geometryById = new Map();
   let arrivalState = arrival ? "globe" : "skipped";
   let arrivalTimer = 0;
-  let restoreWarm = null;
+  let warmAbort = null;
   let layersReady = false;
   let runCount = 0;
   let cityId = "";
@@ -273,6 +272,11 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
   try {
     addBuildings(map);
     map.setProjection({ type: "globe" });
+    map.once("render", () => {
+      const canvas = map.getCanvas();
+      if (!canvas || canvas.style.visibility === "hidden") return;
+      if (map.getZoom() < 3 && map.getPitch() < 1) mapEl.dataset.globe = "shown";
+    });
     map.setLight({
       anchor: "viewport",
       color: "#ffffff",
@@ -344,16 +348,12 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
     }
   }
 
-  /* The hidden LA visit must not retitle the region chip or ease the pitch. */
-  let quietCamera = false;
   map.on("move", syncProbe);
   map.on("moveend", () => {
-    if (!quietCamera) followRegion();
+    followRegion();
     syncProbe();
-    if (!quietCamera) {
-      const current = map.getCenter();
-      onView?.([current.lng, current.lat], map.getZoom());
-    }
+    const current = map.getCenter();
+    onView?.([current.lng, current.lat], map.getZoom());
     easePitchDown();
   });
   syncProbe();
@@ -365,120 +365,70 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
     cancelArrival({ stop: false });
   });
 
+  function showCanvas() {
+    if (disposed) return;
+    const canvas = map.getCanvas();
+    if (canvas) canvas.style.visibility = "";
+  }
+
   function cancelArrival({ stop = true } = {}) {
-    if (arrivalState === "done" || arrivalState === "skipped") return;
-    const playing = arrivalState === "playing";
-    arrivalState = "done";
-    syncIntro();
-    window.clearTimeout(arrivalTimer);
-    restoreWarm?.();
-    restoreWarm = null;
-    if (stop && playing && !disposed) map.stop();
+    const finished = arrivalState === "done" || arrivalState === "skipped";
+    if (!finished) {
+      const playing = arrivalState === "playing";
+      arrivalState = "done";
+      syncIntro();
+      window.clearTimeout(arrivalTimer);
+      warmAbort?.();
+      warmAbort = null;
+      if (stop && playing && !disposed) map.stop();
+    }
+    showCanvas();
   }
 
-  /* Wait until the camera we just jumped to has rendered. A same-turn
-     areTilesLoaded() still describes the previous view, so the check
-     happens on the next frame. The timeout keeps a failed fetch from
-     holding the globe. */
-  function whenSettled(ms) {
-    return new Promise((resolve) => {
-      let settled = false;
-      const finish = () => {
-        if (settled) return;
-        settled = true;
-        resolve();
-      };
-      window.setTimeout(finish, ms);
-      window.requestAnimationFrame(() => {
-        if (settled || disposed) {
-          finish();
-          return;
-        }
-        const tilesReady = typeof map.areTilesLoaded !== "function" || map.areTilesLoaded();
-        if (map.loaded() && !map.isMoving() && tilesReady) {
-          finish();
-          return;
-        }
-        map.once("idle", finish);
-      });
-    });
-  }
-
-  /* Bytes for the zooms the dive crosses. The arrival view itself is visited
-     below, because a fetch never enters the source cache. */
-  function prefetchApproach(canvas) {
-    const templates = map.getSource("openmaptiles")?.tiles || [];
-    const template = templates.find((url) => String(url).includes("{z}"));
-    if (!template) return;
+  /* Fetch the close-up tiles while the globe stays on screen. A camera jump
+     would either flash LA or hide the canvas. The flight waits for these
+     bytes, or for the timeout, and does not move until then. */
+  async function warmDestination() {
+    mapEl.dataset.warm = "warming";
     const home = map.getCenter();
+    const canvas = map.getCanvas();
     const tiles = approachTiles({
       from: [home.lng, home.lat],
       to: [arrival.center[0], arrival.center[1], arrival.zoom],
       width: canvas.clientWidth,
       height: canvas.clientHeight,
-    }).filter((tile) => tile.z >= 6 && tile.z <= 10);
-    for (const tile of tiles) {
-      fetch(expandTileURL(template, tile)).catch(() => {});
-    }
-  }
-
-  /* Visit the arrival camera while the canvas is hidden so those tiles enter
-     the source cache, then return to the globe. */
-  async function warmDestination() {
-    mapEl.dataset.warm = "warming";
-    const home = map.getCenter();
-    const canvas = map.getCanvas();
-    mapEl.dataset.warmTiles = String(
-      approachTiles({
-        from: [home.lng, home.lat],
-        to: [arrival.center[0], arrival.center[1], arrival.zoom],
-        width: canvas.clientWidth,
-        height: canvas.clientHeight,
-      }).length,
-    );
-    const homePose = {
-      center: [home.lng, home.lat],
-      zoom: map.getZoom(),
-      pitch: 0,
-      bearing: 0,
-      padding: { top: 0, right: 0, bottom: 0, left: 0 },
-    };
-    const reveal = () => {
-      if (disposed) return;
-      suppressPitch = true;
-      map.jumpTo(homePose);
-      suppressPitch = false;
-      canvas.style.visibility = "";
-      quietCamera = false;
-      restoreWarm = null;
-    };
-    restoreWarm = reveal;
-    canvas.style.visibility = "hidden";
-    quietCamera = true;
-    const tilt = camera();
-    suppressPitch = true;
-    map.jumpTo({
-      center: arrival.center,
-      zoom: arrival.zoom,
-      pitch: tilt.pitch,
-      bearing: tilt.bearing,
-      padding: { top: 0, right: 0, bottom: 0, left: 0 },
-    });
-    suppressPitch = false;
-    await whenSettled(2500);
-    if (disposed) return;
-    /* A region or a drag during the visit already owns the camera.
-       Jumping home again would wipe that move. */
-    if (arrivalState !== "globe") {
-      mapEl.dataset.warm = "failed";
-      if (canvas.style.visibility === "hidden") reveal();
+    }).filter((tile) => tile.z >= 10);
+    mapEl.dataset.warmTiles = String(tiles.length);
+    const templates = map.getSource("openmaptiles")?.tiles || [];
+    const template = templates.find((url) => String(url).includes("{z}"));
+    if (!template || !tiles.length) {
+      if (arrivalState === "globe") mapEl.dataset.warm = "timeout";
       return;
     }
-    const laLoaded = typeof map.areTilesLoaded !== "function" || map.areTilesLoaded();
-    reveal();
-    prefetchApproach(canvas);
-    await whenSettled(2000);
-    if (arrivalState === "globe") mapEl.dataset.warm = laLoaded ? "ready" : "timeout";
+    const controller = new AbortController();
+    warmAbort = () => controller.abort();
+    const fetches = tiles.map((tile) =>
+      fetch(expandTileURL(template, tile), { signal: controller.signal })
+        .then((res) => res.ok)
+        .catch(() => false),
+    );
+    let outcome = "timeout";
+    try {
+      outcome = await Promise.race([
+        Promise.all(fetches).then((oks) => (oks.every(Boolean) ? "ready" : "failed")),
+        new Promise((resolve) => {
+          window.setTimeout(() => resolve("timeout"), 2500);
+        }),
+      ]);
+    } catch {
+      outcome = "failed";
+    }
+    warmAbort = null;
+    if (disposed || arrivalState !== "globe") {
+      if (!disposed && arrivalState !== "globe") mapEl.dataset.warm = "failed";
+      return;
+    }
+    mapEl.dataset.warm = outcome;
   }
 
   function playArrival() {
@@ -760,7 +710,8 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
       disposed = true;
       arrivalState = "done";
       window.clearTimeout(arrivalTimer);
-      restoreWarm?.();
+      warmAbort?.();
+      warmAbort = null;
       map.remove();
     },
   };
