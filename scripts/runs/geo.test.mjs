@@ -5,7 +5,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
 import { assignCity } from "./cities.mjs";
-import { applyPrivacy, decodePolyline, distanceToMeters, haversine, moveMeters, pathLength } from "./geo.mjs";
+import { applyPrivacy, decodePolyline, densify, privacyWindow, distanceToMeters, haversine, moveMeters, pathLength } from "./geo.mjs";
 import { coordsFromTrackBytes, fitIsRun, isRunType, RUN_TYPES } from "./parse.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -60,6 +60,51 @@ test("optional zones hide a middle pass as well as the ends", () => {
   for (const line of parts) {
     for (const point of line) assert.ok(haversine(point, mid) > 60);
   }
+});
+
+function parkLoop(laps, sideM = 450, step = 10) {
+  // A square loop with the start at one corner, run `laps` times. Each lap
+  // drifts 0.5m east, the way repeated GPS laps never land on the same points.
+  const start = [-121.96, 37.4];
+  const coords = [];
+  for (let lap = 0; lap < laps; lap++) {
+    for (let d = 0; d < sideM * 4; d += step) {
+      const leg = Math.floor(d / sideM);
+      const t = d % sideM;
+      const [e, n] = [[t, 0], [sideM, t], [sideM - t, sideM], [0, sideM - t]][leg];
+      coords.push(moveMeters(start, e + lap * 0.5, n));
+    }
+  }
+  coords.push(start);
+  return coords;
+}
+
+test("a 21-lap loop near the start keeps its laps", () => {
+  const coords = parkLoop(21);
+  const parts = applyPrivacy(coords, { radiusM: 400 });
+  assert.ok(parts);
+  const kept = parts.reduce((sum, line) => sum + pathLength(line), 0);
+  assert.ok(kept > 0.9 * pathLength(coords), `kept ${kept} of ${pathLength(coords)}`);
+});
+
+test("the start and finish stretches of a loop are trimmed", () => {
+  const coords = parkLoop(21);
+  const parts = applyPrivacy(coords, { radiusM: 400 });
+  const start = coords[0];
+  const last = parts[parts.length - 1];
+  assert.ok(haversine(parts[0][0], start) >= 399, `first published point ${haversine(parts[0][0], start)}m from start`);
+  assert.ok(haversine(last[last.length - 1], start) >= 399);
+  const dense = densify(coords, 12);
+  const { head, tail } = privacyWindow(dense, 400);
+  assert.ok(head > 0 && tail < dense.length - 1);
+  // A coordinate in a hidden stretch may also occur mid-run; only points
+  // unique to the hidden stretches have to stay off the map.
+  const key = (point) => point.join(",");
+  const published = new Set(parts.flat().map(key));
+  const kept = new Set(dense.slice(head, tail + 1).map(key));
+  const onlyHidden = [...dense.slice(0, head), ...dense.slice(tail + 1)].map(key).filter((k) => !kept.has(k));
+  assert.ok(onlyHidden.length > 0);
+  for (const point of onlyHidden) assert.ok(!published.has(point), "a start/finish point was published");
 });
 
 test("city assignment keeps South Bay on LA and names away regions", () => {

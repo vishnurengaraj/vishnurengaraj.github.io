@@ -46,7 +46,7 @@ Photos are read from `{photos}/{activityId}/`. EXIF is stripped. Put private exp
 
 ## Privacy
 
-Every published line has a 400m radius removed around its first and last points (clamped to 300–500m with `--trim`). A short activity that never leaves that radius is dropped. An optional polygon file hides extra blocks: pass `--zones privacy-zones.geojson`, or drop `privacy-zones.geojson` next to `activities.csv`.
+Every published line is trimmed from its first point until it first leaves a 400m radius, and from its last point back until it last leaves that radius around the finish (clamped to 300–500m with `--trim`). Only those two stretches are hidden: later laps or an out-and-back that pass back near the start stay on the map, so a park loop run many times is drawn in full. A short activity that never leaves that radius is dropped. An optional polygon file hides extra blocks: pass `--zones privacy-zones.geojson`, or drop `privacy-zones.geojson` next to `activities.csv`.
 
 Tracks outside the metro list are named (Tokyo, Madrid, Michigan, Waco, the eastern Sierra, and so on). Adjacent cells that are the same place share one chip and one heatmap. A Globe button opens those regions as the same thermal glow, hotter where more activity is, and choosing one flies into that city's pitched map.
 

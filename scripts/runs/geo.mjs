@@ -180,27 +180,45 @@ export function pointInZones(point, zones) {
 }
 
 /**
+ * Indexes into `dense` of the first point after the track first leaves
+ * `radiusM` around its start, and the last point before it finally enters
+ * `radiusM` around its end. Everything outside [head, tail] is hidden.
+ */
+export function privacyWindow(dense, radiusM) {
+  const start = dense[0];
+  const end = dense[dense.length - 1];
+  let head = 0;
+  while (head < dense.length && haversine(dense[head], start) < radiusM) head++;
+  let tail = dense.length - 1;
+  while (tail >= 0 && haversine(dense[tail], end) < radiusM) tail--;
+  return { head, tail };
+}
+
+/**
  * Hide the start and end of a route.
- * A circle of `radiusM` (default 400, the middle of the 300–500m band) is
- * removed around the first and last points. Optional polygons do the same
- * for a known home block. What remains is published; short leftovers are dropped.
+ * The track is trimmed from its first point until it first leaves a circle of
+ * `radiusM` (default 400, the middle of the 300–500m band) around the start,
+ * and from its last point back until it last leaves the same circle around
+ * the end. Only those two stretches are removed: a lap or out-and-back that
+ * passes near the start later stays on the map, so a park loop run 21 times
+ * is drawn in full. Optional polygons (`zones`) hide every pass, anywhere in
+ * the activity. Short leftovers are dropped.
  * Returns an array of polylines, or null when nothing safe is left.
  */
 export function applyPrivacy(coords, { radiusM = 400, zones = null, minPartM = 80, minTotalM = 150 } = {}) {
   if (!coords || coords.length < 2) return null;
   const dense = densify(coords, 12);
-  const start = dense[0];
-  const end = dense[dense.length - 1];
-  const hidden = (point) =>
-    haversine(point, start) < radiusM || haversine(point, end) < radiusM || pointInZones(point, zones);
+  const { head, tail } = privacyWindow(dense, radiusM);
+  if (head > tail) return null;
   const parts = [];
   let current = [];
   const flush = () => {
     if (current.length >= 2 && pathLength(current) >= minPartM) parts.push(simplify(current, 7));
     current = [];
   };
-  for (const point of dense) {
-    if (hidden(point)) flush();
+  for (let i = head; i <= tail; i++) {
+    const point = dense[i];
+    if (pointInZones(point, zones)) flush();
     else current.push(point);
   }
   flush();
