@@ -205,7 +205,9 @@ html:has(.runs) #app {
 
 .runs .chips button:focus-visible,
 .runs .chooser button:focus-visible,
-.runs .close:focus-visible {
+.runs .close:focus-visible,
+.runs .strava-link:focus-visible,
+.runs .share-btn:focus-visible {
   outline: 3px solid var(--primary);
   outline-offset: 2px;
 }
@@ -439,6 +441,54 @@ html:has(.runs) #app {
 
 .runs .run-elev {
   font-variant-numeric: tabular-nums;
+}
+
+.runs .run-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.runs .strava-link,
+.runs .share-btn {
+  min-height: 40px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1.2;
+}
+
+.runs .strava-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.runs .strava-link:visited {
+  color: var(--primary);
+}
+
+.runs .strava-link:hover {
+  text-decoration-thickness: 2px;
+}
+
+.runs .share-btn {
+  min-width: 7.5rem;
+  padding: 0 14px;
+  border: 1px solid rgba(45, 29, 122, 0.18);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--primary);
+  cursor: pointer;
+}
+
+.runs .share-btn:hover {
+  background: rgba(45, 29, 122, 0.06);
 }
 
 .runs .photo-strip {

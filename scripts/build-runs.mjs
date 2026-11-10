@@ -30,10 +30,12 @@ import {
   activitiesFromGeojson,
   activityFromFit,
   activityFromRecord,
+  claimStravaId,
   isRunType,
   listPhotoFiles,
   loadExport,
   pairsFromMaster,
+  publicStravaId,
   readJsonFlexible,
   resolveFitFile,
 } from "./runs/parse.mjs";
@@ -75,6 +77,7 @@ function mergeActivity(map, incoming, { replaceGeometry }) {
     }
   }
   if (incoming.companions?.length && !prev.companions?.length) prev.companions = incoming.companions;
+  if (incoming.stravaId && !prev.stravaId) prev.stravaId = incoming.stravaId;
   if (incoming.samplePhoto) prev.samplePhoto = true;
   if (incoming.coords?.length >= 2 && (replaceGeometry || !prev.coords?.length)) {
     prev.coords = incoming.coords;
@@ -93,20 +96,20 @@ async function loadSources(flags) {
     const records = await readJsonFlexible(path.resolve(flags.meta));
     for (const record of records) {
       const activity = activityFromRecord(record);
-      if (activity) mergeActivity(map, activity, { replaceGeometry: false });
+      if (activity) mergeActivity(map, claimStravaId(activity), { replaceGeometry: false });
     }
   }
   if (flags.export) {
     for (const activity of await loadExport(path.resolve(flags.export))) {
       activity.geometrySource = "strava";
-      mergeActivity(map, activity, { replaceGeometry: true });
+      mergeActivity(map, claimStravaId(activity), { replaceGeometry: true });
     }
   }
   if (flags.geojson) {
     const collection = JSON.parse(await readFile(path.resolve(flags.geojson), "utf8"));
     for (const activity of activitiesFromGeojson(collection)) {
       activity.geometrySource = "strava";
-      mergeActivity(map, activity, { replaceGeometry: true });
+      mergeActivity(map, claimStravaId(activity), { replaceGeometry: true });
     }
   }
   if (flags.streams) {
@@ -115,7 +118,7 @@ async function loadSources(flags) {
       const activity = activityFromRecord(record);
       if (!activity) continue;
       activity.geometrySource = "strava";
-      mergeActivity(map, activity, { replaceGeometry: true });
+      mergeActivity(map, claimStravaId(activity), { replaceGeometry: true });
     }
   }
   if (flags.garmin) {
@@ -128,7 +131,7 @@ async function loadSources(flags) {
       if (existing?.coords?.length >= 2) continue;
       const file = await resolveFitFile(garminDir, pair);
       if (!file) continue;
-      const activity = await activityFromFit(file, pair.strava);
+      const activity = await activityFromFit(file, pair.strava, { stravaId: pair.strava });
       if (!activity) continue;
       mergeActivity(map, activity, { replaceGeometry: false });
     }
@@ -235,6 +238,7 @@ async function main() {
       continue;
     }
     const id = safeId(activity.id);
+    const stravaId = publicStravaId(activity);
     const flat = parts.flat();
     const start = raw[0];
     const end = raw[raw.length - 1];
@@ -253,6 +257,7 @@ async function main() {
     const photos = await writePhotos({ ...activity, id }, photosDir);
     const summary = {
       id,
+      ...(stravaId ? { stravaId } : {}),
       city: city.id,
       title: activity.title || "Run",
       type: normalizeSport(activity.type) || "Run",

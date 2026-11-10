@@ -468,6 +468,158 @@ test.describe("activity photos", () => {
   }
 });
 
+async function plainRuns(page) {
+  await expect
+    .poll(() => {
+      const url = new URL(page.url());
+      return url.pathname === "/runs" && !url.searchParams.has("activity") && !url.searchParams.has("run");
+    })
+    .toBe(true);
+}
+
+async function expectFramed(page, run) {
+  const map = page.locator("#runs-map");
+  const card = page.locator(".detail.open");
+  await expect(card.locator("h2")).toHaveText(run.title);
+  await expect(map).toHaveAttribute("data-highlight", String(run.id));
+  await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeGreaterThanOrEqual(14.5);
+  await expect.poll(async () => Number(await map.getAttribute("data-lng"))).toBeCloseTo(run.mid[0], 1);
+  await expect.poll(async () => Number(await map.getAttribute("data-lat"))).toBeCloseTo(run.mid[1], 1);
+  const point = await map.evaluate((el, lngLat) => el._runsMap.project(lngLat), run.mid);
+  const box = await map.boundingBox();
+  expect(point.x).toBeGreaterThan(8);
+  expect(point.y).toBeGreaterThan(8);
+  expect(point.x).toBeLessThan(box.width - 8);
+  expect(point.y).toBeLessThan(box.height - 8);
+}
+
+test.describe("activity link and share url", () => {
+  test.describe.configure({ timeout: 120_000 });
+
+  for (const viewport of [
+    { name: "desktop", width: 1440, height: 900 },
+    { name: "phone", width: 390, height: 844 },
+  ]) {
+    test(`${viewport.name} opens a run, reloads that url, and falls back on a bad id`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.addInitScript(() => {
+        window.__copied = [];
+        window.__shared = [];
+        const clipboard = {
+          writeText: async (text) => {
+            window.__copied.push(text);
+          },
+        };
+        Object.defineProperty(navigator, "clipboard", { configurable: true, value: clipboard });
+        navigator.share = async (data) => {
+          window.__shared.push(data);
+        };
+      });
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto("/runs");
+      await ready(page);
+      const map = page.locator("#runs-map");
+      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+
+      const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
+      const humboldt = manifest.runs.find((run) => run.title.includes("Humboldt"));
+      expect(humboldt.stravaId).toBe(humboldt.id);
+
+      await page.getByRole("button", { name: /^Runs in LA \(/ }).click();
+      const option = page.locator("#run-chooser").getByRole("option").first();
+      const title = (await option.locator(".chooser-title").innerText()).trim();
+      const run = manifest.runs.find((item) => item.title === title && item.city === "la");
+      await option.click();
+      const card = page.locator(".detail.open");
+      await expect(card.locator("h2")).toHaveText(title);
+      await expect.poll(() => new URL(page.url()).searchParams.get("activity")).toBe(String(run.id));
+      await expect(page).toHaveTitle(`${title} · Runs · Vishnu Rengaraj`);
+
+      const strava = card.getByRole("link", { name: "View on Strava" });
+      await expect(strava).toHaveAttribute("href", `https://www.strava.com/activities/${run.stravaId}`);
+      await expect(strava).toHaveAttribute("target", "_blank");
+      await expect(strava).toHaveAttribute("rel", "noopener");
+      await expect(strava).toBeVisible();
+
+      await page.keyboard.press("Tab");
+      await expect(strava).toBeFocused();
+      const linkStyle = await strava.evaluate((el) => {
+        const style = getComputedStyle(el);
+        return {
+          outlineWidth: parseFloat(style.outlineWidth),
+          outlineStyle: style.outlineStyle,
+          fontSize: parseFloat(style.fontSize),
+          textTransform: style.textTransform,
+        };
+      });
+      expect(linkStyle.outlineWidth).toBeGreaterThanOrEqual(3);
+      expect(linkStyle.outlineStyle).not.toBe("none");
+      expect(linkStyle.fontSize).toBeGreaterThanOrEqual(12);
+      expect(linkStyle.textTransform).toBe("none");
+
+      const share = card.getByRole("button", { name: viewport.name === "phone" ? "Share" : "Copy link" });
+      await expect(share).toBeVisible();
+      const shareStyle = await share.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+      expect(shareStyle).toBeGreaterThanOrEqual(12);
+      await share.click();
+      if (viewport.name === "phone") {
+        await expect.poll(() => page.evaluate(() => window.__shared.map((item) => item.url))).toEqual([
+          `http://127.0.0.1:5173/runs?activity=${run.id}`,
+        ]);
+        expect(await page.evaluate(() => window.__copied)).toEqual([]);
+      } else {
+        await expect(card.getByRole("button", { name: "Copied" })).toBeVisible();
+        await expect.poll(() => page.evaluate(() => window.__copied)).toEqual([
+          `http://127.0.0.1:5173/runs?activity=${run.id}`,
+        ]);
+        expect(await page.evaluate(() => window.__shared)).toEqual([]);
+      }
+
+      await page.getByRole("button", { name: "Close" }).click();
+      await plainRuns(page);
+      await expect(page.locator(".detail.open")).toHaveCount(0);
+      await page.goForward();
+      await expect(card.locator("h2")).toHaveText(title);
+      await expect.poll(() => new URL(page.url()).searchParams.get("activity")).toBe(String(run.id));
+
+      await page.reload();
+      await ready(page);
+      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+      await expectFramed(page, run);
+      await expect(page.locator(".detail.open").getByRole("link", { name: "View on Strava" })).toHaveAttribute(
+        "href",
+        `https://www.strava.com/activities/${run.stravaId}`,
+      );
+
+      await page.goBack();
+      await plainRuns(page);
+      await expect(page.locator(".detail.open")).toHaveCount(0);
+      await expect(page).toHaveTitle("Runs · Vishnu Rengaraj");
+
+      await page.goto(`/runs?run=${humboldt.id}`);
+      await ready(page);
+      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+      await expect.poll(() => new URL(page.url()).searchParams.get("activity")).toBe(String(humboldt.id));
+      await expect(page.locator(".detail.open").getByRole("link", { name: "View on Strava" })).toHaveAttribute(
+        "href",
+        `https://www.strava.com/activities/${humboldt.stravaId}`,
+      );
+      await expectFramed(page, humboldt);
+      await page.getByRole("button", { name: "Close" }).click();
+      await plainRuns(page);
+      await expect(page.locator(".detail.open")).toHaveCount(0);
+
+      await page.goto("/runs?activity=not-a-real-run");
+      await ready(page);
+      await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+      await plainRuns(page);
+      await expect(page.locator(".detail.open")).toHaveCount(0);
+      await expect(map).toHaveAttribute("data-city", "la");
+      await expect(map).toHaveAttribute("data-highlight", "");
+    });
+  }
+});
+
 test.describe("runs stays off the main nav", () => {
   for (const viewport of VIEWPORTS) {
     test(`${viewport.name} links runs from the footer only`, async ({ page }) => {
