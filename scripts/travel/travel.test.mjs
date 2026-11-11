@@ -55,22 +55,22 @@ test("ranking order, slugs, drive trips, and the Level 3 advisory", () => {
   assert.deepEqual(
     shipped.trips.map((trip) => trip.slug),
     [
-      "mexico-city",
       "tucson",
+      "mexico-city",
       "oaxaca",
-      "naples",
-      "andalusia",
       "joshua-tree",
-      "taiwan",
+      "andalusia",
+      "naples",
       "lisbon",
-      "hong-kong",
+      "taiwan",
       "puerto-rico",
+      "hong-kong",
       "big-island",
       "madeira",
-      "tenerife",
-      "maui",
       "la-paz",
+      "tenerife",
       "puerto-vallarta",
+      "maui",
       "guanacaste",
     ],
   );
@@ -97,6 +97,13 @@ test("ranking order, slugs, drive trips, and the Level 3 advisory", () => {
   assert.match(tripBySlug(shipped.trips, "naples").week, /guided out-and-back/);
   assert.match(tripBySlug(shipped.trips, "andalusia").week, /closed Mondays and Jan 11-19/);
   assert.match(tripBySlug(shipped.trips, "madeira").week, /EUR 10\.50/);
+  assert.match(tripBySlug(shipped.trips, "tucson").week, /Wasson Peak/);
+  assert.match(tripBySlug(shipped.trips, "tucson").week, /Arizona-Sonora Desert Museum/);
+  assert.match(tripBySlug(shipped.trips, "joshua-tree").week, /Ryan Mountain/);
+  assert.match(tripBySlug(shipped.trips, "joshua-tree").week, /Palm Springs Aerial Tramway/);
+  assert.match(tripBySlug(shipped.trips, "taiwan").week, /Yangmingshan/);
+  assert.match(tripBySlug(shipped.trips, "taiwan").week, /Teapot Mountain/);
+  assert.match(tripBySlug(shipped.trips, "taiwan").week, /Tainan/);
 });
 
 test("Bookings' Jan 5–12 totals and fares match the Sheet", () => {
@@ -166,26 +173,29 @@ test("the page data keeps noindex helpers and the mild-weather criterion", () =>
 
 test("computed weighted scores match the Scores tab and Bookings' totals", () => {
   const want = {
-    "mexico-city": 8.2,
-    tucson: 7.7,
-    oaxaca: 7.65,
-    naples: 7.0,
-    andalusia: 6.98,
-    "joshua-tree": 6.95,
-    taiwan: 6.85,
-    lisbon: 6.73,
-    "hong-kong": 6.7,
-    "puerto-rico": 6.28,
-    "big-island": 6.23,
-    madeira: 6.13,
-    tenerife: 5.88,
-    maui: 5.75,
-    "la-paz": 5.68,
-    "puerto-vallarta": 5.55,
-    guanacaste: 4.68,
+    tucson: 8.03,
+    "mexico-city": 7.9,
+    oaxaca: 7.55,
+    "joshua-tree": 7.23,
+    andalusia: 6.6,
+    naples: 6.5,
+    lisbon: 6.43,
+    taiwan: 6.3,
+    "puerto-rico": 6.23,
+    "hong-kong": 6.05,
+    "big-island": 6.03,
+    madeira: 5.9,
+    "la-paz": 5.65,
+    tenerife: 5.63,
+    "puerto-vallarta": 5.58,
+    maui: 5.4,
+    guanacaste: 4.63,
   };
   assert.equal(weightLegend(shipped.weights), shipped.weightLegend);
   assert.match(shipped.weightLegend, /Outdoors 25%/);
+  assert.match(shipped.weightLegend, /Food 15%/);
+  assert.match(shipped.weightLegend, /Museums & City 15%/);
+  assert.match(shipped.weightLegend, /Price 25%/);
   for (const [slug, total] of Object.entries(want)) {
     const trip = tripBySlug(shipped.trips, slug);
     assert.equal(trip.scores.weighted, total, slug);
