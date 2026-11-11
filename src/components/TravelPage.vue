@@ -4,7 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useHead } from "@unhead/vue";
 import data from "../data/travel/trips.json";
 import { occlusionPadding } from "../runs/frame.js";
-import { costRows, formatRange, formatUsd, totalFor, tripBySlug } from "../travel/trips.js";
+import { costRows, formatRange, formatScore, formatUsd, hasTotals, sortTrips, totalFor, tripBySlug } from "../travel/trips.js";
 import "../styles/travel.css";
 
 const route = useRoute();
@@ -17,10 +17,17 @@ const loadError = ref("");
 const copyStatus = ref("");
 const announce = ref("");
 
-const trips = data.trips;
+const allTrips = data.trips;
 const windowIds = data.windows.map((w) => w.id);
-const rankedCount = trips.filter((t) => t.rank !== "HM").length;
-const mentionCount = trips.length - rankedCount;
+const rankedCount = allTrips.length;
+const windowPriced = (id) => data.windows.find((w) => w.id === id)?.priced !== false;
+const sortKey = ref("weighted");
+const sortOptions = [
+  { id: "weighted", label: "Weighted" },
+  ...data.weights.categories.map((cat) => ({ id: cat.key, label: cat.label })),
+  { id: "name", label: "Name" },
+];
+const trips = computed(() => sortTrips(allTrips, sortKey.value));
 
 function queryValue(key) {
   const raw = route.query[key];
@@ -33,19 +40,24 @@ function windowFromRoute() {
 }
 
 const windowId = ref(windowFromRoute());
-const selectedSlug = ref(tripBySlug(trips, String(queryValue("dest") || ""))?.slug || "");
-const selected = computed(() => tripBySlug(trips, selectedSlug.value));
+const selectedSlug = ref(tripBySlug(trips.value, String(queryValue("dest") || ""))?.slug || "");
+const selected = computed(() => tripBySlug(trips.value, selectedSlug.value));
 const windowLabel = computed(() => data.windows.find((w) => w.id === windowId.value)?.label || "");
 const rows = computed(() => (selected.value ? costRows(selected.value, windowId.value) : []));
-const selectedIndex = computed(() => trips.findIndex((t) => t.slug === selectedSlug.value));
-const prevTrip = computed(() => (selectedIndex.value > 0 ? trips[selectedIndex.value - 1] : null));
+const selectedIndex = computed(() => trips.value.findIndex((t) => t.slug === selectedSlug.value));
+const prevTrip = computed(() => (selectedIndex.value > 0 ? trips.value[selectedIndex.value - 1] : null));
 const nextTrip = computed(() =>
-  selectedIndex.value >= 0 && selectedIndex.value < trips.length - 1 ? trips[selectedIndex.value + 1] : null,
+  selectedIndex.value >= 0 && selectedIndex.value < trips.value.length - 1 ? trips.value[selectedIndex.value + 1] : null,
 );
-const isDrive = computed(() => selected.value?.breakdown.flights.jan5 === 0 && selected.value?.breakdown.flights.jan2 === 0);
+const isDrive = computed(() => !!selected.value?.drive);
+const priced = computed(() => !!(selected.value && hasTotals(selected.value, windowId.value)));
 
 function rankLabel(trip) {
-  return trip.rank === "HM" ? "Honorable mention" : `#${trip.rank}`;
+  return `#${trip.rank}`;
+}
+
+function alsoRan(trip) {
+  return Number(trip.rank) > 10;
 }
 
 const headTitle = computed(() =>
@@ -53,7 +65,7 @@ const headTitle = computed(() =>
 );
 const headDescription = computed(() => {
   if (!selected.value) {
-    return "Warm-weather trip options for January 2027, ranked and priced for 2 people and 7 nights. Prices as of Nov 11, 2026.";
+    return "January 2027 trip options, ranked for mild weather and priced for 2 people and 7 nights. Prices as of Nov 11, 2026.";
   }
   const t = selected.value;
   return `${rankLabel(t)}: ${t.name}. ${formatRange(totalFor(t, windowId.value))} for 2 people, 7 nights (${windowLabel.value}). Prices as of Nov 11, 2026.`;
@@ -79,6 +91,26 @@ const PIN_ROOM = 28;
 
 function isPhone() {
   return window.matchMedia("(max-width: 640px)").matches;
+}
+
+/** On a tall phone the map canvas is taller than a world at the zoom that
+ *  fits every pin, and MapLibre will not zoom out past that. Shrink the
+ *  canvas so the overview can show the whole set. */
+function layoutMap() {
+  const el = mapEl.value;
+  if (!el) return;
+  if (!isPhone()) {
+    el.style.top = "";
+    el.style.bottom = "";
+    el.style.height = "";
+    return;
+  }
+  const board = pageEl.value?.querySelector(".board");
+  const visible = board ? board.getBoundingClientRect().top : window.innerHeight * 0.7;
+  const maxH = Math.ceil((window.innerWidth * 360) / 290) + 8;
+  el.style.bottom = "auto";
+  el.style.top = "0px";
+  el.style.height = `${Math.min(Math.max(visible, 280), maxH)}px`;
 }
 
 function prefersReduced() {
@@ -141,7 +173,7 @@ function viaKeyboard(event) {
 }
 
 async function pick(slug, { from = null, fly = true, instant = false } = {}) {
-  const trip = tripBySlug(trips, slug);
+  const trip = tripBySlug(trips.value, slug);
   if (!trip) return;
   if (from) opener = from;
   selectedSlug.value = trip.slug;
@@ -230,6 +262,7 @@ function onKey(event) {
 function onResize() {
   window.clearTimeout(resizeTimer);
   resizeTimer = window.setTimeout(() => {
+    layoutMap();
     mapApi?.resize();
     if (selectedSlug.value) mapApi?.flyTo(selectedSlug.value, framePadding());
     else mapApi?.frameAll(framePadding(PIN_ROOM), { animate: false });
@@ -250,10 +283,10 @@ async function startMap() {
   if (!alive || !mapEl.value) return;
   try {
     mapApi = await mountTravelMap(mapEl.value, {
-      trips,
+      trips: allTrips,
       home: data.home,
-      center: [-118, 24],
-      zoom: 2,
+      center: [-20, 25],
+      zoom: 1.2,
       onPick: (slug) => pick(slug, { from: mapEl.value }),
     });
   } catch (error) {
@@ -267,6 +300,8 @@ async function startMap() {
     mapApi = null;
     return;
   }
+  layoutMap();
+  mapApi.resize();
   mapApi.frameAll(framePadding(PIN_ROOM), { animate: false });
   if (selectedSlug.value) {
     mapApi.select(selectedSlug.value);
@@ -280,7 +315,7 @@ watch(
   ([dest, dates]) => {
     const want = windowIds.includes(String(dates || "")) ? String(dates) : data.defaultWindow;
     if (want !== windowId.value) windowId.value = want;
-    const slug = tripBySlug(trips, String(dest || ""))?.slug || "";
+    const slug = tripBySlug(trips.value, String(dest || ""))?.slug || "";
     if (slug === selectedSlug.value) return;
     if (slug) pick(slug);
     else closeCard({ restore: false });
@@ -323,7 +358,7 @@ onUnmounted(() => {
       <header class="topbar">
         <h1>January trips</h1>
         <p class="sub">
-          {{ rankedCount }} ranked options and {{ mentionCount }} honorable mention, for 2 people and 7 nights
+          {{ rankedCount }} trip options, scored for 2 people and 7 nights
         </p>
         <fieldset class="dates">
           <legend class="sr-only">Travel dates</legend>
@@ -352,6 +387,14 @@ onUnmounted(() => {
           <span class="list-chev" aria-hidden="true"></span>
         </button>
         <h2 id="rank-heading" class="board-heading">Ranking · {{ windowLabel }}</h2>
+        <p class="list-weights">{{ data.weightLegend }}</p>
+        <div class="sort">
+          <label for="travel-sort">Sort</label>
+          <select id="travel-sort" v-model="sortKey">
+            <option v-for="opt in sortOptions" :key="opt.id" :value="opt.id">{{ opt.label }}</option>
+          </select>
+        </div>
+        <p v-if="!windowPriced(windowId)" class="window-note">{{ data.missingWindowNote }}</p>
         <ol id="rank-list" class="rank-list" @keydown="onListKey">
           <li v-for="trip in trips" :key="trip.slug">
             <button
@@ -361,14 +404,15 @@ onUnmounted(() => {
               :class="{ on: selectedSlug === trip.slug }"
               @click="pick(trip.slug, { from: $event.currentTarget, instant: viaKeyboard($event) })"
             >
-              <span class="rank-badge" :class="{ hm: trip.rank === 'HM' }" aria-hidden="true">{{ trip.rank }}</span>
+              <span class="rank-badge" :class="{ also: alsoRan(trip) }" aria-hidden="true">{{ trip.rank }}</span>
               <span class="rank-text">
                 <span class="rank-name">
                   <span class="sr-only">{{ rankLabel(trip) }}: </span>{{ trip.name }}
                 </span>
                 <span class="rank-meta">
+                  <span class="rank-score" :aria-label="`Score ${formatScore(trip.scores.weighted)}`">{{ formatScore(trip.scores.weighted) }}</span>
                   <span class="rank-cost">{{ formatRange(totalFor(trip, windowId)) }}</span>
-                  <span v-if="trip.plan === 'drive'" class="rank-tag">drive</span>
+                  <span v-if="trip.drive" class="rank-tag">drive</span>
                   <span v-if="trip.advisoryLevel >= 3" class="rank-tag warn">Level 3 advisory</span>
                 </span>
               </span>
@@ -402,11 +446,21 @@ onUnmounted(() => {
       <button v-show="selected" class="close" type="button" aria-label="Close" @click="closeCard()">×</button>
       <div v-if="selected" class="card-body">
         <p class="eyebrow">
-          <span class="rank-badge big" :class="{ hm: selected.rank === 'HM' }" aria-hidden="true">{{ selected.rank }}</span>
-          {{ selected.rank === "HM" ? "Honorable mention" : `Ranked #${selected.rank} of ${rankedCount}` }}<template v-if="selected.tag && selected.tag !== 'honorable mention'"> · {{ selected.tag }}</template>
+          <span class="rank-badge big" :class="{ also: alsoRan(selected) }" aria-hidden="true">{{ selected.rank }}</span>
+          {{ `Ranked #${selected.rank} of ${rankedCount}` }}<template v-if="selected.tag"> · {{ selected.tag }}</template>
         </p>
         <h2 class="card-title">{{ selected.name }}</h2>
         <p v-if="selected.plan" class="plan">{{ selected.plan }}</p>
+
+        <div class="score-row">
+          <div class="score" :aria-label="`Weighted score ${formatScore(selected.scores.weighted)}`">{{ formatScore(selected.scores.weighted) }}</div>
+          <ul class="score-chips">
+            <li v-for="cat in data.weights.categories" :key="cat.key">
+              <span class="chip-val">{{ selected.scores[cat.key] }}</span>
+              <span class="chip-lbl">{{ cat.label }}</span>
+            </li>
+          </ul>
+        </div>
 
         <p v-if="selected.advisoryLevel >= 3" class="advisory" role="note">
           <strong>Travel advisory</strong>
@@ -416,12 +470,10 @@ onUnmounted(() => {
         <div class="cost">
           <p class="cost-total">{{ formatRange(totalFor(selected, windowId)) }}</p>
           <p class="cost-sub">Total for 2, 7 nights · {{ windowLabel }} · estimate</p>
-          <p v-if="windowId === 'jan2' && !isDrive" class="cost-note">
-            Jan 2–9 changes only the flight price. Lodging prices are from a Jan 5–12 search.
-          </p>
+          <p v-if="!priced" class="cost-note">{{ data.missingWindowNote }}</p>
         </div>
 
-        <table class="breakdown">
+        <table v-if="priced" class="breakdown">
           <caption class="sr-only">Cost breakdown, {{ windowLabel }}</caption>
           <thead>
             <tr>
@@ -448,10 +500,8 @@ onUnmounted(() => {
             </tr>
           </tfoot>
         </table>
-        <details class="basis">
-          <summary>Basis and notes</summary>
-          <p>{{ selected.breakdown.basis }}</p>
-        </details>
+        <p class="pay-note">{{ data.paymentNote }}</p>
+        <p v-if="selected.cardPoints" class="card-points">{{ selected.cardPoints }}</p>
 
         <dl class="facts">
           <div>
@@ -459,39 +509,41 @@ onUnmounted(() => {
             <dd>{{ selected.weather }}</dd>
           </div>
           <div>
-            <dt>{{ isDrive ? "Drive from LA" : "Flight from LAX" }}</dt>
-            <dd>{{ selected.travelTime }}</dd>
+            <dt>{{ isDrive ? "Drive from LA" : "From LAX" }}</dt>
+            <dd>{{ selected.laxFlight }}</dd>
           </div>
           <div>
-            <dt>Best dates</dt>
-            <dd>{{ selected.bestDates }}</dd>
+            <dt>From DTW</dt>
+            <dd>{{ selected.dtwFlight }}</dd>
           </div>
         </dl>
 
-        <h3>Why it’s good</h3>
+        <h3>Why this place</h3>
         <p>{{ selected.why }}</p>
-        <h3>Top hikes</h3>
-        <ul class="hikes">
-          <li v-for="hike in selected.hikes" :key="hike">{{ hike }}</li>
-        </ul>
-        <h3>Museums and food</h3>
-        <p>{{ selected.museumsFood }}</p>
-        <template v-if="selected.advisoryLevel < 3 || !selected.advisoryLevel">
-          <h3>Downsides</h3>
-          <p>{{ selected.downsides }}</p>
-        </template>
+        <h3>What a week looks like</h3>
+        <p>{{ selected.week }}</p>
 
-        <section v-if="selected.itinerary" class="itinerary" aria-labelledby="itin-heading">
-          <h3 id="itin-heading">Sample itinerary · Jan 5–12</h3>
-          <ol>
-            <li v-for="day in selected.itinerary.days" :key="day.day">
-              <span class="day">{{ day.day }}</span>
-              <span>{{ day.plan }}</span>
-            </li>
-          </ol>
-          <p v-if="selected.itinerary.bookAhead" class="book-ahead">
-            <strong>Book ahead:</strong> {{ selected.itinerary.bookAhead }}
-          </p>
+        <section class="safety" aria-labelledby="safety-heading">
+          <h3 id="safety-heading">Safety</h3>
+          <dl>
+            <div>
+              <dt>Advisory</dt>
+              <dd>{{ selected.safety.advisory }}</dd>
+            </div>
+            <div v-if="selected.safety.consensus">
+              <dt>Traveler consensus</dt>
+              <dd>{{ selected.safety.consensus }}</dd>
+            </div>
+            <div v-if="selected.safety.risks">
+              <dt>Top risks</dt>
+              <dd>{{ selected.safety.risks }}</dd>
+            </div>
+            <div v-if="selected.safety.stay">
+              <dt>Where to stay</dt>
+              <dd>{{ selected.safety.stay }}</dd>
+            </div>
+          </dl>
+          <p v-if="!selected.safety.researched" class="safety-note">{{ data.safetyHowToRead }}</p>
         </section>
 
         <section class="sources" aria-labelledby="src-heading">

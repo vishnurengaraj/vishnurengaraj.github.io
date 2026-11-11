@@ -1,15 +1,23 @@
 {
-  "_note": "Not from the Sheet: URL slug, pin label, map position, and which Sources-tab rows apply. Every price, temperature, time, and description comes from sheet/*.csv via scripts/travel/build-travel.mjs.",
+  "_note": "Not from the Sheet: URL slug, pin label, map position, pin nudge for the zoomed-out view, drive flag, advisory highlight, and which Sources rows apply. Every price, temperature, time, and description comes from sheet/*.csv via scripts/travel/build-travel.mjs.",
   "home": { "label": "LAX", "center": [-118.4085, 33.9416] },
   "places": [
-    { "rank": "1", "slug": "big-island", "short": "Big Island", "center": [-155.52, 19.6], "nudge": [14,  12], "itineraryColumn": 1, "sources": ["flights", "lodging", "noaa", "era5", "hawaii-tax", "kilauea", "havo-fees", "kayak"] },
-    { "rank": "2", "slug": "oaxaca", "short": "Oaxaca", "center": [-96.7266, 17.0732], "nudge": [8,  10], "itineraryColumn": 2, "sources": ["flights", "lodging", "smn", "era5", "mexico-advisory"] },
-    { "rank": "3", "slug": "la-paz", "short": "La Paz", "center": [-110.3128, 24.1426], "nudge": [0, 0], "itineraryColumn": 3, "sources": ["flights", "lodging", "smn", "era5", "mexico-advisory"] },
-    { "rank": "4", "slug": "mexico-city", "short": "Mexico City", "center": [-99.1332, 19.4326], "nudge": [-4,  -14], "sources": ["flights", "lodging", "smn", "era5", "mexico-advisory"] },
-    { "rank": "5", "slug": "maui", "short": "Maui", "center": [-156.4536, 20.7644], "nudge": [-12,  -12], "sources": ["flights", "lodging", "noaa", "era5", "hawaii-tax", "hale-fees"] },
-    { "rank": "6", "slug": "joshua-tree", "short": "Joshua Tree", "center": [-116.31, 33.95], "nudge": [0, 0], "sources": ["lodging", "noaa", "aaa"] },
-    { "rank": "7", "slug": "puerto-vallarta", "short": "Puerto Vallarta", "center": [-105.2253, 20.6534], "nudge": [-10,  2], "advisoryLevel": 3, "sources": ["flights", "lodging", "smn", "era5", "mexico-advisory"] },
-    { "rank": "8", "slug": "tucson", "short": "Tucson", "center": [-110.9747, 32.2226], "nudge": [0, 0], "sources": ["lodging", "noaa", "aaa"] },
-    { "rank": "HM", "slug": "guanacaste", "short": "Guanacaste", "center": [-85.8371, 10.2995], "nudge": [0, 0], "sources": ["flights", "lodging", "smn", "costa-rica-advisory"] }
+    { "rank": "1", "slug": "mexico-city", "short": "Mexico City", "center": [-99.1332, 19.4326], "nudge": [0, 0], "sources": ["worldwide", "flights", "lodging", "smn", "mexico-advisory"] },
+    { "rank": "2", "slug": "oaxaca", "short": "Oaxaca", "center": [-96.7266, 17.0732], "nudge": [0, 0], "sources": ["worldwide", "flights", "lodging", "smn", "mexico-advisory"] },
+    { "rank": "3", "slug": "big-island", "short": "Big Island", "center": [-155.52, 19.6], "nudge": [0, 0], "sources": ["worldwide", "flights", "lodging", "noaa", "hawaii-tax", "kilauea", "havo-fees"] },
+    { "rank": "4", "slug": "madeira", "short": "Madeira", "center": [-16.9087, 32.6669], "nudge": [0, 0], "sources": ["worldwide", "flights", "lodging"] },
+    { "rank": "5", "slug": "lisbon", "short": "Lisbon", "center": [-9.1393, 38.7223], "nudge": [0, 0], "sources": ["worldwide", "flights", "lodging"] },
+    { "rank": "6", "slug": "andalusia", "short": "Andalusia", "center": [-4.4214, 36.7213], "nudge": [0, 0], "sources": ["worldwide", "flights", "lodging"] },
+    { "rank": "7", "slug": "hong-kong", "short": "Hong Kong", "center": [114.1694, 22.3193], "nudge": [0, 0], "sources": ["worldwide", "flights", "lodging"] },
+    { "rank": "8", "slug": "naples", "short": "Naples", "center": [14.2681, 40.8518], "nudge": [0, 0], "sources": ["worldwide", "flights", "lodging"] },
+    { "rank": "9", "slug": "tenerife", "short": "Tenerife", "center": [-16.5517, 28.2916], "nudge": [0, 0], "sources": ["worldwide", "flights", "lodging"] },
+    { "rank": "10", "slug": "puerto-rico", "short": "Puerto Rico", "center": [-66.1057, 18.4655], "nudge": [0, 0], "sources": ["worldwide", "flights", "lodging", "noaa"] },
+    { "rank": "11", "slug": "la-paz", "short": "La Paz", "center": [-110.3128, 24.1426], "nudge": [0, 0], "sources": ["worldwide", "flights", "lodging", "smn", "mexico-advisory"] },
+    { "rank": "12", "slug": "maui", "short": "Maui", "center": [-156.4536, 20.7644], "nudge": [0, 0], "sources": ["worldwide", "flights", "lodging", "noaa", "hawaii-tax", "hale-fees"] },
+    { "rank": "13", "slug": "joshua-tree", "short": "Joshua Tree", "center": [-116.31, 33.95], "nudge": [0, 0], "drive": true, "sources": ["worldwide", "flights", "lodging", "noaa", "aaa"] },
+    { "rank": "14", "slug": "tucson", "short": "Tucson", "center": [-110.9747, 32.2226], "nudge": [0, 0], "drive": true, "sources": ["worldwide", "flights", "lodging", "noaa", "aaa"] },
+    { "rank": "15", "slug": "puerto-vallarta", "short": "Puerto Vallarta", "center": [-105.2253, 20.6534], "nudge": [0, 0], "advisoryLevel": 3, "sources": ["worldwide", "flights", "lodging", "smn", "mexico-advisory"] },
+    { "rank": "16", "slug": "guanacaste", "short": "Guanacaste", "center": [-85.8371, 10.2995], "nudge": [0, 0], "sources": ["worldwide", "flights", "lodging", "costa-rica-advisory"] },
+    { "rank": "17", "slug": "taiwan", "short": "Taiwan", "center": [121.5654, 25.033], "nudge": [0, 0], "sources": ["worldwide", "flights", "lodging"] }
   ]
 }

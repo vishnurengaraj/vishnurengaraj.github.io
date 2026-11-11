@@ -4,8 +4,13 @@ export function tripBySlug(trips, slug) {
   return (trips || []).find((trip) => trip.slug === slug) || null;
 }
 
+export function hasTotals(trip, windowId) {
+  const range = trip?.totals?.[windowId];
+  return !!(range && Number.isFinite(range.low) && Number.isFinite(range.high));
+}
+
 export function totalFor(trip, windowId) {
-  return trip?.totals?.[windowId] || null;
+  return hasTotals(trip, windowId) ? trip.totals[windowId] : null;
 }
 
 const USD = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -15,32 +20,35 @@ export function formatUsd(value) {
 }
 
 export function formatRange(range) {
-  if (!range) return "";
+  if (!range || !Number.isFinite(range.low) || !Number.isFinite(range.high)) return "Not priced";
   return `${formatUsd(range.low)}–${formatUsd(range.high)}`;
 }
 
-/** The Cost breakdown tab as rows for one date window. Labels keep the Sheet's estimate wording. */
+/** Cost rows for one date window. Labels keep the Sheet's estimate wording. */
 export function costRows(trip, windowId) {
+  if (!hasTotals(trip, windowId)) return [];
   const b = trip.breakdown;
-  const driving = b.flights.jan5 === 0 && b.flights.jan2 === 0;
-  const rows = [];
-  if (driving) {
-    rows.push({ key: "flights", label: "Flights", note: "None, it’s a drive", low: 0, high: 0 });
-  } else {
-    rows.push({
-      key: "flights",
-      label: "Flights",
-      note: "cheapest found, 2 people, round trip",
-      low: b.flights[windowId],
-      high: b.flights[windowId],
-    });
-    rows.push({ key: "buffer", label: "Standard-economy / bag buffer", note: "estimate, HIGH only", low: null, high: b.buffer });
-  }
-  rows.push({ key: "lodging", label: "Lodging", note: "7 nights incl. est. tax", ...b.lodging });
-  rows.push({ key: "transport", label: "Car / transport / gas", note: "estimate", ...b.transport });
-  rows.push({ key: "food", label: "Food", note: "2 people, 7 days, estimate", ...b.food });
-  rows.push({ key: "activities", label: "Activities", note: "estimate", ...b.activities });
-  return rows;
+  return [
+    {
+      key: "lax",
+      label: "LAX fare",
+      note: trip.drive ? "None, it’s a drive" : "1 person, round trip",
+      low: b.flights.lax,
+      high: b.flights.lax,
+    },
+    {
+      key: "dtw",
+      label: trip.drive ? "DTW–LAX fare" : "DTW fare",
+      note: "1 person, round trip",
+      low: b.flights.dtw,
+      high: b.flights.dtw,
+    },
+    { key: "buffer", label: "Standard-economy / bag buffer", note: "estimate, HIGH only", low: null, high: b.buffer },
+    { key: "lodging", label: "Lodging", note: "7 nights incl. est. tax", ...b.lodging },
+    { key: "transport", label: "Car / transport / gas", note: "estimate", ...b.transport },
+    { key: "food", label: "Food", note: "2 people, 7 days, estimate", ...b.food },
+    { key: "activities", label: "Activities", note: "estimate", ...b.activities },
+  ];
 }
 
 /** Shortest great-circle arc, as [lng, lat] points, for the line from home. */
@@ -65,4 +73,20 @@ export function arc(from, to, steps = 48) {
     points.push([Math.atan2(y, x) / rad, Math.atan2(z, Math.hypot(x, y)) / rad]);
   }
   return points;
+}
+
+export function formatScore(value) {
+  return Number.isFinite(value) ? value.toFixed(2) : "";
+}
+
+/** Sort by weighted total (default), a category key, or name. */
+export function sortTrips(trips, sortKey = "weighted") {
+  const list = [...(trips || [])];
+  if (sortKey === "name") return list.sort((a, b) => a.name.localeCompare(b.name));
+  const scoreOf = (trip) =>
+    sortKey === "weighted" || !sortKey ? trip.scores?.weighted : trip.scores?.[sortKey];
+  return list.sort((a, b) => {
+    const diff = (scoreOf(b) ?? 0) - (scoreOf(a) ?? 0);
+    return diff || b.scores.weighted - a.scores.weighted || a.name.localeCompare(b.name);
+  });
 }
