@@ -6,7 +6,7 @@ export const STYLE = "https://tiles.openfreemap.org/styles/positron";
 
 /** A globe-projection map with the /runs controls, resolved once the style loads.
     On a load failure the map is removed, `data-map="error"` is set, and this throws. */
-export async function openGlobeMap(mapEl, options, { timeoutMs = 20000, beforeGlobe } = {}) {
+export async function openGlobeMap(mapEl, options, { timeoutMs = 20000, beforeGlobe, projection = "globe" } = {}) {
   const map = new maplibregl.Map({
     container: mapEl,
     style: STYLE,
@@ -32,13 +32,15 @@ export async function openGlobeMap(mapEl, options, { timeoutMs = 20000, beforeGl
   }
   try {
     beforeGlobe?.(map);
-    map.setProjection({ type: "globe" });
-    map.setLight({
-      anchor: "viewport",
-      color: "#ffffff",
-      intensity: 0.55,
-      position: [1.15, 210, 28],
-    });
+    map.setProjection({ type: projection });
+    if (projection === "globe") {
+      map.setLight({
+        anchor: "viewport",
+        color: "#ffffff",
+        intensity: 0.55,
+        position: [1.15, 210, 28],
+      });
+    }
   } catch (error) {
     console.warn("Globe setup skipped part of the style", error);
   }

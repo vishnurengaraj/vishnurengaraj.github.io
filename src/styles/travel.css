@@ -4,11 +4,11 @@
 html:has(.travel),
 html:has(.travel) body,
 html:has(.travel) #app {
-  background: #f7f7f8;
+  background: #f2f3f0;
 }
 
 .travel {
-  --bg: #f7f7f8;
+  --bg: #f2f3f0;
   --card: #fffdfb;
   --line: #e7d9ce;
   --gold: #ffb020;
@@ -97,13 +97,15 @@ html:has(.travel) #app {
   color: var(--primary);
 }
 
-.travel .trip-pin.hm .pin-fill {
+.travel .trip-pin.hm .pin-fill,
+.travel .trip-pin.also .pin-fill {
   fill: #fff;
   stroke: #6a5db3;
   stroke-width: 1.5;
 }
 
-.travel .trip-pin.hm .pin-rank {
+.travel .trip-pin.hm .pin-rank,
+.travel .trip-pin.also .pin-rank {
   color: var(--primary);
 }
 
@@ -193,7 +195,8 @@ html:has(.travel) #app {
   pointer-events: none;
 }
 
-.travel .trip-pin.hm .pin-rank {
+.travel .trip-pin.hm .pin-rank,
+.travel .trip-pin.also .pin-rank {
   font-size: 10px;
   top: 11px;
 }
@@ -337,6 +340,132 @@ html:has(.travel) #app {
   letter-spacing: 0;
 }
 
+.travel .window-note {
+  margin: 0 16px 8px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.travel .list-weights {
+  margin: 0 16px 8px;
+  color: var(--muted);
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.travel .sort {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0 16px 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.travel .sort select {
+  flex: 1;
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+}
+
+.travel .sort select:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.travel .rank-score {
+  flex: none;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.travel .score-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 12px 0 4px;
+}
+
+.travel .score {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+  color: var(--primary);
+  background: #fff;
+  font: 700 14px/1 Roboto, system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.travel .score-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.travel .score-chips li {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.travel .chip-val {
+  color: var(--primary);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.travel .chip-lbl {
+  color: var(--muted);
+}
+
+.travel .safety {
+  margin-top: 8px;
+}
+
+.travel .safety dl {
+  margin: 0;
+}
+
+.travel .safety dt {
+  margin-top: 10px;
+  color: var(--muted);
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.travel .safety dd {
+  margin: 2px 0 0;
+}
+
+.travel .safety-note {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .travel .rank-list {
   margin: 0;
   padding: 0 8px 4px;
@@ -396,6 +525,7 @@ html:has(.travel) #app {
   font-variant-numeric: tabular-nums;
 }
 
+.travel .rank-badge.also,
 .travel .rank-badge.hm {
   background: #fff;
   box-shadow: inset 0 0 0 1.5px var(--primary);
@@ -600,6 +730,18 @@ html:has(.travel) #app {
 .travel .cost-note {
   font-family: inherit;
   font-weight: 400;
+}
+
+.travel .pay-note,
+.travel .card-points {
+  margin: 12px 0 0;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.travel .card-points {
+  color: var(--muted);
 }
 
 .travel .breakdown {

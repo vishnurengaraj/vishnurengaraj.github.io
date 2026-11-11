@@ -2,33 +2,27 @@
   "title": "January 2027 Warm-Weather Trip Options",
   "sheetUrl": "https://docs.google.com/spreadsheets/d/1ryfjLvoGTmf63buDqLxvHFbxLKBbhXAJswBkxhYBb_Q/edit",
   "asOf": "Nov 11, 2026",
+  "criterion": "mild, not freezing or soaked",
   "windows": [
     {
       "id": "jan2",
       "label": "Jan 2–9",
-      "sheetLabel": "Jan 2-9"
+      "sheetLabel": "Jan 2-9",
+      "priced": false
     },
     {
       "id": "jan5",
       "label": "Jan 5–12",
-      "sheetLabel": "Jan 5-12"
+      "sheetLabel": "Jan 5-12",
+      "priced": true
     }
   ],
   "defaultWindow": "jan5",
-  "columns": {
-    "flights": {
-      "jan5": "Flights Jan 5-12 (cheapest found, 2 people, round trip)",
-      "jan2": "Flights Jan 2-9 (cheapest found, 2 people)"
-    },
-    "buffer": "Standard-economy / bag buffer (estimate, HIGH only)",
-    "lodgingLow": "Lodging LOW (7 nights incl. est. tax)",
-    "lodgingHigh": "Lodging HIGH (7 nights incl. est. tax)",
-    "transportLow": "Car / transport / gas LOW",
-    "foodLow": "Food LOW (2 people, 7 days)",
-    "activitiesLow": "Activities LOW"
-  },
-  "notes": "Prices checked Nov 11, 2026 (PT). Totals are ESTIMATES built from the Cost breakdown tab. LOW = cheapest fare found plus the lower lodging, food and activity numbers. HIGH adds $300 for standard economy or bags plus the higher numbers. 'If Jan 2-9' totals change only the flight price (lodging was checked for Jan 5-12 only). Nothing is booked.",
-  "howToRead": "All figures are USD for 2 people and 7 nights, checked Nov 11, 2026 (PT). Flight prices are live Google Flights results (cheapest round trip found for 1 adult, times 2, economy, may be basic economy). Lodging = Airbnb search results for Jan 5-12, 2027, 2 adults, entire place (7-night price including fees, before taxes), 25th-75th percentile of the first page of results, plus the estimated tax shown. Car, food and activities are ESTIMATES (not quotes). Prices change daily; re-check before booking.",
+  "missingWindowNote": "The Worldwide ranking was priced for Jan 5–12 only. The Sheet has no Jan 2–9 fares for this ranking.",
+  "paymentNote": "Pay with Chase Sapphire Preferred (no foreign transaction fee). Points estimates come from Credit Max and are unverified.",
+  "notes": "Totals are for 2 people and 7 nights: one LAX round trip plus one DTW round trip. For drive trips, she flies DTW–LAX and they drive the HR-V from Hawthorne.",
+  "howToRead": "Checked Wed Nov 11, 2026 (PT). Fares are live Google Flights round trips for Jan 5-12, 2027: one from LAX and one from DTW, economy, using a reasonable option rather than the absolute cheapest 30h+ itinerary. HIGH adds $300 for standard economy or bags. Lodging comes from Airbnb entire-place searches for Jan 5-12 (25th-75th percentile of the first page) plus estimated taxes. Transport, food and activities are ESTIMATES. For drive trips, she flies DTW-LAX and they drive the HR-V from Hawthorne (gas at $4.19/gal, 30 mpg). Long-haul time cost: Europe means losing about 1 day each way and a 5-9h time shift; Hong Kong and Taiwan mean losing about 1.5-2 days and a 15-16h shift for him. Points figures are Credit Max's estimates (1 cent per point, award space not checked) and did not affect any ranking. Use the Sapphire Preferred for travel and abroad, never the Freedom card abroad.",
+  "asOfDetail": "Wed Nov 11, 2026 (Pacific Time). All prices are snapshots and change daily. Nothing was booked or held.",
   "method": [
     {
       "section": "Method: skills used",
@@ -125,9 +119,86 @@
       "item": "What is NOT a quote",
       "detail": "Food, activities, car rental totals, transfers, and the Mexico/CA/AZ/CR lodging tax multipliers are estimates by the planner, labeled as such and dated Nov 11, 2026. Drive distances and times are approximate.",
       "links": []
+    },
+    {
+      "section": "South America QA (Nov 11, 2026)",
+      "item": "1. Switched from cheapest fares to realistic ones",
+      "detail": "Several of the cheapest fares were 2-stop itineraries taking 20-33h each way (Cartagena $964, Rio $2,332, Santiago $2,364). The totals use the cheapest 1-stop or nonstop fare instead; the cheapest any-stop fare is shown in its own column.",
+      "links": []
+    },
+    {
+      "section": "South America QA (Nov 11, 2026)",
+      "item": "2. Peru dropped from contention",
+      "detail": "Official normals put Cusco at 69/46F with about 20 rain days in January, and Machu Picchu gets about 341 mm. It's the wrong season for a warm-weather trip, so it's listed but not ranked.",
+      "links": []
+    },
+    {
+      "section": "South America QA (Nov 11, 2026)",
+      "item": "3. Colombia advisory is Level 3",
+      "detail": "The State Dept rated Colombia Level 3 'Reconsider travel' on Mar 31, 2026. Both Colombian options moved down even though Cartagena is the cheapest.",
+      "links": []
+    },
+    {
+      "section": "South America QA (Nov 11, 2026)",
+      "item": "4. Brazil e-visa confirmed",
+      "detail": "US$80.90 per person, via VFS Global only (gov.br, updated Oct 29, 2026). Added $162 to Rio.",
+      "links": []
+    },
+    {
+      "section": "South America QA (Nov 11, 2026)",
+      "item": "5. Medellin is not 'warm'",
+      "detail": "IDEAM normals are 82/64F, spring-like. Its verdict is set against Oaxaca, which is warmer and cheaper.",
+      "links": []
+    },
+    {
+      "section": "South America QA (Nov 11, 2026)",
+      "item": "6. Ranking tab unchanged",
+      "detail": "No South American option beats or ties the current top 5 for a 7-night trip. The best one, Buenos Aires + Mendoza, would slot around #6.",
+      "links": []
+    },
+    {
+      "section": "Worldwide QA (Nov 11, 2026)",
+      "item": "1. Nevado de Toluca is closed",
+      "detail": "The Ranking tab had listed it for Mexico City. It has been closed since Aug 10, 2025, with no reopening date. Replaced with La Malinche (7.9 mi, 4,320 ft, AllTrails; may have snow Dec-Mar) and Ajusco / Pico del Aguila (3.1 mi, 2,349 ft).",
+      "links": []
+    },
+    {
+      "section": "Worldwide QA (Nov 11, 2026)",
+      "item": "2. New weather test",
+      "detail": "The new test is highs about 55F+, lows above freezing, not rain-soaked. Kyoto (48/35F), Osaka (49/37F) and Fukuoka (50/39F) fail. Bali (about 19 rain days) and Cairns (about 16) are in wet season. Mexico City, Tucson and Joshua Tree no longer get a 'not warm' penalty. Granada (34F lows) is borderline and is noted.",
+      "links": []
+    },
+    {
+      "section": "Worldwide QA (Nov 11, 2026)",
+      "item": "3. Her DTW fare changes the order",
+      "detail": "Each total now has 1 LAX + 1 DTW round trip. Europe gets cheaper or shorter for her (Lisbon 11.9h, Naples 11.3h). La Paz needs 2 stops from DTW ($788), and Hong Kong is $1,923 for a 22h itinerary, which pushes both down. For drive trips she flies DTW-LAX ($254 RT, 11.9h with 1 stop; the cheapest is $224 at 19.9h).",
+      "links": []
+    },
+    {
+      "section": "Worldwide QA (Nov 11, 2026)",
+      "item": "4. Realistic, not cheapest, fares",
+      "detail": "Many of the cheapest results were 30-50h itineraries (e.g. Auckland $1,234 at 51h, Hong Kong from DTW $1,190 at 32h). The totals use the cheapest reasonable 1-stop or nonstop fare. HIGH adds $300 for basic-to-standard economy and bags.",
+      "links": []
+    },
+    {
+      "section": "Worldwide QA (Nov 11, 2026)",
+      "item": "5. Hike access checks",
+      "detail": "Madeira PR trails now need a booked time slot via SIMplifica (EUR 4.50, or EUR 10.50 for PR1; EUR 50 fine without a booking). Taroko (Taiwan) is only partly open (Shakadang closed until about 2031, Zhuilu closed). Samaria Gorge (Crete) is closed in winter (general knowledge, not re-verified).",
+      "links": []
+    },
+    {
+      "section": "Worldwide QA (Nov 11, 2026)",
+      "item": "6. Advisories and routing",
+      "detail": "Jalisco (Puerto Vallarta), Colombia, Guatemala, Israel and Jordan are Level 3. Qatar and UAE are Level 3, so avoid Doha and Dubai connections (affects the Sri Lanka DTW fare). ETIAS for Europe is not live yet. Entry fees added where known: Indonesia about $36 per person, NZ NZ$117-123 per person, Australia ETA AUD 20, Vietnam e-visa $25.",
+      "links": []
+    },
+    {
+      "section": "Worldwide QA (Nov 11, 2026)",
+      "item": "7. Points did not affect the ranking",
+      "detail": "The Card & points lines are Credit Max's estimates (from LAX only; award space not checked). Her DTW leg needs its own check. Pay with Sapphire Preferred (no foreign transaction fee).",
+      "links": []
     }
   ],
-  "asOfDetail": "Wed Nov 11, 2026 (Pacific Time). All prices are snapshots and change daily. Nothing was booked or held.",
   "home": {
     "label": "LAX",
     "center": [
@@ -135,83 +206,270 @@
       33.9416
     ]
   },
+  "weights": {
+    "_note": "Category shares for the /travel weighted score. They must sum to 1. Changing a share and running `node scripts/travel/build-travel.mjs` re-scores every destination. The page reads the computed totals from trips.json.",
+    "categories": [
+      {
+        "key": "outdoors",
+        "label": "Outdoors",
+        "share": 0.25
+      },
+      {
+        "key": "food",
+        "label": "Food",
+        "share": 0.2
+      },
+      {
+        "key": "museums",
+        "label": "Museums & City",
+        "share": 0.2
+      },
+      {
+        "key": "price",
+        "label": "Price",
+        "share": 0.15
+      },
+      {
+        "key": "gettingThere",
+        "label": "Getting There",
+        "share": 0.1
+      },
+      {
+        "key": "safety",
+        "label": "Safety",
+        "share": 0.1
+      }
+    ]
+  },
+  "weightLegend": "Weighted = Outdoors 25% · Food 20% · Museums & City 20% · Price 15% · Getting There 10% · Safety 10%",
+  "scoreLegend": "Weighted = Outdoors 25% · Food 20% · Museums & City 20% · Price 15% · Getting There 10% · Safety 10%. Weather is pass/fail (all 17 pass), not scored.",
+  "safetyHowToRead": "Researched Nov 11, 2026 (PT) from Reddit, travel blogs, local news and official park/agency pages. Claims are kept to what the linked sources say. Where a 'safest area' isn't from a source, it's labeled a suggestion. Some Reddit threads could not be opened directly (server error); those claims rely on search-result excerpts. Positions 11-17 were not researched in this depth; they get advisory-based safety scores on the Scores tab.",
   "trips": [
     {
-      "slug": "big-island",
-      "rank": "1",
-      "short": "Big Island",
+      "slug": "mexico-city",
+      "worldwideRank": "1",
+      "short": "Mexico City",
       "center": [
-        -155.52,
-        19.6
+        -99.1332,
+        19.4326
       ],
       "nudge": [
-        14,
-        12
+        0,
+        0
       ],
-      "advisoryLevel": null,
-      "name": "Big Island, Hawaii",
-      "plan": "Kona 4 nights + Volcano 3 nights",
+      "drive": false,
+      "advisoryLevel": 2,
+      "name": "Mexico City",
+      "plan": "La Malinche, Tepoztlan",
       "tag": "",
-      "sheetName": "Big Island, Hawaii (Kona 4 nights + Volcano 3 nights)",
-      "costLabel": "1. Big Island, Hawaii (Kona 4n + Volcano 3n)",
-      "why": "Most varied week in the set: an actively erupting volcano (Kilauea has had 56 lava-fountain episodes since Dec 2024), beaches, manta-ray night snorkel, Mauna Kea stargazing, and reliably warm weather on the Kona side. Hawaii was a must-include and this is the island that best fits hikers.",
-      "hikes": [
-        "Kilauea Iki (4 mi loop across a crater floor)",
-        "Pololu Valley lookout trail",
-        "Captain Cook Monument / Ka'awaloa trail (snorkel at the end)",
-        "Mauna Kea summit area / Onizuka visitor station",
-        "Akaka Falls"
-      ],
-      "museumsFood": "Pu'uhonua o Honaunau National Historical Park, Volcano Art Center, Kona coffee farm tours, Hilo Farmers Market; poke, loco moco, shave ice, Kona coffee",
-      "weather": "Kona: high ~81F / low ~69F (NOAA 1991-2020); rain on ~1 in 4 days near Kona (ERA5 2015-25). Volcano village (3,700 ft) is much cooler and wetter, so bring layers.",
-      "travelTime": "5h50 nonstop LAX-KOA (Alaska, American, Delta)",
-      "bestDates": "Jan 5-12 (flights $894 vs $1,256 for two)",
-      "downsides": "Most expensive option. Eruption timing is unpredictable (fountaining episodes are usually under 12 hours and separated by pauses of 2+ weeks), so seeing live lava is a bonus, not a promise. Some park areas are closed for eruption hazards and summit construction. Lighter on museums.",
+      "sheetName": "Mexico City (+ La Malinche, Tepoztlan)",
+      "why": "Best mix of big hikes and a world-class museum/food city, and the cheapest, easiest meetup for both.",
+      "week": "Museo Nacional de Antropologia, Frida Kahlo/Coyoacan, Bellas Artes, Teotihuacan. Big hike: La Malinche summit (7.9 mi, 4,320 ft, 14,600 ft altitude; acclimatize, maybe hire a guide, possible ice). Shorter: Tepozteco or Desierto de los Leones. (Ajusco dropped: see Safety tab.) Tacos, mercados, one splurge dinner (Pujol or Contramar).",
+      "weather": "High ~72F / low ~47F, dry (SMN)",
+      "laxFlight": "3h45 nonstop (Aeromexico). A cheaper connection is $371.",
+      "dtwFlight": "About 7.8h with 1 stop (American)",
+      "advisory": "Level 2 (Mexico City)",
+      "downsides": "Level 2 (Mexico City)",
+      "cardPoints": "Pay cash with Sapphire Preferred (CSP); Credit Max's Virgin/Aeromexico award (about $460 in points) doesn't beat the $487 fare.",
+      "oldRank": "#4",
+      "scores": {
+        "outdoors": 7,
+        "food": 10,
+        "museums": 10,
+        "price": 7,
+        "gettingThere": 7.5,
+        "safety": 6.5,
+        "weighted": 8.2
+      },
+      "scoreWhy": "Outdoors: one big hike (La Malinche); Ajusco dropped on safety grounds. Food and museums are world-class. Price: $3.5k midpoint. Getting there: 3h45 nonstop for him, 7.8h with 1 stop for her. Safety: Level 2; avoid taxis.",
+      "safety": {
+        "researched": true,
+        "advisory": "Level 2 (Mexico City)",
+        "consensus": "Widely considered safe for tourists in Roma Norte, Condesa and Polanco, 'on par with other big cities'. The most repeated advice is to never hail street taxis and use Uber or DiDi instead.",
+        "risks": "1) Street or airport taxis: overcharging and robbery, and express kidnappings often involve fake or real taxi drivers. Use Uber, DiDi or Cabify (turn on the Uber PIN), or the authorized airport 'sitio' taxis. 2) Phone and jewelry theft, including motorbike snatches in Polanco. Wear no flashy watches or chains. 3) Drinks spiked in bars. Watch your drinks; ATMs only inside banks or malls.",
+        "stay": "Roma Norte, Condesa, Polanco (Reddit locals). Avoid east of the Zocalo/National Palace at night and north Polanco past the Soumaya."
+      },
       "totals": {
         "jan5": {
-          "low": 3787,
-          "high": 6130
+          "low": 2638,
+          "high": 4402
         },
-        "jan2": {
-          "low": 4149,
-          "high": 6492
-        }
+        "jan2": null
       },
       "breakdown": {
         "flights": {
-          "jan5": 894,
-          "jan2": 1256
+          "jan5": 1070,
+          "jan2": null,
+          "lax": 487,
+          "dtw": 583
         },
         "buffer": 300,
         "lodging": {
-          "low": 1353,
-          "high": 1886
+          "low": 678,
+          "high": 1152
         },
         "transport": {
-          "low": 450,
-          "high": 750
+          "low": 150,
+          "high": 300
         },
         "food": {
-          "low": 840,
-          "high": 1400
+          "low": 490,
+          "high": 980
         },
         "activities": {
           "low": 250,
-          "high": 900
+          "high": 600
         },
         "totals": {
           "jan5": {
-            "low": 3787,
-            "high": 6130
+            "low": 2638,
+            "high": 4402
           },
-          "jan2": {
-            "low": 4149,
-            "high": 6492
-          }
-        },
-        "basis": "Flights: nonstop KOA, Alaska $894 (Jan 5-12) / American $1,256 (Jan 2-9). Lodging: Airbnb entire-home 7-night totals for Jan 5-12, 25th to 75th percentile of first results page: Kona $1,264-1,553, Volcano $975-1,638, weighted 4/3 nights, times 1.187 for Hawaii taxes (11% state TAT + 3% county TAT + 4.712% GET). Resorts run higher. Car: KAYAK lists Kona rentals from $30/day for Jan 2027. Estimate $450-750 incl. taxes, fees and gas. Activities (estimate): HVNP $30/vehicle, Pu'uhonua o Honaunau, manta night snorkel, optional Mauna Kea tour."
+          "jan2": null
+        }
       },
       "sources": [
+        {
+          "key": "worldwide",
+          "section": "Sources: Worldwide",
+          "title": "Google Flights via fli (Jan 5-12, 2027, LAX and DTW, checked Nov 11, 2026); Airbnb search JSON (Jan 5-12); Wikipedia climate tables citing JMA, HKO, CWA, BoM, NIWA, AEMET, IPMA, NOAA and SMN; travel.state.gov advisories via the davemanuel.com CSV; Madeira SIMplifica trail rules; open.er-api.com FX (1 USD = 0.894 EUR, 1.78 NZD, 1.45 AUD, 18,089 IDR)",
+          "detail": "https://travel.state.gov/en/international-travel/travel-advisories.html ; https://www.google.com/travel/flights ; https://www.airbnb.com",
+          "links": [
+            "https://travel.state.gov/en/international-travel/travel-advisories.html",
+            "https://www.google.com/travel/flights",
+            "https://www.airbnb.com"
+          ]
+        },
+        {
+          "key": "flights",
+          "section": "Sources: flights",
+          "title": "Google Flights (queried via the open-source 'fli' client, pip package 'flights')",
+          "detail": "https://www.google.com/travel/flights. Round trip LAX to KOA/OGG/LIH/HNL/OAX/MEX/LAP/SJD/PVR/LIR for Jan 2-9 and Jan 5-12, 2027, economy, 1 adult, times 2. Queried Nov 11, 2026.",
+          "links": [
+            "https://www.google.com/travel/flights."
+          ]
+        },
+        {
+          "key": "lodging",
+          "section": "Sources: lodging",
+          "title": "Airbnb search results",
+          "detail": "https://www.airbnb.com/s/<place>/homes?checkin=2027-01-05&checkout=2027-01-12&adults=2&room_types[]=Entire home/apt. First page (18 listings) per place, 7-night price incl. fees, before taxes. Queried Nov 11, 2026.",
+          "links": []
+        },
+        {
+          "key": "smn",
+          "section": "Sources: weather",
+          "title": "Mexico Servicio Meteorologico Nacional 1991-2020 normals (via Wikipedia)",
+          "detail": "Oaxaca, Mexico City (Tacubaya), La Paz. Puerto Vallarta: WMO. Liberia, Costa Rica: Instituto Meteorologico Nacional.",
+          "links": []
+        },
+        {
+          "key": "mexico-advisory",
+          "section": "Sources: advisories",
+          "title": "US State Dept Mexico Travel Advisory (May 29, 2026)",
+          "detail": "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/mexico-travel-advisory.html",
+          "links": [
+            "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/mexico-travel-advisory.html"
+          ]
+        }
+      ],
+      "rank": "1"
+    },
+    {
+      "slug": "tucson",
+      "worldwideRank": "14",
+      "short": "Tucson",
+      "center": [
+        -110.9747,
+        32.2226
+      ],
+      "nudge": [
+        0,
+        0
+      ],
+      "drive": true,
+      "advisoryLevel": null,
+      "name": "Tucson",
+      "plan": "",
+      "tag": "",
+      "sheetName": "Tucson (drive)",
+      "why": "Cheapest overall. Decent hiking and museums.",
+      "week": "Wasson Peak, Sabino/Seven Falls, Desert Museum, Pima Air & Space.",
+      "weather": "~67F / ~41F (NOAA)",
+      "laxFlight": "Drive about 7-8h",
+      "dtwFlight": "DTW-LAX as above",
+      "advisory": "n/a",
+      "downsides": "n/a",
+      "cardPoints": "Cash.",
+      "oldRank": "#8",
+      "scores": {
+        "outdoors": 8,
+        "food": 7.5,
+        "museums": 6,
+        "price": 10,
+        "gettingThere": 6,
+        "safety": 9,
+        "weighted": 7.7
+      },
+      "scoreWhy": "Outdoors: Wasson Peak, Seven Falls, Mt Lemmon (may have snow). Food: UNESCO City of Gastronomy. Museums: Desert Museum, Pima Air & Space, but not a big city. Price: cheapest. Getting there: 7-8h drive each way plus her flight. Safety: US, low risk.",
+      "safety": {
+        "researched": false,
+        "advisory": "n/a",
+        "consensus": "",
+        "risks": "",
+        "stay": ""
+      },
+      "totals": {
+        "jan5": {
+          "low": 1928,
+          "high": 3227
+        },
+        "jan2": null
+      },
+      "breakdown": {
+        "flights": {
+          "jan5": 254,
+          "jan2": null,
+          "lax": 0,
+          "dtw": 254
+        },
+        "buffer": 300,
+        "lodging": {
+          "low": 744,
+          "high": 1073
+        },
+        "transport": {
+          "low": 150,
+          "high": 200
+        },
+        "food": {
+          "low": 630,
+          "high": 1050
+        },
+        "activities": {
+          "low": 150,
+          "high": 350
+        },
+        "totals": {
+          "jan5": {
+            "low": 1928,
+            "high": 3227
+          },
+          "jan2": null
+        }
+      },
+      "sources": [
+        {
+          "key": "worldwide",
+          "section": "Sources: Worldwide",
+          "title": "Google Flights via fli (Jan 5-12, 2027, LAX and DTW, checked Nov 11, 2026); Airbnb search JSON (Jan 5-12); Wikipedia climate tables citing JMA, HKO, CWA, BoM, NIWA, AEMET, IPMA, NOAA and SMN; travel.state.gov advisories via the davemanuel.com CSV; Madeira SIMplifica trail rules; open.er-api.com FX (1 USD = 0.894 EUR, 1.78 NZD, 1.45 AUD, 18,089 IDR)",
+          "detail": "https://travel.state.gov/en/international-travel/travel-advisories.html ; https://www.google.com/travel/flights ; https://www.airbnb.com",
+          "links": [
+            "https://travel.state.gov/en/international-travel/travel-advisories.html",
+            "https://www.google.com/travel/flights",
+            "https://www.airbnb.com"
+          ]
+        },
         {
           "key": "flights",
           "section": "Sources: flights",
@@ -236,13 +494,1085 @@
           "links": []
         },
         {
-          "key": "era5",
-          "section": "Sources: weather",
-          "title": "Open-Meteo ERA5 archive (rain frequency, Jan 1-14, 2015-2025)",
-          "detail": "https://archive-api.open-meteo.com/v1/archive",
+          "key": "aaa",
+          "section": "Sources: driving",
+          "title": "AAA California average regular gas $4.19 (Nov 11, 2026)",
+          "detail": "https://gasprices.aaa.com/?state=CA . Fuel economy assumption: 2021 Honda HR-V about 30 mpg combined (EPA, FWD).",
           "links": [
-            "https://archive-api.open-meteo.com/v1/archive"
+            "https://gasprices.aaa.com/?state=CA"
           ]
+        }
+      ],
+      "rank": "2"
+    },
+    {
+      "slug": "oaxaca",
+      "worldwideRank": "2",
+      "short": "Oaxaca",
+      "center": [
+        -96.7266,
+        17.0732
+      ],
+      "nudge": [
+        0,
+        0
+      ],
+      "drive": false,
+      "advisoryLevel": 2,
+      "name": "Oaxaca",
+      "plan": "Sierra Norte",
+      "tag": "",
+      "sheetName": "Oaxaca (+ Sierra Norte)",
+      "why": "Mexico's best food and crafts city with real mountain hiking. Warmest of the city picks.",
+      "week": "Museo de las Culturas at Santo Domingo, the Ethnobotanical Garden, Monte Alban, Mitla, Hierve el Agua. Big hike: guided Sierra Norte Cuajimoloyas to Latuvi (10.1 mi, 6.5-7h). Mole, tlayudas, mercado food, mezcal; reserve one dinner (e.g. Criollo or Casa Oaxaca).",
+      "weather": "High ~84F / low ~51F, dry (SMN)",
+      "laxFlight": "About 10.5h with 2 stops (United). No nonstop.",
+      "dtwFlight": "About 7.5h with 1 stop (United)",
+      "advisory": "Level 2 (Isthmus region restricted, far from the city)",
+      "downsides": "Level 2 (Isthmus region restricted, far from the city)",
+      "cardPoints": "Cash with CSP; the Aeromexico award (about $460) is roughly break-even.",
+      "oldRank": "#2",
+      "scores": {
+        "outdoors": 7.5,
+        "food": 9.5,
+        "museums": 7.5,
+        "price": 7.5,
+        "gettingThere": 6,
+        "safety": 6.5,
+        "weighted": 7.65
+      },
+      "scoreWhy": "Outdoors: guided Sierra Norte 10-mile day plus Hierve el Agua. Food: elite. Museums: Santo Domingo museum, Monte Alban; a mid-size city. Getting there: 2 stops for him, 1 stop for her. Safety: Level 2; blockades.",
+      "safety": {
+        "researched": true,
+        "advisory": "Level 2 (Oaxaca state; Isthmus restricted for US staff)",
+        "consensus": "Generally safe for tourists. The real issue is CNTE teacher-union blockades (an inconvenience, not aimed at visitors), not violent crime.",
+        "risks": "1) Blockades of streets, toll booths and the airport road: in June 2026 they cut airport access several times, and an Oct 16 strike made some passengers walk about 1 km to the airport. A Section 22 strike that began Nov 4 is ongoing. Check the news and your hotel the morning you fly, leave very early, and never drive through a blockade. 2) Petty theft and ATM crime. Use ATMs inside banks. 3) Mountain driving. Don't drive mountain roads after dark; take a guide or driver.",
+        "stay": "Centro / Santo Domingo, Jalatlaco, Reforma (mexicotravelandleisure.com)"
+      },
+      "totals": {
+        "jan5": {
+          "low": 2580,
+          "high": 4150
+        },
+        "jan2": null
+      },
+      "breakdown": {
+        "flights": {
+          "jan5": 1319,
+          "jan2": null,
+          "lax": 551,
+          "dtw": 768
+        },
+        "buffer": 300,
+        "lodging": {
+          "low": 391,
+          "high": 641
+        },
+        "transport": {
+          "low": 150,
+          "high": 350
+        },
+        "food": {
+          "low": 420,
+          "high": 840
+        },
+        "activities": {
+          "low": 300,
+          "high": 700
+        },
+        "totals": {
+          "jan5": {
+            "low": 2580,
+            "high": 4150
+          },
+          "jan2": null
+        }
+      },
+      "sources": [
+        {
+          "key": "worldwide",
+          "section": "Sources: Worldwide",
+          "title": "Google Flights via fli (Jan 5-12, 2027, LAX and DTW, checked Nov 11, 2026); Airbnb search JSON (Jan 5-12); Wikipedia climate tables citing JMA, HKO, CWA, BoM, NIWA, AEMET, IPMA, NOAA and SMN; travel.state.gov advisories via the davemanuel.com CSV; Madeira SIMplifica trail rules; open.er-api.com FX (1 USD = 0.894 EUR, 1.78 NZD, 1.45 AUD, 18,089 IDR)",
+          "detail": "https://travel.state.gov/en/international-travel/travel-advisories.html ; https://www.google.com/travel/flights ; https://www.airbnb.com",
+          "links": [
+            "https://travel.state.gov/en/international-travel/travel-advisories.html",
+            "https://www.google.com/travel/flights",
+            "https://www.airbnb.com"
+          ]
+        },
+        {
+          "key": "flights",
+          "section": "Sources: flights",
+          "title": "Google Flights (queried via the open-source 'fli' client, pip package 'flights')",
+          "detail": "https://www.google.com/travel/flights. Round trip LAX to KOA/OGG/LIH/HNL/OAX/MEX/LAP/SJD/PVR/LIR for Jan 2-9 and Jan 5-12, 2027, economy, 1 adult, times 2. Queried Nov 11, 2026.",
+          "links": [
+            "https://www.google.com/travel/flights."
+          ]
+        },
+        {
+          "key": "lodging",
+          "section": "Sources: lodging",
+          "title": "Airbnb search results",
+          "detail": "https://www.airbnb.com/s/<place>/homes?checkin=2027-01-05&checkout=2027-01-12&adults=2&room_types[]=Entire home/apt. First page (18 listings) per place, 7-night price incl. fees, before taxes. Queried Nov 11, 2026.",
+          "links": []
+        },
+        {
+          "key": "smn",
+          "section": "Sources: weather",
+          "title": "Mexico Servicio Meteorologico Nacional 1991-2020 normals (via Wikipedia)",
+          "detail": "Oaxaca, Mexico City (Tacubaya), La Paz. Puerto Vallarta: WMO. Liberia, Costa Rica: Instituto Meteorologico Nacional.",
+          "links": []
+        },
+        {
+          "key": "mexico-advisory",
+          "section": "Sources: advisories",
+          "title": "US State Dept Mexico Travel Advisory (May 29, 2026)",
+          "detail": "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/mexico-travel-advisory.html",
+          "links": [
+            "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/mexico-travel-advisory.html"
+          ]
+        }
+      ],
+      "rank": "3"
+    },
+    {
+      "slug": "naples",
+      "worldwideRank": "8",
+      "short": "Naples",
+      "center": [
+        14.2681,
+        40.8518
+      ],
+      "nudge": [
+        0,
+        0
+      ],
+      "drive": false,
+      "advisoryLevel": 2,
+      "name": "Naples + Amalfi Coast",
+      "plan": "",
+      "tag": "",
+      "sheetName": "Naples + Amalfi Coast",
+      "why": "Pompeii, Herculaneum and Naples' museums plus pizza, with Vesuvius and the Path of the Gods. Mild but sometimes wet in January.",
+      "week": "Naples: National Archaeological Museum, Capodimonte, the Underground. Pompeii and Herculaneum. Hikes: Path of the Gods (Bomerano to Nocelle; real shoes, skip it in rain). Vesuvius is now a guided out-and-back to 1,170 m (the rim loop is closed; book online). Optional: Capri by ferry if seas allow. Pizza at the classics; reserve one dinner.",
+      "weather": "Naples: high ~56F / low ~40F, about 9 rain days (Naples airport 1991-2020, via Wikipedia)",
+      "laxFlight": "About 15.2h with 1 stop",
+      "dtwFlight": "About 11.3h with 1 stop (Delta)",
+      "advisory": "Level 2 (Italy)",
+      "downsides": "Level 2 (Italy)",
+      "cardPoints": "Maybe: United partner award (about 40k each way to Rome) for his leg.",
+      "oldRank": "new",
+      "scores": {
+        "outdoors": 7,
+        "food": 9,
+        "museums": 9,
+        "price": 4,
+        "gettingThere": 3.5,
+        "safety": 7,
+        "weighted": 7
+      },
+      "scoreWhy": "Outdoors: Path of the Gods; Vesuvius is now a short guided out-and-back. Food: pizza capital. Museums: MANN, Pompeii, Herculaneum. Getting there: 15h / 11h, 6-9h time shift. Safety: snatch theft.",
+      "safety": {
+        "researched": true,
+        "advisory": "Level 2 (Italy)",
+        "consensus": "Safer than its reputation. Sources and r/napoli say the risks are opportunistic pickpocketing and scooter bag-snatching, not violent crime. The Quartieri Spagnoli are fine by day and on busy streets at night.",
+        "risks": "1) Scooter snatches and pickpockets. Carry your bag crossbody on the wall side and don't hold your phone out in narrow lanes. 2) Quiet alleys late at night. Stick to busy streets. 3) Campi Flegrei earthquakes (207 in October 2026) are a background natural hazard west of the city; not a reason to skip.",
+        "stay": "Chiaia, Vomero, or the historic center along busy streets (suggestion); Sorrento for the Amalfi nights."
+      },
+      "totals": {
+        "jan5": {
+          "low": 3582,
+          "high": 5506
+        },
+        "jan2": null
+      },
+      "breakdown": {
+        "flights": {
+          "jan5": 1710,
+          "jan2": null,
+          "lax": 872,
+          "dtw": 838
+        },
+        "buffer": 300,
+        "lodging": {
+          "low": 792,
+          "high": 1376
+        },
+        "transport": {
+          "low": 200,
+          "high": 450
+        },
+        "food": {
+          "low": 630,
+          "high": 1120
+        },
+        "activities": {
+          "low": 250,
+          "high": 550
+        },
+        "totals": {
+          "jan5": {
+            "low": 3582,
+            "high": 5506
+          },
+          "jan2": null
+        }
+      },
+      "sources": [
+        {
+          "key": "worldwide",
+          "section": "Sources: Worldwide",
+          "title": "Google Flights via fli (Jan 5-12, 2027, LAX and DTW, checked Nov 11, 2026); Airbnb search JSON (Jan 5-12); Wikipedia climate tables citing JMA, HKO, CWA, BoM, NIWA, AEMET, IPMA, NOAA and SMN; travel.state.gov advisories via the davemanuel.com CSV; Madeira SIMplifica trail rules; open.er-api.com FX (1 USD = 0.894 EUR, 1.78 NZD, 1.45 AUD, 18,089 IDR)",
+          "detail": "https://travel.state.gov/en/international-travel/travel-advisories.html ; https://www.google.com/travel/flights ; https://www.airbnb.com",
+          "links": [
+            "https://travel.state.gov/en/international-travel/travel-advisories.html",
+            "https://www.google.com/travel/flights",
+            "https://www.airbnb.com"
+          ]
+        },
+        {
+          "key": "flights",
+          "section": "Sources: flights",
+          "title": "Google Flights (queried via the open-source 'fli' client, pip package 'flights')",
+          "detail": "https://www.google.com/travel/flights. Round trip LAX to KOA/OGG/LIH/HNL/OAX/MEX/LAP/SJD/PVR/LIR for Jan 2-9 and Jan 5-12, 2027, economy, 1 adult, times 2. Queried Nov 11, 2026.",
+          "links": [
+            "https://www.google.com/travel/flights."
+          ]
+        },
+        {
+          "key": "lodging",
+          "section": "Sources: lodging",
+          "title": "Airbnb search results",
+          "detail": "https://www.airbnb.com/s/<place>/homes?checkin=2027-01-05&checkout=2027-01-12&adults=2&room_types[]=Entire home/apt. First page (18 listings) per place, 7-night price incl. fees, before taxes. Queried Nov 11, 2026.",
+          "links": []
+        }
+      ],
+      "rank": "4"
+    },
+    {
+      "slug": "andalusia",
+      "worldwideRank": "6",
+      "short": "Andalusia",
+      "center": [
+        -4.4214,
+        36.7213
+      ],
+      "nudge": [
+        0,
+        0
+      ],
+      "drive": false,
+      "advisoryLevel": 2,
+      "name": "Andalusia",
+      "plan": "Malaga, Granada, Seville",
+      "tag": "",
+      "sheetName": "Andalusia: Malaga, Granada, Seville",
+      "why": "Alhambra, the Seville Alcazar and Picasso museums plus tapas, with gorge and Sierra Nevada foothill hikes. Granada nights get near freezing.",
+      "week": "Malaga: Picasso Museum, Alcazaba. Caminito del Rey gorge walk (closed Mondays and Jan 11-19, 2027, so book Jan 6-10). Granada: Alhambra (book ahead), Albaicin; a hike in the Alpujarras or the Monachil Los Cahorros gorge. Seville: Alcazar, Cathedral, flamenco. Tapas crawls.",
+      "weather": "Seville: high ~61F / low ~43F; Granada: ~55F / ~34F (airport normals via Wikipedia)",
+      "laxFlight": "About 18.9h with 1 stop to Malaga (Turkish)",
+      "dtwFlight": "About 17.9h with 1 stop (Delta)",
+      "advisory": "Level 2 (Spain)",
+      "downsides": "Level 2 (Spain)",
+      "cardPoints": "Maybe: Iberia Avios to Madrid off-peak (about 25.5k each way + $150-200 tax per person; 30% transfer bonus through Dec 1), then train south.",
+      "oldRank": "new",
+      "scores": {
+        "outdoors": 6.5,
+        "food": 8.5,
+        "museums": 9,
+        "price": 5,
+        "gettingThere": 3,
+        "safety": 8,
+        "weighted": 6.98
+      },
+      "scoreWhy": "Outdoors: Caminito del Rey (short, closed Jan 11-19), Los Cahorros, Alpujarras. Food: tapas. Museums: Alhambra, Alcazar, Picasso. Getting there: about 18-19h each. Safety: petty theft only.",
+      "safety": {
+        "researched": true,
+        "advisory": "Level 2 (Spain: terrorism/unrest boilerplate)",
+        "consensus": "Generally safe. Pickpocketing in crowded tourist spots is the real risk and is rising in Granada (tour guides) and Seville (police union, May 2026).",
+        "risks": "1) Pickpockets on Granada's C30/C31 Alhambra buses, at Mirador de San Nicolas and in the Alhambra queues, on Calle Mateos Gago in Seville, and on Calle Larios in Malaga. Bag in front, phone secured. 2) The 'rosemary ladies' and clipboard petition scams. Say no and walk on. 3) Housing and overtourism protests are aimed at policy, not tourists. Give them room.",
+        "stay": "Seville: Santa Cruz / Arenal; Granada: Realejo or Centro; Malaga: Centro Historico (suggestion; sources give hotspots, not 'safest' lists)."
+      },
+      "totals": {
+        "jan5": {
+          "low": 3431,
+          "high": 5129
+        },
+        "jan2": null
+      },
+      "breakdown": {
+        "flights": {
+          "jan5": 1626,
+          "jan2": null,
+          "lax": 835,
+          "dtw": 791
+        },
+        "buffer": 300,
+        "lodging": {
+          "low": 695,
+          "high": 1103
+        },
+        "transport": {
+          "low": 300,
+          "high": 550
+        },
+        "food": {
+          "low": 560,
+          "high": 1050
+        },
+        "activities": {
+          "low": 250,
+          "high": 500
+        },
+        "totals": {
+          "jan5": {
+            "low": 3431,
+            "high": 5129
+          },
+          "jan2": null
+        }
+      },
+      "sources": [
+        {
+          "key": "worldwide",
+          "section": "Sources: Worldwide",
+          "title": "Google Flights via fli (Jan 5-12, 2027, LAX and DTW, checked Nov 11, 2026); Airbnb search JSON (Jan 5-12); Wikipedia climate tables citing JMA, HKO, CWA, BoM, NIWA, AEMET, IPMA, NOAA and SMN; travel.state.gov advisories via the davemanuel.com CSV; Madeira SIMplifica trail rules; open.er-api.com FX (1 USD = 0.894 EUR, 1.78 NZD, 1.45 AUD, 18,089 IDR)",
+          "detail": "https://travel.state.gov/en/international-travel/travel-advisories.html ; https://www.google.com/travel/flights ; https://www.airbnb.com",
+          "links": [
+            "https://travel.state.gov/en/international-travel/travel-advisories.html",
+            "https://www.google.com/travel/flights",
+            "https://www.airbnb.com"
+          ]
+        },
+        {
+          "key": "flights",
+          "section": "Sources: flights",
+          "title": "Google Flights (queried via the open-source 'fli' client, pip package 'flights')",
+          "detail": "https://www.google.com/travel/flights. Round trip LAX to KOA/OGG/LIH/HNL/OAX/MEX/LAP/SJD/PVR/LIR for Jan 2-9 and Jan 5-12, 2027, economy, 1 adult, times 2. Queried Nov 11, 2026.",
+          "links": [
+            "https://www.google.com/travel/flights."
+          ]
+        },
+        {
+          "key": "lodging",
+          "section": "Sources: lodging",
+          "title": "Airbnb search results",
+          "detail": "https://www.airbnb.com/s/<place>/homes?checkin=2027-01-05&checkout=2027-01-12&adults=2&room_types[]=Entire home/apt. First page (18 listings) per place, 7-night price incl. fees, before taxes. Queried Nov 11, 2026.",
+          "links": []
+        }
+      ],
+      "rank": "5"
+    },
+    {
+      "slug": "joshua-tree",
+      "worldwideRank": "13",
+      "short": "Joshua Tree",
+      "center": [
+        -116.31,
+        33.95
+      ],
+      "nudge": [
+        0,
+        0
+      ],
+      "drive": true,
+      "advisoryLevel": null,
+      "name": "Joshua Tree + Palm Springs",
+      "plan": "",
+      "tag": "",
+      "sheetName": "Joshua Tree + Palm Springs (drive)",
+      "why": "Cheap, and no weather penalty now, but a thin museum/food scene.",
+      "week": "Ryan Mountain, Lost Palms Oasis, San Jacinto via the tram.",
+      "weather": "PS ~71F / ~48F; JT ~63F / ~42F (NOAA)",
+      "laxFlight": "Drive about 2.5-3h",
+      "dtwFlight": "DTW-LAX about 11.9h with 1 stop (Frontier, $254 RT). The cheapest is $224 at 19.9h.",
+      "advisory": "n/a",
+      "downsides": "n/a",
+      "cardPoints": "Cash.",
+      "oldRank": "#6",
+      "scores": {
+        "outdoors": 8,
+        "food": 6,
+        "museums": 4.5,
+        "price": 8,
+        "gettingThere": 7,
+        "safety": 9.5,
+        "weighted": 6.95
+      },
+      "scoreWhy": "Outdoors: Ryan Mtn, Lost Palms Oasis, San Jacinto via the tram. Food: decent. Museums: Palm Springs Art Museum, Sunnylands. Getting there: 2.5-3h drive plus her 11.9h flight. Safety: very low risk.",
+      "safety": {
+        "researched": false,
+        "advisory": "n/a",
+        "consensus": "",
+        "risks": "",
+        "stay": ""
+      },
+      "totals": {
+        "jan5": {
+          "low": 2457,
+          "high": 3846
+        },
+        "jan2": null
+      },
+      "breakdown": {
+        "flights": {
+          "jan5": 254,
+          "jan2": null,
+          "lax": 0,
+          "dtw": 254
+        },
+        "buffer": 300,
+        "lodging": {
+          "low": 1293,
+          "high": 1612
+        },
+        "transport": {
+          "low": 60,
+          "high": 140
+        },
+        "food": {
+          "low": 700,
+          "high": 1190
+        },
+        "activities": {
+          "low": 150,
+          "high": 350
+        },
+        "totals": {
+          "jan5": {
+            "low": 2457,
+            "high": 3846
+          },
+          "jan2": null
+        }
+      },
+      "sources": [
+        {
+          "key": "worldwide",
+          "section": "Sources: Worldwide",
+          "title": "Google Flights via fli (Jan 5-12, 2027, LAX and DTW, checked Nov 11, 2026); Airbnb search JSON (Jan 5-12); Wikipedia climate tables citing JMA, HKO, CWA, BoM, NIWA, AEMET, IPMA, NOAA and SMN; travel.state.gov advisories via the davemanuel.com CSV; Madeira SIMplifica trail rules; open.er-api.com FX (1 USD = 0.894 EUR, 1.78 NZD, 1.45 AUD, 18,089 IDR)",
+          "detail": "https://travel.state.gov/en/international-travel/travel-advisories.html ; https://www.google.com/travel/flights ; https://www.airbnb.com",
+          "links": [
+            "https://travel.state.gov/en/international-travel/travel-advisories.html",
+            "https://www.google.com/travel/flights",
+            "https://www.airbnb.com"
+          ]
+        },
+        {
+          "key": "flights",
+          "section": "Sources: flights",
+          "title": "Google Flights (queried via the open-source 'fli' client, pip package 'flights')",
+          "detail": "https://www.google.com/travel/flights. Round trip LAX to KOA/OGG/LIH/HNL/OAX/MEX/LAP/SJD/PVR/LIR for Jan 2-9 and Jan 5-12, 2027, economy, 1 adult, times 2. Queried Nov 11, 2026.",
+          "links": [
+            "https://www.google.com/travel/flights."
+          ]
+        },
+        {
+          "key": "lodging",
+          "section": "Sources: lodging",
+          "title": "Airbnb search results",
+          "detail": "https://www.airbnb.com/s/<place>/homes?checkin=2027-01-05&checkout=2027-01-12&adults=2&room_types[]=Entire home/apt. First page (18 listings) per place, 7-night price incl. fees, before taxes. Queried Nov 11, 2026.",
+          "links": []
+        },
+        {
+          "key": "noaa",
+          "section": "Sources: weather",
+          "title": "NOAA 1991-2020 normals (via Wikipedia climate tables)",
+          "detail": "Kona Intl Airport, Kahului Airport, Palm Springs, Twentynine Palms, Tucson Intl Airport",
+          "links": []
+        },
+        {
+          "key": "aaa",
+          "section": "Sources: driving",
+          "title": "AAA California average regular gas $4.19 (Nov 11, 2026)",
+          "detail": "https://gasprices.aaa.com/?state=CA . Fuel economy assumption: 2021 Honda HR-V about 30 mpg combined (EPA, FWD).",
+          "links": [
+            "https://gasprices.aaa.com/?state=CA"
+          ]
+        }
+      ],
+      "rank": "6"
+    },
+    {
+      "slug": "taiwan",
+      "worldwideRank": "17",
+      "short": "Taiwan",
+      "center": [
+        121.5654,
+        25.033
+      ],
+      "nudge": [
+        0,
+        0
+      ],
+      "drive": false,
+      "advisoryLevel": 1,
+      "name": "Taiwan",
+      "plan": "Taipei + Tainan",
+      "tag": "",
+      "sheetName": "Taiwan (Taipei + Tainan)",
+      "why": "Superb food and the National Palace Museum, mild, but Taroko's main gorge trails are closed and the flights are long for her.",
+      "week": "Yangmingshan, Teapot Mountain; Tainan old town food.",
+      "weather": "Taipei ~67F / ~58F, about 14 rain days; Tainan ~73F / ~58F (1991-2020 normals via Wikipedia)",
+      "laxFlight": "14.7h nonstop (EVA)",
+      "dtwFlight": "About 22.8h with 1 stop",
+      "advisory": "Level 1",
+      "downsides": "Level 1",
+      "cardPoints": "Cash.",
+      "oldRank": "new",
+      "scores": {
+        "outdoors": 6.5,
+        "food": 9.5,
+        "museums": 8.5,
+        "price": 3.5,
+        "gettingThere": 2,
+        "safety": 9,
+        "weighted": 6.85
+      },
+      "scoreWhy": "Outdoors: Yangmingshan, Teapot Mtn; Taroko's main trails closed. Food: elite. Museums: National Palace Museum. Getting there: 14.7h nonstop for him, about 23h for her, 16h shift. Safety: Level 1, very safe. (Safety not researched in depth.)",
+      "safety": {
+        "researched": false,
+        "advisory": "Level 1",
+        "consensus": "",
+        "risks": "",
+        "stay": ""
+      },
+      "totals": {
+        "jan5": {
+          "low": 4021,
+          "high": 5521
+        },
+        "jan2": null
+      },
+      "breakdown": {
+        "flights": {
+          "jan5": 2811,
+          "jan2": null,
+          "lax": 1097,
+          "dtw": 1714
+        },
+        "buffer": 300,
+        "lodging": {
+          "low": 420,
+          "high": 730
+        },
+        "transport": {
+          "low": 150,
+          "high": 300
+        },
+        "food": {
+          "low": 490,
+          "high": 980
+        },
+        "activities": {
+          "low": 150,
+          "high": 400
+        },
+        "totals": {
+          "jan5": {
+            "low": 4021,
+            "high": 5521
+          },
+          "jan2": null
+        }
+      },
+      "sources": [
+        {
+          "key": "worldwide",
+          "section": "Sources: Worldwide",
+          "title": "Google Flights via fli (Jan 5-12, 2027, LAX and DTW, checked Nov 11, 2026); Airbnb search JSON (Jan 5-12); Wikipedia climate tables citing JMA, HKO, CWA, BoM, NIWA, AEMET, IPMA, NOAA and SMN; travel.state.gov advisories via the davemanuel.com CSV; Madeira SIMplifica trail rules; open.er-api.com FX (1 USD = 0.894 EUR, 1.78 NZD, 1.45 AUD, 18,089 IDR)",
+          "detail": "https://travel.state.gov/en/international-travel/travel-advisories.html ; https://www.google.com/travel/flights ; https://www.airbnb.com",
+          "links": [
+            "https://travel.state.gov/en/international-travel/travel-advisories.html",
+            "https://www.google.com/travel/flights",
+            "https://www.airbnb.com"
+          ]
+        },
+        {
+          "key": "flights",
+          "section": "Sources: flights",
+          "title": "Google Flights (queried via the open-source 'fli' client, pip package 'flights')",
+          "detail": "https://www.google.com/travel/flights. Round trip LAX to KOA/OGG/LIH/HNL/OAX/MEX/LAP/SJD/PVR/LIR for Jan 2-9 and Jan 5-12, 2027, economy, 1 adult, times 2. Queried Nov 11, 2026.",
+          "links": [
+            "https://www.google.com/travel/flights."
+          ]
+        },
+        {
+          "key": "lodging",
+          "section": "Sources: lodging",
+          "title": "Airbnb search results",
+          "detail": "https://www.airbnb.com/s/<place>/homes?checkin=2027-01-05&checkout=2027-01-12&adults=2&room_types[]=Entire home/apt. First page (18 listings) per place, 7-night price incl. fees, before taxes. Queried Nov 11, 2026.",
+          "links": []
+        }
+      ],
+      "rank": "7"
+    },
+    {
+      "slug": "lisbon",
+      "worldwideRank": "5",
+      "short": "Lisbon",
+      "center": [
+        -9.1393,
+        38.7223
+      ],
+      "nudge": [
+        0,
+        0
+      ],
+      "drive": false,
+      "advisoryLevel": 1,
+      "name": "Lisbon + Sintra / Arrabida",
+      "plan": "",
+      "tag": "",
+      "sheetName": "Lisbon + Sintra / Arrabida",
+      "why": "Elite museums and food, mild, cheapest Europe flights for both. Hiking is moderate (day hikes, not big mountains).",
+      "week": "Gulbenkian, Azulejo Museum, MAAT, Belem. Sintra: Pena and the Moorish Castle on foot via Sintra-Cascais park trails; a coastal Arrabida day hike. Pasteis, tascas, seafood; reserve one dinner. Optional 2 nights in Porto.",
+      "weather": "High ~59F / low ~47F, about 10 rain days (IPMA)",
+      "laxFlight": "About 17.7h with 1 stop (Air Canada)",
+      "dtwFlight": "About 11.9h with 1 stop (American)",
+      "advisory": "Level 1",
+      "downsides": "Level 1",
+      "cardPoints": "Maybe: United partner award (about 40k each way) for his leg. Cash is already fairly low.",
+      "oldRank": "new",
+      "scores": {
+        "outdoors": 5,
+        "food": 8.5,
+        "museums": 8.5,
+        "price": 5.5,
+        "gettingThere": 3.5,
+        "safety": 9,
+        "weighted": 6.73
+      },
+      "scoreWhy": "Outdoors: moderate day hikes only. Food and museums: excellent. Price: cheapest of Europe. Getting there: 17.7h / 11.9h. Safety: Level 1; pickpockets.",
+      "safety": {
+        "researched": true,
+        "advisory": "Level 1",
+        "consensus": "'Very safe', including for solo travelers. The one real issue is pickpockets on Tram 28, at viewpoints, in Baixa/Rossio and on the Sintra trains.",
+        "risks": "1) Pickpockets working in groups at tram doors. Ride Tram 28 early or late, wear bags in front, and keep nothing in back pockets. 2) Street 'hashish' sellers (fake product). Ignore them. 3) Sintra: car break-ins on forest roads, unlicensed tuk-tuk fares, crowds. Take the train or bus, agree fares first, buy official timed palace tickets.",
+        "stay": "Central Lisbon is broadly safe. Chiado, Principe Real, Estrela and Campo de Ourique are quieter bases (suggestion). Be alert in crowded Baixa, Rossio and Alfama."
+      },
+      "totals": {
+        "jan5": {
+          "low": 3161,
+          "high": 4854
+        },
+        "jan2": null
+      },
+      "breakdown": {
+        "flights": {
+          "jan5": 1648,
+          "jan2": null,
+          "lax": 789,
+          "dtw": 859
+        },
+        "buffer": 300,
+        "lodging": {
+          "low": 603,
+          "high": 1056
+        },
+        "transport": {
+          "low": 150,
+          "high": 350
+        },
+        "food": {
+          "low": 560,
+          "high": 1050
+        },
+        "activities": {
+          "low": 200,
+          "high": 450
+        },
+        "totals": {
+          "jan5": {
+            "low": 3161,
+            "high": 4854
+          },
+          "jan2": null
+        }
+      },
+      "sources": [
+        {
+          "key": "worldwide",
+          "section": "Sources: Worldwide",
+          "title": "Google Flights via fli (Jan 5-12, 2027, LAX and DTW, checked Nov 11, 2026); Airbnb search JSON (Jan 5-12); Wikipedia climate tables citing JMA, HKO, CWA, BoM, NIWA, AEMET, IPMA, NOAA and SMN; travel.state.gov advisories via the davemanuel.com CSV; Madeira SIMplifica trail rules; open.er-api.com FX (1 USD = 0.894 EUR, 1.78 NZD, 1.45 AUD, 18,089 IDR)",
+          "detail": "https://travel.state.gov/en/international-travel/travel-advisories.html ; https://www.google.com/travel/flights ; https://www.airbnb.com",
+          "links": [
+            "https://travel.state.gov/en/international-travel/travel-advisories.html",
+            "https://www.google.com/travel/flights",
+            "https://www.airbnb.com"
+          ]
+        },
+        {
+          "key": "flights",
+          "section": "Sources: flights",
+          "title": "Google Flights (queried via the open-source 'fli' client, pip package 'flights')",
+          "detail": "https://www.google.com/travel/flights. Round trip LAX to KOA/OGG/LIH/HNL/OAX/MEX/LAP/SJD/PVR/LIR for Jan 2-9 and Jan 5-12, 2027, economy, 1 adult, times 2. Queried Nov 11, 2026.",
+          "links": [
+            "https://www.google.com/travel/flights."
+          ]
+        },
+        {
+          "key": "lodging",
+          "section": "Sources: lodging",
+          "title": "Airbnb search results",
+          "detail": "https://www.airbnb.com/s/<place>/homes?checkin=2027-01-05&checkout=2027-01-12&adults=2&room_types[]=Entire home/apt. First page (18 listings) per place, 7-night price incl. fees, before taxes. Queried Nov 11, 2026.",
+          "links": []
+        }
+      ],
+      "rank": "8"
+    },
+    {
+      "slug": "hong-kong",
+      "worldwideRank": "7",
+      "short": "Hong Kong",
+      "center": [
+        114.1694,
+        22.3193
+      ],
+      "nudge": [
+        0,
+        0
+      ],
+      "drive": false,
+      "advisoryLevel": 2,
+      "name": "Hong Kong",
+      "plan": "",
+      "tag": "",
+      "sheetName": "Hong Kong",
+      "why": "Top-tier city food and museums with genuinely great mountain/coastal hiking. Mild and dry. Long-haul, though, and her flight is long and pricey.",
+      "week": "Hikes: Lantau Peak (sunrise), Dragon's Back, a MacLehose Trail section in Sai Kung. M+ and the Hong Kong Palace Museum, the Peak, Star Ferry. Dim sum, dai pai dong, roast goose; reserve one dinner.",
+      "weather": "High ~66F / low ~58F, about 6 rain days (Hong Kong Observatory)",
+      "laxFlight": "16h nonstop (United)",
+      "dtwFlight": "About 22h with 1 stop (United, $1,923). A $1,190 fare takes about 32h.",
+      "advisory": "Level 2 (local laws)",
+      "downsides": "Level 2 (local laws)",
+      "cardPoints": "No award estimate from Credit Max for HK. Pay cash with CSP.",
+      "oldRank": "new",
+      "scores": {
+        "outdoors": 7.5,
+        "food": 9.5,
+        "museums": 8.5,
+        "price": 2.5,
+        "gettingThere": 2,
+        "safety": 6.5,
+        "weighted": 6.7
+      },
+      "scoreWhy": "Outdoors: Lantau Peak, MacLehose, Dragon's Back. Food: elite. Museums: M+, Palace Museum. Price: high because of her $1,923 fare. Getting there: 16h / 22h, 16h shift. Safety: low crime, but national security law and device-password legal risk.",
+      "safety": {
+        "researched": true,
+        "advisory": "Level 2 (arbitrary enforcement of local laws / national security laws)",
+        "consensus": "For ordinary tourists who avoid politics, locals and travelers on Reddit describe visits as uneventful and street crime as very low. The real concern is legal: broadly worded national security laws can apply to foreigners and to online posts.",
+        "risks": "1) National security laws: avoid protests or commemorations, don't photograph police or protest scenes, and avoid political posts while there. 2) Devices: since Mar 23, 2026, refusing to give passwords or decryption help in a national-security case is a crime, including in airport transit (State Dept / OSAC). Consider traveling with a minimal phone and data; Reddit travelers discuss wiping phones or using burners. 3) Exit bans and wrongful-detention warnings are aimed at mainland China, not Hong Kong, but don't add a side trip to the mainland without checking.",
+        "stay": "Tsim Sha Tsui, Central/Sheung Wan, Wan Chai (suggestion; no crime-by-area source)."
+      },
+      "totals": {
+        "jan5": {
+          "low": 4278,
+          "high": 6014
+        },
+        "jan2": null
+      },
+      "breakdown": {
+        "flights": {
+          "jan5": 2900,
+          "jan2": null,
+          "lax": 977,
+          "dtw": 1923
+        },
+        "buffer": 300,
+        "lodging": {
+          "low": 568,
+          "high": 1164
+        },
+        "transport": {
+          "low": 100,
+          "high": 200
+        },
+        "food": {
+          "low": 560,
+          "high": 1050
+        },
+        "activities": {
+          "low": 150,
+          "high": 400
+        },
+        "totals": {
+          "jan5": {
+            "low": 4278,
+            "high": 6014
+          },
+          "jan2": null
+        }
+      },
+      "sources": [
+        {
+          "key": "worldwide",
+          "section": "Sources: Worldwide",
+          "title": "Google Flights via fli (Jan 5-12, 2027, LAX and DTW, checked Nov 11, 2026); Airbnb search JSON (Jan 5-12); Wikipedia climate tables citing JMA, HKO, CWA, BoM, NIWA, AEMET, IPMA, NOAA and SMN; travel.state.gov advisories via the davemanuel.com CSV; Madeira SIMplifica trail rules; open.er-api.com FX (1 USD = 0.894 EUR, 1.78 NZD, 1.45 AUD, 18,089 IDR)",
+          "detail": "https://travel.state.gov/en/international-travel/travel-advisories.html ; https://www.google.com/travel/flights ; https://www.airbnb.com",
+          "links": [
+            "https://travel.state.gov/en/international-travel/travel-advisories.html",
+            "https://www.google.com/travel/flights",
+            "https://www.airbnb.com"
+          ]
+        },
+        {
+          "key": "flights",
+          "section": "Sources: flights",
+          "title": "Google Flights (queried via the open-source 'fli' client, pip package 'flights')",
+          "detail": "https://www.google.com/travel/flights. Round trip LAX to KOA/OGG/LIH/HNL/OAX/MEX/LAP/SJD/PVR/LIR for Jan 2-9 and Jan 5-12, 2027, economy, 1 adult, times 2. Queried Nov 11, 2026.",
+          "links": [
+            "https://www.google.com/travel/flights."
+          ]
+        },
+        {
+          "key": "lodging",
+          "section": "Sources: lodging",
+          "title": "Airbnb search results",
+          "detail": "https://www.airbnb.com/s/<place>/homes?checkin=2027-01-05&checkout=2027-01-12&adults=2&room_types[]=Entire home/apt. First page (18 listings) per place, 7-night price incl. fees, before taxes. Queried Nov 11, 2026.",
+          "links": []
+        }
+      ],
+      "rank": "9"
+    },
+    {
+      "slug": "puerto-rico",
+      "worldwideRank": "10",
+      "short": "Puerto Rico",
+      "center": [
+        -66.1057,
+        18.4655
+      ],
+      "nudge": [
+        0,
+        0
+      ],
+      "drive": false,
+      "advisoryLevel": null,
+      "name": "Puerto Rico",
+      "plan": "San Juan + El Yunque",
+      "tag": "",
+      "sheetName": "Puerto Rico (San Juan + El Yunque)",
+      "why": "Cheapest warm trip for both, no passport needed, a real old city plus rainforest hikes. Hikes are shorter than their usual.",
+      "week": "Old San Juan, El Morro and San Cristobal forts, Museo de Arte de Puerto Rico. El Yunque: El Toro or El Yunque peak trail (reservation for the road). Bioluminescent bay; lechon in Guavate; reserve one dinner in San Juan.",
+      "weather": "High ~83F / low ~72F, short showers on about 12 days (NOAA)",
+      "laxFlight": "About 11.2h with 1 stop (United)",
+      "dtwFlight": "About 12.9h with 1 stop (Frontier)",
+      "advisory": "n/a (US territory)",
+      "downsides": "n/a (US territory)",
+      "cardPoints": "Pay cash with CSP (fares already low).",
+      "oldRank": "new",
+      "scores": {
+        "outdoors": 5,
+        "food": 7.5,
+        "museums": 6.5,
+        "price": 6.5,
+        "gettingThere": 5,
+        "safety": 7.5,
+        "weighted": 6.28
+      },
+      "scoreWhy": "Outdoors: El Yunque hikes are short. Food: good. Museums: Old San Juan forts, art museum. Getting there: about 11-13h with 1 stop each. Safety: car break-ins, outages.",
+      "safety": {
+        "researched": true,
+        "advisory": "n/a (US territory)",
+        "consensus": "Tourist areas (Old San Juan, Condado, Isla Verde) are generally safe day and evening. The main risk is theft from rental cars at beaches and trailheads; power outages are a nuisance.",
+        "risks": "1) Car break-ins at beach lots and El Yunque trailheads. Leave nothing visible. 2) La Perla and unfamiliar neighborhoods late at night. Avoid them; use Uber or a taxi. 3) Power outages (usually localized, minutes to hours). Book lodging with a generator that covers rooms and AC, and bring a power bank. Rip currents at beaches.",
+        "stay": "Old San Juan, Condado, Isla Verde"
+      },
+      "totals": {
+        "jan5": {
+          "low": 2824,
+          "high": 4682
+        },
+        "jan2": null
+      },
+      "breakdown": {
+        "flights": {
+          "jan5": 674,
+          "jan2": null,
+          "lax": 384,
+          "dtw": 290
+        },
+        "buffer": 300,
+        "lodging": {
+          "low": 950,
+          "high": 1518
+        },
+        "transport": {
+          "low": 350,
+          "high": 600
+        },
+        "food": {
+          "low": 700,
+          "high": 1190
+        },
+        "activities": {
+          "low": 150,
+          "high": 400
+        },
+        "totals": {
+          "jan5": {
+            "low": 2824,
+            "high": 4682
+          },
+          "jan2": null
+        }
+      },
+      "sources": [
+        {
+          "key": "worldwide",
+          "section": "Sources: Worldwide",
+          "title": "Google Flights via fli (Jan 5-12, 2027, LAX and DTW, checked Nov 11, 2026); Airbnb search JSON (Jan 5-12); Wikipedia climate tables citing JMA, HKO, CWA, BoM, NIWA, AEMET, IPMA, NOAA and SMN; travel.state.gov advisories via the davemanuel.com CSV; Madeira SIMplifica trail rules; open.er-api.com FX (1 USD = 0.894 EUR, 1.78 NZD, 1.45 AUD, 18,089 IDR)",
+          "detail": "https://travel.state.gov/en/international-travel/travel-advisories.html ; https://www.google.com/travel/flights ; https://www.airbnb.com",
+          "links": [
+            "https://travel.state.gov/en/international-travel/travel-advisories.html",
+            "https://www.google.com/travel/flights",
+            "https://www.airbnb.com"
+          ]
+        },
+        {
+          "key": "flights",
+          "section": "Sources: flights",
+          "title": "Google Flights (queried via the open-source 'fli' client, pip package 'flights')",
+          "detail": "https://www.google.com/travel/flights. Round trip LAX to KOA/OGG/LIH/HNL/OAX/MEX/LAP/SJD/PVR/LIR for Jan 2-9 and Jan 5-12, 2027, economy, 1 adult, times 2. Queried Nov 11, 2026.",
+          "links": [
+            "https://www.google.com/travel/flights."
+          ]
+        },
+        {
+          "key": "lodging",
+          "section": "Sources: lodging",
+          "title": "Airbnb search results",
+          "detail": "https://www.airbnb.com/s/<place>/homes?checkin=2027-01-05&checkout=2027-01-12&adults=2&room_types[]=Entire home/apt. First page (18 listings) per place, 7-night price incl. fees, before taxes. Queried Nov 11, 2026.",
+          "links": []
+        },
+        {
+          "key": "noaa",
+          "section": "Sources: weather",
+          "title": "NOAA 1991-2020 normals (via Wikipedia climate tables)",
+          "detail": "Kona Intl Airport, Kahului Airport, Palm Springs, Twentynine Palms, Tucson Intl Airport",
+          "links": []
+        }
+      ],
+      "rank": "10"
+    },
+    {
+      "slug": "big-island",
+      "worldwideRank": "3",
+      "short": "Big Island",
+      "center": [
+        -155.52,
+        19.6
+      ],
+      "nudge": [
+        0,
+        0
+      ],
+      "drive": false,
+      "advisoryLevel": null,
+      "name": "Big Island, Hawaii",
+      "plan": "",
+      "tag": "",
+      "sheetName": "Big Island, Hawaii",
+      "why": "Best pure hiking and nature (active volcano, Mauna Kea, snorkeling); weakest city/museum side.",
+      "week": "Hawaii Volcanoes NP: Kilauea Iki and Napau Crater (11.9 mi, 5-5.5h). Mauna Kea via the Humu'ula Trail (9-10h, above 12,000 ft) or the stargazing route. Captain Cook / Ka'awaloa hike (1,256 ft) plus snorkeling. Pu'uhonua o Honaunau, the 'Imiloa center in Hilo. Poke, plate lunch; reserve Merriman's Waimea.",
+      "weather": "Kona: high ~81F / low ~69F (NOAA)",
+      "laxFlight": "5h50 nonstop",
+      "dtwFlight": "About 12.4h with 1 stop (Delta)",
+      "advisory": "n/a (US)",
+      "downsides": "n/a (US)",
+      "cardPoints": "Possible saving: BA Avios on Alaska/Hawaiian, about 88k Avios for 2 LAX round trips (Credit Max estimate, about $700 value vs about $894 cash). Her DTW leg needs its own check. Verify on ba.com.",
+      "oldRank": "#1",
+      "scores": {
+        "outdoors": 9.5,
+        "food": 6.5,
+        "museums": 3.5,
+        "price": 3,
+        "gettingThere": 5.5,
+        "safety": 8.5,
+        "weighted": 6.23
+      },
+      "scoreWhy": "Outdoors: best in set (volcano park, Mauna Kea). Museums: little city. Price: $5k midpoint. Getting there: 5h50 nonstop / 12.4h. Safety: natural hazards and break-ins.",
+      "safety": {
+        "researched": true,
+        "advisory": "n/a (US)",
+        "consensus": "Safe for tourists. The risks are nature (volcanic gas and vog, cliff edges, altitude, surf) plus rental-car break-ins at trailheads and beaches.",
+        "risks": "1) Car break-ins at trailheads and beach parks. Leave nothing visible and keep valuables with you. 2) Volcanic gas, vog and tephra: NPS warns people with heart or lung conditions. Check the NPS air-quality map and the USGS daily update, and bring a mask and eye protection near active fountaining. 3) Closures: on Oct 7, 2026 the park closed the Halema'uma'u and part of the Byron Ledge trails (seismicity, rockfall). Kilauea is paused after episode 56 (ended Nov 5), and USGS forecast episode 57 for about Nov 16-21.",
+        "stay": "Kona side for weather (Kailua-Kona, Keauhou, Waikoloa), plus Volcano Village for park access (logistics suggestion, not a sourced safety ranking)."
+      },
+      "totals": {
+        "jan5": {
+          "low": 3840,
+          "high": 6183
+        },
+        "jan2": null
+      },
+      "breakdown": {
+        "flights": {
+          "jan5": 947,
+          "jan2": null,
+          "lax": 447,
+          "dtw": 500
+        },
+        "buffer": 300,
+        "lodging": {
+          "low": 1353,
+          "high": 1886
+        },
+        "transport": {
+          "low": 450,
+          "high": 750
+        },
+        "food": {
+          "low": 840,
+          "high": 1400
+        },
+        "activities": {
+          "low": 250,
+          "high": 900
+        },
+        "totals": {
+          "jan5": {
+            "low": 3840,
+            "high": 6183
+          },
+          "jan2": null
+        }
+      },
+      "sources": [
+        {
+          "key": "worldwide",
+          "section": "Sources: Worldwide",
+          "title": "Google Flights via fli (Jan 5-12, 2027, LAX and DTW, checked Nov 11, 2026); Airbnb search JSON (Jan 5-12); Wikipedia climate tables citing JMA, HKO, CWA, BoM, NIWA, AEMET, IPMA, NOAA and SMN; travel.state.gov advisories via the davemanuel.com CSV; Madeira SIMplifica trail rules; open.er-api.com FX (1 USD = 0.894 EUR, 1.78 NZD, 1.45 AUD, 18,089 IDR)",
+          "detail": "https://travel.state.gov/en/international-travel/travel-advisories.html ; https://www.google.com/travel/flights ; https://www.airbnb.com",
+          "links": [
+            "https://travel.state.gov/en/international-travel/travel-advisories.html",
+            "https://www.google.com/travel/flights",
+            "https://www.airbnb.com"
+          ]
+        },
+        {
+          "key": "flights",
+          "section": "Sources: flights",
+          "title": "Google Flights (queried via the open-source 'fli' client, pip package 'flights')",
+          "detail": "https://www.google.com/travel/flights. Round trip LAX to KOA/OGG/LIH/HNL/OAX/MEX/LAP/SJD/PVR/LIR for Jan 2-9 and Jan 5-12, 2027, economy, 1 adult, times 2. Queried Nov 11, 2026.",
+          "links": [
+            "https://www.google.com/travel/flights."
+          ]
+        },
+        {
+          "key": "lodging",
+          "section": "Sources: lodging",
+          "title": "Airbnb search results",
+          "detail": "https://www.airbnb.com/s/<place>/homes?checkin=2027-01-05&checkout=2027-01-12&adults=2&room_types[]=Entire home/apt. First page (18 listings) per place, 7-night price incl. fees, before taxes. Queried Nov 11, 2026.",
+          "links": []
+        },
+        {
+          "key": "noaa",
+          "section": "Sources: weather",
+          "title": "NOAA 1991-2020 normals (via Wikipedia climate tables)",
+          "detail": "Kona Intl Airport, Kahului Airport, Palm Springs, Twentynine Palms, Tucson Intl Airport",
+          "links": []
         },
         {
           "key": "hawaii-tax",
@@ -273,288 +1603,105 @@
           "links": [
             "https://www.nps.gov/havo/planyourvisit/fees.htm"
           ]
-        },
-        {
-          "key": "kayak",
-          "section": "Sources: Hawaii",
-          "title": "KAYAK Kona airport car rentals (from $30/day listed for Jan 2027)",
-          "detail": "https://www.kayak.com/Kona-Intl-Airport-Car-Rentals.KOA.cap.ksp",
-          "links": [
-            "https://www.kayak.com/Kona-Intl-Airport-Car-Rentals.KOA.cap.ksp"
-          ]
         }
       ],
-      "itinerary": {
-        "heading": "#1 Big Island, Hawaii (Jan 5-12)",
-        "days": [
-          {
-            "day": "Day 1 (Tue Jan 5)",
-            "plan": "Fly LAX-KOA nonstop. Pick up car, base in Kona. Sunset at Magic Sands or Kahalu'u beach, then poke for dinner."
-          },
-          {
-            "day": "Day 2",
-            "plan": "Morning: Captain Cook Monument (Ka'awaloa) trail, about 3.8 mi round trip, with snorkeling at Kealakekua Bay. Afternoon: Pu'uhonua o Honaunau and a Kona coffee farm tour."
-          },
-          {
-            "day": "Day 3",
-            "plan": "North Kohala: Pololu Valley trail down to the black-sand beach, then Hawi town. Evening: manta-ray night snorkel off Kona (book ahead)."
-          },
-          {
-            "day": "Day 4",
-            "plan": "Mauna Kea: Onizuka visitor station for sunset and stargazing (bring warm layers; a tour van is needed for the summit). Easy morning at Hapuna Beach."
-          },
-          {
-            "day": "Day 5",
-            "plan": "Drive to Volcano via Ka'u (Punalu'u black-sand beach, sea turtles). Check into Volcano village. Evening: Halema'uma'u overlook for glow if an eruption episode is happening (check the USGS HVO page that day)."
-          },
-          {
-            "day": "Day 6",
-            "plan": "Hawai'i Volcanoes NP: Kilauea Iki trail (4 mi), Nahuku lava tube, Chain of Craters Road to the Holei Sea Arch. Volcano Art Center."
-          },
-          {
-            "day": "Day 7",
-            "plan": "Hilo side: Akaka Falls, Hilo Farmers Market, Rainbow Falls, 'Imiloa Astronomy Center. Overnight Volcano or Hilo."
-          },
-          {
-            "day": "Day 8 (Tue Jan 12)",
-            "plan": "Drive back across Saddle Road (about 1h45 to Kona airport) and fly KOA-LAX nonstop. Or fly out of Hilo if the fares work."
-          }
-        ],
-        "bookAhead": "Manta night snorkel, Mauna Kea tour (if doing the summit), rental car, Volcano lodging. Check NPS HAVO alerts and USGS HVO before going."
-      }
+      "rank": "11"
     },
     {
-      "slug": "oaxaca",
-      "rank": "2",
-      "short": "Oaxaca",
+      "slug": "madeira",
+      "worldwideRank": "4",
+      "short": "Madeira",
       "center": [
-        -96.7266,
-        17.0732
-      ],
-      "nudge": [
-        8,
-        10
-      ],
-      "advisoryLevel": null,
-      "name": "Oaxaca, Mexico",
-      "plan": "",
-      "tag": "",
-      "sheetName": "Oaxaca, Mexico",
-      "costLabel": "2. Oaxaca, Mexico",
-      "why": "Mexico's food and craft capital in its dry season: hot sunny days with cool nights, Zapotec ruins, mezcal country, weaving villages, and real mountain hiking in the Sierra Norte. Best value per day of any option.",
-      "hikes": [
-        "Sierra Norte / Pueblos Mancomunados village-to-village hikes (guided)",
-        "Hierve el Agua petrified waterfalls",
-        "Monte Alban hilltop ruins",
-        "Mitla",
-        "El Tule tree"
-      ],
-      "museumsFood": "Museo de las Culturas (Santo Domingo), Textile Museum, Ethnobotanical Garden, Teotitlan del Valle weavers; mole, tlayudas, mezcal tastings, Mercado 20 de Noviembre, cooking classes",
-      "weather": "High ~84F / low ~51F (Mexico's SMN 1991-2020); rain on ~1% of early-January days (ERA5 2015-25)",
-      "travelTime": "No nonstop. ~7.5h with a stop in Mexico City (Aeromexico); cheapest Jan 5-12 fare is ~10.5h with a stop on United",
-      "bestDates": "Jan 5-12 (flights $1,102 vs $1,948 for two)",
-      "downsides": "Connecting flight both ways. Cold mornings (~50F). US State Dept Level 2 (increased caution) for Oaxaca state; US government staff may not travel to the Isthmus region, which is far from Oaxaca City.",
-      "totals": {
-        "jan5": {
-          "low": 2363,
-          "high": 3933
-        },
-        "jan2": {
-          "low": 3209,
-          "high": 4779
-        }
-      },
-      "breakdown": {
-        "flights": {
-          "jan5": 1102,
-          "jan2": 1948
-        },
-        "buffer": 300,
-        "lodging": {
-          "low": 391,
-          "high": 641
-        },
-        "transport": {
-          "low": 150,
-          "high": 350
-        },
-        "food": {
-          "low": 420,
-          "high": 840
-        },
-        "activities": {
-          "low": 300,
-          "high": 700
-        },
-        "totals": {
-          "jan5": {
-            "low": 2363,
-            "high": 3933
-          },
-          "jan2": {
-            "low": 3209,
-            "high": 4779
-          }
-        },
-        "basis": "Flights: 1 stop each way, United $1,102 (Jan 5-12) / Aeromexico via MEX $1,948 (Jan 2-9). Lodging: Airbnb entire-home 7-night p25-p75 $326-534, times about 1.20 for Mexican VAT plus lodging tax (estimate). Boutique hotels cost more. Transport (estimate): taxis/Uber, plus a guided Sierra Norte day or a driver to Hierve el Agua. Food $60-120/day for two (estimate). Activities (estimate): Monte Alban and Mitla entry, guided Sierra Norte hike, cooking class, mezcal tour."
-      },
-      "sources": [
-        {
-          "key": "flights",
-          "section": "Sources: flights",
-          "title": "Google Flights (queried via the open-source 'fli' client, pip package 'flights')",
-          "detail": "https://www.google.com/travel/flights. Round trip LAX to KOA/OGG/LIH/HNL/OAX/MEX/LAP/SJD/PVR/LIR for Jan 2-9 and Jan 5-12, 2027, economy, 1 adult, times 2. Queried Nov 11, 2026.",
-          "links": [
-            "https://www.google.com/travel/flights."
-          ]
-        },
-        {
-          "key": "lodging",
-          "section": "Sources: lodging",
-          "title": "Airbnb search results",
-          "detail": "https://www.airbnb.com/s/<place>/homes?checkin=2027-01-05&checkout=2027-01-12&adults=2&room_types[]=Entire home/apt. First page (18 listings) per place, 7-night price incl. fees, before taxes. Queried Nov 11, 2026.",
-          "links": []
-        },
-        {
-          "key": "smn",
-          "section": "Sources: weather",
-          "title": "Mexico Servicio Meteorologico Nacional 1991-2020 normals (via Wikipedia)",
-          "detail": "Oaxaca, Mexico City (Tacubaya), La Paz. Puerto Vallarta: WMO. Liberia, Costa Rica: Instituto Meteorologico Nacional.",
-          "links": []
-        },
-        {
-          "key": "era5",
-          "section": "Sources: weather",
-          "title": "Open-Meteo ERA5 archive (rain frequency, Jan 1-14, 2015-2025)",
-          "detail": "https://archive-api.open-meteo.com/v1/archive",
-          "links": [
-            "https://archive-api.open-meteo.com/v1/archive"
-          ]
-        },
-        {
-          "key": "mexico-advisory",
-          "section": "Sources: advisories",
-          "title": "US State Dept Mexico Travel Advisory (May 29, 2026)",
-          "detail": "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/mexico-travel-advisory.html",
-          "links": [
-            "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/mexico-travel-advisory.html"
-          ]
-        }
-      ],
-      "itinerary": {
-        "heading": "#2 Oaxaca, Mexico (Jan 5-12)",
-        "days": [
-          {
-            "day": "Day 1 (Tue Jan 5)",
-            "plan": "Fly LAX-OAX with one connection, arriving in the evening. Stay in Centro/Jalatlaco. Walk the zocalo and have mezcal nearby."
-          },
-          {
-            "day": "Day 2",
-            "plan": "Monte Alban in the morning (go early, it's hot and exposed). Afternoon: Museo de las Culturas at Santo Domingo and the Ethnobotanical Garden (guided visits only). Dinner: mole tasting menu."
-          },
-          {
-            "day": "Day 3",
-            "plan": "Day trip east: El Tule tree, Teotitlan del Valle weavers, Mitla ruins, Hierve el Agua (swim in the mineral pools, short hike), a mezcal palenque on the way back."
-          },
-          {
-            "day": "Day 4",
-            "plan": "Sierra Norte (Pueblos Mancomunados) guided hike, e.g. Cuajimoloyas to Latuvi via forest trails with lunch in a village. Optional overnight in a village cabin."
-          },
-          {
-            "day": "Day 5",
-            "plan": "Slower day: Textile Museum, Mercado 20 de Noviembre and Benito Juarez market, cooking class with a market tour."
-          },
-          {
-            "day": "Day 6",
-            "plan": "San Jose del Pacifico or Ocotlan/San Martin Tilcajete (alebrije carvers) day trip, or a Hierve el Agua alternative. Rooftop dinner."
-          },
-          {
-            "day": "Day 7",
-            "plan": "Free day / buffer: Santo Domingo church, galleries, chocolate and mezcal tastings, last mole."
-          },
-          {
-            "day": "Day 8 (Tue Jan 12)",
-            "plan": "Fly OAX-LAX with one connection."
-          }
-        ],
-        "bookAhead": "Sierra Norte guide (Expediciones Sierra Norte or similar), cooking class, Ethnobotanical Garden tour times."
-      }
-    },
-    {
-      "slug": "la-paz",
-      "rank": "3",
-      "short": "La Paz",
-      "center": [
-        -110.3128,
-        24.1426
+        -16.9087,
+        32.6669
       ],
       "nudge": [
         0,
         0
       ],
-      "advisoryLevel": null,
-      "name": "La Paz + Todos Santos, Baja California Sur",
+      "drive": false,
+      "advisoryLevel": 1,
+      "name": "Madeira, Portugal",
       "plan": "",
       "tag": "",
-      "sheetName": "La Paz + Todos Santos, Baja California Sur",
-      "costLabel": "3. La Paz + Todos Santos, BCS",
-      "why": "Shortest flight of any abroad option to warm, dry desert-by-the-sea. Boat day to Isla Espiritu Santo (sea lions, snorkeling), whale sharks in La Paz bay in season, then the surf-and-art town of Todos Santos. Best for outdoors plus easy logistics.",
-      "hikes": [
-        "Balandra Bay and El Mirador trail",
-        "Sierra de la Laguna foothill hikes (Canon de la Zorra waterfall)",
-        "Punta Lobos and Las Palmas beach walk near Todos Santos",
-        "kayaking Espiritu Santo"
-      ],
-      "museumsFood": "Malecon de La Paz, La Paz Regional Museum of Anthropology, Todos Santos galleries; fish and shrimp tacos, chocolate clams, Baja farm-to-table restaurants near Todos Santos",
-      "weather": "La Paz: high ~78F / low ~54F (SMN 1991-2020); Todos Santos ~77F / ~59F (ERA5); rain on ~2-3% of days",
-      "travelTime": "2h30 nonstop LAX-LAP (Alaska)",
-      "bestDates": "Jan 5-12 (nonstop $914 vs $1,068 for two, or $1,328 for the Jan 2-9 nonstop)",
-      "downsides": "You need a rental car, and Mexican liability insurance makes it pricier than the base rate. Ocean is cool (wetsuit helps). Thinner museum scene. State Dept Level 2 for Baja California Sur.",
+      "sheetName": "Madeira, Portugal",
+      "why": "The best day-hiking island in Europe, mild all winter, with a pleasant small city in Funchal.",
+      "week": "PR1 Pico do Arieiro to Pico Ruivo ridge (reopened fully May 2026; booked time slot, EUR 10.50), PR9 Caldeirao Verde levada, Sao Lourenco point, 25 Fontes. Funchal old town, Mercado dos Lavradores, Monte cable car, Madeira wine lodges. Fish (espada), poncha bars.",
+      "weather": "Funchal: high ~68F / low ~58F, about 6 rain days (Funchal Observatory 1991-2020, via Wikipedia)",
+      "laxFlight": "About 22-24h with 1 stop (TAP)",
+      "dtwFlight": "About 17.2h with 1 stop",
+      "advisory": "Level 1 (Portugal)",
+      "downsides": "Level 1 (Portugal)",
+      "cardPoints": "Maybe: United partner award (about 40k each way to Lisbon) plus a Lisbon-Funchal hop. Check on United.",
+      "oldRank": "new",
+      "scores": {
+        "outdoors": 9,
+        "food": 7,
+        "museums": 4.5,
+        "price": 3.5,
+        "gettingThere": 2,
+        "safety": 8.5,
+        "weighted": 6.13
+      },
+      "scoreWhy": "Outdoors: PR1 and levadas, but weather closures happen in winter. Museums: Funchal is small. Getting there: about 22-24h / 17h. Safety: very low crime; trail hazards.",
+      "safety": {
+        "researched": true,
+        "advisory": "Level 1 (Portugal)",
+        "consensus": "Very low crime. Trail safety and weather are the issues: winter storms close the whole trail network on warning days, and rockfalls close individual routes.",
+        "risks": "1) Weather closures: IFCN closed ALL classified trails on Nov 11, 2026 (IPMA warning, Storm Charles). Keep 2-3 flexible hiking days and check the IFCN list each morning. 2) Rockfall and mud after rain: PR10 is closed (path collapse) and PR16 closed (rockfall). Turn back at fresh rockfall and respect on-site signs even if the online list says open. 3) Falls and rescues: on Nov 6, 2026 a Belgian hiker broke a leg on PR1 and bad weather stopped the helicopter, so ground teams carried her out.",
+        "stay": "Funchal (Zona Velha / Lido) is the usual base (suggestion; no area-crime data found)."
+      },
       "totals": {
         "jan5": {
-          "low": 2885,
-          "high": 4844
+          "low": 3887,
+          "high": 5524
         },
-        "jan2": {
-          "low": 3039,
-          "high": 4998
-        }
+        "jan2": null
       },
       "breakdown": {
         "flights": {
-          "jan5": 914,
-          "jan2": 1068
+          "jan5": 2115,
+          "jan2": null,
+          "lax": 907,
+          "dtw": 1208
         },
         "buffer": 300,
         "lodging": {
-          "low": 651,
-          "high": 1140
+          "low": 812,
+          "high": 1209
         },
         "transport": {
-          "low": 430,
-          "high": 780
+          "low": 250,
+          "high": 450
         },
         "food": {
-          "low": 490,
-          "high": 910
+          "low": 560,
+          "high": 1050
         },
         "activities": {
-          "low": 400,
-          "high": 800
+          "low": 150,
+          "high": 400
         },
         "totals": {
           "jan5": {
-            "low": 2885,
-            "high": 4844
+            "low": 3887,
+            "high": 5524
           },
-          "jan2": {
-            "low": 3039,
-            "high": 4998
-          }
-        },
-        "basis": "Flights: Alaska nonstop LAP $914 (Jan 5-12). Jan 2-9 is $1,068 with 1 stop or $1,328 nonstop. Lodging: Airbnb p25-p75 La Paz $431-778, Todos Santos $690-1,179, weighted 4/3 nights, times about 1.20 tax (estimate). Car (estimate): 7-day rental incl. mandatory Mexican liability insurance plus gas. Activities (estimate): Espiritu Santo boat/snorkel day, whale shark tour (in season), national-park wristbands."
+          "jan2": null
+        }
       },
       "sources": [
+        {
+          "key": "worldwide",
+          "section": "Sources: Worldwide",
+          "title": "Google Flights via fli (Jan 5-12, 2027, LAX and DTW, checked Nov 11, 2026); Airbnb search JSON (Jan 5-12); Wikipedia climate tables citing JMA, HKO, CWA, BoM, NIWA, AEMET, IPMA, NOAA and SMN; travel.state.gov advisories via the davemanuel.com CSV; Madeira SIMplifica trail rules; open.er-api.com FX (1 USD = 0.894 EUR, 1.78 NZD, 1.45 AUD, 18,089 IDR)",
+          "detail": "https://travel.state.gov/en/international-travel/travel-advisories.html ; https://www.google.com/travel/flights ; https://www.airbnb.com",
+          "links": [
+            "https://travel.state.gov/en/international-travel/travel-advisories.html",
+            "https://www.google.com/travel/flights",
+            "https://www.airbnb.com"
+          ]
+        },
         {
           "key": "flights",
           "section": "Sources: flights",
@@ -570,147 +1717,105 @@
           "title": "Airbnb search results",
           "detail": "https://www.airbnb.com/s/<place>/homes?checkin=2027-01-05&checkout=2027-01-12&adults=2&room_types[]=Entire home/apt. First page (18 listings) per place, 7-night price incl. fees, before taxes. Queried Nov 11, 2026.",
           "links": []
-        },
-        {
-          "key": "smn",
-          "section": "Sources: weather",
-          "title": "Mexico Servicio Meteorologico Nacional 1991-2020 normals (via Wikipedia)",
-          "detail": "Oaxaca, Mexico City (Tacubaya), La Paz. Puerto Vallarta: WMO. Liberia, Costa Rica: Instituto Meteorologico Nacional.",
-          "links": []
-        },
-        {
-          "key": "era5",
-          "section": "Sources: weather",
-          "title": "Open-Meteo ERA5 archive (rain frequency, Jan 1-14, 2015-2025)",
-          "detail": "https://archive-api.open-meteo.com/v1/archive",
-          "links": [
-            "https://archive-api.open-meteo.com/v1/archive"
-          ]
-        },
-        {
-          "key": "mexico-advisory",
-          "section": "Sources: advisories",
-          "title": "US State Dept Mexico Travel Advisory (May 29, 2026)",
-          "detail": "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/mexico-travel-advisory.html",
-          "links": [
-            "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/mexico-travel-advisory.html"
-          ]
         }
       ],
-      "itinerary": {
-        "heading": "#3 La Paz + Todos Santos (Jan 5-12)",
-        "days": [
-          {
-            "day": "Day 1 (Tue Jan 5)",
-            "plan": "Fly LAX-LAP nonstop (2.5h), pick up car. Stroll the Malecon at sunset and eat fish tacos."
-          },
-          {
-            "day": "Day 2",
-            "plan": "Full-day boat trip to Isla Espiritu Santo: sea-lion snorkel at Los Islotes, beach lunch. Book ahead."
-          },
-          {
-            "day": "Day 3",
-            "plan": "Balandra Bay: hike El Mirador trail and walk the shallows. Afternoon: La Paz Regional Museum of Anthropology. Whale-shark tour if in season (check the operator)."
-          },
-          {
-            "day": "Day 4",
-            "plan": "Drive to Todos Santos (about 1h15). Walk the historic center and galleries. Sunset at Punta Lobos, where fishermen land pangas in the afternoon."
-          },
-          {
-            "day": "Day 5",
-            "plan": "Sierra de la Laguna foothills: Canon de la Zorra waterfall hike (short, near Santiago) or a longer guided canyon hike. Dinner at a farm-to-table restaurant near Todos Santos."
-          },
-          {
-            "day": "Day 6",
-            "plan": "Beach day: Las Palmas / Playa Cerritos (surf lesson option). Optional sunrise yoga or a whale-watching boat (humpbacks in season)."
-          },
-          {
-            "day": "Day 7",
-            "plan": "Back toward La Paz via El Triunfo (old mining village, small museums). Last dinner on the Malecon."
-          },
-          {
-            "day": "Day 8 (Tue Jan 12)",
-            "plan": "Return the car, fly LAP-LAX nonstop."
-          }
-        ],
-        "bookAhead": "Espiritu Santo boat tour, whale-shark tour (regulated season), rental car with Mexican liability insurance."
-      }
+      "rank": "12"
     },
     {
-      "slug": "mexico-city",
-      "rank": "4",
-      "short": "Mexico City",
+      "slug": "tenerife",
+      "worldwideRank": "9",
+      "short": "Tenerife",
       "center": [
-        -99.1332,
-        19.4326
+        -16.5517,
+        28.2916
       ],
       "nudge": [
-        -4,
-        -14
+        0,
+        0
       ],
-      "advisoryLevel": null,
-      "name": "Mexico City",
+      "drive": false,
+      "advisoryLevel": 2,
+      "name": "Tenerife, Canary Islands",
       "plan": "",
       "tag": "",
-      "sheetName": "Mexico City",
-      "costLabel": "4. Mexico City",
-      "why": "World-class museums and food at a bargain, cheapest flights in the set. Day trips to Teotihuacan and volcano hikes. Less 'warm-weather' than the others: sunny days but cold nights.",
-      "hikes": [
-        "Nevado de Toluca crater lakes (day trip, about 14,000 ft)",
-        "Desierto de los Leones",
-        "Teotihuacan pyramids",
-        "Chapultepec"
-      ],
-      "museumsFood": "National Museum of Anthropology, Frida Kahlo Museum, Palacio de Bellas Artes, Museo Soumaya; tacos al pastor, mercados, Roma/Condesa restaurants",
-      "weather": "High ~72F / low ~47F (SMN 1991-2020, Tacubaya); rain on ~7% of days",
-      "travelTime": "3h45 nonstop LAX-MEX (Aeromexico, others)",
-      "bestDates": "Jan 5-12 (cheapest $742 with stops or $974 nonstop for two, vs $996 Jan 2-9)",
-      "downsides": "At 7,350 ft, nights are cold, and altitude plus air quality can bother some people. A big city, not a beach. State Dept Level 2.",
+      "sheetName": "Tenerife, Canary Islands",
+      "why": "Warmest place in Europe, with big volcano hikes. Small-city culture only (La Laguna).",
+      "week": "Teide: summit by permit (or Montana Blanca trail plus the cable car), the Roques de Garcia loop. Anaga forest ridges; Masca gorge (booking required, check status). La Laguna old town, Museo de la Naturaleza y Arqueologia. Guachinches (local wine taverns).",
+      "weather": "High ~70F / low ~60F, about 8 rain days (AEMET)",
+      "laxFlight": "About 18.1h with 1 stop (BA)",
+      "dtwFlight": "About 21.2h with 1 stop (Delta/Transavia)",
+      "advisory": "Level 2 (Spain)",
+      "downsides": "Level 2 (Spain)",
+      "cardPoints": "Maybe: Iberia Avios via Madrid (Iberia flies to the Canaries).",
+      "oldRank": "new",
+      "scores": {
+        "outdoors": 8.5,
+        "food": 6.5,
+        "museums": 4.5,
+        "price": 3,
+        "gettingThere": 2.5,
+        "safety": 8.5,
+        "weighted": 5.88
+      },
+      "scoreWhy": "Outdoors: Teide (permit), Anaga, Masca. Museums: La Laguna only. Getting there: 18h / 21h. Safety: peaceful protests; hiking rescues.",
+      "safety": {
+        "researched": true,
+        "advisory": "Level 2 (Spain)",
+        "consensus": "Safe and still welcoming. The 2026 overtourism and housing protests are peaceful, mostly in Santa Cruz and aimed at governments and landlords. Theft from rental cars is the bigger everyday risk.",
+        "risks": "1) Rental-car and beach theft. Use secure parking and leave nothing visible. 2) Timeshare 'winning scratch card' scams on seafronts. Walk away. 3) Protests and strikes (Spain-wide general strike Nov 11, 2026). Not relevant for January, but check the news.",
+        "stay": "Puerto de la Cruz (2025 crime down 13.56%, El Dia) or Costa Adeje."
+      },
       "totals": {
         "jan5": {
-          "low": 2280,
-          "high": 4024
+          "low": 4001,
+          "high": 5828
         },
-        "jan2": {
-          "low": 2534,
-          "high": 4278
-        }
+        "jan2": null
       },
       "breakdown": {
         "flights": {
-          "jan5": 742,
-          "jan2": 996
+          "jan5": 2173,
+          "jan2": null,
+          "lax": 1232,
+          "dtw": 941
         },
         "buffer": 300,
         "lodging": {
-          "low": 678,
-          "high": 1152
+          "low": 868,
+          "high": 1455
         },
         "transport": {
-          "low": 120,
-          "high": 250
+          "low": 250,
+          "high": 450
         },
         "food": {
-          "low": 490,
-          "high": 980
+          "low": 560,
+          "high": 1050
         },
         "activities": {
-          "low": 250,
-          "high": 600
+          "low": 150,
+          "high": 400
         },
         "totals": {
           "jan5": {
-            "low": 2280,
-            "high": 4024
+            "low": 4001,
+            "high": 5828
           },
-          "jan2": {
-            "low": 2534,
-            "high": 4278
-          }
-        },
-        "basis": "Flights: $742 Jan 5-12 is a connecting itinerary. The Aeromexico nonstop is $974 for Jan 5-12 and $996 (1 stop) for Jan 2-9. Lodging: Airbnb Roma Norte p25-p75 $565-960, times about 1.20 (estimate). Transport (estimate): Uber/Metro plus a Teotihuacan or Nevado de Toluca day trip. Museums are cheap."
+          "jan2": null
+        }
       },
       "sources": [
+        {
+          "key": "worldwide",
+          "section": "Sources: Worldwide",
+          "title": "Google Flights via fli (Jan 5-12, 2027, LAX and DTW, checked Nov 11, 2026); Airbnb search JSON (Jan 5-12); Wikipedia climate tables citing JMA, HKO, CWA, BoM, NIWA, AEMET, IPMA, NOAA and SMN; travel.state.gov advisories via the davemanuel.com CSV; Madeira SIMplifica trail rules; open.er-api.com FX (1 USD = 0.894 EUR, 1.78 NZD, 1.45 AUD, 18,089 IDR)",
+          "detail": "https://travel.state.gov/en/international-travel/travel-advisories.html ; https://www.google.com/travel/flights ; https://www.airbnb.com",
+          "links": [
+            "https://travel.state.gov/en/international-travel/travel-advisories.html",
+            "https://www.google.com/travel/flights",
+            "https://www.airbnb.com"
+          ]
+        },
         {
           "key": "flights",
           "section": "Sources: flights",
@@ -726,79 +1831,67 @@
           "title": "Airbnb search results",
           "detail": "https://www.airbnb.com/s/<place>/homes?checkin=2027-01-05&checkout=2027-01-12&adults=2&room_types[]=Entire home/apt. First page (18 listings) per place, 7-night price incl. fees, before taxes. Queried Nov 11, 2026.",
           "links": []
-        },
-        {
-          "key": "smn",
-          "section": "Sources: weather",
-          "title": "Mexico Servicio Meteorologico Nacional 1991-2020 normals (via Wikipedia)",
-          "detail": "Oaxaca, Mexico City (Tacubaya), La Paz. Puerto Vallarta: WMO. Liberia, Costa Rica: Instituto Meteorologico Nacional.",
-          "links": []
-        },
-        {
-          "key": "era5",
-          "section": "Sources: weather",
-          "title": "Open-Meteo ERA5 archive (rain frequency, Jan 1-14, 2015-2025)",
-          "detail": "https://archive-api.open-meteo.com/v1/archive",
-          "links": [
-            "https://archive-api.open-meteo.com/v1/archive"
-          ]
-        },
-        {
-          "key": "mexico-advisory",
-          "section": "Sources: advisories",
-          "title": "US State Dept Mexico Travel Advisory (May 29, 2026)",
-          "detail": "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/mexico-travel-advisory.html",
-          "links": [
-            "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/mexico-travel-advisory.html"
-          ]
         }
       ],
-      "itinerary": null
+      "rank": "13"
     },
     {
       "slug": "maui",
-      "rank": "5",
+      "worldwideRank": "12",
       "short": "Maui",
       "center": [
         -156.4536,
         20.7644
       ],
       "nudge": [
-        -12,
-        -12
+        0,
+        0
       ],
+      "drive": false,
       "advisoryLevel": null,
-      "name": "Maui, Hawaii",
-      "plan": "Kihei base",
-      "tag": "the Hawaii alternative",
-      "sheetName": "Maui, Hawaii (Kihei base): the Hawaii alternative",
-      "costLabel": "5. Maui, Hawaii (Kihei) - alt",
-      "why": "If you'd rather have Maui: Haleakala sunrise, the Road to Hana, peak whale season in January, and great beaches. Polished and easy, but lodging costs more than on the Big Island and there's no lava.",
-      "hikes": [
-        "Pipiwai Trail (bamboo forest, Waimoku Falls)",
-        "Haleakala Sliding Sands trail",
-        "Waihe'e Ridge",
-        "Hoapili trail"
-      ],
-      "museumsFood": "Maui Ocean Center, Bailey House Museum, Hawaiian Islands Humpback Whale Sanctuary; poke, Paia and Upcountry food, farm stands",
-      "weather": "Kahului: high ~82F / low ~64F (NOAA 1991-2020); rain on ~1 in 5 days (ERA5)",
-      "travelTime": "5h55 nonstop LAX-OGG",
-      "bestDates": "Jan 5-12 (flights $894 vs $1,034 for two)",
-      "downsides": "Most expensive lodging of all the options. Haleakala sunrise needs a $1 reservation (plus the $30 park fee) that sells out. Road to Hana is a long driving day.",
+      "name": "Maui",
+      "plan": "",
+      "tag": "",
+      "sheetName": "Maui",
+      "why": "Lovely, but costly lodging and not much city.",
+      "week": "Haleakala, Pipiwai, Waihe'e Ridge.",
+      "weather": "~82F / ~64F (NOAA)",
+      "laxFlight": "5h55 nonstop",
+      "dtwFlight": "About 13.7h with 1 stop",
+      "advisory": "n/a",
+      "downsides": "n/a",
+      "cardPoints": "BA Avios as for the Big Island.",
+      "oldRank": "#5",
+      "scores": {
+        "outdoors": 8.5,
+        "food": 7,
+        "museums": 3,
+        "price": 1.5,
+        "gettingThere": 5,
+        "safety": 9,
+        "weighted": 5.75
+      },
+      "scoreWhy": "Outdoors: Haleakala, Pipiwai, Waihe'e. Price: priciest. Museums: thin.",
+      "safety": {
+        "researched": false,
+        "advisory": "n/a",
+        "consensus": "",
+        "risks": "",
+        "stay": ""
+      },
       "totals": {
         "jan5": {
-          "low": 4231,
-          "high": 6455
+          "low": 4362,
+          "high": 6586
         },
-        "jan2": {
-          "low": 4371,
-          "high": 6595
-        }
+        "jan2": null
       },
       "breakdown": {
         "flights": {
-          "jan5": 894,
-          "jan2": 1034
+          "jan5": 1025,
+          "jan2": null,
+          "lax": 447,
+          "dtw": 578
         },
         "buffer": 300,
         "lodging": {
@@ -819,17 +1912,24 @@
         },
         "totals": {
           "jan5": {
-            "low": 4231,
-            "high": 6455
+            "low": 4362,
+            "high": 6586
           },
-          "jan2": {
-            "low": 4371,
-            "high": 6595
-          }
-        },
-        "basis": "Flights: nonstop OGG, Delta $894 (Jan 5-12) / American $1,034 (Jan 2-9). Lodging: Airbnb Kihei p25-p75 $1,556-2,031, times 1.187 Hawaii tax. Head Honcho's $300-500/night for hotels with resort fees fits above this range. Haleakala: $30/vehicle plus a $1 sunrise reservation."
+          "jan2": null
+        }
       },
       "sources": [
+        {
+          "key": "worldwide",
+          "section": "Sources: Worldwide",
+          "title": "Google Flights via fli (Jan 5-12, 2027, LAX and DTW, checked Nov 11, 2026); Airbnb search JSON (Jan 5-12); Wikipedia climate tables citing JMA, HKO, CWA, BoM, NIWA, AEMET, IPMA, NOAA and SMN; travel.state.gov advisories via the davemanuel.com CSV; Madeira SIMplifica trail rules; open.er-api.com FX (1 USD = 0.894 EUR, 1.78 NZD, 1.45 AUD, 18,089 IDR)",
+          "detail": "https://travel.state.gov/en/international-travel/travel-advisories.html ; https://www.google.com/travel/flights ; https://www.airbnb.com",
+          "links": [
+            "https://travel.state.gov/en/international-travel/travel-advisories.html",
+            "https://www.google.com/travel/flights",
+            "https://www.airbnb.com"
+          ]
+        },
         {
           "key": "flights",
           "section": "Sources: flights",
@@ -852,15 +1952,6 @@
           "title": "NOAA 1991-2020 normals (via Wikipedia climate tables)",
           "detail": "Kona Intl Airport, Kahului Airport, Palm Springs, Twentynine Palms, Tucson Intl Airport",
           "links": []
-        },
-        {
-          "key": "era5",
-          "section": "Sources: weather",
-          "title": "Open-Meteo ERA5 archive (rain frequency, Jan 1-14, 2015-2025)",
-          "detail": "https://archive-api.open-meteo.com/v1/archive",
-          "links": [
-            "https://archive-api.open-meteo.com/v1/archive"
-          ]
         },
         {
           "key": "hawaii-tax",
@@ -883,85 +1974,112 @@
           ]
         }
       ],
-      "itinerary": null
+      "rank": "14"
     },
     {
-      "slug": "joshua-tree",
-      "rank": "6",
-      "short": "Joshua Tree",
+      "slug": "la-paz",
+      "worldwideRank": "11",
+      "short": "La Paz",
       "center": [
-        -116.31,
-        33.95
+        -110.3128,
+        24.1426
       ],
       "nudge": [
         0,
         0
       ],
-      "advisoryLevel": null,
-      "name": "Joshua Tree + Palm Springs",
-      "plan": "drive",
+      "drive": false,
+      "advisoryLevel": 2,
+      "name": "La Paz + Todos Santos",
+      "plan": "",
       "tag": "",
-      "sheetName": "Joshua Tree + Palm Springs (drive)",
-      "costLabel": "6. Joshua Tree + Palm Springs (drive)",
-      "why": "Easy and cheap: no flights, desert hiking plus Palm Springs pools, mid-century design and food. Good fallback if you'd rather keep cash for a bigger trip.",
-      "hikes": [
-        "Ryan Mountain",
-        "Lost Palms Oasis",
-        "Hidden Valley",
-        "Skull Rock",
-        "Tahquitz Canyon",
-        "Palm Springs Aerial Tramway to the San Jacinto trails (can be snowy)"
-      ],
-      "museumsFood": "Palm Springs Art Museum, Sunnylands, Moorten Botanical Garden; date shakes, Palm Springs restaurant scene",
-      "weather": "Palm Springs: high ~71F / low ~48F; Twentynine Palms (Joshua Tree): high ~63F / low ~42F (NOAA 1991-2020)",
-      "travelTime": "About 2.5-3h drive each way (estimate, about 140 mi to Joshua Tree)",
-      "bestDates": "Either window (no flights). Weekdays are quieter.",
-      "downsides": "Only mildly warm: Joshua Tree nights get close to freezing. Small chance of storms. Feels less like a getaway.",
+      "sheetName": "La Paz + Todos Santos",
+      "why": "Great outdoors and easy for him, but a weak city/museum scene and a 2-stop trip from DTW.",
+      "week": "Espiritu Santo boat day, Balandra, Sierra de la Laguna; Malecon.",
+      "weather": "La Paz ~78F / ~54F (SMN)",
+      "laxFlight": "2h30 nonstop",
+      "dtwFlight": "About 15.9h with 2 stops",
+      "advisory": "Level 2",
+      "downsides": "Level 2",
+      "cardPoints": "Virgin/Aeromexico award about $280 for his leg (estimate).",
+      "oldRank": "#3",
+      "scores": {
+        "outdoors": 6.5,
+        "food": 7,
+        "museums": 3.5,
+        "price": 5,
+        "gettingThere": 5,
+        "safety": 7,
+        "weighted": 5.68
+      },
+      "scoreWhy": "Outdoors: boat days and Sierra de la Laguna. Getting there: 2h30 nonstop for him, 2 stops for her. Safety: Level 2 (not researched in depth).",
+      "safety": {
+        "researched": false,
+        "advisory": "Level 2",
+        "consensus": "",
+        "risks": "",
+        "stay": ""
+      },
       "totals": {
         "jan5": {
-          "low": 2203,
-          "high": 3292
+          "low": 3216,
+          "high": 5175
         },
-        "jan2": {
-          "low": 2203,
-          "high": 3292
-        }
+        "jan2": null
       },
       "breakdown": {
         "flights": {
-          "jan5": 0,
-          "jan2": 0
+          "jan5": 1245,
+          "jan2": null,
+          "lax": 457,
+          "dtw": 788
         },
-        "buffer": 0,
+        "buffer": 300,
         "lodging": {
-          "low": 1293,
-          "high": 1612
+          "low": 651,
+          "high": 1140
         },
         "transport": {
-          "low": 60,
-          "high": 140
+          "low": 430,
+          "high": 780
         },
         "food": {
-          "low": 700,
-          "high": 1190
+          "low": 490,
+          "high": 910
         },
         "activities": {
-          "low": 150,
-          "high": 350
+          "low": 400,
+          "high": 800
         },
         "totals": {
           "jan5": {
-            "low": 2203,
-            "high": 3292
+            "low": 3216,
+            "high": 5175
           },
-          "jan2": {
-            "low": 2203,
-            "high": 3292
-          }
-        },
-        "basis": "Gas: about 450 mi total / 30 mpg (2021 HR-V FWD EPA combined) x $4.19 (AAA CA regular, Nov 11 2026) = about $63, plus parking. Lodging: Airbnb p25-p75 Joshua Tree $927-1,171 (3 nights scaled), Palm Springs $1,325-1,640 (4 nights scaled), times about 1.12 lodging tax (estimate). Activities: JT park $30/vehicle, Aerial Tramway, Palm Springs Art Museum (estimates)."
+          "jan2": null
+        }
       },
       "sources": [
+        {
+          "key": "worldwide",
+          "section": "Sources: Worldwide",
+          "title": "Google Flights via fli (Jan 5-12, 2027, LAX and DTW, checked Nov 11, 2026); Airbnb search JSON (Jan 5-12); Wikipedia climate tables citing JMA, HKO, CWA, BoM, NIWA, AEMET, IPMA, NOAA and SMN; travel.state.gov advisories via the davemanuel.com CSV; Madeira SIMplifica trail rules; open.er-api.com FX (1 USD = 0.894 EUR, 1.78 NZD, 1.45 AUD, 18,089 IDR)",
+          "detail": "https://travel.state.gov/en/international-travel/travel-advisories.html ; https://www.google.com/travel/flights ; https://www.airbnb.com",
+          "links": [
+            "https://travel.state.gov/en/international-travel/travel-advisories.html",
+            "https://www.google.com/travel/flights",
+            "https://www.airbnb.com"
+          ]
+        },
+        {
+          "key": "flights",
+          "section": "Sources: flights",
+          "title": "Google Flights (queried via the open-source 'fli' client, pip package 'flights')",
+          "detail": "https://www.google.com/travel/flights. Round trip LAX to KOA/OGG/LIH/HNL/OAX/MEX/LAP/SJD/PVR/LIR for Jan 2-9 and Jan 5-12, 2027, economy, 1 adult, times 2. Queried Nov 11, 2026.",
+          "links": [
+            "https://www.google.com/travel/flights."
+          ]
+        },
         {
           "key": "lodging",
           "section": "Sources: lodging",
@@ -970,67 +2088,81 @@
           "links": []
         },
         {
-          "key": "noaa",
+          "key": "smn",
           "section": "Sources: weather",
-          "title": "NOAA 1991-2020 normals (via Wikipedia climate tables)",
-          "detail": "Kona Intl Airport, Kahului Airport, Palm Springs, Twentynine Palms, Tucson Intl Airport",
+          "title": "Mexico Servicio Meteorologico Nacional 1991-2020 normals (via Wikipedia)",
+          "detail": "Oaxaca, Mexico City (Tacubaya), La Paz. Puerto Vallarta: WMO. Liberia, Costa Rica: Instituto Meteorologico Nacional.",
           "links": []
         },
         {
-          "key": "aaa",
-          "section": "Sources: driving",
-          "title": "AAA California average regular gas $4.19 (Nov 11, 2026)",
-          "detail": "https://gasprices.aaa.com/?state=CA . Fuel economy assumption: 2021 Honda HR-V about 30 mpg combined (EPA, FWD).",
+          "key": "mexico-advisory",
+          "section": "Sources: advisories",
+          "title": "US State Dept Mexico Travel Advisory (May 29, 2026)",
+          "detail": "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/mexico-travel-advisory.html",
           "links": [
-            "https://gasprices.aaa.com/?state=CA"
+            "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/mexico-travel-advisory.html"
           ]
         }
       ],
-      "itinerary": null
+      "rank": "15"
     },
     {
       "slug": "puerto-vallarta",
-      "rank": "7",
+      "worldwideRank": "15",
       "short": "Puerto Vallarta",
       "center": [
         -105.2253,
         20.6534
       ],
       "nudge": [
-        -10,
-        2
+        0,
+        0
       ],
+      "drive": false,
       "advisoryLevel": 3,
-      "name": "Puerto Vallarta, Mexico",
+      "name": "Puerto Vallarta",
       "plan": "",
       "tag": "",
-      "sheetName": "Puerto Vallarta, Mexico",
-      "costLabel": "7. Puerto Vallarta, Mexico",
-      "why": "Warmest beach option in Mexico, with jungle hikes, boat-only beaches and a good food scene. Easy nonstop flights.",
-      "hikes": [
-        "Boca de Tomatlan to Las Animas / Quimixto coastal trail",
-        "Vallarta Botanical Garden",
-        "Cerro de la Cruz lookout"
-      ],
-      "museumsFood": "Vallarta Botanical Garden, Malecon sculptures; street tacos, seafood, Zona Romantica restaurants",
-      "weather": "High ~80F / low ~62F (WMO normals); rain on ~6% of days",
-      "travelTime": "3h05 nonstop LAX-PVR (Alaska)",
-      "bestDates": "Jan 5-12 (nonstop $962 vs $1,244 for two)",
-      "downsides": "QA DOWNGRADE: Jalisco is US State Dept Level 3 'Reconsider travel' (May 29, 2026). The government-staff travel bans cover southern Jalisco, not PV itself, but it is still the highest-risk rating in this set. Fewer museums and more resort feel.",
+      "sheetName": "Puerto Vallarta",
+      "why": "Fine beach and jungle trip; Jalisco is Level 3.",
+      "week": "Coastal trail to Las Animas, Botanical Garden.",
+      "weather": "~80F / ~62F (WMO)",
+      "laxFlight": "3h05 nonstop",
+      "dtwFlight": "About 7.4h with 1 stop",
+      "advisory": "Level 3 (Jalisco)",
+      "downsides": "Level 3 (Jalisco)",
+      "cardPoints": "Virgin/Aeromexico award about $400 for his leg (estimate).",
+      "oldRank": "#7",
+      "scores": {
+        "outdoors": 5.5,
+        "food": 7,
+        "museums": 3.5,
+        "price": 5.5,
+        "gettingThere": 8,
+        "safety": 4.5,
+        "weighted": 5.55
+      },
+      "scoreWhy": "Easiest to reach (3h nonstop / 7.4h), but Jalisco is Level 3 and it's beach-first.",
+      "safety": {
+        "researched": false,
+        "advisory": "Level 3 (Jalisco)",
+        "consensus": "",
+        "risks": "",
+        "stay": ""
+      },
       "totals": {
         "jan5": {
-          "low": 3029,
-          "high": 5129
+          "low": 3030,
+          "high": 5130
         },
-        "jan2": {
-          "low": 3311,
-          "high": 5411
-        }
+        "jan2": null
       },
       "breakdown": {
         "flights": {
-          "jan5": 962,
-          "jan2": 1244
+          "jan5": 963,
+          "jan2": null,
+          "lax": 481,
+          "dtw": 482
         },
         "buffer": 300,
         "lodging": {
@@ -1051,17 +2183,24 @@
         },
         "totals": {
           "jan5": {
-            "low": 3029,
-            "high": 5129
+            "low": 3030,
+            "high": 5130
           },
-          "jan2": {
-            "low": 3311,
-            "high": 5411
-          }
-        },
-        "basis": "Flights: Alaska nonstop $962 (Jan 5-12) / $1,244 (Jan 2-9). A $734 2-stop fare exists for Jan 5-12 but takes about 27h, so it was excluded. Lodging: Airbnb p25-p75 $881-1,514, times about 1.20 (estimate)."
+          "jan2": null
+        }
       },
       "sources": [
+        {
+          "key": "worldwide",
+          "section": "Sources: Worldwide",
+          "title": "Google Flights via fli (Jan 5-12, 2027, LAX and DTW, checked Nov 11, 2026); Airbnb search JSON (Jan 5-12); Wikipedia climate tables citing JMA, HKO, CWA, BoM, NIWA, AEMET, IPMA, NOAA and SMN; travel.state.gov advisories via the davemanuel.com CSV; Madeira SIMplifica trail rules; open.er-api.com FX (1 USD = 0.894 EUR, 1.78 NZD, 1.45 AUD, 18,089 IDR)",
+          "detail": "https://travel.state.gov/en/international-travel/travel-advisories.html ; https://www.google.com/travel/flights ; https://www.airbnb.com",
+          "links": [
+            "https://travel.state.gov/en/international-travel/travel-advisories.html",
+            "https://www.google.com/travel/flights",
+            "https://www.airbnb.com"
+          ]
+        },
         {
           "key": "flights",
           "section": "Sources: flights",
@@ -1086,15 +2225,6 @@
           "links": []
         },
         {
-          "key": "era5",
-          "section": "Sources: weather",
-          "title": "Open-Meteo ERA5 archive (rain frequency, Jan 1-14, 2015-2025)",
-          "detail": "https://archive-api.open-meteo.com/v1/archive",
-          "links": [
-            "https://archive-api.open-meteo.com/v1/archive"
-          ]
-        },
-        {
           "key": "mexico-advisory",
           "section": "Sources: advisories",
           "title": "US State Dept Mexico Travel Advisory (May 29, 2026)",
@@ -1104,112 +2234,11 @@
           ]
         }
       ],
-      "itinerary": null
-    },
-    {
-      "slug": "tucson",
-      "rank": "8",
-      "short": "Tucson",
-      "center": [
-        -110.9747,
-        32.2226
-      ],
-      "nudge": [
-        0,
-        0
-      ],
-      "advisoryLevel": null,
-      "name": "Tucson, AZ",
-      "plan": "drive",
-      "tag": "",
-      "sheetName": "Tucson, AZ (drive)",
-      "costLabel": "8. Tucson, AZ (drive)",
-      "why": "Cheapest overall. Saguaro hiking, a world-class desert museum, Sonoran food (Tucson is a UNESCO City of Gastronomy). But it's cool, not warm, in January.",
-      "hikes": [
-        "Sabino Canyon / Seven Falls",
-        "Saguaro National Park (Wasson Peak, Hugh Norris)",
-        "Mount Lemmon (may be snowy)",
-        "Tumamoc Hill"
-      ],
-      "museumsFood": "Arizona-Sonora Desert Museum, Pima Air & Space Museum, Mission San Xavier del Bac; Sonoran hot dogs, carne asada, Mexican food on 4th Ave and South Tucson",
-      "weather": "High ~67F / low ~41F (NOAA 1991-2020, Tucson airport)",
-      "travelTime": "About 7-8h drive each way (estimate, about 490 mi)",
-      "bestDates": "Either window",
-      "downsides": "Coolest option, with nights near 40F. Two long drive days use up much of the week. Least 'vacation-warm'.",
-      "totals": {
-        "jan5": {
-          "low": 1674,
-          "high": 2673
-        },
-        "jan2": {
-          "low": 1674,
-          "high": 2673
-        }
-      },
-      "breakdown": {
-        "flights": {
-          "jan5": 0,
-          "jan2": 0
-        },
-        "buffer": 0,
-        "lodging": {
-          "low": 744,
-          "high": 1073
-        },
-        "transport": {
-          "low": 150,
-          "high": 200
-        },
-        "food": {
-          "low": 630,
-          "high": 1050
-        },
-        "activities": {
-          "low": 150,
-          "high": 350
-        },
-        "totals": {
-          "jan5": {
-            "low": 1674,
-            "high": 2673
-          },
-          "jan2": {
-            "low": 1674,
-            "high": 2673
-          }
-        },
-        "basis": "Gas: about 1,150 mi round trip plus local driving / 30 mpg x $4.19 (CA price used as a conservative upper bound; AZ is usually cheaper) = about $160. Lodging: Airbnb p25-p75 $664-958, times about 1.12 (estimate). Activities (estimate): Saguaro NP $25/vehicle, Desert Museum, Pima Air & Space."
-      },
-      "sources": [
-        {
-          "key": "lodging",
-          "section": "Sources: lodging",
-          "title": "Airbnb search results",
-          "detail": "https://www.airbnb.com/s/<place>/homes?checkin=2027-01-05&checkout=2027-01-12&adults=2&room_types[]=Entire home/apt. First page (18 listings) per place, 7-night price incl. fees, before taxes. Queried Nov 11, 2026.",
-          "links": []
-        },
-        {
-          "key": "noaa",
-          "section": "Sources: weather",
-          "title": "NOAA 1991-2020 normals (via Wikipedia climate tables)",
-          "detail": "Kona Intl Airport, Kahului Airport, Palm Springs, Twentynine Palms, Tucson Intl Airport",
-          "links": []
-        },
-        {
-          "key": "aaa",
-          "section": "Sources: driving",
-          "title": "AAA California average regular gas $4.19 (Nov 11, 2026)",
-          "detail": "https://gasprices.aaa.com/?state=CA . Fuel economy assumption: 2021 Honda HR-V about 30 mpg combined (EPA, FWD).",
-          "links": [
-            "https://gasprices.aaa.com/?state=CA"
-          ]
-        }
-      ],
-      "itinerary": null
+      "rank": "16"
     },
     {
       "slug": "guanacaste",
-      "rank": "HM",
+      "worldwideRank": "16",
       "short": "Guanacaste",
       "center": [
         -85.8371,
@@ -1219,37 +2248,51 @@
         0,
         0
       ],
-      "advisoryLevel": null,
+      "drive": false,
+      "advisoryLevel": 2,
       "name": "Guanacaste, Costa Rica",
-      "plan": "Tamarindo area",
-      "tag": "honorable mention",
-      "sheetName": "Guanacaste, Costa Rica (Tamarindo area): honorable mention",
-      "costLabel": "HM. Guanacaste, Costa Rica",
-      "why": "Hottest and greenest option: national parks, wildlife, surf. Dry season starts in January.",
-      "hikes": [
-        "Rincon de la Vieja volcano trails and hot springs",
-        "Las Catalinas trails",
-        "Playa Conchal beach walks"
-      ],
-      "museumsFood": "Limited museums; casados, ceviche, sodas (local diners)",
-      "weather": "Liberia: high ~92F / low ~69F (Instituto Meteorologico Nacional)",
-      "travelTime": "5h40 nonstop on Jan 2-9 only; the cheapest Jan 5-12 fare has 3 stops (~10.5h)",
-      "bestDates": "Jan 5-12 if you accept connections; Jan 2-9 for the nonstop ($1,872 for two)",
-      "downsides": "Flights are pricey or involve long connections. Driving is slow and mandatory rental insurance is expensive. It's a 2-week trip squeezed into 7 nights. State Dept Level 2.",
+      "plan": "",
+      "tag": "",
+      "sheetName": "Guanacaste, Costa Rica",
+      "why": "Nature-only; pricey.",
+      "week": "Rincon de la Vieja.",
+      "weather": "~92F / ~69F (IMN)",
+      "laxFlight": "About 10.4h with 3 stops (American). No nonstop on Jan 5.",
+      "dtwFlight": "About 9.3h with 1 stop (JetBlue)",
+      "advisory": "Level 2",
+      "downsides": "Level 2",
+      "cardPoints": "Cash.",
+      "oldRank": "HM",
+      "scores": {
+        "outdoors": 6.5,
+        "food": 5,
+        "museums": 2,
+        "price": 3,
+        "gettingThere": 5,
+        "safety": 7,
+        "weighted": 4.68
+      },
+      "scoreWhy": "Nature only; pricey; 3 stops for him.",
+      "safety": {
+        "researched": false,
+        "advisory": "Level 2",
+        "consensus": "",
+        "risks": "",
+        "stay": ""
+      },
       "totals": {
         "jan5": {
-          "low": 3522,
-          "high": 6152
+          "low": 3615,
+          "high": 6245
         },
-        "jan2": {
-          "low": 4206,
-          "high": 6836
-        }
+        "jan2": null
       },
       "breakdown": {
         "flights": {
-          "jan5": 1006,
-          "jan2": 1690
+          "jan5": 1099,
+          "jan2": null,
+          "lax": 503,
+          "dtw": 596
         },
         "buffer": 300,
         "lodging": {
@@ -1270,17 +2313,24 @@
         },
         "totals": {
           "jan5": {
-            "low": 3522,
-            "high": 6152
+            "low": 3615,
+            "high": 6245
           },
-          "jan2": {
-            "low": 4206,
-            "high": 6836
-          }
-        },
-        "basis": "Flights: $1,006 Jan 5-12 is 3 stops (about 10.5h). Jan 2-9 is $1,690 (2 stops) or $1,872 nonstop on United. Lodging: Airbnb Tamarindo p25-p75 $1,005-1,793, times 1.13 (13% IVA, estimate). Car (estimate): rental with mandatory insurance."
+          "jan2": null
+        }
       },
       "sources": [
+        {
+          "key": "worldwide",
+          "section": "Sources: Worldwide",
+          "title": "Google Flights via fli (Jan 5-12, 2027, LAX and DTW, checked Nov 11, 2026); Airbnb search JSON (Jan 5-12); Wikipedia climate tables citing JMA, HKO, CWA, BoM, NIWA, AEMET, IPMA, NOAA and SMN; travel.state.gov advisories via the davemanuel.com CSV; Madeira SIMplifica trail rules; open.er-api.com FX (1 USD = 0.894 EUR, 1.78 NZD, 1.45 AUD, 18,089 IDR)",
+          "detail": "https://travel.state.gov/en/international-travel/travel-advisories.html ; https://www.google.com/travel/flights ; https://www.airbnb.com",
+          "links": [
+            "https://travel.state.gov/en/international-travel/travel-advisories.html",
+            "https://www.google.com/travel/flights",
+            "https://www.airbnb.com"
+          ]
+        },
         {
           "key": "flights",
           "section": "Sources: flights",
@@ -1298,13 +2348,6 @@
           "links": []
         },
         {
-          "key": "smn",
-          "section": "Sources: weather",
-          "title": "Mexico Servicio Meteorologico Nacional 1991-2020 normals (via Wikipedia)",
-          "detail": "Oaxaca, Mexico City (Tacubaya), La Paz. Puerto Vallarta: WMO. Liberia, Costa Rica: Instituto Meteorologico Nacional.",
-          "links": []
-        },
-        {
           "key": "costa-rica-advisory",
           "section": "Sources: advisories",
           "title": "US State Dept Costa Rica Travel Advisory (Level 2, Apr 2, 2026)",
@@ -1314,7 +2357,7 @@
           ]
         }
       ],
-      "itinerary": null
+      "rank": "17"
     }
   ]
 }
