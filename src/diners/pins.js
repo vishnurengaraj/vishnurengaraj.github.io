@@ -18,11 +18,11 @@ function liftOf(place) {
   return neighbor.lat < place.lat ? "above" : "below";
 }
 
-const DROP_GOLD =
+export const DROP_GOLD =
   "M17 43.2C17 43.2 2.2 27.2 2.2 15.6a14.8 14.8 0 1 1 29.6 0c0 11.6-14.8 27.6-14.8 27.6z";
-const DROP_WHITE =
+export const DROP_WHITE =
   "M17 41.4C17 41.4 4.2 26.4 4.2 15.6a12.8 12.8 0 1 1 25.6 0c0 10.8-12.8 25.8-12.8 25.8z";
-const DROP_FILL =
+export const DROP_FILL =
   "M17 39.6C17 39.6 6 25.6 6 15.6a11 11 0 1 1 22 0c0 10-11 24-11 24z";
 
 /** Flat teardrop: white edge, score, name. Rank 1 is the deeper purple. */
