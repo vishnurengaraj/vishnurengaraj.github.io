@@ -1,0 +1,26 @@
+{
+  "id": "20865616173",
+  "stravaId": "20865616173",
+  "city": "la",
+  "title": "Evening Run",
+  "type": "Run",
+  "date": "2026-11-04T00:00:00.000Z",
+  "distanceM": 9342.21,
+  "movingS": 3284,
+  "elevM": 21,
+  "mid": [
+    -118.370326,
+    33.909612
+  ],
+  "photos": [
+    {
+      "src": "/media/runs/photos/20865616173/1.webp",
+      "w": 1600,
+      "h": 1200,
+      "sample": false
+    }
+  ],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 3312
+}
