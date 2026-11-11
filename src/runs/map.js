@@ -1,5 +1,4 @@
-import maplibregl from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
+import { openGlobeMap } from "./basemap.js";
 import { densityHeat } from "./density.js";
 import { boundsFromGeometry, routeCamera } from "./frame.js";
 import { REGION_ZOOM, WORLD_CENTER, WORLD_ZOOM, nearestCity, pitchForZoom } from "./globe.js";
@@ -11,8 +10,6 @@ import { approachTiles, expandTileURL } from "./warm.js";
 const FLY_MS = 5000;
 
 const ROUTE_EASE_MS = 850;
-
-const STYLE = "https://tiles.openfreemap.org/styles/positron";
 
 function camera() {
   const phone = window.matchMedia("(max-width: 640px)").matches;
@@ -209,37 +206,9 @@ function hitsAt(map, point) {
     `arrival` is the one-time globe-to-city flight. Null skips it (reduced motion or a shared run). */
 export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick, onView }) {
   const view = arrival ? { pitch: 0, bearing: 0 } : camera();
-  const map = new maplibregl.Map({
-    container: mapEl,
-    style: STYLE,
-    center,
-    zoom,
-    pitch: view.pitch,
-    bearing: view.bearing,
-    attributionControl: false,
-    maxPitch: 70,
-    minZoom: 0.5,
-    maxZoom: 17.5,
-    fadeDuration: 0,
-    hash: false,
-    clickTolerance: 12,
-    maxTileCacheZoomLevels: 16,
-  });
-  map.addControl(new maplibregl.NavigationControl({ showCompass: true, visualizePitch: true }), "bottom-right");
-  map.addControl(new maplibregl.AttributionControl({ compact: false }), "bottom-left");
-
-  let disposed = false;
-  const geometryById = new Map();
-  let arrivalState = arrival ? "globe" : "skipped";
-  let arrivalTimer = 0;
-  let warmAbort = null;
-  let layersReady = false;
-  let runCount = 0;
-  let cityId = "";
-  let regions = [];
-  let highlighted = "";
+  const arrivalState0 = arrival ? "globe" : "skipped";
   mapEl.dataset.highlight = "";
-  mapEl.dataset.intro = arrivalState;
+  mapEl.dataset.intro = arrivalState0;
   mapEl.dataset.warm = arrival ? "idle" : "skipped";
   if (arrival) {
     mapEl.dataset.zoom = Number(zoom).toFixed(3);
@@ -247,45 +216,38 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
     mapEl.dataset.bearing = "0.00";
     mapEl.dataset.pad = "0,0,0,0";
   }
+  const map = await openGlobeMap(
+    mapEl,
+    {
+      center,
+      zoom,
+      pitch: view.pitch,
+      bearing: view.bearing,
+      maxPitch: 70,
+      minZoom: 0.5,
+      maxZoom: 17.5,
+      clickTolerance: 12,
+      maxTileCacheZoomLevels: 16,
+    },
+    { beforeGlobe: addBuildings },
+  );
 
-  const loaded = new Promise((resolve, reject) => {
-    const timer = window.setTimeout(() => reject(new Error("Map style timed out")), 20000);
-    map.once("load", () => {
-      window.clearTimeout(timer);
-      resolve();
-    });
+  let disposed = false;
+  const geometryById = new Map();
+  let arrivalState = arrivalState0;
+  let arrivalTimer = 0;
+  let warmAbort = null;
+  let layersReady = false;
+  let runCount = 0;
+  let cityId = "";
+  let regions = [];
+  let highlighted = "";
+
+  map.once("render", () => {
+    const canvas = map.getCanvas();
+    if (!canvas || canvas.style.visibility === "hidden") return;
+    if (map.getZoom() < 3 && map.getPitch() < 1) mapEl.dataset.globe = "shown";
   });
-  try {
-    await loaded;
-  } catch (error) {
-    if (!disposed) {
-      mapEl.dataset.map = "error";
-      map.remove();
-    }
-    throw error;
-  }
-  if (disposed) {
-    map.remove();
-    return null;
-  }
-
-  try {
-    addBuildings(map);
-    map.setProjection({ type: "globe" });
-    map.once("render", () => {
-      const canvas = map.getCanvas();
-      if (!canvas || canvas.style.visibility === "hidden") return;
-      if (map.getZoom() < 3 && map.getPitch() < 1) mapEl.dataset.globe = "shown";
-    });
-    map.setLight({
-      anchor: "viewport",
-      color: "#ffffff",
-      intensity: 0.55,
-      position: [1.15, 210, 28],
-    });
-  } catch (error) {
-    console.warn("Run building layer skipped", error);
-  }
 
   function framedBearing() {
     return map.getBearing();

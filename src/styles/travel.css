@@ -1,0 +1,1003 @@
+/* /travel. The /runs globe and chrome, with /diners drop pins.
+   Night purple and gold on the light Positron map. */
+
+html:has(.travel),
+html:has(.travel) body,
+html:has(.travel) #app {
+  background: #f7f7f8;
+}
+
+.travel {
+  --bg: #f7f7f8;
+  --card: #fffdfb;
+  --line: #e7d9ce;
+  --gold: #ffb020;
+  --text: #1f1f1f;
+  --muted: #6e5a4e;
+  --primary: #2d1d7a;
+  --primary-soft: rgba(45, 29, 122, 0.06);
+  --warn: #9a2b16;
+  --warn-bg: #fff1e8;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --side-w: 340px;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Roboto, system-ui, -apple-system, sans-serif;
+  color-scheme: light;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.travel button,
+.travel input {
+  font-family: inherit;
+}
+
+.travel button,
+.travel label,
+.travel summary,
+.travel a {
+  touch-action: manipulation;
+}
+
+.travel #travel-map {
+  position: absolute;
+  inset: 0;
+  background: #f2f3f0;
+}
+
+.travel .maplibregl-ctrl-group {
+  border: 1px solid var(--line);
+  box-shadow: 0 2px 8px rgba(26, 16, 51, 0.12);
+  overflow: hidden;
+}
+
+.travel .maplibregl-ctrl-group button {
+  width: 36px;
+  height: 36px;
+}
+
+.travel .maplibregl-ctrl-attrib {
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.travel .maplibregl-ctrl-attrib a,
+.travel a {
+  color: var(--primary);
+}
+
+.travel .maplibregl-ctrl-bottom-left {
+  left: calc(var(--side-w) + 24px);
+}
+
+.travel.card-open .maplibregl-ctrl-bottom-right {
+  right: min(452px, calc(100% - 16px));
+}
+
+/* ---------- Pins ---------- */
+
+/* The marker box stays on the true point; the nudged body takes the clicks. */
+.travel .trip-pin {
+  width: 34px;
+  height: 44px;
+  pointer-events: none;
+  cursor: pointer;
+  user-select: none;
+  color: #6a5db3;
+}
+
+.travel .trip-pin.top {
+  color: var(--primary);
+}
+
+.travel .trip-pin.hm .pin-fill {
+  fill: #fff;
+  stroke: #6a5db3;
+  stroke-width: 1.5;
+}
+
+.travel .trip-pin.hm .pin-rank {
+  color: var(--primary);
+}
+
+.travel .pin-body {
+  position: relative;
+  pointer-events: auto;
+  width: 34px;
+  height: 44px;
+  transform-origin: 50% 100%;
+  transition:
+    translate 0.32s var(--ease-out),
+    scale 0.18s var(--ease-out);
+  animation: travel-pin-in 0.3s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 40ms + 120ms);
+}
+
+.travel .pins-near .pin-body {
+  translate: var(--nx, 0) var(--ny, 0);
+}
+
+@keyframes travel-pin-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes travel-pin-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .travel .trip-pin .pin-body:hover {
+    scale: 1.08;
+  }
+}
+
+.travel .trip-pin.sel {
+  z-index: 2;
+}
+
+.travel .trip-pin.sel .pin-body {
+  scale: 1.2;
+}
+
+.travel .pin-shape {
+  display: block;
+  filter: drop-shadow(0 1px 1.5px rgba(26, 16, 51, 0.28));
+}
+
+.travel .pin-fill {
+  fill: currentColor;
+}
+
+.travel .pin-ring {
+  fill: var(--gold);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.travel .trip-pin.sel .pin-ring,
+.travel .pin-body:hover .pin-ring {
+  opacity: 1;
+}
+
+.travel .trip-pin.warn .pin-ring {
+  fill: #e0582e;
+  opacity: 1;
+}
+
+.travel .pin-rank {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 10px;
+  text-align: center;
+  color: #fff;
+  font: 700 12px/1 Roboto, system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  pointer-events: none;
+}
+
+.travel .trip-pin.hm .pin-rank {
+  font-size: 10px;
+  top: 11px;
+}
+
+.travel .pin-name {
+  position: absolute;
+  left: calc(100% + 4px);
+  top: 7px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--primary);
+  font: 600 12px/1.35 Roboto, system-ui, sans-serif;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(26, 16, 51, 0.12);
+  opacity: 1;
+  transition: opacity 0.16s ease;
+  pointer-events: none;
+}
+
+.travel .pins-near .trip-pin:not(.sel) .pin-body:not(:hover) .pin-name {
+  opacity: 0;
+}
+
+.travel .trip-pin.sel .pin-name {
+  box-shadow: 0 0 0 2px rgba(255, 176, 32, 0.7), 0 1px 2px rgba(26, 16, 51, 0.12);
+}
+
+/* ---------- Side: title, dates, ranking ---------- */
+
+.travel .side {
+  position: absolute;
+  z-index: 6;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  left: 12px;
+  bottom: 12px;
+  width: var(--side-w);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.travel .topbar,
+.travel .board {
+  pointer-events: auto;
+  border-radius: 18px;
+  background: rgba(255, 253, 251, 0.96);
+  box-shadow: 0 10px 28px rgba(26, 16, 51, 0.14);
+}
+
+.travel .topbar {
+  padding: 16px 16px 14px;
+}
+
+.travel h1 {
+  margin: 0;
+  color: var(--primary);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.travel .sub {
+  margin: 4px 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+.travel .dates {
+  display: inline-flex;
+  gap: 2px;
+  margin: 0;
+  padding: 3px;
+  border: 1px solid rgba(45, 29, 122, 0.18);
+  border-radius: 999px;
+  background: #fff;
+}
+
+.travel .dates label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.travel .dates label:hover {
+  background: var(--primary-soft);
+}
+
+.travel .dates label.on {
+  background: var(--primary);
+  color: #fff;
+}
+
+.travel .dates input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.travel .dates label:has(input:focus-visible) {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.travel .board {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 0 1 auto;
+  overflow: hidden;
+}
+
+.travel .list-toggle {
+  display: none;
+}
+
+.travel .board-heading {
+  margin: 14px 16px 6px;
+  color: var(--muted);
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.travel .rank-list {
+  margin: 0;
+  padding: 0 8px 4px;
+  list-style: none;
+  overflow: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
+}
+
+.travel .rank-list button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  margin: 0;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.16s ease;
+}
+
+.travel .rank-list button:hover {
+  background: var(--primary-soft);
+}
+
+.travel .rank-list button.on {
+  background: rgba(255, 176, 32, 0.16);
+  box-shadow: inset 0 0 0 1.5px rgba(255, 176, 32, 0.8);
+}
+
+.travel .rank-list button:focus-visible,
+.travel .close:focus-visible,
+.travel .pill:focus-visible,
+.travel .list-toggle:focus-visible,
+.travel summary:focus-visible,
+.travel a:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.travel .rank-badge {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.travel .rank-badge.hm {
+  background: #fff;
+  box-shadow: inset 0 0 0 1.5px var(--primary);
+  color: var(--primary);
+  font-size: 10px;
+}
+
+.travel .rank-badge.big {
+  width: 30px;
+  height: 30px;
+}
+
+.travel .rank-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.travel .rank-name {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.travel .rank-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.travel .rank-cost {
+  font-variant-numeric: tabular-nums;
+}
+
+.travel .rank-tag {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.travel .rank-tag.warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+.travel .board-foot {
+  padding: 8px 16px 14px;
+  border-top: 1px solid var(--line);
+}
+
+.travel .asof {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.travel .asof a,
+.travel .sources a {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.travel .method {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.travel .method p {
+  margin: 6px 0 0;
+  line-height: 1.45;
+}
+
+.travel summary {
+  cursor: pointer;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* ---------- Card ---------- */
+
+.travel .trip-card {
+  position: absolute;
+  z-index: 12;
+  top: 12px;
+  right: 12px;
+  width: min(420px, calc(100% - 24px));
+  max-height: calc(100% - 24px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: 0 16px 40px rgba(26, 16, 51, 0.18);
+  transform: translateX(calc(100% + 28px));
+  transition: transform 0.36s var(--ease-out);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.travel .trip-card.open {
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.travel .card-body {
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 20px 22px 24px;
+}
+
+.travel .close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.travel .eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding-right: 40px;
+  color: var(--primary);
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.travel .card-title {
+  margin: 0;
+  padding-right: 36px;
+  font-size: 24px;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.travel .plan {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.travel .advisory {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-left: 4px solid #e0582e;
+  border-radius: 8px;
+  background: var(--warn-bg);
+  color: #4a1b0d;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.travel .advisory strong {
+  display: block;
+  color: var(--warn);
+}
+
+.travel .cost {
+  margin-top: 16px;
+}
+
+.travel .cost-total {
+  margin: 0;
+  color: var(--primary);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.travel .cost-sub,
+.travel .cost-note {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.travel .cost-note {
+  font-family: inherit;
+  font-weight: 400;
+}
+
+.travel .breakdown {
+  width: 100%;
+  margin-top: 14px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.travel .breakdown th,
+.travel .breakdown td {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.travel .breakdown thead th {
+  color: var(--muted);
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.travel .breakdown thead th:first-child,
+.travel .breakdown tbody th,
+.travel .breakdown tfoot th {
+  text-align: left;
+}
+
+.travel .breakdown tbody th {
+  font-weight: 600;
+}
+
+.travel .row-note {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.travel .breakdown td {
+  width: 5.5em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.travel .breakdown tfoot th,
+.travel .breakdown tfoot td {
+  border-bottom: 0;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.travel .basis {
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.travel .basis p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.travel .facts {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0 0;
+}
+
+.travel .facts dt {
+  color: var(--muted);
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.travel .facts dd {
+  margin: 2px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.travel .card-body h3 {
+  margin: 20px 0 6px;
+  color: var(--primary);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.travel .card-body > p,
+.travel .card-body li {
+  font-size: 14px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.travel .card-body > p {
+  margin: 0;
+}
+
+.travel .hikes,
+.travel .sources ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.travel .itinerary ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-left: 2px dashed rgba(45, 29, 122, 0.25);
+}
+
+.travel .itinerary li {
+  position: relative;
+  margin: 0 0 10px;
+  padding-left: 14px;
+}
+
+.travel .itinerary li::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 2px var(--card);
+}
+
+.travel .day {
+  display: block;
+  color: var(--primary);
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.travel .book-ahead {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.travel .sources li {
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.travel .src-title {
+  display: block;
+}
+
+.travel .sources a {
+  display: inline-block;
+  margin-right: 10px;
+  overflow-wrap: anywhere;
+}
+
+.travel .card-actions,
+.travel .card-step {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.travel .card-actions {
+  justify-content: flex-start;
+}
+
+.travel .pill {
+  min-height: 40px;
+  min-width: 7.5rem;
+  padding: 0 14px;
+  border: 1px solid rgba(45, 29, 122, 0.18);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 0.16s ease,
+    transform 0.12s var(--ease-out);
+}
+
+.travel .pill:hover {
+  background: var(--primary-soft);
+}
+
+.travel .pill:active {
+  transform: scale(0.97);
+}
+
+.travel .card-asof {
+  margin-top: 16px;
+}
+
+.travel .map-error {
+  position: absolute;
+  z-index: 7;
+  right: 12px;
+  bottom: 40px;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--primary);
+  font-size: 13px;
+  box-shadow: 0 2px 10px rgba(26, 16, 51, 0.16);
+}
+
+.travel .scrim {
+  display: none;
+}
+
+.travel.no-anim .trip-card,
+.travel.no-anim .scrim {
+  transition: none;
+}
+
+/* ---------- Phone ---------- */
+
+@media (max-width: 640px) {
+  .travel .side {
+    display: contents;
+  }
+
+  /* Above the scrim, so dates still switch while a card is open. */
+  .travel .topbar {
+    position: absolute;
+    z-index: 13;
+    top: calc(10px + env(safe-area-inset-top, 0px));
+    left: 10px;
+    right: 10px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 2px 8px;
+    padding: 10px 10px 10px 14px;
+    border-radius: 16px;
+  }
+
+  .travel h1 {
+    font-size: 18px;
+  }
+
+  .travel .sub {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin: 0;
+    font-size: 12px;
+  }
+
+  .travel .pins-near .pin-body {
+    scale: 0.84;
+  }
+
+  .travel .pins-near .trip-pin.sel .pin-body {
+    scale: 1.05;
+  }
+
+  .travel .dates label {
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .travel .board {
+    position: absolute;
+    z-index: 7;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: min(62dvh, 560px);
+    border-radius: 18px 18px 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .travel .list-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 48px;
+    padding: 0 18px;
+    border: 0;
+    background: transparent;
+    color: var(--primary);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .travel .list-chev {
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: translateY(2px) rotate(225deg);
+    transition: transform 0.2s var(--ease-out);
+  }
+
+  .travel.list-open .list-chev {
+    transform: translateY(-2px) rotate(45deg);
+  }
+
+  .travel .board-heading {
+    display: none;
+  }
+
+  .travel .rank-list {
+    display: none;
+  }
+
+  .travel.list-open .rank-list {
+    display: block;
+  }
+
+  .travel .board-foot {
+    padding: 8px 18px 12px;
+  }
+
+  .travel .method {
+    display: none;
+  }
+
+  .travel.list-open .method {
+    display: block;
+  }
+
+  .travel .maplibregl-ctrl-bottom-left {
+    left: 0;
+    bottom: 96px;
+  }
+
+  .travel .maplibregl-ctrl-bottom-right {
+    bottom: 96px;
+  }
+
+  .travel.card-open .maplibregl-ctrl-bottom-right {
+    right: 0;
+  }
+
+  .travel .trip-card {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-height: min(78dvh, 680px);
+    border-radius: 18px 18px 0 0;
+    transform: translateY(110%);
+  }
+
+  .travel .trip-card.open {
+    transform: translateY(0);
+  }
+
+  .travel .card-body {
+    padding: 18px 18px calc(22px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .travel .scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 11;
+    background: rgba(30, 35, 41, 0.28);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .travel .scrim.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .travel .trip-card,
+  .travel .scrim,
+  .travel .pin-body,
+  .travel .pin-ring,
+  .travel .pin-name,
+  .travel .list-chev,
+  .travel .pill,
+  .travel .dates label {
+    transition: none;
+  }
+
+  .travel .pin-body {
+    animation-name: travel-pin-fade;
+  }
+}
