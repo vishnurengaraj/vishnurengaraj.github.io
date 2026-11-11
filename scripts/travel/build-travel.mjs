@@ -29,10 +29,16 @@ export function parseScore(value) {
   return n;
 }
 
-/** Weighted total, rounded to two decimals, from weights.json shares. */
+/** Weighted total, rounded to two decimals, from weights.json shares.
+ *  Shares are applied as whole percents so values like 8.025 become 8.03
+ *  the same way Google Sheets ROUND does, instead of losing a half-cent
+ *  to floating-point noise. */
 export function weightedScore(scores, weights) {
-  const total = weights.categories.reduce((sum, cat) => sum + scores[cat.key] * cat.share, 0);
-  return Math.round(total * 100) / 100;
+  const total = weights.categories.reduce(
+    (sum, cat) => sum + scores[cat.key] * Math.round(cat.share * 100),
+    0,
+  );
+  return Math.round(total) / 100;
 }
 
 export function weightLegend(weights) {
@@ -133,8 +139,11 @@ export function buildTrips() {
   }
 
   const trips = places.places.map((place) => {
-    const r = worldwide.rows.find((row) => row[0] === place.rank);
-    if (!r) throw new Error(`Worldwide tab has no rank ${place.rank}`);
+    // The Worldwide tab is now ordered by the weighted score; its first
+    // column is that rank, not the earlier cost ranking. Join by name.
+    // place.rank still matches the Safety tab (the previous Worldwide ranks).
+    const worldwideDestinations = worldwide.rows.filter((row) => /^\d+$/.test(String(row[0] || "").trim()));
+    const r = findByShort(worldwideDestinations, 1, place);
     const scoreRow = findByShort(scoresTab.rows, 1, place);
     const scores = {
       outdoors: parseScore(scoreRow[2]),

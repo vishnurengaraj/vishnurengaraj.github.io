@@ -17,6 +17,7 @@ const VIEWPORTS = [
 
 const usd = (n) => `$${n.toLocaleString("en-US")}`;
 const range = (t) => `${usd(t.low)}–${usd(t.high)}`;
+const formatScore = (n) => n.toFixed(2);
 const trip = (slug) => data.trips.find((t) => t.slug === slug);
 
 async function ready(page) {
@@ -79,13 +80,13 @@ test.describe("travel page", () => {
       await openList(page, viewport);
       await expect(page.locator(".list-weights")).toHaveText(data.weightLegend);
       await expect(page.locator("#travel-sort")).toHaveValue("weighted");
-      const first = page.locator('.rank-list [data-slug="mexico-city"]');
+      const first = page.locator('.rank-list [data-slug="tucson"]');
       await expect(first).toBeVisible();
-      await expect(first).toContainText(range(trip("mexico-city").totals.jan5));
-      await expect(first).toContainText("8.20");
+      await expect(first).toContainText(range(trip("tucson").totals.jan5));
+      await expect(first).toContainText("8.03");
       const items = page.locator(".rank-list [data-slug]");
       await expect(items).toHaveCount(17);
-      await expect(items.nth(1)).toHaveAttribute("data-slug", "tucson");
+      await expect(items.nth(1)).toHaveAttribute("data-slug", "mexico-city");
       await expect(page.locator('.rank-list [data-slug="puerto-vallarta"]')).toContainText("Level 3 advisory");
       await expect(page.locator('.rank-list [data-slug="joshua-tree"]')).toContainText("drive");
       for (const slug of ["madeira", "hong-kong", "puerto-rico", "taiwan"]) {
@@ -110,7 +111,7 @@ test.describe("travel page", () => {
       await expect(card.locator(".breakdown tbody")).toContainText("DTW fare");
       await expect(card.locator(".breakdown tbody")).toContainText("estimate, HIGH only");
       await expect(card.locator(".pay-note")).toContainText("Chase Sapphire Preferred");
-      await expect(card.locator(".score")).toHaveText("7.65");
+      await expect(card.locator(".score")).toHaveText(formatScore(trip("oaxaca").scores.weighted));
       await expect(card.locator(".score-chips li")).toHaveCount(data.weights.categories.length);
       await expect(card.getByText("What a week looks like")).toBeVisible();
       await expect(card).toContainText(trip("oaxaca").week);
@@ -164,7 +165,7 @@ test.describe("travel page", () => {
     await page.goto("/travel");
     await ready(page);
 
-    const first = page.locator('.rank-list [data-slug="mexico-city"]');
+    const first = page.locator('.rank-list [data-slug="tucson"]');
     await first.focus();
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("ArrowDown");
@@ -222,7 +223,7 @@ test.describe("travel page", () => {
     await expect(page.locator(".trip-card.open .card-title")).toHaveText("Mexico City");
     await expect(page.locator(".trip-card.open")).toContainText("La Malinche");
     await expect(page.locator(".trip-card.open")).toContainText("Ajusco dropped");
-    await expect(page.locator(".trip-card.open .score")).toHaveText("8.20");
+    await expect(page.locator(".trip-card.open .score")).toHaveText("7.90");
 
     await page.goto("/travel?dest=atlantis");
     await ready(page);
@@ -238,8 +239,8 @@ test.describe("travel page", () => {
       await ready(page);
       await openList(page, viewport);
       const items = page.locator(".rank-list [data-slug]");
-      await expect(items.nth(0)).toHaveAttribute("data-slug", "mexico-city");
-      await expect(items.nth(1)).toHaveAttribute("data-slug", "tucson");
+      await expect(items.nth(0)).toHaveAttribute("data-slug", "tucson");
+      await expect(items.nth(1)).toHaveAttribute("data-slug", "mexico-city");
       await page.locator("#travel-sort").selectOption("name");
       const names = (await items.allTextContents()).map((t) => t.trim());
       const firstNames = await items.evaluateAll((els) => els.map((el) => el.dataset.slug));
@@ -247,8 +248,8 @@ test.describe("travel page", () => {
       await page.locator("#travel-sort").selectOption("food");
       await expect(items.nth(0)).toHaveAttribute("data-slug", "mexico-city");
       await page.locator("#travel-sort").selectOption("weighted");
-      await expect(items.nth(0)).toHaveAttribute("data-slug", "mexico-city");
-      await expect(items.nth(1)).toHaveAttribute("data-slug", "tucson");
+      await expect(items.nth(0)).toHaveAttribute("data-slug", "tucson");
+      await expect(items.nth(1)).toHaveAttribute("data-slug", "mexico-city");
     }
   });
 
@@ -259,6 +260,8 @@ test.describe("travel page", () => {
     await ready(page);
     let card = page.locator(".trip-card.open");
     await expect(card).toContainText("Ajusco dropped");
+    await expect(card).toContainText("14,600 ft");
+    await expect(card).toContainText("4,320 ft");
     await expect(card.locator(".safety")).toContainText("Roma Norte, Condesa, Polanco");
     await expect(card.locator(".safety")).toContainText("Uber or DiDi");
 
@@ -266,12 +269,28 @@ test.describe("travel page", () => {
     await ready(page);
     card = page.locator(".trip-card.open");
     await expect(card).toContainText("guided out-and-back");
-    await expect(card.locator(".eyebrow")).toContainText("Ranked #4 of 17");
+    await expect(card.locator(".eyebrow")).toContainText("Ranked #6 of 17");
 
     await page.goto("/travel?dest=andalusia");
     await ready(page);
     card = page.locator(".trip-card.open");
     await expect(card).toContainText("closed Mondays and Jan 11-19");
+
+    await page.goto("/travel?dest=tucson");
+    await ready(page);
+    card = page.locator(".trip-card.open");
+    await expect(card).toContainText("Wasson Peak");
+    await expect(card).toContainText("Arizona-Sonora Desert Museum");
+    await expect(card.locator(".score")).toHaveText("8.03");
+
+    await page.goto("/travel?dest=joshua-tree");
+    await ready(page);
+    await expect(page.locator(".trip-card.open")).toContainText("Palm Springs Aerial Tramway");
+
+    await page.goto("/travel?dest=taiwan");
+    await ready(page);
+    await expect(page.locator(".trip-card.open")).toContainText("Teapot Mountain");
+    await expect(page.locator(".trip-card.open")).toContainText("Tainan");
   });
 
   test("nothing on the page books or buys", async ({ page }) => {
