@@ -93,24 +93,15 @@ function isPhone() {
   return window.matchMedia("(max-width: 640px)").matches;
 }
 
-/** On a tall phone the map canvas is taller than a world at the zoom that
- *  fits every pin, and MapLibre will not zoom out past that. Shrink the
- *  canvas so the overview can show the whole set. */
+/** The map fills the page (CSS inset 0). The ranking sheet and cards sit on
+ *  top of it. Do not shrink the canvas: a short canvas left a band of empty
+ *  page under the globe. */
 function layoutMap() {
   const el = mapEl.value;
   if (!el) return;
-  if (!isPhone()) {
-    el.style.top = "";
-    el.style.bottom = "";
-    el.style.height = "";
-    return;
-  }
-  const board = pageEl.value?.querySelector(".board");
-  const visible = board ? board.getBoundingClientRect().top : window.innerHeight * 0.7;
-  const maxH = Math.ceil((window.innerWidth * 360) / 290) + 8;
-  el.style.bottom = "auto";
-  el.style.top = "0px";
-  el.style.height = `${Math.min(Math.max(visible, 280), maxH)}px`;
+  el.style.top = "";
+  el.style.bottom = "";
+  el.style.height = "";
 }
 
 function prefersReduced() {
@@ -279,14 +270,14 @@ function linkLabel(url) {
 }
 
 async function startMap() {
-  const { mountTravelMap } = await import("../travel/map.js");
+  const { mountTravelMap, AMERICAS_CENTER, AMERICAS_ZOOM } = await import("../travel/map.js");
   if (!alive || !mapEl.value) return;
   try {
     mapApi = await mountTravelMap(mapEl.value, {
       trips: allTrips,
       home: data.home,
-      center: [-20, 25],
-      zoom: 1.2,
+      center: AMERICAS_CENTER,
+      zoom: AMERICAS_ZOOM,
       onPick: (slug) => pick(slug, { from: mapEl.value }),
     });
   } catch (error) {

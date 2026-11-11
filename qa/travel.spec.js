@@ -20,6 +20,77 @@ const range = (t) => `${usd(t.low)}–${usd(t.high)}`;
 const formatScore = (n) => n.toFixed(2);
 const trip = (slug) => data.trips.find((t) => t.slug === slug);
 
+const centers = Object.fromEntries(data.trips.map((t) => [t.slug, t.center]));
+
+function kmBetween(a, b) {
+  const earth = 6371;
+  const r = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * r;
+  const dLng = ((((b.lng - a.lng) % 360) + 540) % 360) - 180;
+  const x =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin((dLng * r) / 2) ** 2;
+  return 2 * earth * Math.asin(Math.min(1, Math.sqrt(x)));
+}
+
+async function visiblePinTips(page) {
+  return page.evaluate((centers) => {
+    const mapEl = document.querySelector("#travel-map");
+    const api = mapEl.__travel;
+    const mapRect = mapEl.getBoundingClientRect();
+    return [...document.querySelectorAll(".trip-pin")]
+      .filter((el) => !el.hidden && getComputedStyle(el).display !== "none" && el.querySelector(".pin-shape")?.getClientRects().length)
+      .map((el) => {
+        const r = el.querySelector(".pin-shape").getBoundingClientRect();
+        const x = r.x + r.width / 2 - mapRect.x;
+        const y = r.bottom - mapRect.y;
+        const ll = api.unproject(x, y);
+        const c = centers[el.dataset.slug];
+        const exp = api.project(c[0], c[1]);
+        return {
+          slug: el.dataset.slug,
+          tip: { x, y },
+          expected: exp,
+          ll,
+          front: api.isFront(c[0], c[1]),
+        };
+      });
+  }, centers);
+}
+
+async function assertVisiblePinTips(page) {
+  const rows = await visiblePinTips(page);
+  expect(rows.length, "expected at least one visible pin").toBeGreaterThan(0);
+  for (const row of rows) {
+    const c = centers[row.slug];
+    const px = Math.hypot(row.tip.x - row.expected.x, row.tip.y - row.expected.y);
+    const km = kmBetween({ lng: row.ll.lng, lat: row.ll.lat }, { lng: c[0], lat: c[1] });
+    expect(row.front, `${row.slug} should be on the near side`).toBe(true);
+    expect(px, `${row.slug} tip is ${px.toFixed(1)}px / ${km.toFixed(1)}km from true coordinates`).toBeLessThanOrEqual(8);
+  }
+  return rows;
+}
+
+async function clickPinOrCluster(page, slug) {
+  const pin = page.locator(`.trip-pin[data-slug="${slug}"]`);
+  if (await pin.isVisible()) {
+    await pin.locator(".pin-shape").click();
+    return;
+  }
+  const handle = await page.evaluateHandle((slug) => {
+    return [...document.querySelectorAll(".trip-cluster")].find((el) => (el.dataset.slugs || "").split(",").includes(slug)) || null;
+  }, slug);
+  const el = handle.asElement();
+  if (el) {
+    await el.click();
+    await expect(pin).toBeVisible({ timeout: 8000 });
+    await pin.locator(".pin-shape").click();
+    return;
+  }
+  await page.locator(`.rank-list [data-slug="${slug}"]`).click();
+}
+
+
 async function ready(page) {
   await page.waitForFunction(() => document.documentElement.classList.contains("vue-ready"));
   await expect(page.locator("#travel-map")).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
@@ -44,7 +115,6 @@ test.describe("travel page", () => {
       await expect(page.locator("h1")).toHaveText("January trips");
       await expect(page.locator(".sub")).toContainText("17 trip options, scored");
       await expect(page.locator(".site-footer")).toHaveCount(0);
-      await expect(page.locator(".trip-pin")).toHaveCount(data.trips.length);
       await expect(page.locator(".rank-list li")).toHaveCount(data.trips.length);
       await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex");
       await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /mild weather/);
@@ -55,27 +125,30 @@ test.describe("travel page", () => {
       await expect(note).toContainText("Prices as of Nov 11, 2026; estimates labeled");
       await expect(note.locator("a")).toHaveAttribute("href", SHEET);
 
-      /* At the overview every pin's head is the topmost thing under it, so each one is clickable. */
-      const blocked = await page.evaluate(() =>
-        [...document.querySelectorAll(".trip-pin")]
-          .filter((el) => {
-            const r = el.querySelector(".pin-shape").getBoundingClientRect();
-            const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height * 0.35);
-            return hit?.closest(".trip-pin") !== el;
-          })
-          .map((el) => el.dataset.slug),
-      );
-      expect(blocked).toEqual([]);
-
-      /* Pins stay on screen and clear of the side panel at the overview. */
-      if (viewport.name === "desktop") {
-        const board = await page.locator(".board").boundingBox();
-        for (const el of await page.locator(".trip-pin").all()) {
-          const box = await el.locator(".pin-shape").boundingBox();
-          expect(box.x, await el.getAttribute("data-slug")).toBeGreaterThan(board.x + board.width - 4);
-          expect(box.x + box.width).toBeLessThan(viewport.width);
-        }
+      /* Every destination is in the list. On the globe, a place is either a
+         visible pin, inside a cluster badge, or hidden on the far side. */
+      const coverage = await page.evaluate((centers) => {
+        const api = document.querySelector("#travel-map").__travel;
+        const visible = new Set(
+          [...document.querySelectorAll(".trip-pin")]
+            .filter((el) => !el.hidden && getComputedStyle(el).display !== "none")
+            .map((el) => el.dataset.slug),
+        );
+        const clustered = new Set(
+          [...document.querySelectorAll(".trip-cluster")].flatMap((el) => (el.dataset.slugs || "").split(",").filter(Boolean)),
+        );
+        return Object.entries(centers).map(([slug, center]) => ({
+          slug,
+          visible: visible.has(slug),
+          clustered: clustered.has(slug),
+          front: api.isFront(center[0], center[1]),
+        }));
+      }, centers);
+      for (const row of coverage) {
+        if (row.front) expect(row.visible || row.clustered, `${row.slug} is on the near side but missing`).toBe(true);
+        else expect(row.visible, `${row.slug} is on the far side but still shown`).toBe(false);
       }
+      expect(coverage.some((row) => row.visible)).toBe(true);
 
       await openList(page, viewport);
       await expect(page.locator(".list-weights")).toHaveText(data.weightLegend);
@@ -90,7 +163,6 @@ test.describe("travel page", () => {
       await expect(page.locator('.rank-list [data-slug="puerto-vallarta"]')).toContainText("Level 3 advisory");
       await expect(page.locator('.rank-list [data-slug="joshua-tree"]')).toContainText("drive");
       for (const slug of ["madeira", "hong-kong", "puerto-rico", "taiwan"]) {
-        await expect(page.locator(`.trip-pin[data-slug="${slug}"]`)).toHaveCount(1);
         await expect(page.locator(`.rank-list [data-slug="${slug}"]`)).toHaveCount(1);
       }
     });
@@ -101,7 +173,7 @@ test.describe("travel page", () => {
       await page.goto("/travel");
       await ready(page);
 
-      await page.locator('.trip-pin[data-slug="oaxaca"] .pin-shape').click();
+      await clickPinOrCluster(page, "oaxaca");
       const card = page.locator(".trip-card.open");
       await expect(card).toBeVisible();
       await expect(card.locator(".card-title")).toHaveText("Oaxaca");
@@ -291,6 +363,43 @@ test.describe("travel page", () => {
     await ready(page);
     await expect(page.locator(".trip-card.open")).toContainText("Teapot Mountain");
     await expect(page.locator(".trip-card.open")).toContainText("Tainan");
+  });
+
+
+  test("pin tips sit on true coordinates on the globe", async ({ page }) => {
+    const europe = ["lisbon", "andalusia", "naples", "madeira", "tenerife"];
+    for (const viewport of VIEWPORTS) {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto("/travel");
+      await ready(page);
+      await page.waitForTimeout(400);
+      const overview = await assertVisiblePinTips(page);
+      const southwest = ["mexico-city", "tucson", "oaxaca", "joshua-tree"];
+      const clustered = await page.evaluate((slugs) => {
+        const names = [...document.querySelectorAll(".trip-cluster")].flatMap((el) => (el.dataset.slugs || "").split(","));
+        return slugs.filter((slug) => names.includes(slug));
+      }, southwest);
+      const visible = overview.map((row) => row.slug);
+      expect(
+        southwest.some((slug) => visible.includes(slug) || clustered.includes(slug)),
+        `${viewport.name} Americas view pins ${visible} clusters ${clustered}`,
+      ).toBe(true);
+
+      await page.evaluate(() => {
+        const mexico = [ -99.1332, 19.4326 ];
+        document.querySelector("#travel-map").__travel.jumpTo({ center: mexico, zoom: 6.2 });
+      });
+      await page.waitForTimeout(400);
+      await assertVisiblePinTips(page);
+
+      await page.evaluate(() => {
+        document.querySelector("#travel-map").__travel.jumpTo({ center: [8, 42], zoom: 2.3 });
+      });
+      await page.waitForTimeout(400);
+      const rotated = await assertVisiblePinTips(page);
+      expect(rotated.some((row) => europe.includes(row.slug)), `${viewport.name} Europe view pins ${rotated.map((r) => r.slug)}`).toBe(true);
+    }
   });
 
   test("nothing on the page books or buys", async ({ page }) => {

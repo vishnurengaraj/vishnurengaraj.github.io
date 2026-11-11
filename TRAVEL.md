@@ -4,7 +4,7 @@ January 2027 trip options on the /runs basemap, ranked for mild weather (highs a
 
 The default list follows the weighted score (Outdoors 25%, Food 15%, Museums & City 15%, Price 25%, Getting There 10%, Safety 10%). A sort dropdown can switch to any category or to name. Weights live in `weights.json`.
 
-The overview uses the same Positron basemap as /runs, in mercator, so every pin is visible at once. A 3D globe can only show one hemisphere, and these 17 places span about 260°.
+The overview uses the same Positron globe as /runs, framed on the Americas so Mexico and the US Southwest sit in the open map. Spin the globe to see Europe or Asia. Each pin tip sits on the destination's true coordinates. Nearby pins collapse into a count badge that zooms in when tapped. Pins on the far side of the globe are hidden.
 
 ## Data
 
@@ -13,7 +13,7 @@ https://docs.google.com/spreadsheets/d/1ryfjLvoGTmf63buDqLxvHFbxLKBbhXAJswBkxhYB
 
 - `src/data/travel/sheet/*.csv` is a snapshot of its tabs, taken Nov 11, 2026. The Worldwide tab is the prices, week sketches, and flight times. The Scores and Safety tabs feed the ranking and the card notes. Asia, Europe & beyond, South America, and Sources & method are kept beside them.
 - `src/data/travel/weights.json` holds the category shares. They must sum to 1. Change a share, run the build, and every total is recomputed. The page reads the computed totals from `trips.json`, not this file directly.
-- `src/data/travel/places.json` holds what the Sheet doesn't have: slug, pin label, map position, pin nudge for the zoomed-out view, and which Sources rows apply to each option.
+- `src/data/travel/places.json` holds what the Sheet doesn't have: slug, pin label, map position, and which Sources rows apply to each option.
 - `node scripts/travel/build-travel.mjs` writes `src/data/travel/trips.json` from those inputs. The page reads only that file.
 
 To refresh after the Sheet changes, export the Worldwide, Scores, Safety, Asia, Europe & beyond, South America, and Sources & method tabs as CSV over the matching files in `sheet/`, run the build, then run `node --test scripts/travel/*.test.mjs`. The tests check that every total equals the sum of its parts, that one LAX fare plus one DTW fare equals the flights total, that every computed weighted score matches the Scores tab, and that every dollar figure on the page appears in the Sheet.

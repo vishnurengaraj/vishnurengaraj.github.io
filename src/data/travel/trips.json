@@ -253,10 +253,6 @@
         -110.9747,
         32.2226
       ],
-      "nudge": [
-        0,
-        0
-      ],
       "drive": true,
       "advisoryLevel": null,
       "name": "Tucson",
@@ -382,10 +378,6 @@
       "center": [
         -99.1332,
         19.4326
-      ],
-      "nudge": [
-        0,
-        0
       ],
       "drive": false,
       "advisoryLevel": 2,
@@ -513,10 +505,6 @@
         -96.7266,
         17.0732
       ],
-      "nudge": [
-        0,
-        0
-      ],
       "drive": false,
       "advisoryLevel": 2,
       "name": "Oaxaca",
@@ -642,10 +630,6 @@
       "center": [
         -116.31,
         33.95
-      ],
-      "nudge": [
-        0,
-        0
       ],
       "drive": true,
       "advisoryLevel": null,
@@ -773,10 +757,6 @@
         -4.4214,
         36.7213
       ],
-      "nudge": [
-        0,
-        0
-      ],
       "drive": false,
       "advisoryLevel": 2,
       "name": "Andalusia",
@@ -886,10 +866,6 @@
       "center": [
         14.2681,
         40.8518
-      ],
-      "nudge": [
-        0,
-        0
       ],
       "drive": false,
       "advisoryLevel": 2,
@@ -1001,10 +977,6 @@
         -9.1393,
         38.7223
       ],
-      "nudge": [
-        0,
-        0
-      ],
       "drive": false,
       "advisoryLevel": 1,
       "name": "Lisbon + Sintra / Arrabida",
@@ -1115,10 +1087,6 @@
         121.5654,
         25.033
       ],
-      "nudge": [
-        0,
-        0
-      ],
       "drive": false,
       "advisoryLevel": 1,
       "name": "Taiwan",
@@ -1228,10 +1196,6 @@
       "center": [
         -66.1057,
         18.4655
-      ],
-      "nudge": [
-        0,
-        0
       ],
       "drive": false,
       "advisoryLevel": null,
@@ -1350,10 +1314,6 @@
         114.1694,
         22.3193
       ],
-      "nudge": [
-        0,
-        0
-      ],
       "drive": false,
       "advisoryLevel": 2,
       "name": "Hong Kong",
@@ -1463,10 +1423,6 @@
       "center": [
         -155.52,
         19.6
-      ],
-      "nudge": [
-        0,
-        0
       ],
       "drive": false,
       "advisoryLevel": null,
@@ -1615,10 +1571,6 @@
         -16.9087,
         32.6669
       ],
-      "nudge": [
-        0,
-        0
-      ],
       "drive": false,
       "advisoryLevel": 1,
       "name": "Madeira, Portugal",
@@ -1728,10 +1680,6 @@
       "center": [
         -110.3128,
         24.1426
-      ],
-      "nudge": [
-        0,
-        0
       ],
       "drive": false,
       "advisoryLevel": 2,
@@ -1859,10 +1807,6 @@
         -16.5517,
         28.2916
       ],
-      "nudge": [
-        0,
-        0
-      ],
       "drive": false,
       "advisoryLevel": 2,
       "name": "Tenerife, Canary Islands",
@@ -1972,10 +1916,6 @@
       "center": [
         -105.2253,
         20.6534
-      ],
-      "nudge": [
-        0,
-        0
       ],
       "drive": false,
       "advisoryLevel": 3,
@@ -2102,10 +2042,6 @@
       "center": [
         -156.4536,
         20.7644
-      ],
-      "nudge": [
-        0,
-        0
       ],
       "drive": false,
       "advisoryLevel": null,
@@ -2243,10 +2179,6 @@
       "center": [
         -85.8371,
         10.2995
-      ],
-      "nudge": [
-        0,
-        0
       ],
       "drive": false,
       "advisoryLevel": 2,

@@ -83,7 +83,7 @@ html:has(.travel) #app {
 
 /* ---------- Pins ---------- */
 
-/* The marker box stays on the true point; the nudged body takes the clicks. */
+/* The marker box is anchored at its tip (bottom center) on the true point. */
 .travel .trip-pin {
   width: 34px;
   height: 44px;
@@ -115,15 +115,9 @@ html:has(.travel) #app {
   width: 34px;
   height: 44px;
   transform-origin: 50% 100%;
-  transition:
-    translate 0.32s var(--ease-out),
-    scale 0.18s var(--ease-out);
+  transition: scale 0.18s var(--ease-out);
   animation: travel-pin-in 0.3s var(--ease-out) both;
   animation-delay: calc(var(--i, 0) * 40ms + 120ms);
-}
-
-.travel .pins-near .pin-body {
-  translate: var(--nx, 0) var(--ny, 0);
 }
 
 @keyframes travel-pin-fade {
@@ -223,6 +217,32 @@ html:has(.travel) #app {
 
 .travel .trip-pin.sel .pin-name {
   box-shadow: 0 0 0 2px rgba(255, 176, 32, 0.7), 0 1px 2px rgba(26, 16, 51, 0.12);
+}
+
+.travel .trip-cluster {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(26, 16, 51, 0.28);
+  font: 700 14px/1 Roboto, system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.travel .trip-cluster:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.travel .cluster-count {
+  display: block;
+  width: 100%;
+  text-align: center;
 }
 
 /* ---------- Side: title, dates, ranking ---------- */

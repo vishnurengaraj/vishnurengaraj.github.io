@@ -183,7 +183,6 @@ export function buildTrips() {
       worldwideRank: place.rank,
       short: place.short,
       center: place.center,
-      nudge: place.nudge,
       drive: !!place.drive,
       advisoryLevel: place.advisoryLevel || sheetAdvisory,
       name: dest.name,
