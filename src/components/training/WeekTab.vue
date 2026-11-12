@@ -69,7 +69,7 @@ const rings = computed(() => {
       big: k.done ? "Done" : race.value ? "Sat" : keyD ? WD[(new Date(ms(keyD.date)).getUTCDay() + 6) % 7] : "",
       small: k.done ? monthDay(k.by.date) : race.value ? monthDay(m.race.date) : keyD ? monthDay(keyD.date) : "",
       sub: w.key,
-      rule: race.value ? "Counts when the race is logged" : `Counts when a run besides the longest climbs ${fmt0(k.threshold)}+ ft`,
+      rule: race.value ? "Counts when the race is logged" : `Counts when a run besides the long run climbs ${fmt0(k.threshold)}+ ft`,
     },
   ];
 });

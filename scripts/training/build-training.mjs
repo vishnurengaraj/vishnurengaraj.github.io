@@ -48,7 +48,9 @@ const weeks = plan.weeks.map((w, i) => {
   const dates = weekDates(plan.start, i);
   if (w.days.length !== 7) throw new Error(`week ${w.week} has ${w.days.length} days`);
   for (const d of w.days) {
-    if (!["Key", "Supporting", "Optional", "Rest"].includes(d.role)) throw new Error(`week ${w.week}: bad role ${d.role}`);
+    if (!["Key", "Long", "Race", "Supporting", "Optional", "Rest"].includes(d.role)) {
+      throw new Error(`week ${w.week}: bad role ${d.role}`);
+    }
   }
   return { ...w, start: dates[0], end: dates[6], days: w.days.map((d, j) => ({ date: dates[j], ...d })) };
 });

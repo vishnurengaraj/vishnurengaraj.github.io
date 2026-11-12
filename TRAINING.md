@@ -26,7 +26,7 @@ Only activities from the plan start through the build date are included. Nothing
 ### Counting rules (`src/training/progress.js`)
 
 - Miles, the long run, and the key session count `Run` and `Trail Run`. Vert also counts `Hike`. Walks are not counted.
-- **Key session:** the long run already has its own ring, so it never counts as the key session. Hills can’t be detected from Strava summaries, so the key session is done when a run **other than the week’s longest run** climbs at least the week’s low vert target ÷ 3 (week 1: 300 ÷ 3 = 100 ft). If two runs tie for longest, one is set aside. In race week the key session is the race, done when a run is logged on race day.
+- **Key session:** each week has its own midweek hilly session, separate from the long run, with a minimum vert (`keyMin` in `plan.json`). It is done when a run that is not that week's long run reaches the minimum (week 1: 150 ft). The long run and walks never count. A week with no minimum falls back to the old rule: a run other than the longest climbs at least the week's low vert target ÷ 3, and if two runs tie for longest, one is set aside. In race week the key session is the race, done when a run is logged on race day.
 
 ## Refresh
 

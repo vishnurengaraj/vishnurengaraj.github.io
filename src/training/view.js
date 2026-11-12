@@ -17,7 +17,8 @@ export const monthDay = (iso) => {
 };
 export const fmt1 = (n) => (Math.round(n * 10) / 10).toLocaleString("en-US", { maximumFractionDigits: 1 });
 export const fmt0 = (n) => Math.round(n).toLocaleString("en-US");
-export const roleWord = (r) => ({ Key: "Key", Supporting: "Easy", Optional: "Optional", Rest: "Rest" })[r] || r;
+export const roleWord = (r) =>
+  ({ Key: "Key", Long: "Long", Race: "Race", Supporting: "Easy", Optional: "Optional", Rest: "Rest" })[r] || r;
 
 export function sleepText(min) {
   if (min == null) return "";

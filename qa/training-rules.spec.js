@@ -39,6 +39,19 @@ test.describe("key session rule", () => {
     expect(keySession(week, acts).done).toBe(false);
   });
 
+  test("a week's own key-session minimum replaces vertLo / 3", () => {
+    const planned = { vertLo: 300, keyMin: 150, longDate: "2026-11-14" };
+    expect(keySession(planned, [run("2026-11-12", 5, 149)]).done).toBe(false);
+    const hit = keySession(planned, [run("2026-11-12", 5, 150)]);
+    expect(hit.done).toBe(true);
+    expect(hit.threshold).toBe(150);
+    expect(hit.by.date).toBe("2026-11-12");
+    expect(keySession(planned, [run("2026-11-14", 10, 900)]).done).toBe(false);
+    const both = keySession(planned, [run("2026-11-14", 10, 900), run("2026-11-12", 5, 150)]);
+    expect(both.done).toBe(true);
+    expect(both.by.date).toBe("2026-11-12");
+  });
+
   test("race week: done only when a run is logged on race day", () => {
     const opts = { raceWeek: true, raceDate: "2027-03-06" };
     expect(keySession({ vertLo: 4799 }, [run("2027-03-02", 4, 50)], opts).done).toBe(false);

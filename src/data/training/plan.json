@@ -1,5 +1,5 @@
 {
-  "_readme": "Edit this file to change the plan. Weeks run Mon-Sun from start. mi is the planned distance used for chip sizes (a range uses its midpoint); miText is what the chip shows. role is Key, Supporting, Optional, or Rest. vertLo/vertHi are the weekly vert target in feet. Run node scripts/training/build-training.mjs after editing.",
+  "_readme": "Edit this file to change the plan. Weeks run Mon-Sun from start. mi is the planned distance used for chip sizes (a range uses its midpoint); miText is what the chip shows. role is Key, Long, Race, Supporting, Optional, or Rest. keyMin is the key session's own minimum vert in feet. vertLo and vertHi are the weekly vert target. Long is the long run, and Race is the long run in week 17. Run node scripts/training/build-training.mjs after editing.",
   "source": "https://cursor.com/canvas/store-aca1f973-0ba0-4805-8b23-cf8716e00b96/3a6d3055-0bf0-4dc4-94bd-fb025dae6cfb",
   "updated": "2026-11-11",
   "start": "2026-11-09",
@@ -21,11 +21,31 @@
     [
       "Base",
       3,
+      5
+    ],
+    [
+      "Cutback",
+      6,
+      7
+    ],
+    [
+      "Base",
+      8,
       8
     ],
     [
       "Specific",
       9,
+      10
+    ],
+    [
+      "Cutback",
+      11,
+      11
+    ],
+    [
+      "Specific",
+      12,
       13
     ],
     [
@@ -36,6 +56,11 @@
     [
       "Taper",
       16,
+      16
+    ],
+    [
+      "Race",
+      17,
       17
     ]
   ],
@@ -48,8 +73,10 @@
       "vertHi": 700,
       "vertText": "300–700 ft",
       "long": 6,
-      "key": "Easy 6 on Saturday; everything left is easy / Z2",
-      "note": "Week 1 target is now 20 miles. About 4.2 are already done (Tuesday's night tempo). Wednesday is rest after readiness 51 and 27 hours of recovery, so every remaining run stays easy and conversational. Suggested: Thursday 5 easy, Friday 3 easy (optional), Saturday 6 long easy (trail or hills if convenient), Sunday 2–3 easy — about 16 more miles. Saturday is the one that matters; drop Friday or Sunday if you need to, and do not make up miles with another hard effort.",
+      "longDate": "2026-11-14",
+      "keyMin": 150,
+      "key": "Rolling 5 mi, easy / Z2, about 150 ft or more",
+      "note": "Rolling 5 mi, easy / Z2, about 150 ft or more. Long run; keep it easy.",
       "days": [
         {
           "session": "Off or easy walk; optional strength",
@@ -59,11 +86,11 @@
           "miText": ""
         },
         {
-          "session": "Easy 3 mi",
-          "purpose": "Original suggestion; the run came out as a tempo",
+          "session": "Done: 4.19 mi night run, avg HR 152",
+          "purpose": "Logged; it came out as a tempo, not the planned easy 3",
           "role": "Supporting",
-          "mi": 3,
-          "miText": "3"
+          "mi": 4.19,
+          "miText": "4.19"
         },
         {
           "session": "Rest",
@@ -73,9 +100,9 @@
           "miText": ""
         },
         {
-          "session": "Easy 5 mi, conversational / Z2",
-          "purpose": "Get back to easy running after the rest day",
-          "role": "Supporting",
+          "session": "Rolling 5 mi, easy / Z2, about 150 ft or more",
+          "purpose": "Key session: easy rolling terrain, not a workout",
+          "role": "Key",
           "mi": 5,
           "miText": "5"
         },
@@ -88,8 +115,8 @@
         },
         {
           "session": "Easy 6 mi long run, earlier if practical; trail or hills if convenient",
-          "purpose": "The run that matters this week; keep it easy",
-          "role": "Key",
+          "purpose": "Long run; keep it easy",
+          "role": "Long",
           "mi": 6,
           "miText": "6"
         },
@@ -110,15 +137,17 @@
       "vertHi": 800,
       "vertText": "400–800 ft",
       "long": 7,
-      "key": "Easy 7, optional short rollers",
-      "note": "Stay easy. This is about a 10% step from the new 20-mile week 1, not a jump in intensity. The long run stays 7 so the 6–7–8–9–10 progression holds. Introduce a short rolling trail if legs feel good.",
+      "longDate": "2026-11-21",
+      "keyMin": 200,
+      "key": "Rolling 6 mi, easy / Z2, about 200–300 ft",
+      "note": "Rolling 6 mi, easy / Z2, about 200–300 ft. Long run; Palos Verdes or Kenneth Hahn if legs feel good.",
       "days": [
         {
           "session": "Off or easy walk; strength 20–30 min",
           "purpose": "Recover and keep the routine",
           "role": "Rest",
-          "mi": 0,
-          "miText": ""
+          "mi": 25,
+          "miText": "20–30"
         },
         {
           "session": "Easy 6 mi",
@@ -135,9 +164,9 @@
           "miText": ""
         },
         {
-          "session": "Easy 6 mi",
-          "purpose": "Aerobic volume",
-          "role": "Supporting",
+          "session": "Rolling 6 mi, easy / Z2, about 200–300 ft",
+          "purpose": "Key session: easy rolling terrain, no repeats",
+          "role": "Key",
           "mi": 6,
           "miText": "6"
         },
@@ -150,8 +179,8 @@
         },
         {
           "session": "Easy 7 mi; optional rolling trail",
-          "purpose": "Main run; Palos Verdes or Kenneth Hahn if legs feel good",
-          "role": "Key",
+          "purpose": "Long run; Palos Verdes or Kenneth Hahn if legs feel good",
+          "role": "Long",
           "mi": 7,
           "miText": "7"
         },
@@ -172,8 +201,10 @@
       "vertHi": 1000,
       "vertText": "600–1,000 ft",
       "long": 8,
-      "key": "Easy 8; keep this run even if Thursday moves",
-      "note": "Thanksgiving week. Keep the long run. Move Thursday's run to Wednesday or Friday if needed, and do not make Saturday longer to 'make up' a missed midweek run.",
+      "longDate": "2026-11-28",
+      "keyMin": 150,
+      "key": "Rolling 5 mi, easy / Z2, about 150–250 ft; can shift to Wednesday or Friday, not Thanksgiving",
+      "note": "Rolling 5 mi, easy / Z2, about 150–250 ft; can shift to Wednesday or Friday, not Thanksgiving. Long run for the week.",
       "days": [
         {
           "session": "Off or easy walk; strength",
@@ -183,37 +214,37 @@
           "miText": ""
         },
         {
-          "session": "Easy 5 mi",
-          "purpose": "Midweek volume; can shift to Wednesday",
-          "role": "Supporting",
+          "session": "Rolling 5 mi, easy / Z2, about 150–250 ft; can shift to Wed or Fri",
+          "purpose": "Key session: easy rolling terrain; do not place this on Thanksgiving",
+          "role": "Key",
           "mi": 5,
           "miText": "5"
         },
         {
-          "session": "Off, or the midweek run if Thursday is busy",
+          "session": "Off, or the key rolling 5 if Tuesday is busy",
           "purpose": "Holiday swap is fine",
           "role": "Rest",
           "mi": 0,
           "miText": ""
         },
         {
-          "session": "Thanksgiving: off, or shift the run to Wed or Fri",
-          "purpose": "Do not force a workout around the meal",
+          "session": "Thanksgiving: off",
+          "purpose": "Do not force a run around the meal",
           "role": "Rest",
           "mi": 0,
           "miText": ""
         },
         {
-          "session": "Easy 5 mi if not already run Wed or Thu",
-          "purpose": "Second midweek run",
+          "session": "Easy 5 mi, or the key rolling 5 if it moved here",
+          "purpose": "Second midweek run, or the shifted key session",
           "role": "Supporting",
           "mi": 5,
           "miText": "5"
         },
         {
           "session": "Easy 8 mi, rolling trail if practical",
-          "purpose": "Main run for the week",
-          "role": "Key",
+          "purpose": "Long run for the week",
+          "role": "Long",
           "mi": 8,
           "miText": "8"
         },
@@ -234,8 +265,10 @@
       "vertHi": 1200,
       "vertText": "800–1,200 ft",
       "long": 9,
-      "key": "Trail 9 with a bottle",
-      "note": "Mostly easy aerobic running. Make the weekend long run the first one that is mainly on trail.",
+      "longDate": "2026-12-05",
+      "keyMin": 250,
+      "key": "Rolling 6 mi, easy / Z2, about 250 ft or more",
+      "note": "Rolling 6 mi, easy / Z2, about 250 ft or more. Long run; Palos Verdes or Kenneth Hahn.",
       "days": [
         {
           "session": "Off or easy walk; strength",
@@ -259,9 +292,9 @@
           "miText": ""
         },
         {
-          "session": "Easy 6 mi, gentle rollers if handy",
-          "purpose": "Aerobic volume",
-          "role": "Supporting",
+          "session": "Rolling 6 mi, easy / Z2, about 250 ft or more",
+          "purpose": "Key session: easy rolling terrain, no repeats",
+          "role": "Key",
           "mi": 6,
           "miText": "6"
         },
@@ -274,8 +307,8 @@
         },
         {
           "session": "Trail 9 mi; carry a bottle and sip",
-          "purpose": "Main run; Palos Verdes or Kenneth Hahn",
-          "role": "Key",
+          "purpose": "Long run; Palos Verdes or Kenneth Hahn",
+          "role": "Long",
           "mi": 9,
           "miText": "9"
         },
@@ -296,8 +329,10 @@
       "vertHi": 1500,
       "vertText": "1,000–1,500 ft",
       "long": 10,
-      "key": "First 10-mile trail long run",
-      "note": "First double-digit long run of this block. Aim for about 1,000 to 1,300 ft on Saturday if the trails allow. Practice carrying a bottle. This is the last build week before a planned cutback.",
+      "longDate": "2026-12-12",
+      "keyMin": 250,
+      "key": "Rolling 6 mi, easy / Z2, about 250–350 ft",
+      "note": "Rolling 6 mi, easy / Z2, about 250–350 ft. First 10 of the block; bottle practice.",
       "days": [
         {
           "session": "Off or easy walk; strength",
@@ -321,9 +356,9 @@
           "miText": ""
         },
         {
-          "session": "Easy 6 mi",
-          "purpose": "Aerobic volume",
-          "role": "Supporting",
+          "session": "Rolling 6 mi, easy / Z2, about 250–350 ft",
+          "purpose": "Key session: easy rolling terrain, no repeats",
+          "role": "Key",
           "mi": 6,
           "miText": "6"
         },
@@ -337,7 +372,7 @@
         {
           "session": "Trail 10 mi, about 1,000–1,300 ft if trails allow",
           "purpose": "First 10 of the block; bottle practice",
-          "role": "Key",
+          "role": "Long",
           "mi": 10,
           "miText": "10"
         },
@@ -358,8 +393,10 @@
       "vertHi": 1000,
       "vertText": "600–1,000 ft",
       "long": 8,
-      "key": "Easy 8; no hills or intensity",
-      "note": "Planned down week so the first five weeks can settle. Recover and keep easy. Do not add a workout just because the legs feel fresh.",
+      "longDate": "2026-12-19",
+      "keyMin": 100,
+      "key": "Easy rolling 5 mi, about 100–150 ft, no repeats",
+      "note": "Easy rolling 5 mi, about 100–150 ft, no repeats. Long run, shorter on purpose.",
       "days": [
         {
           "session": "Off or easy walk; light strength",
@@ -383,9 +420,9 @@
           "miText": ""
         },
         {
-          "session": "Easy 5 mi",
-          "purpose": "Keep the habit, stay easy",
-          "role": "Supporting",
+          "session": "Easy rolling 5 mi, about 100–150 ft, no repeats",
+          "purpose": "Key session: gentle rolling only, cutback week",
+          "role": "Key",
           "mi": 5,
           "miText": "5"
         },
@@ -398,8 +435,8 @@
         },
         {
           "session": "Easy 8 mi, relaxed trail or road",
-          "purpose": "Main run, shorter on purpose",
-          "role": "Key",
+          "purpose": "Long run, shorter on purpose",
+          "role": "Long",
           "mi": 8,
           "miText": "8"
         },
@@ -420,8 +457,10 @@
       "vertHi": 1000,
       "vertText": "600–1,000 ft",
       "long": 8,
-      "key": "Easy 8, not on Christmas Day",
-      "note": "Christmas week, another hold. Shift days around Friday freely. Do not schedule a big long run around the holiday, and do not lengthen Saturday if a midweek run gets skipped.",
+      "longDate": "2026-12-26",
+      "keyMin": 100,
+      "key": "Easy rolling 5 mi, about 100–150 ft, no repeats; can shift to Wednesday, not Christmas",
+      "note": "Easy rolling 5 mi, about 100–150 ft, no repeats; can shift to Wednesday, not Christmas. Long run, kept modest.",
       "days": [
         {
           "session": "Off or easy walk; light strength",
@@ -431,21 +470,21 @@
           "miText": ""
         },
         {
-          "session": "Easy 5 mi, or move to Wednesday",
-          "purpose": "Midweek volume; movable",
-          "role": "Supporting",
+          "session": "Easy rolling 5 mi, about 100–150 ft, no repeats; or move to Wednesday",
+          "purpose": "Key session: gentle rolling only; not on Christmas",
+          "role": "Key",
           "mi": 5,
           "miText": "5"
         },
         {
-          "session": "Off, or the midweek run if Tuesday is busy",
+          "session": "Off, or the key rolling 5 if Tuesday is busy",
           "purpose": "Holiday swap is fine",
           "role": "Rest",
           "mi": 0,
           "miText": ""
         },
         {
-          "session": "Easy 5 mi, or off if you ran Wed and want Christmas Eve quiet",
+          "session": "Easy 5 mi, or off if you want Christmas Eve quiet",
           "purpose": "Second midweek run, movable",
           "role": "Supporting",
           "mi": 5,
@@ -453,15 +492,15 @@
         },
         {
           "session": "Christmas: off",
-          "purpose": "Do not place the long run here",
+          "purpose": "Do not place the key session or the long run here",
           "role": "Rest",
           "mi": 0,
           "miText": ""
         },
         {
           "session": "Easy 8 mi, or Sunday if Saturday is the gathering",
-          "purpose": "Main run, kept modest",
-          "role": "Key",
+          "purpose": "Long run, kept modest",
+          "role": "Long",
           "mi": 8,
           "miText": "8"
         },
@@ -482,8 +521,10 @@
       "vertHi": 1500,
       "vertText": "1,000–1,500 ft",
       "long": 10,
-      "key": "Trail 10, if week 7 felt easy",
-      "note": "New Year week. Resume a modest build only if week 7 felt easy. Shift midweek runs around Friday, January 1. If the holidays ran you down, repeat week 7 instead of forcing 24.",
+      "longDate": "2027-01-02",
+      "keyMin": 250,
+      "key": "Rolling 6 mi, easy / Z2, about 250–350 ft; can move to Tuesday or Wednesday, not New Year's Day",
+      "note": "Rolling 6 mi, easy / Z2, about 250–350 ft; can move to Tuesday or Wednesday, not New Year's Day. Long run, back to double digits.",
       "days": [
         {
           "session": "Off or easy walk; strength",
@@ -493,23 +534,23 @@
           "miText": ""
         },
         {
-          "session": "Easy 5 mi, or shift around New Year",
-          "purpose": "Midweek volume; movable",
+          "session": "Easy 5 mi, or the key rolling 6 if Thursday moves here",
+          "purpose": "Midweek volume, or the shifted key session",
           "role": "Supporting",
           "mi": 5,
           "miText": "5"
         },
         {
-          "session": "Off, or a shifted midweek run",
+          "session": "Off, or a shifted key rolling 6",
           "purpose": "Holiday swap is fine",
           "role": "Rest",
           "mi": 0,
           "miText": ""
         },
         {
-          "session": "Easy 6 mi, or move to Saturday's side of the week",
-          "purpose": "Second midweek run",
-          "role": "Supporting",
+          "session": "Rolling 6 mi, easy / Z2, about 250–350 ft; or move to Tue or Wed",
+          "purpose": "Key session: easy rolling terrain, no repeats",
+          "role": "Key",
           "mi": 6,
           "miText": "6"
         },
@@ -522,8 +563,8 @@
         },
         {
           "session": "Trail 10 mi, about 1,000–1,300 ft if trails allow",
-          "purpose": "Main run, back to double digits",
-          "role": "Key",
+          "purpose": "Long run, back to double digits",
+          "role": "Long",
           "mi": 10,
           "miText": "10"
         },
@@ -544,8 +585,10 @@
       "vertHi": 2000,
       "vertText": "1,500–2,000 ft",
       "long": 12,
-      "key": "Trail 12 with fueling and a controlled descent",
-      "note": "Start of the trail-specific block. Begin structured fueling on the long run (about 30–60 g carbohydrate per hour). Include one controlled descent. Midweek stays easy.",
+      "longDate": "2027-01-09",
+      "keyMin": 300,
+      "key": "Rolling 6 mi with 4–6 short hike-jogs, about 300 ft or more",
+      "note": "Rolling 6 mi with 4–6 short hike-jogs, about 300 ft or more. First specific long run.",
       "days": [
         {
           "session": "Off or easy walk; strength",
@@ -569,9 +612,9 @@
           "miText": ""
         },
         {
-          "session": "Easy 6 mi on rolling terrain; optional short hike-jogs",
-          "purpose": "Light specificity, not a hard workout",
-          "role": "Supporting",
+          "session": "Rolling 6 mi with 4–6 short hike-jogs, about 300 ft or more",
+          "purpose": "Key session: first light specificity, not a hard workout",
+          "role": "Key",
           "mi": 6,
           "miText": "6"
         },
@@ -585,7 +628,7 @@
         {
           "session": "Trail 12 mi, about 1,500–1,800 ft; start fueling practice; one controlled descent",
           "purpose": "First specific long run",
-          "role": "Key",
+          "role": "Long",
           "mi": 12,
           "miText": "12"
         },
@@ -606,8 +649,10 @@
       "vertHi": 2400,
       "vertText": "1,800–2,400 ft",
       "long": 14,
-      "key": "Short hills midweek; trail 14 with a 7–8 mi two-bottle stretch",
-      "note": "Power-hike steep grades, no poles. On Saturday, go at least 7 to 8 miles in the middle without a refill, matching the Quarry-to-ALT aid gap. Midweek hills are the quality session: keep them off the day before the long run.",
+      "longDate": "2027-01-16",
+      "keyMin": 300,
+      "key": "Easy 6 mi plus 4–6 short hills (60–90 sec hike/run on about 8–14% grade), about 300 ft or more",
+      "note": "Easy 6 mi plus 4–6 short hills (60–90 sec hike/run on about 8–14% grade), about 300 ft or more. Long run: time on feet, climbing, fueling.",
       "days": [
         {
           "session": "Off or easy walk; strength",
@@ -631,8 +676,8 @@
           "miText": ""
         },
         {
-          "session": "Easy 6 mi plus 4–6 short hills (60–90 sec hike/run on about 8–14% grade)",
-          "purpose": "Goat Hill and finish-climb practice, not a long interval set",
+          "session": "Easy 6 mi plus 4–6 short hills (60–90 sec hike/run on about 8–14% grade), about 300 ft or more",
+          "purpose": "Key session: Goat Hill and finish-climb practice, not a long interval set",
           "role": "Key",
           "mi": 6,
           "miText": "6"
@@ -646,10 +691,10 @@
         },
         {
           "session": "Trail 14 mi, about 1,800–2,200 ft; two bottles for a 7–8 mi stretch",
-          "purpose": "Time on feet, climbing, fueling",
-          "role": "Key",
-          "mi": 14,
-          "miText": "14"
+          "purpose": "Long run: time on feet, climbing, fueling",
+          "role": "Long",
+          "mi": 7.5,
+          "miText": "7–8"
         },
         {
           "session": "Optional 4 mi very easy, or off",
@@ -668,8 +713,10 @@
       "vertHi": 1500,
       "vertText": "1,000–1,500 ft",
       "long": 10,
-      "key": "Easy trail 10; skip the hills",
-      "note": "Down week after the first specific block. MLK Monday is a rest or easy walk day, not a workout. After this cutback, week 12 returns to the build (32), not a jump from 24.",
+      "longDate": "2027-01-23",
+      "keyMin": 150,
+      "key": "Easy rolling 5 mi, about 150–200 ft, no repeats",
+      "note": "Easy rolling 5 mi, about 150–200 ft, no repeats. Long run, shorter on purpose.",
       "days": [
         {
           "session": "MLK Day: rest or easy walk",
@@ -693,9 +740,9 @@
           "miText": ""
         },
         {
-          "session": "Easy 5 mi; no hill repeats this week",
-          "purpose": "Keep it easy",
-          "role": "Supporting",
+          "session": "Easy rolling 5 mi, about 150–200 ft, no repeats",
+          "purpose": "Key session: gentle rolling only, cutback week",
+          "role": "Key",
           "mi": 5,
           "miText": "5"
         },
@@ -708,8 +755,8 @@
         },
         {
           "session": "Easy trail 10 mi",
-          "purpose": "Main run, shorter on purpose",
-          "role": "Key",
+          "purpose": "Long run, shorter on purpose",
+          "role": "Long",
           "mi": 10,
           "miText": "10"
         },
@@ -730,15 +777,17 @@
       "vertHi": 2800,
       "vertText": "2,200–2,800 ft",
       "long": 16,
-      "key": "Trail 16 with 2,000–2,500 ft; best rehearsal weekend",
-      "note": "Key specificity week. If a Cool or Auburn weekend opens up, time on the Olmstead Loop and Western States Trail is the best dress rehearsal. Otherwise use Malibu Creek, Topanga, or a similar hilly South Bay loop. Not required. Carry two bottles and include a late steep hike-up.",
+      "longDate": "2027-01-30",
+      "keyMin": 300,
+      "key": "Easy 6 mi plus 4–6 short hills (60–90 sec hike/run), about 300 ft or more",
+      "note": "Easy 6 mi plus 4–6 short hills (60–90 sec hike/run), about 300 ft or more. Long run: time on feet, climb, descend, fuel; optional Auburn or Malibu Creek rehearsal.",
       "days": [
         {
           "session": "Off or easy walk; strength 20–30 min",
           "purpose": "Recover and keep the routine",
           "role": "Rest",
-          "mi": 0,
-          "miText": ""
+          "mi": 25,
+          "miText": "20–30"
         },
         {
           "session": "Easy 6 mi, mostly flat or gentle rollers",
@@ -755,9 +804,9 @@
           "miText": ""
         },
         {
-          "session": "Easy 6 mi on rolling terrain; optional short hike-jogs",
-          "purpose": "Light specificity; the long run is the quality day",
-          "role": "Supporting",
+          "session": "Easy 6 mi plus 4–6 short hills (60–90 sec hike/run), about 300 ft or more",
+          "purpose": "Key session: hill practice, not a hard blowout before the 16",
+          "role": "Key",
           "mi": 6,
           "miText": "6"
         },
@@ -770,10 +819,10 @@
         },
         {
           "session": "Trail 16 mi, earlier if practical; 2,000–2,500 ft; two-bottle 7–8 mi stretch; late hike-up",
-          "purpose": "Time on feet, climb, descend, fuel; optional Auburn or Malibu Creek rehearsal",
-          "role": "Key",
-          "mi": 16,
-          "miText": "16"
+          "purpose": "Long run: time on feet, climb, descend, fuel; optional Auburn or Malibu Creek rehearsal",
+          "role": "Long",
+          "mi": 7.5,
+          "miText": "7–8"
         },
         {
           "session": "4 mi very easy and flat, or off",
@@ -792,8 +841,10 @@
       "vertHi": 3000,
       "vertText": "2,400–3,000 ft",
       "long": 18,
-      "key": "Steep short hills midweek; trail 18 with a late hike-up",
-      "note": "Advance only if week 12 recovered cleanly. Saturday finishes with a steep hike-up to rehearse arriving at Goat Hill already tired. This is the alternate weekend for an Auburn or big local-trail rehearsal if week 12 stayed closer to home.",
+      "longDate": "2027-02-06",
+      "keyMin": 400,
+      "key": "Easy 6 mi plus 4–6 steep 60–90 sec hike/runs (about 10–14%), about 400 ft or more",
+      "note": "Easy 6 mi plus 4–6 steep 60–90 sec hike/runs (about 10–14%), about 400 ft or more. Long run: longest specific run before the 20.",
       "days": [
         {
           "session": "Off or easy walk; strength",
@@ -817,8 +868,8 @@
           "miText": ""
         },
         {
-          "session": "Easy 6 mi plus 4–6 steep 60–90 sec hike/runs (about 10–14%)",
-          "purpose": "Goat Hill and late-finish climb rehearsal",
+          "session": "Easy 6 mi plus 4–6 steep 60–90 sec hike/runs (about 10–14%), about 400 ft or more",
+          "purpose": "Key session: Goat Hill and late-finish climb rehearsal",
           "role": "Key",
           "mi": 6,
           "miText": "6"
@@ -832,8 +883,8 @@
         },
         {
           "session": "Trail 18 mi, about 2,300–2,800 ft; finish with a steep hike-up; full fueling",
-          "purpose": "Longest specific run before the 20",
-          "role": "Key",
+          "purpose": "Long run: longest specific run before the 20",
+          "role": "Long",
           "mi": 18,
           "miText": "18"
         },
@@ -854,8 +905,10 @@
       "vertHi": 3200,
       "vertText": "2,600–3,200 ft",
       "long": 20,
-      "key": "Peak trail 20 with a full race-day fueling rehearsal",
-      "note": "Peak long run is 20 miles, not race distance, on Saturday, February 13. Start near 8:00 a.m. if you can. Include a controlled long descent and a late tired climb. Midweek stays easy; the 20 is the workout. This is the last big effort, three weeks before race day.",
+      "longDate": "2027-02-13",
+      "keyMin": 150,
+      "key": "Light rolling 6 mi, easy / Z2, about 150 ft or more, no repeats",
+      "note": "Light rolling 6 mi, easy / Z2, about 150 ft or more, no repeats. Dress rehearsal for time on feet, terrain, and race nutrition.",
       "days": [
         {
           "session": "Off or easy walk; light strength",
@@ -879,9 +932,9 @@
           "miText": ""
         },
         {
-          "session": "Easy 6 mi; skip the hill repeats",
-          "purpose": "Keep it easy so Saturday can be the quality day",
-          "role": "Supporting",
+          "session": "Light rolling 6 mi, easy / Z2, about 150 ft or more, no repeats",
+          "purpose": "Key session: keep it light so Saturday can be the quality long run",
+          "role": "Key",
           "mi": 6,
           "miText": "6"
         },
@@ -895,7 +948,7 @@
         {
           "session": "Peak long run: trail 20 mi, start near 8:00 a.m.; 2,500–3,000 ft; full fueling; late climb and a controlled descent",
           "purpose": "Dress rehearsal for time on feet, terrain, and race nutrition",
-          "role": "Key",
+          "role": "Long",
           "mi": 20,
           "miText": "20"
         },
@@ -916,8 +969,10 @@
       "vertHi": 2600,
       "vertText": "2,000–2,600 ft",
       "long": 16,
-      "key": "Trail 16, easier than the 20",
-      "note": "Slightly down after the 20-miler. Do not add a 22 unless week 14 was clearly easy — and even then 22 is optional, not required.",
+      "longDate": "2027-02-20",
+      "keyMin": 250,
+      "key": "Easy 6 mi with 4–6 short crisp hills if they feel good, about 250 ft or more",
+      "note": "Easy 6 mi with 4–6 short crisp hills if they feel good, about 250 ft or more. Long run: maintain trail legs without another peak.",
       "days": [
         {
           "session": "Off or easy walk; light strength",
@@ -941,9 +996,9 @@
           "miText": ""
         },
         {
-          "session": "Easy 6 mi; optional short crisp hills only if they feel good",
-          "purpose": "Keep a little snap, or skip the hills",
-          "role": "Supporting",
+          "session": "Easy 6 mi with 4–6 short crisp hills if they feel good, about 250 ft or more",
+          "purpose": "Key session: keep a little snap, or skip the hills",
+          "role": "Key",
           "mi": 6,
           "miText": "6"
         },
@@ -956,8 +1011,8 @@
         },
         {
           "session": "Trail 16 mi, a bit easier than week 12",
-          "purpose": "Maintain trail legs without another peak",
-          "role": "Key",
+          "purpose": "Long run: maintain trail legs without another peak",
+          "role": "Long",
           "mi": 16,
           "miText": "16"
         },
@@ -978,8 +1033,10 @@
       "vertHi": 1500,
       "vertText": "1,000–1,500 ft",
       "long": 10,
-      "key": "Easy trail 10; a few strides if they feel crisp",
-      "note": "First taper week. Volume comes down to about two-thirds of the peak week. Keep a few strides or short hills only if they feel crisp, and keep some trail underfoot. Do not invent extra miles because you feel restless.",
+      "longDate": "2027-02-27",
+      "keyMin": 100,
+      "key": "Easy 5 mi with 4–6 very short hills if they feel crisp, about 100 ft or more",
+      "note": "Easy 5 mi with 4–6 very short hills if they feel crisp, about 100 ft or more. Long run: last double-digit run, kept relaxed.",
       "days": [
         {
           "session": "Off or easy walk; very light strength or skip it",
@@ -989,9 +1046,9 @@
           "miText": ""
         },
         {
-          "session": "Easy 6 mi with 4–6 strides if they feel crisp",
-          "purpose": "Keep a little sharpness, shorter volume",
-          "role": "Key",
+          "session": "Easy 6 mi",
+          "purpose": "Stay loose, shorter volume",
+          "role": "Supporting",
           "mi": 6,
           "miText": "6"
         },
@@ -1003,9 +1060,9 @@
           "miText": ""
         },
         {
-          "session": "Easy 5 mi; optional very short hills",
-          "purpose": "Stay loose",
-          "role": "Supporting",
+          "session": "Easy 5 mi with 4–6 very short hills if they feel crisp, about 100 ft or more",
+          "purpose": "Key session: a little sharpness, only if it feels crisp",
+          "role": "Key",
           "mi": 5,
           "miText": "5"
         },
@@ -1018,8 +1075,8 @@
         },
         {
           "session": "Easy trail 10 mi on rolling terrain",
-          "purpose": "Last double-digit run, kept relaxed",
-          "role": "Key",
+          "purpose": "Long run: last double-digit run, kept relaxed",
+          "role": "Long",
           "mi": 10,
           "miText": "10"
         },
@@ -1040,8 +1097,10 @@
       "vertHi": 4799,
       "vertText": "Race: 4,799 ft",
       "long": 31.4,
-      "key": "Race day, Saturday March 6",
-      "note": "Pre-race training is 7 miles (Tuesday 4, Thursday 3). Saturday is the 31.4-mile race at 8:00 a.m. Friday check-in is listed for March 5, 12:00–7:00 p.m. at Fleet Feet Folsom, with race-morning check-in 6:00–7:45 a.m. at Cool Fire Station.",
+      "longDate": "2027-03-06",
+      "keyMin": 50,
+      "key": "Race day",
+      "note": "Pre-race training is about 7 miles. Saturday is the 31.4-mile race at 8:00 a.m.",
       "days": [
         {
           "session": "Off",
@@ -1051,9 +1110,9 @@
           "miText": ""
         },
         {
-          "session": "Easy 4 mi, plus 3–4 strides if they feel crisp",
-          "purpose": "Stay loose, very short",
-          "role": "Supporting",
+          "session": "Easy 4 mi, plus 3–4 strides on a short rise if they feel crisp, about 50 ft or more",
+          "purpose": "Key session: stay loose, very short",
+          "role": "Key",
           "mi": 4,
           "miText": "4"
         },
@@ -1072,7 +1131,7 @@
           "miText": "3"
         },
         {
-          "session": "Off; packet pickup if you are already in town",
+          "session": "Off",
           "purpose": "Travel and rest, no run",
           "role": "Rest",
           "mi": 0,
@@ -1081,7 +1140,7 @@
         {
           "session": "Race: 31.4 mi, 8:00 a.m., Cool Fire Station",
           "purpose": "Way Too Cool 50K",
-          "role": "Key",
+          "role": "Race",
           "mi": 31.4,
           "miText": "31.4"
         },

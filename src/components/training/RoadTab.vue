@@ -144,7 +144,7 @@ const cumLabel = computed(
           role="img"
           :aria-label="`Training block from ${monthDay(m.weeks[0].start)} to ${monthDay(m.race.date)}. Today is in week ${m.current.week}, ${m.current.phase}.`"
         >
-          <g v-for="p in trackSvg.phases" :key="p.name">
+          <g v-for="(p, i) in trackSvg.phases" :key="`${p.name}-${i}`">
             <rect :x="p.x0 + 1" y="18" :width="Math.max(0, p.x1 - p.x0 - 2)" height="12" rx="3" :fill="p.fill" />
             <text v-if="p.showLabel" :x="p.x0 + 2" y="12" class="al">{{ p.name }}</text>
           </g>

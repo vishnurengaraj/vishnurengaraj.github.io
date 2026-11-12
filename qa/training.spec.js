@@ -81,7 +81,8 @@ for (const vp of VIEWPORTS) {
       await expect(miles.locator("svg.ring")).toHaveAttribute("data-frac", Math.min(1, mi / current.miles).toFixed(3));
       const longest = Math.max(0, ...weekActs(current).filter((a) => RUN.has(a.type)).map((a) => a.mi));
       await expect(card.locator('[data-ring="long"] .rv b')).toHaveText(fmt1(longest));
-      await expect(card.locator('[data-ring="key"] .rr')).toContainText(`${Math.round(current.vertLo / 3)}+ ft`);
+      const keyFt = Number.isFinite(current.keyMin) ? current.keyMin : Math.round(current.vertLo / 3);
+      await expect(card.locator('[data-ring="key"] .rr')).toContainText(`${keyFt}+ ft`);
       await expect(card.locator('[data-ring="key"] .rs')).toHaveText(current.key);
 
       // Pick the peak week from the strip: a future week shows targets, empty rings.
