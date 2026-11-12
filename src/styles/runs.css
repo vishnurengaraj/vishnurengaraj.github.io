@@ -71,86 +71,86 @@ html:has(.runs) #app {
   text-transform: uppercase;
 }
 
-.runs .map-tools {
+.runs .fab {
   position: absolute;
-  z-index: 6;
-  top: calc(12px + env(safe-area-inset-top, 0px));
-  left: 12px;
+  z-index: 13;
+  right: 16px;
+  bottom: max(
+    calc(132px + env(safe-area-inset-bottom, 0px)),
+    calc(16px + env(safe-area-inset-bottom, 0px) + var(--sheet-visible, 0px))
+  );
+}
+
+.runs .fab-main {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: var(--primary);
+  color: var(--on-primary);
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(26, 16, 51, 0.22);
+}
+
+.runs .fab-main svg {
+  display: block;
+  transition: transform 180ms ease;
+}
+
+.runs .fab.open .fab-main svg {
+  transform: rotate(45deg);
+}
+
+.runs .fab-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.runs .fab.open .fab-menu {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.runs .fab-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 8px;
 }
 
-.runs .globe-btn {
-  min-height: 36px;
+.runs .fab-action {
+  min-height: 44px;
   padding: 0 14px;
   border: 1px solid rgba(45, 29, 122, 0.18);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(255, 255, 255, 0.96);
   color: var(--primary);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(26, 16, 51, 0.12);
 }
 
-.runs .dice-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 1px solid rgba(45, 29, 122, 0.18);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.94);
-  color: var(--primary);
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(26, 16, 51, 0.12);
-}
-
-.runs .dice-btn svg {
-  display: block;
-}
-
-.runs .dice-btn:hover {
-  background: rgba(45, 29, 122, 0.06);
-}
-
-.runs .globe-btn.on {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: var(--on-primary);
-}
-
-.runs .layers-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 1px solid rgba(45, 29, 122, 0.18);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.94);
-  color: var(--primary);
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(26, 16, 51, 0.12);
-}
-
-.runs .layers-btn svg {
-  display: block;
-}
-
-.runs .layers-btn:hover {
-  background: rgba(45, 29, 122, 0.06);
+.runs .fab-action:hover,
+.runs .fab-main:hover {
+  filter: brightness(1.05);
 }
 
 .runs .layer-picker {
-  position: absolute;
-  top: 52px;
-  left: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -182,9 +182,8 @@ html:has(.runs) #app {
   color: var(--primary);
 }
 
-.runs .globe-btn:focus-visible,
-.runs .dice-btn:focus-visible,
-.runs .layers-btn:focus-visible,
+.runs .fab-main:focus-visible,
+.runs .fab-action:focus-visible,
 .runs .layer-picker button:focus-visible,
 .runs .sheet-handle:focus-visible {
   outline: 3px solid var(--primary);
@@ -276,6 +275,11 @@ html:has(.runs) #app {
   outline-offset: 2px;
 }
 
+.runs .fab .chips {
+  width: min(300px, calc(100vw - 32px));
+  max-height: min(40dvh, 280px);
+}
+
 .runs .chips {
   display: flex;
   flex-wrap: wrap;
@@ -341,7 +345,7 @@ html:has(.runs) #app {
 .runs .run-index {
   position: absolute;
   z-index: 6;
-  top: calc(68px + env(safe-area-inset-top, 0px));
+  top: calc(12px + env(safe-area-inset-top, 0px));
   left: 12px;
   max-width: min(280px, calc(100% - 24px));
   min-height: 36px;
@@ -637,8 +641,16 @@ html:has(.runs) #app {
 }
 
 .runs.no-anim .detail,
-.runs.no-anim .scrim {
+.runs.no-anim .scrim,
+.runs.no-anim .fab-menu,
+.runs.no-anim .fab-main svg {
   transition: none;
+}
+
+@media (min-width: 641px) {
+  .runs.panel-open .fab {
+    right: min(428px, calc(100% - 80px));
+  }
 }
 
 @media (max-width: 640px) {
@@ -724,7 +736,9 @@ html:has(.runs) #app {
 @media (prefers-reduced-motion: reduce) {
   .runs .detail,
   .runs .scrim,
-  .runs .regions-chev {
+  .runs .regions-chev,
+  .runs .fab-menu,
+  .runs .fab-main svg {
     transition: none;
   }
 }

@@ -22,6 +22,7 @@ const sheetPeek = ref(false);
 const sheetDrag = ref(false);
 const layer = ref("density");
 const layersOpen = ref(false);
+const fabOpen = ref(false);
 const selected = ref(null);
 const choices = ref([]);
 const motionOn = ref(false);
@@ -109,7 +110,7 @@ function framePadding() {
   let right = 0;
   let bottom = 0;
   let left = 0;
-  for (const el of root.querySelectorAll(".globe-btn, .dice-btn, .run-index, .regions-toggle")) {
+  for (const el of root.querySelectorAll(".run-index")) {
     const box = el.getBoundingClientRect();
     top = Math.max(top, box.bottom - mapBox.top);
   }
@@ -123,7 +124,7 @@ function framePadding() {
   }
   const visibleBottom = mapBox.bottom - bottom;
   const visibleRight = mapBox.right - right;
-  for (const el of root.querySelectorAll(".map-key, .maplibregl-ctrl-bottom-right, .maplibregl-ctrl-bottom-left")) {
+  for (const el of root.querySelectorAll(".map-key, .fab, .maplibregl-ctrl-bottom-right, .maplibregl-ctrl-bottom-left")) {
     const box = el.getBoundingClientRect();
     if (box.top >= visibleBottom - 1 || box.left >= visibleRight - 1) continue;
     bottom = Math.max(bottom, mapBox.bottom - box.top);
@@ -364,6 +365,7 @@ async function openRun(id, _lngLat, { skipUrl = false } = {}) {
   closeChoices({ restore: false });
   if (fromChooser) runOpener = pageEl.value?.querySelector(".run-index") || null;
   layersOpen.value = false;
+  fabOpen.value = false;
   sheetPeek.value = false;
   closeRegions();
   window.clearTimeout(copyTimer);
@@ -403,7 +405,8 @@ async function openRun(id, _lngLat, { skipUrl = false } = {}) {
 function openRandom(event) {
   const run = pickRandomRun(manifest.runs, selected.value?.id);
   if (!run) return;
-  runOpener = event?.currentTarget || pageEl.value?.querySelector(".dice-btn") || null;
+  fabOpen.value = false;
+  runOpener = pageEl.value?.querySelector(".fab-main") || event?.currentTarget || null;
   openRun(run.id);
   nextTick(() => {
     if (!panel.value) return;
@@ -433,13 +436,29 @@ function toggleCityList(event) {
   nextTick(() => focusEl(pageEl.value?.querySelector("#run-chooser button")));
 }
 
+function toggleFab() {
+  fabOpen.value = !fabOpen.value;
+  if (!fabOpen.value) {
+    regionsOpen.value = false;
+    layersOpen.value = false;
+  }
+}
+
 function toggleRegions() {
   regionsOpen.value = !regionsOpen.value;
+  if (regionsOpen.value) layersOpen.value = false;
+}
+
+function toggleLayers() {
+  layersOpen.value = !layersOpen.value;
+  if (layersOpen.value) regionsOpen.value = false;
 }
 
 function frameWorld() {
   if (!mapApi) return;
   closeRegions();
+  layersOpen.value = false;
+  fabOpen.value = false;
   closeChoices({ restore: false });
   closePanel({ restore: false });
   mapApi.frameWorld(prefersReduced());
@@ -506,6 +525,13 @@ function syncPeekVar() {
   if (!detail || !head) return;
   detail.style.setProperty("--peek", `${head.offsetHeight}px`);
   detail.style.setProperty("--sheet-hide", `${Math.max(0, detail.offsetHeight - head.offsetHeight)}px`);
+  const page = pageEl.value;
+  if (page && panel.value && isPhone()) {
+    const visible = sheetPeek.value ? head.offsetHeight : detail.offsetHeight;
+    page.style.setProperty("--sheet-visible", `${visible}px`);
+  } else {
+    page?.style.removeProperty("--sheet-visible");
+  }
 }
 
 let sheetGesture = null;
@@ -584,13 +610,19 @@ function onKey(event) {
   if (layersOpen.value) {
     event.preventDefault();
     layersOpen.value = false;
-    focusEl(pageEl.value?.querySelector(".layers-btn"));
+    focusEl(pageEl.value?.querySelector(".fab-layers"));
     return;
   }
   if (regionsOpen.value) {
     event.preventDefault();
     closeRegions();
-    focusEl(pageEl.value?.querySelector(".regions-toggle"));
+    focusEl(pageEl.value?.querySelector(".fab-areas"));
+    return;
+  }
+  if (fabOpen.value) {
+    event.preventDefault();
+    fabOpen.value = false;
+    focusEl(pageEl.value?.querySelector(".fab-main"));
     return;
   }
   if (panel.value) {
@@ -730,24 +762,23 @@ onUnmounted(() => {
     <div class="stage">
       <div id="runs-map" ref="mapEl" tabindex="-1" role="region" aria-label="Map of runs"></div>
       <p v-if="manifest.sample" class="sample-tag">Sample routes</p>
-      <div class="map-tools">
-        <button class="globe-btn" type="button" @click="frameWorld">Globe</button>
-        <button
-          class="layers-btn"
-          type="button"
-          aria-label="Map layers"
-          title="Map layers"
-          :aria-expanded="layersOpen ? 'true' : 'false'"
-          aria-controls="layer-picker"
-          @click="layersOpen = !layersOpen"
-        >
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-            <path d="M12 3.5 4 7.2l8 3.7 8-3.7-8-3.7Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
-            <path d="M4 12l8 3.7L20 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
-            <path d="M4 16.6 12 20.3l8-3.7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
-          </svg>
-        </button>
-        <div v-if="layersOpen" id="layer-picker" class="layer-picker" role="listbox" aria-label="Map layers">
+      <div class="fab" :class="{ open: fabOpen }">
+        <div id="fab-menu" class="fab-menu" :inert="fabOpen ? undefined : true">
+        <div v-show="regionsOpen" id="region-list" class="chips" role="radiogroup" aria-label="Regions">
+          <button
+            v-for="city in manifest.cities"
+            :key="city.id"
+            type="button"
+            role="radio"
+            :aria-checked="activeCity === city.id ? 'true' : 'false'"
+            :class="{ on: activeCity === city.id }"
+            :title="`${city.name} · ${city.count} runs`"
+            @click="pickRegion(city.id)"
+          >
+            {{ city.label }}
+          </button>
+        </div>
+        <div v-show="layersOpen" id="layer-picker" class="layer-picker" role="listbox" aria-label="Map layers">
           <button
             v-for="id in LAYER_MODES"
             :key="id"
@@ -757,23 +788,46 @@ onUnmounted(() => {
             :class="{ on: layer === id }"
             @click="chooseLayer(id)"
           >
-            <span class="layer-name">{{ LAYER_LABELS[id] }}</span>
+            {{ LAYER_LABELS[id] }}
           </button>
         </div>
+        <div id="fab-actions" class="fab-actions">
+          <button class="fab-action" type="button" @click="frameWorld">Globe</button>
+          <button class="fab-action" type="button" title="Random run" @click="openRandom">
+            Random run
+          </button>
+          <button
+            class="fab-action fab-areas"
+            type="button"
+            :aria-expanded="regionsOpen ? 'true' : 'false'"
+            aria-controls="region-list"
+            :aria-label="`Areas, ${activeLabel} selected`"
+            @click="toggleRegions"
+          >
+            Areas
+          </button>
+          <button
+            class="fab-action fab-layers"
+            type="button"
+            :aria-expanded="layersOpen ? 'true' : 'false'"
+            aria-controls="layer-picker"
+            aria-label="Map layers"
+            @click="toggleLayers"
+          >
+            Layers
+          </button>
+        </div>
+        </div>
         <button
-          class="dice-btn"
+          class="fab-main"
           type="button"
-          title="Open a random activity"
-          aria-label="Open a random activity"
-          @click="openRandom"
+          aria-label="Map tools"
+          :aria-expanded="fabOpen ? 'true' : 'false'"
+          aria-controls="fab-menu"
+          @click="toggleFab"
         >
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-            <rect x="3.5" y="3.5" width="17" height="17" rx="3.2" fill="none" stroke="currentColor" stroke-width="1.8" />
-            <circle cx="8.2" cy="8.2" r="1.25" fill="currentColor" />
-            <circle cx="15.8" cy="8.2" r="1.25" fill="currentColor" />
-            <circle cx="12" cy="12" r="1.25" fill="currentColor" />
-            <circle cx="8.2" cy="15.8" r="1.25" fill="currentColor" />
-            <circle cx="15.8" cy="15.8" r="1.25" fill="currentColor" />
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
           </svg>
         </button>
       </div>
@@ -792,33 +846,6 @@ onUnmounted(() => {
           <span class="heat-swatch" aria-hidden="true"></span>
           {{ LAYER_LEGENDS[layer] }}
         </p>
-      </div>
-      <div class="regions" :class="{ open: regionsOpen }">
-        <button
-          class="regions-toggle"
-          type="button"
-          :aria-expanded="regionsOpen ? 'true' : 'false'"
-          aria-controls="region-list"
-          :aria-label="`Regions, ${activeLabel} selected`"
-          @click="toggleRegions"
-        >
-          <span class="regions-name">{{ activeLabel }}</span>
-          <span class="regions-chev" aria-hidden="true"></span>
-        </button>
-        <div v-if="regionsOpen" id="region-list" class="chips" role="radiogroup" aria-label="Regions">
-          <button
-            v-for="city in manifest.cities"
-            :key="city.id"
-            type="button"
-            role="radio"
-            :aria-checked="activeCity === city.id ? 'true' : 'false'"
-            :class="{ on: activeCity === city.id }"
-            :title="`${city.name} · ${city.count} runs`"
-            @click="pickRegion(city.id)"
-          >
-            {{ city.label }}
-          </button>
-        </div>
       </div>
       <p v-if="loadError" class="map-error" role="status">{{ loadError }}</p>
       <div v-if="choices.length" id="run-chooser" class="chooser" role="listbox" :aria-label="chooserLabel">
