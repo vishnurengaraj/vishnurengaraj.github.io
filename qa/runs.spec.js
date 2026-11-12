@@ -98,8 +98,13 @@ test.describe("runs map", () => {
       await expect(page.getByRole("radio", { name: "SF", exact: true })).toHaveCount(0);
       const globeButton = await page.getByRole("button", { name: "Globe" }).boundingBox();
       const regionBox = await regions.boundingBox();
-      expect(regionBox.x).toBeGreaterThan(globeButton.x + globeButton.width - 1);
-      expect(Math.abs(regionBox.y - globeButton.y)).toBeLessThan(2);
+      if (viewport.name === "phone") {
+        expect(regionBox.y).toBeGreaterThan(globeButton.y + globeButton.height - 1);
+        expect(Math.abs(regionBox.x - globeButton.x)).toBeLessThan(2);
+      } else {
+        expect(regionBox.x).toBeGreaterThan(globeButton.x + globeButton.width - 1);
+        expect(Math.abs(regionBox.y - globeButton.y)).toBeLessThan(2);
+      }
       expect(regionBox.x + regionBox.width).toBeLessThanOrEqual(viewport.width + 1);
 
       await regions.click();
@@ -1678,22 +1683,40 @@ test.describe("run sheet and layers", () => {
     await fab.click();
     await expect(fab).toHaveAttribute("aria-expanded", "true");
     await expect(fab).toHaveAttribute("aria-controls", "fab-menu");
-    // A round 56px FAB; the four icon buttons fan out in a row to its left.
+    // A round 56px FAB; the four icon buttons stack above it, centered on it.
     const main = await fab.boundingBox();
     expect(Math.round(main.width)).toBe(56);
     expect(Math.round(main.height)).toBe(56);
     expect(await fab.evaluate((el) => getComputedStyle(el).borderRadius)).toBe("50%");
-    let rightEdge = main.x;
+    let topEdge = main.y;
     for (const name of ["Map layers", "Areas, LA selected", "Random run", "Globe"]) {
       const button = page.getByRole("button", { name });
       await expect(button).toBeVisible();
       await expect(button.locator("svg")).toHaveCount(1);
       const box = await button.boundingBox();
       expect(Math.round(box.width)).toBe(44);
-      expect(Math.abs(box.y + box.height / 2 - (main.y + main.height / 2))).toBeLessThan(2);
-      expect(box.x + box.width).toBeLessThanOrEqual(rightEdge + 1);
-      expect(box.x).toBeGreaterThanOrEqual(0);
-      rightEdge = box.x;
+      expect(Math.abs(box.x + box.width / 2 - (main.x + main.width / 2))).toBeLessThan(2);
+      expect(box.y + box.height).toBeLessThanOrEqual(topEdge + 1);
+      expect(box.y).toBeGreaterThanOrEqual(0);
+      topEdge = box.y;
+    }
+    // Options pull out to the left of their button, bottoms aligned, on screen.
+    for (const [name, panel] of [
+      ["Areas, LA selected", page.getByRole("radiogroup", { name: "Regions" })],
+      ["Map layers", page.getByRole("listbox", { name: "Map layers" })],
+    ]) {
+      const button = page.getByRole("button", { name });
+      await button.click();
+      await expect(panel).toBeVisible();
+      await page.waitForTimeout(250);
+      const box = await button.boundingBox();
+      const out = await panel.boundingBox();
+      expect(out.x + out.width).toBeLessThanOrEqual(box.x + 1);
+      expect(Math.abs(out.y + out.height - (box.y + box.height))).toBeLessThan(2);
+      expect(out.x).toBeGreaterThanOrEqual(0);
+      expect(out.y).toBeGreaterThanOrEqual(0);
+      await button.click();
+      await expect(panel).toBeHidden();
     }
     const motion = await page.locator(".fab-menu").evaluate((el) => getComputedStyle(el).transitionDuration);
     expect(motion === "0s" || motion === "0ms").toBe(true);

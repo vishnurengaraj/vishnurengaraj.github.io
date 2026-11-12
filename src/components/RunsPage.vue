@@ -1068,34 +1068,6 @@ onUnmounted(() => {
       <div id="runs-map" ref="mapEl" tabindex="-1" role="region" aria-label="Map of runs"></div>
       <p v-if="manifest.sample" class="sample-tag">Sample routes</p>
       <div class="fab" :class="{ open: fabOpen, rail: !phone, popover: regionsOpen || layersOpen }">
-        <div v-show="regionsOpen" id="region-list" class="chips" role="radiogroup" aria-label="Regions">
-          <button
-            v-for="city in manifest.cities"
-            :key="city.id"
-            type="button"
-            role="radio"
-            :aria-checked="activeCity === city.id ? 'true' : 'false'"
-            :class="{ on: activeCity === city.id }"
-            :title="`${city.name} · ${city.count} runs`"
-            @click="pickRegion(city.id)"
-          >
-            {{ city.label }}
-          </button>
-        </div>
-        <div v-show="layersOpen" id="layer-picker" class="layer-picker" role="listbox" aria-label="Map layers">
-          <button
-            v-for="id in LAYER_MODES"
-            :key="id"
-            type="button"
-            role="option"
-            :aria-selected="layer === id ? 'true' : 'false'"
-            :class="{ on: layer === id }"
-            @click="chooseLayer(id)"
-          >
-            <span class="layer-swatch" :style="{ backgroundImage: rampGradient(id) }" aria-hidden="true"></span>
-            {{ LAYER_LABELS[id] }}
-          </button>
-        </div>
         <div class="fab-row">
           <div id="fab-menu" class="fab-menu" :inert="phone && !fabOpen ? true : undefined">
             <div id="fab-actions" class="fab-actions">
@@ -1115,36 +1087,68 @@ onUnmounted(() => {
                 </svg>
                 <span class="fab-tip" aria-hidden="true">Random run</span>
               </button>
-              <button
-                class="fab-action fab-areas"
-                type="button"
-                style="--i: 1"
-                :aria-expanded="regionsOpen ? 'true' : 'false'"
-                aria-controls="region-list"
-                :aria-label="`Areas, ${activeLabel} selected`"
-                @click="toggleRegions"
-              >
-                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                  <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
-                  <circle cx="12" cy="10" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8" />
-                </svg>
-                <span class="fab-tip" aria-hidden="true">Areas · {{ activeLabel }}</span>
-              </button>
-              <button
-                class="fab-action fab-layers"
-                type="button"
-                style="--i: 0"
-                :aria-expanded="layersOpen ? 'true' : 'false'"
-                aria-controls="layer-picker"
-                aria-label="Map layers"
-                @click="toggleLayers"
-              >
-                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                  <path d="M12 3.5 3.5 8 12 12.5 20.5 8 12 3.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
-                  <path d="m3.5 12 8.5 4.5 8.5-4.5M3.5 16l8.5 4.5 8.5-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
-                </svg>
-                <span class="fab-tip" aria-hidden="true">Layers</span>
-              </button>
+              <div class="fab-item">
+                <button
+                  class="fab-action fab-areas"
+                  type="button"
+                  style="--i: 1"
+                  :aria-expanded="regionsOpen ? 'true' : 'false'"
+                  aria-controls="region-list"
+                  :aria-label="`Areas, ${activeLabel} selected`"
+                  @click="toggleRegions"
+                >
+                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                    <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                    <circle cx="12" cy="10" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8" />
+                  </svg>
+                  <span class="fab-tip" aria-hidden="true">Areas · {{ activeLabel }}</span>
+                </button>
+                <div v-show="regionsOpen" id="region-list" class="chips" role="radiogroup" aria-label="Regions">
+                  <button
+                    v-for="city in manifest.cities"
+                    :key="city.id"
+                    type="button"
+                    role="radio"
+                    :aria-checked="activeCity === city.id ? 'true' : 'false'"
+                    :class="{ on: activeCity === city.id }"
+                    :title="`${city.name} · ${city.count} runs`"
+                    @click="pickRegion(city.id)"
+                  >
+                    {{ city.label }}
+                  </button>
+                </div>
+              </div>
+              <div class="fab-item">
+                <button
+                  class="fab-action fab-layers"
+                  type="button"
+                  style="--i: 0"
+                  :aria-expanded="layersOpen ? 'true' : 'false'"
+                  aria-controls="layer-picker"
+                  aria-label="Map layers"
+                  @click="toggleLayers"
+                >
+                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                    <path d="M12 3.5 3.5 8 12 12.5 20.5 8 12 3.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                    <path d="m3.5 12 8.5 4.5 8.5-4.5M3.5 16l8.5 4.5 8.5-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                  </svg>
+                  <span class="fab-tip" aria-hidden="true">Layers</span>
+                </button>
+                <div v-show="layersOpen" id="layer-picker" class="layer-picker" role="listbox" aria-label="Map layers">
+                  <button
+                    v-for="id in LAYER_MODES"
+                    :key="id"
+                    type="button"
+                    role="option"
+                    :aria-selected="layer === id ? 'true' : 'false'"
+                    :class="{ on: layer === id }"
+                    @click="chooseLayer(id)"
+                  >
+                    <span class="layer-swatch" :style="{ backgroundImage: rampGradient(id) }" aria-hidden="true"></span>
+                    {{ LAYER_LABELS[id] }}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
           <button
