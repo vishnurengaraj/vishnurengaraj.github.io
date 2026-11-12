@@ -6,6 +6,7 @@ import manifest from "../data/runs/manifest.json";
 import { occlusionPadding } from "../runs/frame.js";
 import { formatDate, formatDistance, formatElev, formatPace } from "../runs/format.js";
 import { REGION_ZOOM, WORLD_CENTER, WORLD_ZOOM, nearestCity } from "../runs/globe.js";
+import { LAYER_LABELS, LAYER_LEGENDS, LAYER_MODES, layerMode } from "../runs/layers.js";
 import { resolvePick } from "../runs/pick.js";
 import { pickRandomRun } from "../runs/random.js";
 import { activitySharePath, plainRunsBehind, stravaActivityUrl } from "../runs/share.js";
@@ -17,6 +18,11 @@ const pageEl = ref(null);
 const mapEl = ref(null);
 const activeCity = ref(manifest.defaultCity);
 const panel = ref(false);
+const sheetPeek = ref(false);
+const sheetDrag = ref(false);
+const layer = ref("density");
+const layersOpen = ref(false);
+const fabOpen = ref(false);
 const selected = ref(null);
 const choices = ref([]);
 const motionOn = ref(false);
@@ -24,6 +30,9 @@ const loadError = ref("");
 const regionsOpen = ref(false);
 const copyStatus = ref("");
 const shareKind = ref("copy");
+const photoIndex = ref(-1);
+const photoDrag = ref({ x: 0, y: 0 });
+const photoDragging = ref(false);
 
 const byId = new Map(manifest.runs.map((run) => [run.id, run]));
 const cityById = new Map(manifest.cities.map((city) => [city.id, city]));
@@ -34,7 +43,21 @@ const chooserLabel = ref("Runs here");
 const fromList = ref(false);
 let listOpener = null;
 let runOpener = null;
+let photoOpener = null;
+let photoPointer = null;
 const photos = computed(() => (Array.isArray(selected.value?.photos) ? selected.value.photos : []));
+const photoOpen = computed(() => photoIndex.value >= 0 && photoIndex.value < photos.value.length);
+const photoSlides = computed(() => {
+  if (!photoOpen.value) return [];
+  return [-1, 0, 1]
+    .map((delta) => {
+      const index = photoIndex.value + delta;
+      const photo = photos.value[index];
+      if (!photo) return null;
+      return { index, photo, delta };
+    })
+    .filter(Boolean);
+});
 const companions = computed(() =>
   Array.isArray(selected.value?.companions) ? selected.value.companions.filter(Boolean) : [],
 );
@@ -87,6 +110,8 @@ function queryValue(key) {
   return Array.isArray(raw) ? raw[0] : raw;
 }
 
+layer.value = layerMode(queryValue("layer"));
+
 function isPhone() {
   return window.matchMedia("(max-width: 640px)").matches;
 }
@@ -102,18 +127,21 @@ function framePadding() {
   let right = 0;
   let bottom = 0;
   let left = 0;
-  for (const el of root.querySelectorAll(".globe-btn, .dice-btn, .run-index, .regions-toggle")) {
+  for (const el of root.querySelectorAll(".run-index")) {
     const box = el.getBoundingClientRect();
     top = Math.max(top, box.bottom - mapBox.top);
   }
   const drawer = root.querySelector(".detail.open");
   if (drawer) {
-    if (isPhone()) bottom = Math.max(bottom, drawer.offsetHeight);
-    else right = Math.max(right, drawer.offsetWidth + (parseFloat(getComputedStyle(drawer).right) || 0));
+    if (isPhone()) {
+      const head = drawer.querySelector(".sheet-head");
+      const visible = sheetPeek.value && head ? head.offsetHeight : drawer.offsetHeight;
+      bottom = Math.max(bottom, visible);
+    } else right = Math.max(right, drawer.offsetWidth + (parseFloat(getComputedStyle(drawer).right) || 0));
   }
   const visibleBottom = mapBox.bottom - bottom;
   const visibleRight = mapBox.right - right;
-  for (const el of root.querySelectorAll(".map-key, .maplibregl-ctrl-bottom-right, .maplibregl-ctrl-bottom-left")) {
+  for (const el of root.querySelectorAll(".map-key, .fab, .maplibregl-ctrl-bottom-right, .maplibregl-ctrl-bottom-left")) {
     const box = el.getBoundingClientRect();
     if (box.top >= visibleBottom - 1 || box.left >= visibleRight - 1) continue;
     bottom = Math.max(bottom, mapBox.bottom - box.top);
@@ -160,11 +188,17 @@ function activityIdFromRoute() {
 function withoutActivity(query) {
   const next = {};
   for (const [key, value] of Object.entries(query)) {
-    if (key === "activity" || key === "run") continue;
+    if (key === "activity" || key === "run" || key === "photo") continue;
     if (value == null || value === "") continue;
     next[key] = value;
   }
   return next;
+}
+
+function photoFromQuery() {
+  const raw = Number(queryValue("photo"));
+  if (!Number.isInteger(raw) || raw < 1) return -1;
+  return raw - 1;
 }
 
 function enqueueUrl(task) {
@@ -245,14 +279,17 @@ async function loadLines() {
   }
 }
 
-function publishActivity(id) {
+function publishActivity(id, { keepPhoto = false } = {}) {
   const token = navToken;
   return enqueueUrl(async () => {
     if (token !== navToken) return;
     if (!panel.value || String(selected.value?.id) !== String(id)) return;
     const current = activityIdFromRoute();
-    if (current === id && String(queryValue("activity") || "") === id) return;
+    const activityMatches = current === id && String(queryValue("activity") || "") === id;
+    const photoOk = keepPhoto || !queryValue("photo");
+    if (activityMatches && photoOk) return;
     const query = { ...withoutActivity(route.query), activity: id };
+    if (keepPhoto && queryValue("photo")) query.photo = queryValue("photo");
     try {
       if (current) await router.replace({ name: "runs", query });
       else await router.push({ name: "runs", query });
@@ -346,11 +383,23 @@ async function shareActivity() {
   showCopyStatus(ok ? "Copied" : "Copy failed");
 }
 
-async function openRun(id, _lngLat, { skipUrl = false } = {}) {
+async function openRun(id, _lngLat, { skipUrl = false, fromRoute = false } = {}) {
   const summary = byId.get(id);
   if (!summary) return;
   const token = ++openToken;
+  const requested = fromRoute ? photoFromQuery() : -1;
+  const fromChooser = runOpener?.closest?.("#run-chooser");
+  closeChoices({ restore: false });
+  if (fromChooser) runOpener = pageEl.value?.querySelector(".run-index") || null;
+  layersOpen.value = false;
+  fabOpen.value = false;
+  sheetPeek.value = false;
   closeRegions();
+  photoIndex.value = -1;
+  photoOpener = null;
+  photoPointer = null;
+  photoDragging.value = false;
+  photoDrag.value = { x: 0, y: 0 };
   window.clearTimeout(copyTimer);
   copyStatus.value = "";
   if (summary.city) activeCity.value = summary.city;
@@ -358,7 +407,7 @@ async function openRun(id, _lngLat, { skipUrl = false } = {}) {
   panel.value = true;
   mapApi?.highlight(id);
   mapApi?.armFrame();
-  if (!skipUrl) publishActivity(id);
+  if (!skipUrl) publishActivity(id, { keepPhoto: fromRoute });
   let detail = null;
   try {
     const res = await fetch(`/media/runs/activities/${encodeURIComponent(id)}.json`);
@@ -375,6 +424,14 @@ async function openRun(id, _lngLat, { skipUrl = false } = {}) {
     };
   }
   await nextTick();
+  syncPeekVar();
+  if (requested >= 0 && requested < photos.value.length) {
+    photoIndex.value = requested;
+    await nextTick();
+    focusEl(pageEl.value?.querySelector(".lightbox-close"));
+  } else if (fromRoute && queryValue("photo")) {
+    writePhotoQuery(-1);
+  }
   if (!alive || token !== openToken || !panel.value) return;
   if (!mapApi) {
     pendingFrame = String(id);
@@ -387,7 +444,8 @@ async function openRun(id, _lngLat, { skipUrl = false } = {}) {
 function openRandom(event) {
   const run = pickRandomRun(manifest.runs, selected.value?.id);
   if (!run) return;
-  runOpener = event?.currentTarget || pageEl.value?.querySelector(".dice-btn") || null;
+  fabOpen.value = false;
+  runOpener = pageEl.value?.querySelector(".fab-main") || event?.currentTarget || null;
   openRun(run.id);
   nextTick(() => {
     if (!panel.value) return;
@@ -417,13 +475,29 @@ function toggleCityList(event) {
   nextTick(() => focusEl(pageEl.value?.querySelector("#run-chooser button")));
 }
 
+function toggleFab() {
+  fabOpen.value = !fabOpen.value;
+  if (!fabOpen.value) {
+    regionsOpen.value = false;
+    layersOpen.value = false;
+  }
+}
+
 function toggleRegions() {
   regionsOpen.value = !regionsOpen.value;
+  if (regionsOpen.value) layersOpen.value = false;
+}
+
+function toggleLayers() {
+  layersOpen.value = !layersOpen.value;
+  if (layersOpen.value) regionsOpen.value = false;
 }
 
 function frameWorld() {
   if (!mapApi) return;
   closeRegions();
+  layersOpen.value = false;
+  fabOpen.value = false;
   closeChoices({ restore: false });
   closePanel({ restore: false });
   mapApi.frameWorld(prefersReduced());
@@ -463,9 +537,121 @@ function onPick(runs, lngLat) {
   if (decision.action === "open") openRun(decision.ids[0], lngLat);
 }
 
+function photoThumb(index) {
+  return pageEl.value?.querySelector(`.photo-strip button[data-index="${index}"]`);
+}
+
+function writePhotoQuery(index) {
+  const next = index < 0 ? "" : String(index + 1);
+  if ((queryValue("photo") || "") === next) return;
+  const query = { ...route.query };
+  if (next) query.photo = next;
+  else delete query.photo;
+  router.replace({ name: "runs", query }).catch(() => {});
+}
+
+function slideStyle(delta) {
+  const x = `calc(${delta * 100}% + ${photoDrag.value.x}px)`;
+  const y = `${Math.max(0, photoDrag.value.y)}px`;
+  return { transform: `translate3d(${x}, ${y}, 0)` };
+}
+
+function lightboxStyle() {
+  const y = photoDrag.value.y;
+  if (y <= 0) return undefined;
+  return { opacity: String(Math.max(0.45, 1 - y / 420)) };
+}
+
+async function openPhoto(index, event) {
+  if (index < 0 || index >= photos.value.length) return;
+  photoOpener = event?.currentTarget || photoThumb(index);
+  photoIndex.value = index;
+  photoDrag.value = { x: 0, y: 0 };
+  writePhotoQuery(index);
+  await nextTick();
+  focusEl(pageEl.value?.querySelector(".lightbox-close"));
+}
+
+async function closePhoto({ fromUrl = false } = {}) {
+  if (photoIndex.value < 0) return;
+  const back = photoOpener || photoThumb(photoIndex.value);
+  photoIndex.value = -1;
+  photoOpener = null;
+  photoPointer = null;
+  photoDragging.value = false;
+  photoDrag.value = { x: 0, y: 0 };
+  if (!fromUrl) writePhotoQuery(-1);
+  await nextTick();
+  focusEl(back);
+}
+
+function stepPhoto(delta) {
+  const next = photoIndex.value + delta;
+  if (next < 0 || next >= photos.value.length) return;
+  photoIndex.value = next;
+  photoDrag.value = { x: 0, y: 0 };
+  writePhotoQuery(next);
+}
+
+function trapPhotoFocus(event) {
+  const root = pageEl.value?.querySelector(".lightbox");
+  if (!root) return;
+  const items = [...root.querySelectorAll("button")].filter((el) => !el.disabled && el.getClientRects().length > 0);
+  if (!items.length) return;
+  const first = items[0];
+  const last = items[items.length - 1];
+  const active = document.activeElement;
+  if (event.shiftKey && (active === first || !root.contains(active))) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && (active === last || !root.contains(active))) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
+function onPhotoDown(event) {
+  if (event.button != null && event.button !== 0) return;
+  photoPointer = { id: event.pointerId, x: event.clientX, y: event.clientY, axis: "" };
+  photoDragging.value = true;
+  event.currentTarget.setPointerCapture?.(event.pointerId);
+}
+
+function onPhotoMove(event) {
+  if (!photoPointer || event.pointerId !== photoPointer.id) return;
+  const dx = event.clientX - photoPointer.x;
+  const dy = event.clientY - photoPointer.y;
+  if (!photoPointer.axis && Math.hypot(dx, dy) > 6) {
+    photoPointer.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+  }
+  if (photoPointer.axis === "x") photoDrag.value = { x: dx, y: 0 };
+  else if (photoPointer.axis === "y" && isPhone()) photoDrag.value = { x: 0, y: Math.max(0, dy) };
+}
+
+function onPhotoUp(event) {
+  if (!photoPointer || event.pointerId !== photoPointer.id) return;
+  const { x, y } = photoDrag.value;
+  const axis = photoPointer.axis;
+  photoPointer = null;
+  photoDragging.value = false;
+  if (axis === "y" && isPhone() && y > 72) {
+    photoDrag.value = { x: 0, y: 0 };
+    closePhoto();
+    return;
+  }
+  if (axis === "x" && x <= -56) stepPhoto(1);
+  else if (axis === "x" && x >= 56) stepPhoto(-1);
+  photoDrag.value = { x: 0, y: 0 };
+}
+
 function closePanel({ restore = true, skipUrl = false } = {}) {
   openToken += 1;
   panel.value = false;
+  photoIndex.value = -1;
+  photoOpener = null;
+  photoPointer = null;
+  photoDragging.value = false;
+  photoDrag.value = { x: 0, y: 0 };
   mapApi?.highlight(null);
   mapApi?.releaseFrame();
   window.clearTimeout(copyTimer);
@@ -476,12 +662,131 @@ function closePanel({ restore = true, skipUrl = false } = {}) {
   if (!skipUrl) clearActivityUrl();
 }
 
+function refitOpenRun() {
+  if (!panel.value || !selected.value?.id || !mapApi) return;
+  nextTick(() => {
+    syncPeekVar();
+    mapApi.frameRoute(selected.value.id, framePadding(), prefersReduced());
+  });
+}
+
+function syncPeekVar() {
+  const detail = pageEl.value?.querySelector(".detail");
+  const head = detail?.querySelector(".sheet-head");
+  if (!detail || !head) return;
+  detail.style.setProperty("--peek", `${head.offsetHeight}px`);
+  detail.style.setProperty("--sheet-hide", `${Math.max(0, detail.offsetHeight - head.offsetHeight)}px`);
+  const page = pageEl.value;
+  if (page && panel.value && isPhone()) {
+    const visible = sheetPeek.value ? head.offsetHeight : detail.offsetHeight;
+    page.style.setProperty("--sheet-visible", `${visible}px`);
+  } else {
+    page?.style.removeProperty("--sheet-visible");
+  }
+}
+
+let sheetGesture = null;
+let ignoreSheetClick = false;
+
+function onSheetDown(event) {
+  if (!isPhone() || !panel.value) return;
+  if (event.target.closest(".close, a, .share-btn")) return;
+  sheetGesture = {
+    y: event.clientY,
+    peek: sheetPeek.value,
+    handle: Boolean(event.target.closest?.(".sheet-handle")),
+  };
+  sheetDrag.value = true;
+  event.currentTarget.setPointerCapture?.(event.pointerId);
+}
+
+function onSheetMove(event) {
+  if (!sheetGesture) return;
+  const detail = pageEl.value?.querySelector(".detail");
+  const head = detail?.querySelector(".sheet-head");
+  if (!detail || !head) return;
+  const dy = event.clientY - sheetGesture.y;
+  const full = detail.offsetHeight;
+  const peek = head.offsetHeight;
+  const base = sheetGesture.peek ? full - peek : 0;
+  const next = Math.min(full - peek, Math.max(0, base + dy));
+  detail.style.setProperty("--drag", `${next}px`);
+}
+
+function onSheetUp(event) {
+  if (!sheetGesture) return;
+  const dy = event.clientY - sheetGesture.y;
+  const wasPeek = sheetGesture.peek;
+  const onHandle = sheetGesture.handle;
+  sheetGesture = null;
+  sheetDrag.value = false;
+  const detail = pageEl.value?.querySelector(".detail");
+  detail?.style.removeProperty("--drag");
+  if (Math.abs(dy) < 8) {
+    if (onHandle || wasPeek) {
+      ignoreSheetClick = true;
+      sheetPeek.value = !wasPeek;
+      refitOpenRun();
+    }
+    return;
+  }
+  ignoreSheetClick = true;
+  sheetPeek.value = dy > 0;
+  refitOpenRun();
+}
+
+function toggleSheet() {
+  if (ignoreSheetClick) {
+    ignoreSheetClick = false;
+    return;
+  }
+  if (!isPhone()) return;
+  sheetPeek.value = !sheetPeek.value;
+  refitOpenRun();
+}
+
+function chooseLayer(id) {
+  const next = layerMode(id);
+  layer.value = next;
+  layersOpen.value = false;
+  mapApi?.setLayer(next);
+  const query = { ...route.query };
+  if (next === "density") delete query.layer;
+  else query.layer = next;
+  router.replace({ name: "runs", query }).catch(() => {});
+}
+
 function onKey(event) {
+  if (photoOpen.value) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closePhoto();
+      return;
+    }
+    if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+      event.preventDefault();
+      stepPhoto(event.key === "ArrowRight" ? 1 : -1);
+      return;
+    }
+    if (event.key === "Tab") trapPhotoFocus(event);
+  }
   if (event.key !== "Escape") return;
+  if (layersOpen.value) {
+    event.preventDefault();
+    layersOpen.value = false;
+    focusEl(pageEl.value?.querySelector(".fab-layers"));
+    return;
+  }
   if (regionsOpen.value) {
     event.preventDefault();
     closeRegions();
-    focusEl(pageEl.value?.querySelector(".regions-toggle"));
+    focusEl(pageEl.value?.querySelector(".fab-areas"));
+    return;
+  }
+  if (fabOpen.value) {
+    event.preventDefault();
+    fabOpen.value = false;
+    focusEl(pageEl.value?.querySelector(".fab-main"));
     return;
   }
   if (panel.value) {
@@ -497,6 +802,8 @@ function onKey(event) {
 
 function onResize() {
   syncShareKind();
+  if (!isPhone()) sheetPeek.value = false;
+  syncPeekVar();
   window.clearTimeout(resizeTimer);
   resizeTimer = window.setTimeout(() => {
     mapApi?.resize();
@@ -541,7 +848,7 @@ async function startMap() {
   await loadLines();
   if (!alive || gen !== mountGen) return;
   mapReady = true;
-  if (deep) await openRun(deepId);
+  if (deep) await openRun(deepId, null, { fromRoute: true });
   else if (deepId) clearUnknownActivity();
   if (!alive || gen !== mountGen) return;
   if (pendingFrame && panel.value && String(selected.value?.id) === pendingFrame) {
@@ -552,14 +859,40 @@ async function startMap() {
   }
   if (cameraHeld || panel.value) created.cancelArrival();
   else created.beginArrival();
+  created.setLayer(layer.value);
 }
+
+watch(
+  () => queryValue("layer"),
+  (value) => {
+    const next = layerMode(value);
+    if (next === layer.value) return;
+    layer.value = next;
+    mapApi?.setLayer(next);
+  },
+);
+
+watch(
+  () => queryValue("photo"),
+  () => {
+    if (!panel.value || !photos.value.length) return;
+    const index = photoFromQuery();
+    if (index < 0) {
+      if (photoIndex.value >= 0) closePhoto({ fromUrl: true });
+      return;
+    }
+    if (index >= photos.value.length || index === photoIndex.value) return;
+    photoIndex.value = index;
+    nextTick(() => focusEl(pageEl.value?.querySelector(".lightbox-close")));
+  },
+);
 
 watch(
   () => activityIdFromRoute(),
   (id) => {
     if (!mapReady) return;
     if (id && byId.has(id)) {
-      if (!panel.value || String(selected.value?.id) !== id) openRun(id, null, { skipUrl: true });
+      if (!panel.value || String(selected.value?.id) !== id) openRun(id, null, { skipUrl: true, fromRoute: true });
       return;
     }
     if (id) {
@@ -605,25 +938,75 @@ onUnmounted(() => {
 
 <template>
   <div ref="pageEl" class="runs" :class="{ 'no-anim': !motionOn, 'panel-open': panel }">
-    <div class="stage">
+    <div class="stage" :inert="photoOpen ? true : undefined">
       <div id="runs-map" ref="mapEl" tabindex="-1" role="region" aria-label="Map of runs"></div>
       <p v-if="manifest.sample" class="sample-tag">Sample routes</p>
-      <div class="map-tools">
-        <button class="globe-btn" type="button" @click="frameWorld">Globe</button>
+      <div class="fab" :class="{ open: fabOpen }">
+        <div id="fab-menu" class="fab-menu" :inert="fabOpen ? undefined : true">
+        <div v-show="regionsOpen" id="region-list" class="chips" role="radiogroup" aria-label="Regions">
+          <button
+            v-for="city in manifest.cities"
+            :key="city.id"
+            type="button"
+            role="radio"
+            :aria-checked="activeCity === city.id ? 'true' : 'false'"
+            :class="{ on: activeCity === city.id }"
+            :title="`${city.name} · ${city.count} runs`"
+            @click="pickRegion(city.id)"
+          >
+            {{ city.label }}
+          </button>
+        </div>
+        <div v-show="layersOpen" id="layer-picker" class="layer-picker" role="listbox" aria-label="Map layers">
+          <button
+            v-for="id in LAYER_MODES"
+            :key="id"
+            type="button"
+            role="option"
+            :aria-selected="layer === id ? 'true' : 'false'"
+            :class="{ on: layer === id }"
+            @click="chooseLayer(id)"
+          >
+            {{ LAYER_LABELS[id] }}
+          </button>
+        </div>
+        <div id="fab-actions" class="fab-actions">
+          <button class="fab-action" type="button" @click="frameWorld">Globe</button>
+          <button class="fab-action" type="button" title="Random run" @click="openRandom">
+            Random run
+          </button>
+          <button
+            class="fab-action fab-areas"
+            type="button"
+            :aria-expanded="regionsOpen ? 'true' : 'false'"
+            aria-controls="region-list"
+            :aria-label="`Areas, ${activeLabel} selected`"
+            @click="toggleRegions"
+          >
+            Areas
+          </button>
+          <button
+            class="fab-action fab-layers"
+            type="button"
+            :aria-expanded="layersOpen ? 'true' : 'false'"
+            aria-controls="layer-picker"
+            aria-label="Map layers"
+            @click="toggleLayers"
+          >
+            Layers
+          </button>
+        </div>
+        </div>
         <button
-          class="dice-btn"
+          class="fab-main"
           type="button"
-          title="Open a random activity"
-          aria-label="Open a random activity"
-          @click="openRandom"
+          aria-label="Map tools"
+          :aria-expanded="fabOpen ? 'true' : 'false'"
+          aria-controls="fab-menu"
+          @click="toggleFab"
         >
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-            <rect x="3.5" y="3.5" width="17" height="17" rx="3.2" fill="none" stroke="currentColor" stroke-width="1.8" />
-            <circle cx="8.2" cy="8.2" r="1.25" fill="currentColor" />
-            <circle cx="15.8" cy="8.2" r="1.25" fill="currentColor" />
-            <circle cx="12" cy="12" r="1.25" fill="currentColor" />
-            <circle cx="8.2" cy="15.8" r="1.25" fill="currentColor" />
-            <circle cx="15.8" cy="15.8" r="1.25" fill="currentColor" />
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
           </svg>
         </button>
       </div>
@@ -640,35 +1023,8 @@ onUnmounted(() => {
         <h1>Runs</h1>
         <p class="heat-key">
           <span class="heat-swatch" aria-hidden="true"></span>
-          Low to high activity density
+          {{ LAYER_LEGENDS[layer] }}
         </p>
-      </div>
-      <div class="regions" :class="{ open: regionsOpen }">
-        <button
-          class="regions-toggle"
-          type="button"
-          :aria-expanded="regionsOpen ? 'true' : 'false'"
-          aria-controls="region-list"
-          :aria-label="`Regions, ${activeLabel} selected`"
-          @click="toggleRegions"
-        >
-          <span class="regions-name">{{ activeLabel }}</span>
-          <span class="regions-chev" aria-hidden="true"></span>
-        </button>
-        <div v-if="regionsOpen" id="region-list" class="chips" role="radiogroup" aria-label="Regions">
-          <button
-            v-for="city in manifest.cities"
-            :key="city.id"
-            type="button"
-            role="radio"
-            :aria-checked="activeCity === city.id ? 'true' : 'false'"
-            :class="{ on: activeCity === city.id }"
-            :title="`${city.name} · ${city.count} runs`"
-            @click="pickRegion(city.id)"
-          >
-            {{ city.label }}
-          </button>
-        </div>
       </div>
       <p v-if="loadError" class="map-error" role="status">{{ loadError }}</p>
       <div v-if="choices.length" id="run-chooser" class="chooser" role="listbox" :aria-label="chooserLabel">
@@ -686,19 +1042,36 @@ onUnmounted(() => {
       </div>
       <aside
         class="detail"
-        :class="{ open: panel }"
+        :class="{ open: panel, peek: sheetPeek, 'sheet-drag': sheetDrag }"
+        :data-sheet="sheetPeek ? 'peek' : 'full'"
         :aria-hidden="panel ? 'false' : 'true'"
         :inert="panel ? undefined : true"
         :role="panel ? 'dialog' : undefined"
         :aria-label="selected ? selected.title : 'Run'"
       >
-        <button v-show="panel" class="close" type="button" aria-label="Close" @click="closePanel">×</button>
+        <div
+          v-if="selected"
+          class="sheet-head"
+          @pointerdown="onSheetDown"
+          @pointermove="onSheetMove"
+          @pointerup="onSheetUp"
+          @pointercancel="onSheetUp"
+        >
+          <button
+            class="sheet-handle"
+            type="button"
+            :aria-expanded="sheetPeek ? 'false' : 'true'"
+            :aria-label="sheetPeek ? 'Expand run details' : 'Collapse run details'"
+            @click="toggleSheet"
+          ></button>
+          <button v-show="panel" class="close" type="button" aria-label="Close" @click="closePanel">×</button>
+          <p v-if="selected.sample" class="sample-line">Sample route</p>
+          <p v-if="selected.type" class="run-type">{{ selected.type }}</p>
+          <h2>{{ selected.title }}</h2>
+          <p v-if="selected.date" class="run-date">{{ formatDate(selected.date) }}</p>
+        </div>
         <div v-if="selected" class="detail-body">
           <div class="d-in">
-            <p v-if="selected.sample" class="sample-line">Sample route</p>
-            <p v-if="selected.type" class="run-type">{{ selected.type }}</p>
-            <h2>{{ selected.title }}</h2>
-            <p v-if="selected.date" class="run-date">{{ formatDate(selected.date) }}</p>
             <div class="stats">
               <div>
                 <b class="run-distance">{{ formatDistance(selected.distanceM) }}</b>
@@ -719,19 +1092,75 @@ onUnmounted(() => {
               <span class="sr-only" role="status" aria-live="polite">{{ copyStatus }}</span>
             </div>
             <div v-if="photos.length" class="photo-strip">
-              <img
-                v-for="photo in photos"
+              <button
+                v-for="(photo, index) in photos"
                 :key="photo.src"
-                :src="photo.src"
-                :width="photo.w || undefined"
-                :height="photo.h || undefined"
-                :alt="photo.sample ? 'Sample photo' : selected.title"
-              />
+                type="button"
+                class="photo-thumb"
+                :data-index="index"
+                :aria-label="`Photo ${index + 1} of ${photos.length}`"
+                @click="openPhoto(index, $event)"
+              >
+                <img
+                  :src="photo.src"
+                  :width="photo.w || undefined"
+                  :height="photo.h || undefined"
+                  alt=""
+                  loading="lazy"
+                />
+              </button>
             </div>
           </div>
         </div>
       </aside>
     </div>
-    <div class="scrim" :class="{ open: panel }" @click="closePanel"></div>
+    <div class="scrim" :class="{ open: panel }" :inert="photoOpen ? true : undefined" @click="closePanel"></div>
+    <div
+      v-if="photoOpen"
+      class="lightbox"
+      :class="{ 'is-dragging': photoDragging }"
+      role="dialog"
+      aria-modal="true"
+      :aria-label="`Photo ${photoIndex + 1} of ${photos.length}`"
+      :style="lightboxStyle()"
+    >
+      <div class="lightbox-bar">
+        <p class="lightbox-count">{{ photoIndex + 1 }} / {{ photos.length }}</p>
+        <button class="lightbox-close" type="button" aria-label="Close photos" @click="closePhoto()">×</button>
+      </div>
+      <div
+        class="lightbox-stage"
+        @pointerdown="onPhotoDown"
+        @pointermove="onPhotoMove"
+        @pointerup="onPhotoUp"
+        @pointercancel="onPhotoUp"
+      >
+        <div v-for="slide in photoSlides" :key="slide.index" class="lightbox-slide" :style="slideStyle(slide.delta)">
+          <img
+            :src="slide.photo.src"
+            :alt="slide.delta === 0 ? `${selected.title}, photo ${slide.index + 1} of ${photos.length}` : ''"
+            :width="slide.photo.w || undefined"
+            :height="slide.photo.h || undefined"
+            draggable="false"
+          />
+        </div>
+      </div>
+      <button class="lightbox-nav prev" type="button" aria-label="Previous photo" :disabled="photoIndex === 0" @click="stepPhoto(-1)">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="M14.5 6.5 9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <button
+        class="lightbox-nav next"
+        type="button"
+        aria-label="Next photo"
+        :disabled="photoIndex >= photos.length - 1"
+        @click="stepPhoto(1)"
+      >
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="M9.5 6.5 15 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+    </div>
   </div>
 </template>

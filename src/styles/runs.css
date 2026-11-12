@@ -71,63 +71,140 @@ html:has(.runs) #app {
   text-transform: uppercase;
 }
 
-.runs .map-tools {
+.runs .fab {
   position: absolute;
-  z-index: 6;
-  top: calc(12px + env(safe-area-inset-top, 0px));
-  left: 12px;
+  z-index: 13;
+  right: 16px;
+  bottom: max(
+    calc(132px + env(safe-area-inset-bottom, 0px)),
+    calc(16px + env(safe-area-inset-bottom, 0px) + var(--sheet-visible, 0px))
+  );
+}
+
+.runs .fab-main {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: var(--primary);
+  color: var(--on-primary);
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(26, 16, 51, 0.22);
+}
+
+.runs .fab-main svg {
+  display: block;
+  transition: transform 180ms ease;
+}
+
+.runs .fab.open .fab-main svg {
+  transform: rotate(45deg);
+}
+
+.runs .fab-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.runs .fab.open .fab-menu {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.runs .fab-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 8px;
 }
 
-.runs .globe-btn {
-  min-height: 36px;
+.runs .fab-action {
+  min-height: 44px;
   padding: 0 14px;
   border: 1px solid rgba(45, 29, 122, 0.18);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(255, 255, 255, 0.96);
   color: var(--primary);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(26, 16, 51, 0.12);
 }
 
-.runs .dice-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 1px solid rgba(45, 29, 122, 0.18);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.94);
-  color: var(--primary);
+.runs .fab-action:hover,
+.runs .fab-main:hover {
+  filter: brightness(1.05);
+}
+
+.runs .layer-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 168px;
+  margin: 0;
+  padding: 6px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10px 28px rgba(26, 16, 51, 0.18);
+}
+
+.runs .layer-picker button {
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(26, 16, 51, 0.12);
 }
 
-.runs .dice-btn svg {
-  display: block;
-}
-
-.runs .dice-btn:hover {
+.runs .layer-picker button.on,
+.runs .layer-picker button:hover,
+.runs .layer-picker button:focus-visible {
   background: rgba(45, 29, 122, 0.06);
+  color: var(--primary);
 }
 
-.runs .globe-btn.on {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: var(--on-primary);
-}
-
-.runs .globe-btn:focus-visible,
-.runs .dice-btn:focus-visible {
+.runs .fab-main:focus-visible,
+.runs .fab-action:focus-visible,
+.runs .layer-picker button:focus-visible,
+.runs .sheet-handle:focus-visible {
   outline: 3px solid var(--primary);
   outline-offset: 2px;
+}
+
+.runs .sheet-head {
+  position: relative;
+  padding: 22px 22px 0;
+}
+
+.runs .sheet-head h2 {
+  margin: 0;
+  padding-right: 36px;
+  font-size: 24px;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.runs .sheet-handle {
+  display: none;
 }
 
 .runs .sample-tag {
@@ -198,6 +275,11 @@ html:has(.runs) #app {
   outline-offset: 2px;
 }
 
+.runs .fab .chips {
+  width: min(300px, calc(100vw - 32px));
+  max-height: min(40dvh, 280px);
+}
+
 .runs .chips {
   display: flex;
   flex-wrap: wrap;
@@ -263,7 +345,7 @@ html:has(.runs) #app {
 .runs .run-index {
   position: absolute;
   z-index: 6;
-  top: calc(68px + env(safe-area-inset-top, 0px));
+  top: calc(12px + env(safe-area-inset-top, 0px));
   left: 12px;
   max-width: min(280px, calc(100% - 24px));
   min-height: 36px;
@@ -427,7 +509,6 @@ html:has(.runs) #app {
 
 .runs .d-in h2 {
   margin: 0;
-  padding-right: 36px;
   font-size: 24px;
   letter-spacing: -0.01em;
   line-height: 1.2;
@@ -528,14 +609,138 @@ html:has(.runs) #app {
   overflow-x: auto;
 }
 
+.runs .photo-thumb {
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: #f6efe8;
+  cursor: pointer;
+}
+
 .runs .photo-strip img {
+  display: block;
   height: 148px;
   width: auto;
   max-width: none;
-  flex: none;
   border-radius: 12px;
   object-fit: cover;
   background: #f6efe8;
+}
+
+.runs .photo-thumb:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.runs .lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  background: #14111c;
+  color: #fff;
+  transition: opacity 180ms ease;
+}
+
+.runs .lightbox-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 12px 0;
+}
+
+.runs .lightbox-count {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.runs .lightbox-close,
+.runs .lightbox-nav {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  cursor: pointer;
+}
+
+.runs .lightbox-close {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.runs .lightbox-nav {
+  display: none;
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  transform: translateY(-50%);
+}
+
+.runs .lightbox-nav.prev {
+  left: 16px;
+}
+
+.runs .lightbox-nav.next {
+  right: 16px;
+}
+
+.runs .lightbox-nav:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.runs .lightbox-stage {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.runs .lightbox-slide {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 8px 16px 24px;
+  transition: transform 200ms ease;
+}
+
+.runs .lightbox.is-dragging .lightbox-slide,
+.runs .lightbox.is-dragging {
+  transition: none;
+}
+
+.runs .lightbox-slide img {
+  width: auto;
+  height: auto;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 96px);
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+}
+
+@media (min-width: 641px) {
+  .runs .lightbox-slide img {
+    max-width: min(1100px, calc(100vw - 160px));
+  }
+}
+
+.runs .lightbox-close:focus-visible,
+.runs .lightbox-nav:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .runs .close {
@@ -560,8 +765,22 @@ html:has(.runs) #app {
 }
 
 .runs.no-anim .detail,
-.runs.no-anim .scrim {
+.runs.no-anim .scrim,
+.runs.no-anim .fab-menu,
+.runs.no-anim .fab-main svg,
+.runs.no-anim .lightbox,
+.runs.no-anim .lightbox-slide {
   transition: none;
+}
+
+@media (min-width: 641px) {
+  .runs.panel-open .fab {
+    right: min(428px, calc(100% - 80px));
+  }
+
+  .runs .lightbox-nav {
+    display: grid;
+  }
 }
 
 @media (max-width: 640px) {
@@ -592,6 +811,41 @@ html:has(.runs) #app {
     transform: translateY(0);
   }
 
+  .runs .detail.open.peek {
+    transform: translateY(var(--sheet-hide, calc(100% - var(--peek, 148px))));
+  }
+
+  .runs .detail.open.sheet-drag {
+    transition: none;
+    transform: translateY(var(--drag, 0px));
+  }
+
+  .runs .sheet-handle {
+    display: block;
+    width: 44px;
+    height: 22px;
+    margin: -8px auto 8px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .runs .sheet-handle::before {
+    content: "";
+    display: block;
+    width: 36px;
+    height: 4px;
+    margin: 9px auto 0;
+    border-radius: 999px;
+    background: rgba(45, 29, 122, 0.28);
+  }
+
+  .runs .sheet-head {
+    padding-top: 8px;
+  }
+
   .runs .scrim {
     display: block;
     position: fixed;
@@ -612,7 +866,11 @@ html:has(.runs) #app {
 @media (prefers-reduced-motion: reduce) {
   .runs .detail,
   .runs .scrim,
-  .runs .regions-chev {
+  .runs .regions-chev,
+  .runs .fab-menu,
+  .runs .fab-main svg,
+  .runs .lightbox,
+  .runs .lightbox-slide {
     transition: none;
   }
 }
