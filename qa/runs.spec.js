@@ -219,6 +219,7 @@ test.describe("runs map", () => {
       await page.keyboard.press("Enter");
       const card = page.locator(".detail.open");
       await expect(card).toBeVisible();
+      await expect(chooser).toBeHidden();
       await expect(card.locator("h2")).not.toBeEmpty();
       const labelSize = await card.locator(".stats span").first().evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
       expect(labelSize).toBeGreaterThanOrEqual(12);
@@ -229,8 +230,6 @@ test.describe("runs map", () => {
 
       await page.keyboard.press("Escape");
       await expect(card).toBeHidden();
-      await expect(option).toBeFocused();
-      await page.keyboard.press("Escape");
       await expect(chooser).toBeHidden();
       await expect(opener).toBeFocused();
     });
@@ -1392,6 +1391,97 @@ test.describe("random activity", () => {
         .toBe("held");
     });
   }
+});
+
+test.describe("run sheet and layers", () => {
+  test.describe.configure({ timeout: 120_000 });
+
+  test("the run list closes when a run opens and stays closed", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/runs");
+    await ready(page);
+    await page.getByRole("button", { name: /^Runs in LA \(/ }).click();
+    const chooser = page.locator("#run-chooser");
+    await expect(chooser).toBeVisible();
+    await expect(chooser).toContainText("Runs in LA");
+    await chooser.getByRole("option").first().click();
+    await expect(page.locator(".detail.open")).toBeVisible();
+    await expect(chooser).toHaveCount(0);
+    await page.getByRole("button", { name: "Close" }).click();
+    await expect(page.locator(".detail.open")).toHaveCount(0);
+    await expect(chooser).toHaveCount(0);
+  });
+
+  test("a shared run and the dice do not leave the list open", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
+    const run = manifest.runs.find((item) => item.title === "Lake Sonoma Marathon");
+    await page.goto(`/runs?activity=${run.id}`);
+    await ready(page);
+    await expect(page.locator(".detail.open")).toBeVisible();
+    await expect(page.locator("#run-chooser")).toHaveCount(0);
+    await page.getByRole("button", { name: "Close" }).click();
+    await page.getByRole("button", { name: "Open a random activity" }).click();
+    await expect(page.locator(".detail.open")).toBeVisible();
+    await expect(page.locator("#run-chooser")).toHaveCount(0);
+  });
+
+  test("the phone sheet peeks and refits the route", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 390, height: 844 });
+    const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
+    const run = manifest.runs.find((item) => item.city === "la" && item.distanceM > 8000);
+    await page.goto(`/runs?activity=${run.id}`);
+    await ready(page);
+    const map = page.locator("#runs-map");
+    const card = page.locator(".detail.open");
+    await expect(card).toBeVisible();
+    await expect(card).toHaveAttribute("data-sheet", "full");
+    const openPad = () => map.getAttribute("data-pad").then((value) => Number(value.split(",")[2]));
+    const fullPad = await openPad();
+    expect(fullPad).toBeGreaterThan(160);
+    const motion = await card.evaluate((el) => getComputedStyle(el).transitionDuration);
+    expect(motion === "0s" || motion === "0ms").toBe(true);
+    await card.getByRole("button", { name: "Collapse run details" }).click();
+    await expect(card).toHaveAttribute("data-sheet", "peek");
+    await expect(card.locator("h2")).toBeVisible();
+    const statsBelow = await card.locator(".stats").evaluate((el) => el.getBoundingClientRect().top >= window.innerHeight - 1);
+    expect(statsBelow).toBe(true);
+    const peekPad = await openPad();
+    expect(peekPad).toBeLessThan(fullPad - 40);
+    await card.getByRole("button", { name: "Expand run details" }).click();
+    await expect(card).toHaveAttribute("data-sheet", "full");
+    await expect.poll(openPad).toBeGreaterThan(peekPad + 40);
+    await expect(card.getByRole("button", { name: "Close" })).toBeVisible();
+  });
+
+  test("layer choice colors routes and stays in the url", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/runs?layer=recency");
+    await ready(page);
+    const map = page.locator("#runs-map");
+    await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+    await expect(map).toHaveAttribute("data-layer", "recency");
+    await expect(page.locator(".heat-key")).toContainText("Older to newer");
+    await page.getByRole("button", { name: "Map layers" }).click();
+    await page.getByRole("option", { name: "Pace" }).click();
+    await expect(map).toHaveAttribute("data-layer", "pace");
+    await expect.poll(() => new URL(page.url()).searchParams.get("layer")).toBe("pace");
+    await expect(page.locator(".heat-key")).toContainText("Slower to faster");
+    await page.getByRole("button", { name: "Map layers" }).click();
+    await page.getByRole("option", { name: "Elevation" }).click();
+    await expect(map).toHaveAttribute("data-layer", "elevation");
+    const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
+    const run = manifest.runs.find((item) => item.city === "la");
+    await page.goto(`/runs?activity=${run.id}&layer=distance`);
+    await ready(page);
+    await expect(map).toHaveAttribute("data-layer", "distance", { timeout: 30_000 });
+    await expect(page.locator(".detail.open h2")).toHaveText(run.title);
+    await expect(page.locator(".heat-key")).toContainText("Shorter to longer");
+  });
 });
 
 test.describe("runs stays off the main nav", () => {

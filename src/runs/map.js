@@ -1,5 +1,6 @@
 import { openGlobeMap } from "./basemap.js";
 import { densityHeat } from "./density.js";
+import { layerMode, stampLines } from "./layers.js";
 import { boundsFromGeometry, routeCamera } from "./frame.js";
 import { REGION_ZOOM, WORLD_CENTER, WORLD_ZOOM, nearestCity, pitchForZoom } from "./globe.js";
 import { closerZoom } from "./pick.js";
@@ -157,6 +158,29 @@ function addRunLayers(map) {
   });
   const highlightFilter = ["==", ["get", "id"], ""];
   map.addLayer({
+    id: "runs-value",
+    type: "line",
+    source: "runs-lines",
+    layout: { "line-cap": "round", "line-join": "round", visibility: "none" },
+    paint: {
+      "line-color": [
+        "interpolate",
+        ["linear"],
+        ["coalesce", ["get", "t"], 0],
+        0,
+        "#8a5a32",
+        0.4,
+        "#e07a3d",
+        0.7,
+        "#c43a48",
+        1,
+        "#2d1d7a",
+      ],
+      "line-width": ["interpolate", ["linear"], ["zoom"], 0, 1.2, 4, 1.8, 8, 2.4, 12, 3, 15, 3.8],
+      "line-opacity": 0.9,
+    },
+  });
+  map.addLayer({
     id: "runs-highlight-casing",
     type: "line",
     source: "runs-lines",
@@ -242,6 +266,8 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
   let cityId = "";
   let regions = [];
   let highlighted = "";
+  let lineData = emptyCollection();
+  let activeLayer = "density";
 
   map.once("render", () => {
     const canvas = map.getCanvas();
@@ -273,6 +299,7 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
       .map((n) => Math.round(n))
       .join(",");
     mapEl.dataset.city = cityId;
+    mapEl.dataset.layer = activeLayer;
     mapEl.dataset.runs = String(runCount);
     if (layersReady) mapEl.dataset.map = "ready";
   }
@@ -538,6 +565,18 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
     }
   }
 
+  function applyLayer() {
+    if (!layersReady) return;
+    const value = activeLayer !== "density";
+    for (const id of ["runs-heat", "runs-vein", "runs-vein-glow"]) {
+      if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", value ? "none" : "visible");
+    }
+    if (map.getLayer("runs-value")) map.setLayoutProperty("runs-value", "visibility", value ? "visible" : "none");
+    const features = stampLines(lineData.features, activeLayer);
+    map.getSource("runs-lines")?.setData({ type: "FeatureCollection", features });
+    mapEl.dataset.layer = activeLayer;
+  }
+
   function frameRoute(id, padding, reduced) {
     if (disposed || gestureSinceArm) return;
     const bounds = boundsFromGeometry(geometryById.get(String(id)));
@@ -578,9 +617,16 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
         layersReady = true;
       }
       indexLines(lines);
-      map.getSource("runs-lines").setData(lines);
-      map.getSource("runs-heat").setData(densityHeat(lines));
+      lineData = lines || emptyCollection();
+      map.getSource("runs-heat").setData(densityHeat(lineData));
+      applyLayer();
       applyHighlight();
+      syncProbe();
+    },
+    setLayer(mode) {
+      if (disposed) return;
+      activeLayer = layerMode(mode);
+      applyLayer();
       syncProbe();
     },
     setRegions(cities) {

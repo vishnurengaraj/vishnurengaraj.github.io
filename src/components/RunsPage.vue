@@ -6,6 +6,7 @@ import manifest from "../data/runs/manifest.json";
 import { occlusionPadding } from "../runs/frame.js";
 import { formatDate, formatDistance, formatElev, formatPace } from "../runs/format.js";
 import { REGION_ZOOM, WORLD_CENTER, WORLD_ZOOM, nearestCity } from "../runs/globe.js";
+import { LAYER_LABELS, LAYER_LEGENDS, LAYER_MODES, layerMode } from "../runs/layers.js";
 import { resolvePick } from "../runs/pick.js";
 import { pickRandomRun } from "../runs/random.js";
 import { activitySharePath, plainRunsBehind, stravaActivityUrl } from "../runs/share.js";
@@ -17,6 +18,10 @@ const pageEl = ref(null);
 const mapEl = ref(null);
 const activeCity = ref(manifest.defaultCity);
 const panel = ref(false);
+const sheetPeek = ref(false);
+const sheetDrag = ref(false);
+const layer = ref("density");
+const layersOpen = ref(false);
 const selected = ref(null);
 const choices = ref([]);
 const motionOn = ref(false);
@@ -87,6 +92,8 @@ function queryValue(key) {
   return Array.isArray(raw) ? raw[0] : raw;
 }
 
+layer.value = layerMode(queryValue("layer"));
+
 function isPhone() {
   return window.matchMedia("(max-width: 640px)").matches;
 }
@@ -108,8 +115,11 @@ function framePadding() {
   }
   const drawer = root.querySelector(".detail.open");
   if (drawer) {
-    if (isPhone()) bottom = Math.max(bottom, drawer.offsetHeight);
-    else right = Math.max(right, drawer.offsetWidth + (parseFloat(getComputedStyle(drawer).right) || 0));
+    if (isPhone()) {
+      const head = drawer.querySelector(".sheet-head");
+      const visible = sheetPeek.value && head ? head.offsetHeight : drawer.offsetHeight;
+      bottom = Math.max(bottom, visible);
+    } else right = Math.max(right, drawer.offsetWidth + (parseFloat(getComputedStyle(drawer).right) || 0));
   }
   const visibleBottom = mapBox.bottom - bottom;
   const visibleRight = mapBox.right - right;
@@ -350,6 +360,11 @@ async function openRun(id, _lngLat, { skipUrl = false } = {}) {
   const summary = byId.get(id);
   if (!summary) return;
   const token = ++openToken;
+  const fromChooser = runOpener?.closest?.("#run-chooser");
+  closeChoices({ restore: false });
+  if (fromChooser) runOpener = pageEl.value?.querySelector(".run-index") || null;
+  layersOpen.value = false;
+  sheetPeek.value = false;
   closeRegions();
   window.clearTimeout(copyTimer);
   copyStatus.value = "";
@@ -375,6 +390,7 @@ async function openRun(id, _lngLat, { skipUrl = false } = {}) {
     };
   }
   await nextTick();
+  syncPeekVar();
   if (!alive || token !== openToken || !panel.value) return;
   if (!mapApi) {
     pendingFrame = String(id);
@@ -476,8 +492,101 @@ function closePanel({ restore = true, skipUrl = false } = {}) {
   if (!skipUrl) clearActivityUrl();
 }
 
+function refitOpenRun() {
+  if (!panel.value || !selected.value?.id || !mapApi) return;
+  nextTick(() => {
+    syncPeekVar();
+    mapApi.frameRoute(selected.value.id, framePadding(), prefersReduced());
+  });
+}
+
+function syncPeekVar() {
+  const detail = pageEl.value?.querySelector(".detail");
+  const head = detail?.querySelector(".sheet-head");
+  if (!detail || !head) return;
+  detail.style.setProperty("--peek", `${head.offsetHeight}px`);
+  detail.style.setProperty("--sheet-hide", `${Math.max(0, detail.offsetHeight - head.offsetHeight)}px`);
+}
+
+let sheetGesture = null;
+let ignoreSheetClick = false;
+
+function onSheetDown(event) {
+  if (!isPhone() || !panel.value) return;
+  if (event.target.closest(".close, a, .share-btn")) return;
+  sheetGesture = {
+    y: event.clientY,
+    peek: sheetPeek.value,
+    handle: Boolean(event.target.closest?.(".sheet-handle")),
+  };
+  sheetDrag.value = true;
+  event.currentTarget.setPointerCapture?.(event.pointerId);
+}
+
+function onSheetMove(event) {
+  if (!sheetGesture) return;
+  const detail = pageEl.value?.querySelector(".detail");
+  const head = detail?.querySelector(".sheet-head");
+  if (!detail || !head) return;
+  const dy = event.clientY - sheetGesture.y;
+  const full = detail.offsetHeight;
+  const peek = head.offsetHeight;
+  const base = sheetGesture.peek ? full - peek : 0;
+  const next = Math.min(full - peek, Math.max(0, base + dy));
+  detail.style.setProperty("--drag", `${next}px`);
+}
+
+function onSheetUp(event) {
+  if (!sheetGesture) return;
+  const dy = event.clientY - sheetGesture.y;
+  const wasPeek = sheetGesture.peek;
+  const onHandle = sheetGesture.handle;
+  sheetGesture = null;
+  sheetDrag.value = false;
+  const detail = pageEl.value?.querySelector(".detail");
+  detail?.style.removeProperty("--drag");
+  if (Math.abs(dy) < 8) {
+    if (onHandle || wasPeek) {
+      ignoreSheetClick = true;
+      sheetPeek.value = !wasPeek;
+      refitOpenRun();
+    }
+    return;
+  }
+  ignoreSheetClick = true;
+  sheetPeek.value = dy > 0;
+  refitOpenRun();
+}
+
+function toggleSheet() {
+  if (ignoreSheetClick) {
+    ignoreSheetClick = false;
+    return;
+  }
+  if (!isPhone()) return;
+  sheetPeek.value = !sheetPeek.value;
+  refitOpenRun();
+}
+
+function chooseLayer(id) {
+  const next = layerMode(id);
+  layer.value = next;
+  layersOpen.value = false;
+  mapApi?.setLayer(next);
+  const query = { ...route.query };
+  if (next === "density") delete query.layer;
+  else query.layer = next;
+  router.replace({ name: "runs", query }).catch(() => {});
+}
+
 function onKey(event) {
   if (event.key !== "Escape") return;
+  if (layersOpen.value) {
+    event.preventDefault();
+    layersOpen.value = false;
+    focusEl(pageEl.value?.querySelector(".layers-btn"));
+    return;
+  }
   if (regionsOpen.value) {
     event.preventDefault();
     closeRegions();
@@ -497,6 +606,8 @@ function onKey(event) {
 
 function onResize() {
   syncShareKind();
+  if (!isPhone()) sheetPeek.value = false;
+  syncPeekVar();
   window.clearTimeout(resizeTimer);
   resizeTimer = window.setTimeout(() => {
     mapApi?.resize();
@@ -552,7 +663,18 @@ async function startMap() {
   }
   if (cameraHeld || panel.value) created.cancelArrival();
   else created.beginArrival();
+  created.setLayer(layer.value);
 }
+
+watch(
+  () => queryValue("layer"),
+  (value) => {
+    const next = layerMode(value);
+    if (next === layer.value) return;
+    layer.value = next;
+    mapApi?.setLayer(next);
+  },
+);
 
 watch(
   () => activityIdFromRoute(),
@@ -611,6 +733,34 @@ onUnmounted(() => {
       <div class="map-tools">
         <button class="globe-btn" type="button" @click="frameWorld">Globe</button>
         <button
+          class="layers-btn"
+          type="button"
+          aria-label="Map layers"
+          title="Map layers"
+          :aria-expanded="layersOpen ? 'true' : 'false'"
+          aria-controls="layer-picker"
+          @click="layersOpen = !layersOpen"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path d="M12 3.5 4 7.2l8 3.7 8-3.7-8-3.7Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+            <path d="M4 12l8 3.7L20 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+            <path d="M4 16.6 12 20.3l8-3.7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div v-if="layersOpen" id="layer-picker" class="layer-picker" role="listbox" aria-label="Map layers">
+          <button
+            v-for="id in LAYER_MODES"
+            :key="id"
+            type="button"
+            role="option"
+            :aria-selected="layer === id ? 'true' : 'false'"
+            :class="{ on: layer === id }"
+            @click="chooseLayer(id)"
+          >
+            <span class="layer-name">{{ LAYER_LABELS[id] }}</span>
+          </button>
+        </div>
+        <button
           class="dice-btn"
           type="button"
           title="Open a random activity"
@@ -640,7 +790,7 @@ onUnmounted(() => {
         <h1>Runs</h1>
         <p class="heat-key">
           <span class="heat-swatch" aria-hidden="true"></span>
-          Low to high activity density
+          {{ LAYER_LEGENDS[layer] }}
         </p>
       </div>
       <div class="regions" :class="{ open: regionsOpen }">
@@ -686,19 +836,36 @@ onUnmounted(() => {
       </div>
       <aside
         class="detail"
-        :class="{ open: panel }"
+        :class="{ open: panel, peek: sheetPeek, 'sheet-drag': sheetDrag }"
+        :data-sheet="sheetPeek ? 'peek' : 'full'"
         :aria-hidden="panel ? 'false' : 'true'"
         :inert="panel ? undefined : true"
         :role="panel ? 'dialog' : undefined"
         :aria-label="selected ? selected.title : 'Run'"
       >
-        <button v-show="panel" class="close" type="button" aria-label="Close" @click="closePanel">×</button>
+        <div
+          v-if="selected"
+          class="sheet-head"
+          @pointerdown="onSheetDown"
+          @pointermove="onSheetMove"
+          @pointerup="onSheetUp"
+          @pointercancel="onSheetUp"
+        >
+          <button
+            class="sheet-handle"
+            type="button"
+            :aria-expanded="sheetPeek ? 'false' : 'true'"
+            :aria-label="sheetPeek ? 'Expand run details' : 'Collapse run details'"
+            @click="toggleSheet"
+          ></button>
+          <button v-show="panel" class="close" type="button" aria-label="Close" @click="closePanel">×</button>
+          <p v-if="selected.sample" class="sample-line">Sample route</p>
+          <p v-if="selected.type" class="run-type">{{ selected.type }}</p>
+          <h2>{{ selected.title }}</h2>
+          <p v-if="selected.date" class="run-date">{{ formatDate(selected.date) }}</p>
+        </div>
         <div v-if="selected" class="detail-body">
           <div class="d-in">
-            <p v-if="selected.sample" class="sample-line">Sample route</p>
-            <p v-if="selected.type" class="run-type">{{ selected.type }}</p>
-            <h2>{{ selected.title }}</h2>
-            <p v-if="selected.date" class="run-date">{{ formatDate(selected.date) }}</p>
             <div class="stats">
               <div>
                 <b class="run-distance">{{ formatDistance(selected.distanceM) }}</b>
