@@ -12,6 +12,7 @@
     "preview": "vite preview --host 127.0.0.1 --port 4173",
     "build:runs": "node scripts/build-runs.mjs",
     "build:travel": "node scripts/travel/build-travel.mjs",
+    "build:training": "node scripts/training/build-training.mjs",
     "test": "node --test scripts/runs/*.test.mjs scripts/travel/*.test.mjs && playwright test",
     "deploy": "npm run build && wrangler deploy"
   },

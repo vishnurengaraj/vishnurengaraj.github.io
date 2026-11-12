@@ -1,0 +1,13 @@
+{
+  "_readme": "Course notes for the profile. The elevation line itself comes from the GPX (gpx below) via scripts/training/build-training.mjs. Section ranges are in official race miles; the GPX distance is scaled to 31.4.",
+  "gpx": "/workspace/wtc50k/wtc50k-course-plotaroute-2721862.gpx",
+  "officialMiles": 31.4,
+  "gainFt": 4799,
+  "sections": [
+    { "name": "Canyon descent", "from": 8.7, "to": 11.7, "change": "−996 ft", "grade": "6.2% down", "practice": "Controlled downhill after you are already 8 miles in", "kind": "down", "rehearsed": "Controlled descents on the Jan 9 trail 12 and the Feb 13 peak 20" },
+    { "name": "Quarry to ALT climb", "from": 15.8, "to": 21.3, "change": "+887 ft", "grade": "3.1% up", "practice": "Long moderate climb, two bottles, 7.5-mile aid gap", "kind": "up", "rehearsed": "Two-bottle 7–8 mi stretches on Jan 16, Jan 30, and Feb 13" },
+    { "name": "Goat Hill", "from": 25.8, "to": 27.0, "change": "+347 ft", "grade": "5.2% up, steepest half mile ~14%", "practice": "Late hike-up on tired legs, no poles", "kind": "up", "rehearsed": "Short steep hills Jan 14 and Feb 4; the Feb 6 trail 18 ends with a hike-up" },
+    { "name": "Final climb", "from": 29.0, "to": 30.7, "change": "+462 ft", "grade": "5.1% up", "practice": "A second late climb, then 1.4 mi to the finish", "kind": "up", "rehearsed": "A late tired climb on the Feb 13 peak 20" }
+  ],
+  "aids": [[0, "Start", "Start"], [8, "Fire Station", "Mi 8"], [13, "Quarry", "Quarry"], [20.5, "ALT", "ALT"], [26, "Goat Hill", "Goat"], [30, "Hwy 49", "49"], [31.4, "Finish", "Finish"]]
+}

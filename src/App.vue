@@ -13,6 +13,7 @@ import SiteFooter from "./components/SiteFooter.vue";
 import DinersPage from "./components/DinersPage.vue";
 import RunsPage from "./components/RunsPage.vue";
 import TravelPage from "./components/TravelPage.vue";
+import TrainingPage from "./components/TrainingPage.vue";
 import TitleProto from "./components/TitleProto.vue";
 import { RESUME_PARTS, dockKey, resumeJumpKey, resumePartKey, scrollKey } from "./scroll.js";
 import {
@@ -518,7 +519,7 @@ function queryValue(key) {
 }
 
 function isOffshoot(name = route.name) {
-  return name === "diners" || name === "runs" || name === "travel";
+  return name === "diners" || name === "runs" || name === "travel" || name === "training";
 }
 
 function shellTo(path) {
@@ -2163,6 +2164,7 @@ watch(
   <DinersPage v-if="route.name === 'diners'" />
   <RunsPage v-else-if="route.name === 'runs'" />
   <TravelPage v-else-if="route.name === 'travel'" />
+  <TrainingPage v-else-if="route.name === 'training'" />
   <template v-else>
   <a class="skip" href="#about" @click="onNav($event, 'about')">Skip to content</a>
   <TitleProto

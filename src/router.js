@@ -13,5 +13,6 @@ export const routes = [
   { path: "/diners", name: "diners", component: shell },
   { path: "/runs", name: "runs", component: shell },
   { path: "/travel", name: "travel", component: shell },
+  { path: "/training", name: "training", component: shell },
   { path: "/:pathMatch(.*)*", redirect: "/" },
 ];

@@ -50,6 +50,7 @@ export default defineConfig(({ mode }) => {
           "/diners",
           "/runs",
           "/travel",
+          "/training",
         ];
       },
     },
