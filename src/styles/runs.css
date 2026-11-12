@@ -83,11 +83,19 @@ html.runs-lock body {
   position: absolute;
   z-index: 13;
   right: 16px;
-  bottom: calc(132px + env(safe-area-inset-bottom, 0px));
-  /* Rides 16px above an open phone sheet. A transform, not bottom, so it moves
-     with the sheet without counting as a layout shift. */
-  transform: translateY(min(0px, calc(116px - var(--sheet-visible, 0px))));
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  /* Phone: sits in the bottom-right corner, clear of the map attribution, and
+     16px above the sheet's visible top when a sheet is open, expanded, peeking,
+     or mid-drag. The sheet covers the home indicator, so the safe-area inset
+     only counts with no sheet. A
+     transform, not bottom, so it moves with the sheet without counting as a
+     layout shift. Same duration and curve as the sheet. */
+  transform: translateY(min(0px, calc(8px + env(safe-area-inset-bottom, 0px) - var(--sheet-visible, 0px))));
   transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.runs.sheet-dragging .fab {
+  transition: none;
 }
 
 .runs .fab-row {
@@ -249,8 +257,11 @@ html.runs-lock body {
   display: none;
 }
 
+/* The row sits above MapLibre's zoom and compass, which keep the bottom-right
+   corner on wider screens. */
 .runs .fab.rail {
   right: 10px;
+  bottom: calc(132px + env(safe-area-inset-bottom, 0px));
 }
 
 .runs .fab.rail .fab-main {
@@ -269,14 +280,15 @@ html.runs-lock body {
 }
 
 /* Heights stop 60px under the top of the screen. Each button's bottom edge is
-   a fixed offset above the FAB, which rides 16px above an open sheet. */
+   a fixed offset above the FAB, which sits 24px above the safe area or 16px
+   above an open sheet. */
 .runs .fab:not(.rail) .fab-item > .chips {
   width: min(300px, calc(100vw - 92px));
-  max-height: min(280px, calc(100dvh - max(256px, var(--sheet-visible, 0px) + 140px) - 60px));
+  max-height: min(280px, calc(100dvh - max(148px + env(safe-area-inset-bottom, 0px), var(--sheet-visible, 0px) + 140px) - 60px));
 }
 
 .runs .fab:not(.rail) .fab-item > .layer-picker {
-  max-height: calc(100dvh - max(200px, var(--sheet-visible, 0px) + 84px) - 60px);
+  max-height: calc(100dvh - max(92px + env(safe-area-inset-bottom, 0px), var(--sheet-visible, 0px) + 84px) - 60px);
   overflow: auto;
 }
 
@@ -977,6 +989,24 @@ html.runs-lock body {
 }
 
 @media (max-width: 640px) {
+  /* Zoom and compass move to the top-right corner so the FAB can have the
+     bottom-right one. MapLibre keeps them in its bottom-right container; this
+     restyles that container rather than re-adding the control per breakpoint.
+     Top-left is the "Runs in" button. */
+  .runs .maplibregl-ctrl-bottom-right {
+    top: env(safe-area-inset-top, 0px);
+    bottom: auto;
+  }
+
+  .runs .maplibregl-ctrl-bottom-right .maplibregl-ctrl {
+    margin: 12px 12px 0 0;
+  }
+
+  /* Keep the legend clear of the FAB: 12px inset, legend, 16px gap, 56px FAB, 16px edge. */
+  .runs .map-key {
+    max-width: calc(100% - 112px);
+  }
+
   .runs .regions {
     width: min(440px, calc(100% - 24px));
   }

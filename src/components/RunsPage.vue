@@ -129,8 +129,12 @@ function syncPhone() {
   if (!phone.value) fabOpen.value = false;
 }
 
-/* Top controls, the open drawer, and any corner chrome that still sticks into
-   the visible map. Layout size, not the drawer's slide transform. */
+/* The phone FAB rests this far above an open sheet. Matches the transform on
+   .fab in runs.css. */
+const FAB_GAP = 16;
+
+/* Top controls, the open drawer, and any chrome that still sticks into the
+   visible map. Layout size, not the drawer's slide transform. */
 function framePadding() {
   const map = mapEl.value;
   const root = pageEl.value;
@@ -145,13 +149,24 @@ function framePadding() {
     top = Math.max(top, box.bottom - mapBox.top);
   }
   const drawer = root.querySelector(".detail.open");
-  if (drawer) {
-    if (isPhone()) {
-      const head = drawer.querySelector(".sheet-head");
-      const visible = sheetPeek.value && head ? head.offsetHeight : drawer.offsetHeight;
-      bottom = Math.max(bottom, visible);
-    } else right = Math.max(right, drawer.offsetWidth + (parseFloat(getComputedStyle(drawer).right) || 0));
+  if (isPhone()) {
+    /* The FAB sits FAB_GAP above the sheet's visible top. Measure where it is
+       headed, not where its transition has got to. */
+    const head = drawer?.querySelector(".sheet-head");
+    const visible = drawer ? (sheetPeek.value && head ? head.offsetHeight : drawer.offsetHeight) : 0;
+    const fab = root.querySelector(".fab-main");
+    bottom = visible + (fab ? FAB_GAP + fab.offsetHeight : 0);
+    /* Zoom and compass sit in the top-right corner on phones. A portrait screen
+       has height to spare, so clear them sideways only when they reach below
+       the title row. */
+    const nav = root.querySelector(".maplibregl-ctrl-bottom-right .maplibregl-ctrl-group");
+    if (nav) {
+      const box = nav.getBoundingClientRect();
+      if (box.bottom - mapBox.top > top) right = Math.max(right, mapBox.right - box.left);
+    }
+    return occlusionPadding({ width: mapBox.width, height: mapBox.height, top, right, bottom, left });
   }
+  if (drawer) right = Math.max(right, drawer.offsetWidth + (parseFloat(getComputedStyle(drawer).right) || 0));
   const visibleBottom = mapBox.bottom - bottom;
   const visibleRight = mapBox.right - right;
   for (const el of root.querySelectorAll(".map-key, .fab, .maplibregl-ctrl-bottom-right, .maplibregl-ctrl-bottom-left")) {
@@ -787,11 +802,17 @@ function closePanel({ restore = true, skipUrl = false } = {}) {
   if (!skipUrl) clearActivityUrl();
 }
 
+/* Collapsing or expanding the sheet always refits the route to the map area
+   left above it, even after a pan or zoom. */
+const SHEET_REFIT_MS = 400;
+
 function refitOpenRun() {
   if (!panel.value || !selected.value?.id || !mapApi) return;
   nextTick(() => {
+    if (!panel.value || !selected.value?.id || !mapApi) return;
     syncPeekVar();
-    mapApi.frameRoute(selected.value.id, framePadding(), prefersReduced());
+    mapApi.armFrame();
+    mapApi.frameRoute(selected.value.id, framePadding(), prefersReduced(), SHEET_REFIT_MS);
   });
 }
 
@@ -837,6 +858,7 @@ function onSheetMove(event) {
   const base = sheetGesture.peek ? full - peek : 0;
   const next = Math.min(full - peek, Math.max(0, base + dy));
   detail.style.setProperty("--drag", `${next}px`);
+  pageEl.value?.style.setProperty("--sheet-visible", `${full - next}px`);
 }
 
 function onSheetUp(event) {
@@ -847,6 +869,7 @@ function onSheetUp(event) {
   sheetDrag.value = false;
   const detail = pageEl.value?.querySelector(".detail");
   detail?.style.removeProperty("--drag");
+  syncPeekVar();
   if (Math.abs(dy) < 8) {
     if (wasPeek) {
       sheetPeek.value = false;
@@ -982,6 +1005,10 @@ async function startMap() {
   created.setLayer(layer.value);
 }
 
+/* --sheet-visible drives the FAB. Every way the sheet opens, peeks, closes, or
+   leaves phone layout comes through these, so the FAB never keeps a stale height. */
+watch([panel, sheetPeek, phone], () => nextTick(syncPeekVar));
+
 watch(
   () => queryValue("layer"),
   (value) => {
@@ -1063,7 +1090,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="pageEl" class="runs" :class="{ 'no-anim': !motionOn, 'panel-open': panel }">
+  <div ref="pageEl" class="runs" :class="{ 'no-anim': !motionOn, 'panel-open': panel, 'sheet-dragging': sheetDrag }">
     <div class="stage" :inert="photoOpen ? true : undefined">
       <div id="runs-map" ref="mapEl" tabindex="-1" role="region" aria-label="Map of runs"></div>
       <p v-if="manifest.sample" class="sample-tag">Sample routes</p>
