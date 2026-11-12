@@ -6,7 +6,7 @@ import manifest from "../data/runs/manifest.json";
 import { occlusionPadding } from "../runs/frame.js";
 import { formatDate, formatDistance, formatElev, formatPace } from "../runs/format.js";
 import { REGION_ZOOM, WORLD_CENTER, WORLD_ZOOM, nearestCity } from "../runs/globe.js";
-import { LAYER_LABELS, LAYER_LEGENDS, LAYER_MODES, layerMode } from "../runs/layers.js";
+import { LAYER_LABELS, LAYER_LEGENDS, LAYER_MODES, layerMode, rampGradient } from "../runs/layers.js";
 import { resolvePick } from "../runs/pick.js";
 import { pickRandomRun } from "../runs/random.js";
 import { activitySharePath, plainRunsBehind, stravaActivityUrl } from "../runs/share.js";
@@ -33,6 +33,9 @@ const shareKind = ref("copy");
 const photoIndex = ref(-1);
 const photoDrag = ref({ x: 0, y: 0 });
 const photoDragging = ref(false);
+const photoClosing = ref(false);
+/* Phone gets the speed dial; wider screens show the four tools as a row. */
+const phone = ref(false);
 
 const byId = new Map(manifest.runs.map((run) => [run.id, run]));
 const cityById = new Map(manifest.cities.map((city) => [city.id, city]));
@@ -45,7 +48,12 @@ let listOpener = null;
 let runOpener = null;
 let photoOpener = null;
 let photoPointer = null;
+let photoAnims = [];
+let photoGen = 0;
 const photos = computed(() => (Array.isArray(selected.value?.photos) ? selected.value.photos : []));
+/* The manifest knows the photo count before the detail file lands, so the strip
+   can hold its height and the sheet does not jump when the photos arrive. */
+const photoSlots = computed(() => Number(byId.get(selected.value?.id)?.photos) || 0);
 const photoOpen = computed(() => photoIndex.value >= 0 && photoIndex.value < photos.value.length);
 const photoSlides = computed(() => {
   if (!photoOpen.value) return [];
@@ -114,6 +122,11 @@ layer.value = layerMode(queryValue("layer"));
 
 function isPhone() {
   return window.matchMedia("(max-width: 640px)").matches;
+}
+
+function syncPhone() {
+  phone.value = isPhone();
+  if (!phone.value) fabOpen.value = false;
 }
 
 /* Top controls, the open drawer, and any corner chrome that still sticks into
@@ -395,6 +408,7 @@ async function openRun(id, _lngLat, { skipUrl = false, fromRoute = false } = {})
   fabOpen.value = false;
   sheetPeek.value = false;
   closeRegions();
+  stopPhotoAnims();
   photoIndex.value = -1;
   photoOpener = null;
   photoPointer = null;
@@ -405,6 +419,7 @@ async function openRun(id, _lngLat, { skipUrl = false, fromRoute = false } = {})
   if (summary.city) activeCity.value = summary.city;
   selected.value = { ...summary, companions: [], photos: [] };
   panel.value = true;
+  nextTick(syncPeekVar);
   mapApi?.highlight(id);
   mapApi?.armFrame();
   if (!skipUrl) publishActivity(id, { keepPhoto: fromRoute });
@@ -445,7 +460,7 @@ function openRandom(event) {
   const run = pickRandomRun(manifest.runs, selected.value?.id);
   if (!run) return;
   fabOpen.value = false;
-  runOpener = pageEl.value?.querySelector(".fab-main") || event?.currentTarget || null;
+  runOpener = (phone.value && pageEl.value?.querySelector(".fab-main")) || event?.currentTarget || null;
   openRun(run.id);
   nextTick(() => {
     if (!panel.value) return;
@@ -559,33 +574,140 @@ function slideStyle(delta) {
 function lightboxStyle() {
   const y = photoDrag.value.y;
   if (y <= 0) return undefined;
-  return { opacity: String(Math.max(0.45, 1 - y / 420)) };
+  return { "--backdrop": String(Math.max(0.35, 1 - y / 360)) };
+}
+
+/* Shared-element motion for the gallery. The tapped thumbnail grows into the
+   full-screen photo, and closing shrinks the photo on screen back onto its own
+   thumbnail, which is hidden ("lifted") while the gallery is up. */
+const PHOTO_IN = { duration: 320, easing: "cubic-bezier(0.2, 0, 0, 1)" };
+const PHOTO_OUT = { duration: 280, easing: "cubic-bezier(0.3, 0, 0.1, 1)" };
+
+function stopPhotoAnims() {
+  for (const anim of photoAnims) anim.cancel();
+  photoAnims = [];
+  photoClosing.value = false;
+}
+
+function lightboxEl() {
+  return pageEl.value?.querySelector(".lightbox");
+}
+
+function currentPhotoImg() {
+  return lightboxEl()?.querySelector(".lightbox-slide.current img");
+}
+
+/* Where thumbnail `index` sits on screen, scrolled into the strip first.
+   Null when it is off screen (a peeked sheet, a scrolled card), so the
+   gallery fades instead of flying to nowhere. */
+function thumbRect(index) {
+  const thumb = photoThumb(index);
+  const img = thumb?.querySelector("img");
+  if (!img) return null;
+  const strip = thumb.parentElement;
+  if (strip) {
+    const box = strip.getBoundingClientRect();
+    const at = thumb.getBoundingClientRect();
+    if (at.left < box.left) strip.scrollLeft -= box.left - at.left + 8;
+    else if (at.right > box.right) strip.scrollLeft += at.right - box.right + 8;
+  }
+  const rect = img.getBoundingClientRect();
+  if (!rect.width || !rect.height) return null;
+  if (rect.bottom <= 0 || rect.top >= window.innerHeight || rect.right <= 0 || rect.left >= window.innerWidth) return null;
+  return rect;
+}
+
+function rectTransform(to, from) {
+  const sx = to.width / from.width;
+  const sy = to.height / from.height;
+  return {
+    transform: `translate(${to.left - from.left}px, ${to.top - from.top}px) scale(${sx}, ${sy})`,
+    borderRadius: `${12 / Math.max(0.01, Math.min(sx, sy))}px`,
+  };
+}
+
+function animatePhotoIn(from) {
+  stopPhotoAnims();
+  const root = lightboxEl();
+  if (!root || prefersReduced() || typeof root.animate !== "function") return;
+  const backdrop = root.querySelector(".lightbox-backdrop");
+  if (backdrop) photoAnims.push(backdrop.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, easing: "ease-out" }));
+  for (const el of root.querySelectorAll(".lightbox-bar, .lightbox-nav")) {
+    photoAnims.push(el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, delay: 140, easing: "ease-out", fill: "backwards" }));
+  }
+  const img = currentPhotoImg();
+  if (!img) return;
+  const base = img.getBoundingClientRect();
+  if (from && base.width && base.height) {
+    photoAnims.push(img.animate([rectTransform(from, base), { transform: "none", borderRadius: "0px" }], PHOTO_IN));
+  } else {
+    photoAnims.push(img.animate([{ opacity: 0, transform: "scale(0.94)" }, { opacity: 1, transform: "none" }], PHOTO_IN));
+  }
+}
+
+async function animatePhotoOut(index) {
+  stopPhotoAnims();
+  const root = lightboxEl();
+  if (!root || prefersReduced() || typeof root.animate !== "function") return;
+  photoClosing.value = true;
+  const backdrop = root.querySelector(".lightbox-backdrop");
+  const anims = [];
+  if (backdrop) {
+    const from = getComputedStyle(backdrop).opacity;
+    anims.push(backdrop.animate([{ opacity: from }, { opacity: 0 }], { ...PHOTO_OUT, easing: "ease-out", fill: "forwards" }));
+  }
+  for (const el of root.querySelectorAll(".lightbox-bar, .lightbox-nav")) {
+    anims.push(el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: "ease-out", fill: "forwards" }));
+  }
+  const img = currentPhotoImg();
+  if (img) {
+    const base = img.getBoundingClientRect();
+    const to = thumbRect(index);
+    if (to && base.width && base.height) {
+      anims.push(img.animate([{ transform: "none", borderRadius: "0px" }, rectTransform(to, base)], { ...PHOTO_OUT, fill: "forwards" }));
+    } else {
+      anims.push(img.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(0.94)" }], { duration: 200, easing: "ease-out", fill: "forwards" }));
+    }
+  }
+  photoAnims = anims;
+  await Promise.all(anims.map((anim) => anim.finished)).catch(() => {});
 }
 
 async function openPhoto(index, event) {
   if (index < 0 || index >= photos.value.length) return;
+  photoGen += 1;
   photoOpener = event?.currentTarget || photoThumb(index);
+  const from = thumbRect(index);
   photoIndex.value = index;
   photoDrag.value = { x: 0, y: 0 };
   writePhotoQuery(index);
   await nextTick();
+  animatePhotoIn(from);
   focusEl(pageEl.value?.querySelector(".lightbox-close"));
 }
 
 async function closePhoto({ fromUrl = false } = {}) {
-  if (photoIndex.value < 0) return;
-  const back = photoOpener || photoThumb(photoIndex.value);
-  photoIndex.value = -1;
-  photoOpener = null;
+  if (photoIndex.value < 0 || photoClosing.value) return;
+  const index = photoIndex.value;
+  const gen = ++photoGen;
   photoPointer = null;
   photoDragging.value = false;
-  photoDrag.value = { x: 0, y: 0 };
   if (!fromUrl) writePhotoQuery(-1);
+  await animatePhotoOut(index);
+  if (gen !== photoGen) return;
+  for (const anim of photoAnims) anim.cancel();
+  photoAnims = [];
+  photoClosing.value = false;
+  const back = photoThumb(index) || photoOpener;
+  photoIndex.value = -1;
+  photoOpener = null;
+  photoDrag.value = { x: 0, y: 0 };
   await nextTick();
   focusEl(back);
 }
 
 function stepPhoto(delta) {
+  if (photoClosing.value) return;
   const next = photoIndex.value + delta;
   if (next < 0 || next >= photos.value.length) return;
   photoIndex.value = next;
@@ -611,6 +733,7 @@ function trapPhotoFocus(event) {
 }
 
 function onPhotoDown(event) {
+  if (photoClosing.value) return;
   if (event.button != null && event.button !== 0) return;
   photoPointer = { id: event.pointerId, x: event.clientX, y: event.clientY, axis: "" };
   photoDragging.value = true;
@@ -635,7 +758,7 @@ function onPhotoUp(event) {
   photoPointer = null;
   photoDragging.value = false;
   if (axis === "y" && isPhone() && y > 72) {
-    photoDrag.value = { x: 0, y: 0 };
+    /* Keep the dragged offset: the photo flies home from where the finger left it. */
     closePhoto();
     return;
   }
@@ -647,6 +770,8 @@ function onPhotoUp(event) {
 function closePanel({ restore = true, skipUrl = false } = {}) {
   openToken += 1;
   panel.value = false;
+  photoGen += 1;
+  stopPhotoAnims();
   photoIndex.value = -1;
   photoOpener = null;
   photoPointer = null;
@@ -685,16 +810,17 @@ function syncPeekVar() {
   }
 }
 
+/* The chevron button is the main control. Dragging the head still works, and
+   the head sets touch-action: none so the drag never turns into the browser's
+   pull-to-refresh. */
 let sheetGesture = null;
-let ignoreSheetClick = false;
 
 function onSheetDown(event) {
   if (!isPhone() || !panel.value) return;
-  if (event.target.closest(".close, a, .share-btn")) return;
+  if (event.target.closest(".close, .sheet-toggle, a, .share-btn")) return;
   sheetGesture = {
     y: event.clientY,
     peek: sheetPeek.value,
-    handle: Boolean(event.target.closest?.(".sheet-handle")),
   };
   sheetDrag.value = true;
   event.currentTarget.setPointerCapture?.(event.pointerId);
@@ -717,29 +843,22 @@ function onSheetUp(event) {
   if (!sheetGesture) return;
   const dy = event.clientY - sheetGesture.y;
   const wasPeek = sheetGesture.peek;
-  const onHandle = sheetGesture.handle;
   sheetGesture = null;
   sheetDrag.value = false;
   const detail = pageEl.value?.querySelector(".detail");
   detail?.style.removeProperty("--drag");
   if (Math.abs(dy) < 8) {
-    if (onHandle || wasPeek) {
-      ignoreSheetClick = true;
-      sheetPeek.value = !wasPeek;
+    if (wasPeek) {
+      sheetPeek.value = false;
       refitOpenRun();
     }
     return;
   }
-  ignoreSheetClick = true;
   sheetPeek.value = dy > 0;
   refitOpenRun();
 }
 
 function toggleSheet() {
-  if (ignoreSheetClick) {
-    ignoreSheetClick = false;
-    return;
-  }
   if (!isPhone()) return;
   sheetPeek.value = !sheetPeek.value;
   refitOpenRun();
@@ -783,7 +902,7 @@ function onKey(event) {
     focusEl(pageEl.value?.querySelector(".fab-areas"));
     return;
   }
-  if (fabOpen.value) {
+  if (fabOpen.value && phone.value) {
     event.preventDefault();
     fabOpen.value = false;
     focusEl(pageEl.value?.querySelector(".fab-main"));
@@ -802,6 +921,7 @@ function onKey(event) {
 
 function onResize() {
   syncShareKind();
+  syncPhone();
   if (!isPhone()) sheetPeek.value = false;
   syncPeekVar();
   window.clearTimeout(resizeTimer);
@@ -906,6 +1026,10 @@ watch(
 
 onMounted(() => {
   syncShareKind();
+  syncPhone();
+  /* A map page has nothing to scroll. Without this, a downward drag on the
+     run sheet can trigger the phone browser's pull-to-refresh. */
+  document.documentElement.classList.add("runs-lock");
   pageNode = pageEl.value;
   pageNode?.addEventListener("pointerdown", holdCamera, true);
   pageNode?.addEventListener("wheel", holdCamera, { capture: true, passive: true });
@@ -931,6 +1055,8 @@ onUnmounted(() => {
   pageNode?.removeEventListener("keydown", holdCamera, true);
   window.removeEventListener("keydown", onKey);
   window.removeEventListener("resize", onResize);
+  document.documentElement.classList.remove("runs-lock");
+  stopPhotoAnims();
   mapApi?.destroy();
   mapApi = null;
 });
@@ -941,74 +1067,103 @@ onUnmounted(() => {
     <div class="stage" :inert="photoOpen ? true : undefined">
       <div id="runs-map" ref="mapEl" tabindex="-1" role="region" aria-label="Map of runs"></div>
       <p v-if="manifest.sample" class="sample-tag">Sample routes</p>
-      <div class="fab" :class="{ open: fabOpen }">
-        <div id="fab-menu" class="fab-menu" :inert="fabOpen ? undefined : true">
-        <div v-show="regionsOpen" id="region-list" class="chips" role="radiogroup" aria-label="Regions">
+      <div class="fab" :class="{ open: fabOpen, rail: !phone, popover: regionsOpen || layersOpen }">
+        <div class="fab-row">
+          <div id="fab-menu" class="fab-menu" :inert="phone && !fabOpen ? true : undefined">
+            <div id="fab-actions" class="fab-actions">
+              <button class="fab-action fab-globe" type="button" aria-label="Globe" style="--i: 3" @click="frameWorld">
+                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                  <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8" />
+                  <path d="M3.5 12h17M12 3.5c2.4 2.4 3.6 5.2 3.6 8.5s-1.2 6.1-3.6 8.5c-2.4-2.4-3.6-5.2-3.6-8.5S9.6 5.9 12 3.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                </svg>
+                <span class="fab-tip" aria-hidden="true">Globe</span>
+              </button>
+              <button class="fab-action fab-dice" type="button" aria-label="Random run" style="--i: 2" @click="openRandom">
+                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                  <rect x="4" y="4" width="16" height="16" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.8" />
+                  <circle cx="8.6" cy="8.6" r="1.45" fill="currentColor" />
+                  <circle cx="12" cy="12" r="1.45" fill="currentColor" />
+                  <circle cx="15.4" cy="15.4" r="1.45" fill="currentColor" />
+                </svg>
+                <span class="fab-tip" aria-hidden="true">Random run</span>
+              </button>
+              <div class="fab-item">
+                <button
+                  class="fab-action fab-areas"
+                  type="button"
+                  style="--i: 1"
+                  :aria-expanded="regionsOpen ? 'true' : 'false'"
+                  aria-controls="region-list"
+                  :aria-label="`Areas, ${activeLabel} selected`"
+                  @click="toggleRegions"
+                >
+                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                    <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                    <circle cx="12" cy="10" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8" />
+                  </svg>
+                  <span class="fab-tip" aria-hidden="true">Areas · {{ activeLabel }}</span>
+                </button>
+                <div v-show="regionsOpen" id="region-list" class="chips" role="radiogroup" aria-label="Regions">
+                  <button
+                    v-for="city in manifest.cities"
+                    :key="city.id"
+                    type="button"
+                    role="radio"
+                    :aria-checked="activeCity === city.id ? 'true' : 'false'"
+                    :class="{ on: activeCity === city.id }"
+                    :title="`${city.name} · ${city.count} runs`"
+                    @click="pickRegion(city.id)"
+                  >
+                    {{ city.label }}
+                  </button>
+                </div>
+              </div>
+              <div class="fab-item">
+                <button
+                  class="fab-action fab-layers"
+                  type="button"
+                  style="--i: 0"
+                  :aria-expanded="layersOpen ? 'true' : 'false'"
+                  aria-controls="layer-picker"
+                  aria-label="Map layers"
+                  @click="toggleLayers"
+                >
+                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                    <path d="M12 3.5 3.5 8 12 12.5 20.5 8 12 3.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                    <path d="m3.5 12 8.5 4.5 8.5-4.5M3.5 16l8.5 4.5 8.5-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                  </svg>
+                  <span class="fab-tip" aria-hidden="true">Layers</span>
+                </button>
+                <div v-show="layersOpen" id="layer-picker" class="layer-picker" role="listbox" aria-label="Map layers">
+                  <button
+                    v-for="id in LAYER_MODES"
+                    :key="id"
+                    type="button"
+                    role="option"
+                    :aria-selected="layer === id ? 'true' : 'false'"
+                    :class="{ on: layer === id }"
+                    @click="chooseLayer(id)"
+                  >
+                    <span class="layer-swatch" :style="{ backgroundImage: rampGradient(id) }" aria-hidden="true"></span>
+                    {{ LAYER_LABELS[id] }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
           <button
-            v-for="city in manifest.cities"
-            :key="city.id"
+            class="fab-main"
             type="button"
-            role="radio"
-            :aria-checked="activeCity === city.id ? 'true' : 'false'"
-            :class="{ on: activeCity === city.id }"
-            :title="`${city.name} · ${city.count} runs`"
-            @click="pickRegion(city.id)"
+            aria-label="Map tools"
+            :aria-expanded="fabOpen ? 'true' : 'false'"
+            aria-controls="fab-menu"
+            @click="toggleFab"
           >
-            {{ city.label }}
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
           </button>
         </div>
-        <div v-show="layersOpen" id="layer-picker" class="layer-picker" role="listbox" aria-label="Map layers">
-          <button
-            v-for="id in LAYER_MODES"
-            :key="id"
-            type="button"
-            role="option"
-            :aria-selected="layer === id ? 'true' : 'false'"
-            :class="{ on: layer === id }"
-            @click="chooseLayer(id)"
-          >
-            {{ LAYER_LABELS[id] }}
-          </button>
-        </div>
-        <div id="fab-actions" class="fab-actions">
-          <button class="fab-action" type="button" @click="frameWorld">Globe</button>
-          <button class="fab-action" type="button" title="Random run" @click="openRandom">
-            Random run
-          </button>
-          <button
-            class="fab-action fab-areas"
-            type="button"
-            :aria-expanded="regionsOpen ? 'true' : 'false'"
-            aria-controls="region-list"
-            :aria-label="`Areas, ${activeLabel} selected`"
-            @click="toggleRegions"
-          >
-            Areas
-          </button>
-          <button
-            class="fab-action fab-layers"
-            type="button"
-            :aria-expanded="layersOpen ? 'true' : 'false'"
-            aria-controls="layer-picker"
-            aria-label="Map layers"
-            @click="toggleLayers"
-          >
-            Layers
-          </button>
-        </div>
-        </div>
-        <button
-          class="fab-main"
-          type="button"
-          aria-label="Map tools"
-          :aria-expanded="fabOpen ? 'true' : 'false'"
-          aria-controls="fab-menu"
-          @click="toggleFab"
-        >
-          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-            <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          </svg>
-        </button>
       </div>
       <button
         class="run-index"
@@ -1022,7 +1177,7 @@ onUnmounted(() => {
       <div class="map-key">
         <h1>Runs</h1>
         <p class="heat-key">
-          <span class="heat-swatch" aria-hidden="true"></span>
+          <span class="heat-swatch" :style="{ backgroundImage: rampGradient(layer) }" aria-hidden="true"></span>
           {{ LAYER_LEGENDS[layer] }}
         </p>
       </div>
@@ -1057,13 +1212,18 @@ onUnmounted(() => {
           @pointerup="onSheetUp"
           @pointercancel="onSheetUp"
         >
+          <span class="sheet-handle" aria-hidden="true"></span>
           <button
-            class="sheet-handle"
+            class="sheet-toggle"
             type="button"
             :aria-expanded="sheetPeek ? 'false' : 'true'"
             :aria-label="sheetPeek ? 'Expand run details' : 'Collapse run details'"
             @click="toggleSheet"
-          ></button>
+          >
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path d="m6.5 9.5 5.5 5.5 5.5-5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
           <button v-show="panel" class="close" type="button" aria-label="Close" @click="closePanel">×</button>
           <p v-if="selected.sample" class="sample-line">Sample route</p>
           <p v-if="selected.type" class="run-type">{{ selected.type }}</p>
@@ -1097,6 +1257,7 @@ onUnmounted(() => {
                 :key="photo.src"
                 type="button"
                 class="photo-thumb"
+                :class="{ lifted: photoOpen && index === photoIndex }"
                 :data-index="index"
                 :aria-label="`Photo ${index + 1} of ${photos.length}`"
                 @click="openPhoto(index, $event)"
@@ -1110,6 +1271,7 @@ onUnmounted(() => {
                 />
               </button>
             </div>
+            <div v-else-if="photoSlots > 0" class="photo-strip photo-strip-wait" aria-hidden="true"></div>
           </div>
         </div>
       </aside>
@@ -1118,12 +1280,13 @@ onUnmounted(() => {
     <div
       v-if="photoOpen"
       class="lightbox"
-      :class="{ 'is-dragging': photoDragging }"
+      :class="{ 'is-dragging': photoDragging, closing: photoClosing }"
       role="dialog"
       aria-modal="true"
       :aria-label="`Photo ${photoIndex + 1} of ${photos.length}`"
       :style="lightboxStyle()"
     >
+      <div class="lightbox-backdrop" aria-hidden="true"></div>
       <div class="lightbox-bar">
         <p class="lightbox-count">{{ photoIndex + 1 }} / {{ photos.length }}</p>
         <button class="lightbox-close" type="button" aria-label="Close photos" @click="closePhoto()">×</button>
@@ -1135,7 +1298,7 @@ onUnmounted(() => {
         @pointerup="onPhotoUp"
         @pointercancel="onPhotoUp"
       >
-        <div v-for="slide in photoSlides" :key="slide.index" class="lightbox-slide" :style="slideStyle(slide.delta)">
+        <div v-for="slide in photoSlides" :key="slide.index" class="lightbox-slide" :class="{ current: slide.delta === 0 }" :style="slideStyle(slide.delta)">
           <img
             :src="slide.photo.src"
             :alt="slide.delta === 0 ? `${selected.title}, photo ${slide.index + 1} of ${photos.length}` : ''"
