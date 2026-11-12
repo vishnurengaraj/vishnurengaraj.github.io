@@ -609,14 +609,138 @@ html:has(.runs) #app {
   overflow-x: auto;
 }
 
+.runs .photo-thumb {
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: #f6efe8;
+  cursor: pointer;
+}
+
 .runs .photo-strip img {
+  display: block;
   height: 148px;
   width: auto;
   max-width: none;
-  flex: none;
   border-radius: 12px;
   object-fit: cover;
   background: #f6efe8;
+}
+
+.runs .photo-thumb:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.runs .lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  background: #14111c;
+  color: #fff;
+  transition: opacity 180ms ease;
+}
+
+.runs .lightbox-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 12px 0;
+}
+
+.runs .lightbox-count {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.runs .lightbox-close,
+.runs .lightbox-nav {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  cursor: pointer;
+}
+
+.runs .lightbox-close {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.runs .lightbox-nav {
+  display: none;
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  transform: translateY(-50%);
+}
+
+.runs .lightbox-nav.prev {
+  left: 16px;
+}
+
+.runs .lightbox-nav.next {
+  right: 16px;
+}
+
+.runs .lightbox-nav:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.runs .lightbox-stage {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.runs .lightbox-slide {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 8px 16px 24px;
+  transition: transform 200ms ease;
+}
+
+.runs .lightbox.is-dragging .lightbox-slide,
+.runs .lightbox.is-dragging {
+  transition: none;
+}
+
+.runs .lightbox-slide img {
+  width: auto;
+  height: auto;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 96px);
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+}
+
+@media (min-width: 641px) {
+  .runs .lightbox-slide img {
+    max-width: min(1100px, calc(100vw - 160px));
+  }
+}
+
+.runs .lightbox-close:focus-visible,
+.runs .lightbox-nav:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .runs .close {
@@ -643,13 +767,19 @@ html:has(.runs) #app {
 .runs.no-anim .detail,
 .runs.no-anim .scrim,
 .runs.no-anim .fab-menu,
-.runs.no-anim .fab-main svg {
+.runs.no-anim .fab-main svg,
+.runs.no-anim .lightbox,
+.runs.no-anim .lightbox-slide {
   transition: none;
 }
 
 @media (min-width: 641px) {
   .runs.panel-open .fab {
     right: min(428px, calc(100% - 80px));
+  }
+
+  .runs .lightbox-nav {
+    display: grid;
   }
 }
 
@@ -738,7 +868,9 @@ html:has(.runs) #app {
   .runs .scrim,
   .runs .regions-chev,
   .runs .fab-menu,
-  .runs .fab-main svg {
+  .runs .fab-main svg,
+  .runs .lightbox,
+  .runs .lightbox-slide {
     transition: none;
   }
 }

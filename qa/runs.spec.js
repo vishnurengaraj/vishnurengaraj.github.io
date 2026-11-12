@@ -569,6 +569,89 @@ test.describe("activity photos", () => {
       expect(photos.x).toBeGreaterThanOrEqual(sheet.x - 1);
       expect(photos.x + photos.width).toBeLessThanOrEqual(sheet.x + sheet.width + 1);
     });
+
+    test(`${viewport.name} opens the tapped photo and shares that frame`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
+      const run = manifest.runs.find((item) => item.city === "la" && item.photos >= 5);
+      expect(run.photos).toBeGreaterThanOrEqual(5);
+      await page.goto(`/runs?activity=${run.id}`);
+      await ready(page);
+      const card = page.locator(".detail.open");
+      await expect(card.locator("h2")).toHaveText(run.title, { timeout: 30_000 });
+      const thumb = card.getByRole("button", { name: `Photo 2 of ${run.photos}` });
+      await thumb.scrollIntoViewIfNeeded();
+      await thumb.click();
+
+      const dialog = page.locator(".lightbox");
+      await expect(dialog).toBeVisible();
+      await expect(dialog).toHaveAttribute("aria-label", `Photo 2 of ${run.photos}`);
+      await expect(dialog.locator(".lightbox-count")).toHaveText(`2 / ${run.photos}`);
+      await expect.poll(() => new URL(page.url()).searchParams.get("photo")).toBe("2");
+      await expect.poll(() => new URL(page.url()).searchParams.get("activity")).toBe(String(run.id));
+      await expect(dialog.locator(".lightbox-close")).toBeFocused();
+      const motion = await dialog.locator(".lightbox-slide").first().evaluate((el) => getComputedStyle(el).transitionDuration);
+      expect(motion === "0s" || motion === "0ms").toBe(true);
+      const near = [1, 2, 3].map((n) => `/media/runs/photos/${run.id}/${n}.webp`).sort();
+      await expect
+        .poll(async () => dialog.locator("img").evaluateAll((els) => els.map((el) => el.getAttribute("src")).sort()))
+        .toEqual(near);
+
+      await page.keyboard.press("ArrowRight");
+      await expect(dialog).toHaveAttribute("aria-label", `Photo 3 of ${run.photos}`);
+      await expect(dialog.locator(".lightbox-count")).toHaveText(`3 / ${run.photos}`);
+      await expect.poll(() => new URL(page.url()).searchParams.get("photo")).toBe("3");
+      const stepped = [2, 3, 4].map((n) => `/media/runs/photos/${run.id}/${n}.webp`).sort();
+      await expect
+        .poll(async () => dialog.locator("img").evaluateAll((els) => els.map((el) => el.getAttribute("src")).sort()))
+        .toEqual(stepped);
+
+      const previous = dialog.getByRole("button", { name: "Previous photo" });
+      const next = dialog.getByRole("button", { name: "Next photo" });
+      if (viewport.name === "desktop") {
+        await expect(previous).toBeVisible();
+        await expect(next).toBeVisible();
+        await previous.click();
+        await expect(dialog.locator(".lightbox-count")).toHaveText(`2 / ${run.photos}`);
+      } else {
+        await expect(previous).toBeHidden();
+        await expect(next).toBeHidden();
+      }
+
+      await dialog.locator(".lightbox-close").focus();
+      await page.keyboard.press("Shift+Tab");
+      await expect
+        .poll(() => page.evaluate(() => document.activeElement?.closest(".lightbox") != null))
+        .toBe(true);
+      await page.keyboard.press("Escape");
+      await expect(dialog).toHaveCount(0);
+      await expect.poll(() => new URL(page.url()).searchParams.get("photo")).toBe(null);
+      await expect(thumb).toBeFocused();
+      await expect(card).toBeVisible();
+
+      if (viewport.name === "phone") {
+        await thumb.click();
+        await expect(dialog).toBeVisible();
+        const box = await page.locator(".lightbox-stage").boundingBox();
+        await page.mouse.move(box.x + box.width / 2, box.y + 48);
+        await page.mouse.down();
+        await page.mouse.move(box.x + box.width / 2, box.y + 220, { steps: 12 });
+        await page.mouse.up();
+        await expect(dialog).toHaveCount(0);
+      }
+
+      await page.goto(`/runs?activity=${run.id}&photo=2`);
+      await ready(page);
+      await expect(page.locator(".lightbox")).toHaveAttribute("aria-label", `Photo 2 of ${run.photos}`, { timeout: 30_000 });
+      await expect(page.locator(".lightbox-count")).toHaveText(`2 / ${run.photos}`);
+
+      await page.goto(`/runs?activity=${run.id}&photo=99`);
+      await ready(page);
+      await expect(page.locator(".detail.open h2")).toHaveText(run.title, { timeout: 30_000 });
+      await expect(page.locator(".lightbox")).toHaveCount(0);
+      await expect.poll(() => new URL(page.url()).searchParams.get("photo")).toBe(null);
+    });
   }
 });
 

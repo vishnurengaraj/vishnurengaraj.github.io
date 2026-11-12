@@ -30,6 +30,9 @@ const loadError = ref("");
 const regionsOpen = ref(false);
 const copyStatus = ref("");
 const shareKind = ref("copy");
+const photoIndex = ref(-1);
+const photoDrag = ref({ x: 0, y: 0 });
+const photoDragging = ref(false);
 
 const byId = new Map(manifest.runs.map((run) => [run.id, run]));
 const cityById = new Map(manifest.cities.map((city) => [city.id, city]));
@@ -40,7 +43,21 @@ const chooserLabel = ref("Runs here");
 const fromList = ref(false);
 let listOpener = null;
 let runOpener = null;
+let photoOpener = null;
+let photoPointer = null;
 const photos = computed(() => (Array.isArray(selected.value?.photos) ? selected.value.photos : []));
+const photoOpen = computed(() => photoIndex.value >= 0 && photoIndex.value < photos.value.length);
+const photoSlides = computed(() => {
+  if (!photoOpen.value) return [];
+  return [-1, 0, 1]
+    .map((delta) => {
+      const index = photoIndex.value + delta;
+      const photo = photos.value[index];
+      if (!photo) return null;
+      return { index, photo, delta };
+    })
+    .filter(Boolean);
+});
 const companions = computed(() =>
   Array.isArray(selected.value?.companions) ? selected.value.companions.filter(Boolean) : [],
 );
@@ -171,11 +188,17 @@ function activityIdFromRoute() {
 function withoutActivity(query) {
   const next = {};
   for (const [key, value] of Object.entries(query)) {
-    if (key === "activity" || key === "run") continue;
+    if (key === "activity" || key === "run" || key === "photo") continue;
     if (value == null || value === "") continue;
     next[key] = value;
   }
   return next;
+}
+
+function photoFromQuery() {
+  const raw = Number(queryValue("photo"));
+  if (!Number.isInteger(raw) || raw < 1) return -1;
+  return raw - 1;
 }
 
 function enqueueUrl(task) {
@@ -256,14 +279,17 @@ async function loadLines() {
   }
 }
 
-function publishActivity(id) {
+function publishActivity(id, { keepPhoto = false } = {}) {
   const token = navToken;
   return enqueueUrl(async () => {
     if (token !== navToken) return;
     if (!panel.value || String(selected.value?.id) !== String(id)) return;
     const current = activityIdFromRoute();
-    if (current === id && String(queryValue("activity") || "") === id) return;
+    const activityMatches = current === id && String(queryValue("activity") || "") === id;
+    const photoOk = keepPhoto || !queryValue("photo");
+    if (activityMatches && photoOk) return;
     const query = { ...withoutActivity(route.query), activity: id };
+    if (keepPhoto && queryValue("photo")) query.photo = queryValue("photo");
     try {
       if (current) await router.replace({ name: "runs", query });
       else await router.push({ name: "runs", query });
@@ -357,10 +383,11 @@ async function shareActivity() {
   showCopyStatus(ok ? "Copied" : "Copy failed");
 }
 
-async function openRun(id, _lngLat, { skipUrl = false } = {}) {
+async function openRun(id, _lngLat, { skipUrl = false, fromRoute = false } = {}) {
   const summary = byId.get(id);
   if (!summary) return;
   const token = ++openToken;
+  const requested = fromRoute ? photoFromQuery() : -1;
   const fromChooser = runOpener?.closest?.("#run-chooser");
   closeChoices({ restore: false });
   if (fromChooser) runOpener = pageEl.value?.querySelector(".run-index") || null;
@@ -368,6 +395,11 @@ async function openRun(id, _lngLat, { skipUrl = false } = {}) {
   fabOpen.value = false;
   sheetPeek.value = false;
   closeRegions();
+  photoIndex.value = -1;
+  photoOpener = null;
+  photoPointer = null;
+  photoDragging.value = false;
+  photoDrag.value = { x: 0, y: 0 };
   window.clearTimeout(copyTimer);
   copyStatus.value = "";
   if (summary.city) activeCity.value = summary.city;
@@ -375,7 +407,7 @@ async function openRun(id, _lngLat, { skipUrl = false } = {}) {
   panel.value = true;
   mapApi?.highlight(id);
   mapApi?.armFrame();
-  if (!skipUrl) publishActivity(id);
+  if (!skipUrl) publishActivity(id, { keepPhoto: fromRoute });
   let detail = null;
   try {
     const res = await fetch(`/media/runs/activities/${encodeURIComponent(id)}.json`);
@@ -393,6 +425,13 @@ async function openRun(id, _lngLat, { skipUrl = false } = {}) {
   }
   await nextTick();
   syncPeekVar();
+  if (requested >= 0 && requested < photos.value.length) {
+    photoIndex.value = requested;
+    await nextTick();
+    focusEl(pageEl.value?.querySelector(".lightbox-close"));
+  } else if (fromRoute && queryValue("photo")) {
+    writePhotoQuery(-1);
+  }
   if (!alive || token !== openToken || !panel.value) return;
   if (!mapApi) {
     pendingFrame = String(id);
@@ -498,9 +537,121 @@ function onPick(runs, lngLat) {
   if (decision.action === "open") openRun(decision.ids[0], lngLat);
 }
 
+function photoThumb(index) {
+  return pageEl.value?.querySelector(`.photo-strip button[data-index="${index}"]`);
+}
+
+function writePhotoQuery(index) {
+  const next = index < 0 ? "" : String(index + 1);
+  if ((queryValue("photo") || "") === next) return;
+  const query = { ...route.query };
+  if (next) query.photo = next;
+  else delete query.photo;
+  router.replace({ name: "runs", query }).catch(() => {});
+}
+
+function slideStyle(delta) {
+  const x = `calc(${delta * 100}% + ${photoDrag.value.x}px)`;
+  const y = `${Math.max(0, photoDrag.value.y)}px`;
+  return { transform: `translate3d(${x}, ${y}, 0)` };
+}
+
+function lightboxStyle() {
+  const y = photoDrag.value.y;
+  if (y <= 0) return undefined;
+  return { opacity: String(Math.max(0.45, 1 - y / 420)) };
+}
+
+async function openPhoto(index, event) {
+  if (index < 0 || index >= photos.value.length) return;
+  photoOpener = event?.currentTarget || photoThumb(index);
+  photoIndex.value = index;
+  photoDrag.value = { x: 0, y: 0 };
+  writePhotoQuery(index);
+  await nextTick();
+  focusEl(pageEl.value?.querySelector(".lightbox-close"));
+}
+
+async function closePhoto({ fromUrl = false } = {}) {
+  if (photoIndex.value < 0) return;
+  const back = photoOpener || photoThumb(photoIndex.value);
+  photoIndex.value = -1;
+  photoOpener = null;
+  photoPointer = null;
+  photoDragging.value = false;
+  photoDrag.value = { x: 0, y: 0 };
+  if (!fromUrl) writePhotoQuery(-1);
+  await nextTick();
+  focusEl(back);
+}
+
+function stepPhoto(delta) {
+  const next = photoIndex.value + delta;
+  if (next < 0 || next >= photos.value.length) return;
+  photoIndex.value = next;
+  photoDrag.value = { x: 0, y: 0 };
+  writePhotoQuery(next);
+}
+
+function trapPhotoFocus(event) {
+  const root = pageEl.value?.querySelector(".lightbox");
+  if (!root) return;
+  const items = [...root.querySelectorAll("button")].filter((el) => !el.disabled && el.getClientRects().length > 0);
+  if (!items.length) return;
+  const first = items[0];
+  const last = items[items.length - 1];
+  const active = document.activeElement;
+  if (event.shiftKey && (active === first || !root.contains(active))) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && (active === last || !root.contains(active))) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
+function onPhotoDown(event) {
+  if (event.button != null && event.button !== 0) return;
+  photoPointer = { id: event.pointerId, x: event.clientX, y: event.clientY, axis: "" };
+  photoDragging.value = true;
+  event.currentTarget.setPointerCapture?.(event.pointerId);
+}
+
+function onPhotoMove(event) {
+  if (!photoPointer || event.pointerId !== photoPointer.id) return;
+  const dx = event.clientX - photoPointer.x;
+  const dy = event.clientY - photoPointer.y;
+  if (!photoPointer.axis && Math.hypot(dx, dy) > 6) {
+    photoPointer.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+  }
+  if (photoPointer.axis === "x") photoDrag.value = { x: dx, y: 0 };
+  else if (photoPointer.axis === "y" && isPhone()) photoDrag.value = { x: 0, y: Math.max(0, dy) };
+}
+
+function onPhotoUp(event) {
+  if (!photoPointer || event.pointerId !== photoPointer.id) return;
+  const { x, y } = photoDrag.value;
+  const axis = photoPointer.axis;
+  photoPointer = null;
+  photoDragging.value = false;
+  if (axis === "y" && isPhone() && y > 72) {
+    photoDrag.value = { x: 0, y: 0 };
+    closePhoto();
+    return;
+  }
+  if (axis === "x" && x <= -56) stepPhoto(1);
+  else if (axis === "x" && x >= 56) stepPhoto(-1);
+  photoDrag.value = { x: 0, y: 0 };
+}
+
 function closePanel({ restore = true, skipUrl = false } = {}) {
   openToken += 1;
   panel.value = false;
+  photoIndex.value = -1;
+  photoOpener = null;
+  photoPointer = null;
+  photoDragging.value = false;
+  photoDrag.value = { x: 0, y: 0 };
   mapApi?.highlight(null);
   mapApi?.releaseFrame();
   window.clearTimeout(copyTimer);
@@ -606,6 +757,19 @@ function chooseLayer(id) {
 }
 
 function onKey(event) {
+  if (photoOpen.value) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closePhoto();
+      return;
+    }
+    if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+      event.preventDefault();
+      stepPhoto(event.key === "ArrowRight" ? 1 : -1);
+      return;
+    }
+    if (event.key === "Tab") trapPhotoFocus(event);
+  }
   if (event.key !== "Escape") return;
   if (layersOpen.value) {
     event.preventDefault();
@@ -684,7 +848,7 @@ async function startMap() {
   await loadLines();
   if (!alive || gen !== mountGen) return;
   mapReady = true;
-  if (deep) await openRun(deepId);
+  if (deep) await openRun(deepId, null, { fromRoute: true });
   else if (deepId) clearUnknownActivity();
   if (!alive || gen !== mountGen) return;
   if (pendingFrame && panel.value && String(selected.value?.id) === pendingFrame) {
@@ -709,11 +873,26 @@ watch(
 );
 
 watch(
+  () => queryValue("photo"),
+  () => {
+    if (!panel.value || !photos.value.length) return;
+    const index = photoFromQuery();
+    if (index < 0) {
+      if (photoIndex.value >= 0) closePhoto({ fromUrl: true });
+      return;
+    }
+    if (index >= photos.value.length || index === photoIndex.value) return;
+    photoIndex.value = index;
+    nextTick(() => focusEl(pageEl.value?.querySelector(".lightbox-close")));
+  },
+);
+
+watch(
   () => activityIdFromRoute(),
   (id) => {
     if (!mapReady) return;
     if (id && byId.has(id)) {
-      if (!panel.value || String(selected.value?.id) !== id) openRun(id, null, { skipUrl: true });
+      if (!panel.value || String(selected.value?.id) !== id) openRun(id, null, { skipUrl: true, fromRoute: true });
       return;
     }
     if (id) {
@@ -759,7 +938,7 @@ onUnmounted(() => {
 
 <template>
   <div ref="pageEl" class="runs" :class="{ 'no-anim': !motionOn, 'panel-open': panel }">
-    <div class="stage">
+    <div class="stage" :inert="photoOpen ? true : undefined">
       <div id="runs-map" ref="mapEl" tabindex="-1" role="region" aria-label="Map of runs"></div>
       <p v-if="manifest.sample" class="sample-tag">Sample routes</p>
       <div class="fab" :class="{ open: fabOpen }">
@@ -913,19 +1092,75 @@ onUnmounted(() => {
               <span class="sr-only" role="status" aria-live="polite">{{ copyStatus }}</span>
             </div>
             <div v-if="photos.length" class="photo-strip">
-              <img
-                v-for="photo in photos"
+              <button
+                v-for="(photo, index) in photos"
                 :key="photo.src"
-                :src="photo.src"
-                :width="photo.w || undefined"
-                :height="photo.h || undefined"
-                :alt="photo.sample ? 'Sample photo' : selected.title"
-              />
+                type="button"
+                class="photo-thumb"
+                :data-index="index"
+                :aria-label="`Photo ${index + 1} of ${photos.length}`"
+                @click="openPhoto(index, $event)"
+              >
+                <img
+                  :src="photo.src"
+                  :width="photo.w || undefined"
+                  :height="photo.h || undefined"
+                  alt=""
+                  loading="lazy"
+                />
+              </button>
             </div>
           </div>
         </div>
       </aside>
     </div>
-    <div class="scrim" :class="{ open: panel }" @click="closePanel"></div>
+    <div class="scrim" :class="{ open: panel }" :inert="photoOpen ? true : undefined" @click="closePanel"></div>
+    <div
+      v-if="photoOpen"
+      class="lightbox"
+      :class="{ 'is-dragging': photoDragging }"
+      role="dialog"
+      aria-modal="true"
+      :aria-label="`Photo ${photoIndex + 1} of ${photos.length}`"
+      :style="lightboxStyle()"
+    >
+      <div class="lightbox-bar">
+        <p class="lightbox-count">{{ photoIndex + 1 }} / {{ photos.length }}</p>
+        <button class="lightbox-close" type="button" aria-label="Close photos" @click="closePhoto()">×</button>
+      </div>
+      <div
+        class="lightbox-stage"
+        @pointerdown="onPhotoDown"
+        @pointermove="onPhotoMove"
+        @pointerup="onPhotoUp"
+        @pointercancel="onPhotoUp"
+      >
+        <div v-for="slide in photoSlides" :key="slide.index" class="lightbox-slide" :style="slideStyle(slide.delta)">
+          <img
+            :src="slide.photo.src"
+            :alt="slide.delta === 0 ? `${selected.title}, photo ${slide.index + 1} of ${photos.length}` : ''"
+            :width="slide.photo.w || undefined"
+            :height="slide.photo.h || undefined"
+            draggable="false"
+          />
+        </div>
+      </div>
+      <button class="lightbox-nav prev" type="button" aria-label="Previous photo" :disabled="photoIndex === 0" @click="stepPhoto(-1)">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="M14.5 6.5 9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <button
+        class="lightbox-nav next"
+        type="button"
+        aria-label="Next photo"
+        :disabled="photoIndex >= photos.length - 1"
+        @click="stepPhoto(1)"
+      >
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="M9.5 6.5 15 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+    </div>
   </div>
 </template>
