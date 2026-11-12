@@ -16,8 +16,10 @@ async function ready(page) {
   await page.waitForFunction(() => document.documentElement.classList.contains("vue-ready"));
 }
 
+/* Phone: open the speed dial. Wider screens have no dial; the tools are always out. */
 async function openTools(page) {
   const fab = page.getByRole("button", { name: "Map tools" });
+  if (!(await fab.isVisible())) return null;
   if ((await fab.getAttribute("aria-expanded")) !== "true") await fab.click();
   return fab;
 }
@@ -77,8 +79,12 @@ test.describe("runs map", () => {
       await expect(page.locator(".sample-tag")).toHaveCount(0);
       await expect(page.locator(".regions-toggle, .globe-btn, .dice-btn, .layers-btn")).toHaveCount(0);
       const tools = page.getByRole("button", { name: "Map tools" });
-      await expect(tools).toBeVisible();
-      await expect(tools).toHaveAttribute("aria-expanded", "false");
+      if (viewport.name === "phone") {
+        await expect(tools).toBeVisible();
+        await expect(tools).toHaveAttribute("aria-expanded", "false");
+      } else {
+        await expect(tools).toBeHidden();
+      }
       const map = page.locator("#runs-map");
       await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
       await expect(map).toHaveAttribute("data-city", "la");
@@ -92,7 +98,8 @@ test.describe("runs map", () => {
       await expect(page.getByRole("radio", { name: "SF", exact: true })).toHaveCount(0);
       const globeButton = await page.getByRole("button", { name: "Globe" }).boundingBox();
       const regionBox = await regions.boundingBox();
-      expect(regionBox.y).toBeGreaterThan(globeButton.y + globeButton.height - 1);
+      expect(regionBox.x).toBeGreaterThan(globeButton.x + globeButton.width - 1);
+      expect(Math.abs(regionBox.y - globeButton.y)).toBeLessThan(2);
       expect(regionBox.x + regionBox.width).toBeLessThanOrEqual(viewport.width + 1);
 
       await regions.click();
@@ -297,7 +304,9 @@ test.describe("one continuous map", () => {
       await expect(page.getByRole("button", { name: "Globe" })).not.toHaveAttribute("aria-pressed", "true");
       await page.getByRole("button", { name: "Globe" }).click();
       await expect.poll(async () => Number(await map.getAttribute("data-zoom"))).toBeLessThan(3);
-      await expect(page.getByRole("button", { name: "Map tools" })).toHaveAttribute("aria-expanded", "false");
+      if (viewport.name === "phone") {
+        await expect(page.getByRole("button", { name: "Map tools" })).toHaveAttribute("aria-expanded", "false");
+      }
       const box = await map.boundingBox();
       for (const city of [humboldt, whitney]) {
         const point = await map.evaluate((el, lngLat) => el._runsMap.project(lngLat), city.center);
@@ -627,7 +636,9 @@ test.describe("activity photos", () => {
       await page.keyboard.press("Escape");
       await expect(dialog).toHaveCount(0);
       await expect.poll(() => new URL(page.url()).searchParams.get("photo")).toBe(null);
-      await expect(thumb).toBeFocused();
+      // Focus lands on the thumbnail of the photo that was showing, where the photo flew back to.
+      const shown = viewport.name === "desktop" ? 2 : 3;
+      await expect(card.getByRole("button", { name: `Photo ${shown} of ${run.photos}` })).toBeFocused();
       await expect(card).toBeVisible();
 
       if (viewport.name === "phone") {
@@ -1296,7 +1307,7 @@ test.describe("globe arrival", () => {
     await page.goto("/runs");
     await ready(page);
     await expect(map).toHaveAttribute("data-intro", "globe");
-    await page.getByRole("button", { name: "Map tools" }).focus();
+    await page.getByRole("button", { name: "Globe" }).focus();
     await page.keyboard.press("Escape");
     await expect(map).toHaveAttribute("data-intro", "done");
     const escapeHidden = await map.evaluate((el) => el.querySelector("canvas")?.style.visibility || "");
@@ -1445,7 +1456,8 @@ test.describe("random activity", () => {
       await openTools(page);
       const dice = page.getByRole("button", { name: "Random run" });
       await expect(dice).toBeVisible();
-      await expect(dice).toHaveAttribute("title", "Random run");
+      await expect(dice.locator("svg")).toHaveCount(1);
+      await expect(dice.locator(".fab-tip")).toHaveText("Random run");
       const diceBox = await dice.boundingBox();
       expect(diceBox.width).toBeGreaterThanOrEqual(44);
       expect(diceBox.height).toBeGreaterThanOrEqual(44);
@@ -1477,7 +1489,7 @@ test.describe("random activity", () => {
       await expect(card.getByRole("button", { name: "Close" })).toBeFocused();
       await page.keyboard.press("Escape");
       await expect(card).toHaveCount(0);
-      await expect(page.getByRole("button", { name: "Map tools" })).toBeFocused();
+      await expect(page.getByRole("button", { name: viewport.name === "phone" ? "Map tools" : "Random run" })).toBeFocused();
 
       await openTools(page);
       await dice.click();
@@ -1551,7 +1563,7 @@ test.describe("run sheet and layers", () => {
     await expect(page.locator(".detail.open")).toBeVisible();
     await expect(page.locator("#run-chooser")).toHaveCount(0);
     const covered = await page.evaluate(() => {
-      const fab = document.querySelector(".fab-main").getBoundingClientRect();
+      const fab = document.querySelector(".fab").getBoundingClientRect();
       const card = document.querySelector(".detail.open").getBoundingClientRect();
       return fab.left < card.right - 1 && fab.right > card.left + 1 && fab.top < card.bottom - 1 && fab.bottom > card.top + 1;
     });
@@ -1587,7 +1599,20 @@ test.describe("run sheet and layers", () => {
     expect(await fabGap()).toBeGreaterThanOrEqual(-1);
     const motion = await card.evaluate((el) => getComputedStyle(el).transitionDuration);
     expect(motion === "0s" || motion === "0ms").toBe(true);
-    await card.getByRole("button", { name: "Collapse run details" }).click();
+    // A drag on the head is ours, never the browser's pull-to-refresh.
+    const guards = await page.evaluate(() => ({
+      head: getComputedStyle(document.querySelector(".detail.open .sheet-head")).touchAction,
+      root: getComputedStyle(document.documentElement).overscrollBehaviorY,
+      body: getComputedStyle(document.querySelector(".detail.open .detail-body")).overscrollBehaviorY,
+    }));
+    expect(guards).toEqual({ head: "none", root: "none", body: "contain" });
+    const toggle = card.getByRole("button", { name: "Collapse run details" });
+    const toggleBox = await toggle.boundingBox();
+    expect(toggleBox.width).toBeGreaterThanOrEqual(34);
+    expect(Math.abs(toggleBox.width - toggleBox.height)).toBeLessThan(1);
+    await expect(toggle.locator("svg")).toHaveCount(1);
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await toggle.click();
     await expect(card).toHaveAttribute("data-sheet", "peek");
     await expect(card.locator("h2")).toBeVisible();
     const statsBelow = await card.locator(".stats").evaluate((el) => el.getBoundingClientRect().top >= window.innerHeight - 1);
@@ -1595,6 +1620,7 @@ test.describe("run sheet and layers", () => {
     const peekPad = await openPad();
     expect(peekPad).toBeLessThan(fullPad - 40);
     expect(await fabGap()).toBeGreaterThanOrEqual(-1);
+    await expect(card.getByRole("button", { name: "Expand run details" })).toHaveAttribute("aria-expanded", "false");
     await card.getByRole("button", { name: "Expand run details" }).click();
     await expect(card).toHaveAttribute("data-sheet", "full");
     await expect.poll(openPad).toBeGreaterThan(peekPad + 40);
@@ -1616,9 +1642,23 @@ test.describe("run sheet and layers", () => {
     await expect(map).toHaveAttribute("data-layer", "pace");
     await expect.poll(() => new URL(page.url()).searchParams.get("layer")).toBe("pace");
     await expect(page.locator(".heat-key")).toContainText("Slower to faster");
+    // The legend swatch and the map draw from the same ramp, and each mode has its own.
+    const legend = async () => {
+      const ramp = (await map.getAttribute("data-ramp")).split(" ");
+      const swatch = await page.locator(".heat-swatch").evaluate((el) => getComputedStyle(el).backgroundImage);
+      const rgb = ramp.map((hex) => {
+        const n = parseInt(hex.slice(1), 16);
+        return `rgb(${n >> 16}, ${(n >> 8) & 255}, ${n & 255})`;
+      });
+      for (const color of rgb) expect(swatch).toContain(color);
+      return ramp.join(" ");
+    };
+    const paceRamp = await legend();
+    await expect(page.locator('.layer-picker [role="option"] .layer-swatch')).toHaveCount(5);
     await page.getByRole("button", { name: "Map layers" }).click();
     await page.getByRole("option", { name: "Elevation" }).click();
     await expect(map).toHaveAttribute("data-layer", "elevation");
+    expect(await legend()).not.toBe(paceRamp);
     const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
     const run = manifest.runs.find((item) => item.city === "la");
     await page.goto(`/runs?activity=${run.id}&layer=distance`);
@@ -1638,8 +1678,22 @@ test.describe("run sheet and layers", () => {
     await fab.click();
     await expect(fab).toHaveAttribute("aria-expanded", "true");
     await expect(fab).toHaveAttribute("aria-controls", "fab-menu");
-    for (const name of ["Globe", "Random run", "Areas, LA selected", "Map layers"]) {
-      await expect(page.getByRole("button", { name })).toBeVisible();
+    // A round 56px FAB; the four icon buttons fan out in a row to its left.
+    const main = await fab.boundingBox();
+    expect(Math.round(main.width)).toBe(56);
+    expect(Math.round(main.height)).toBe(56);
+    expect(await fab.evaluate((el) => getComputedStyle(el).borderRadius)).toBe("50%");
+    let rightEdge = main.x;
+    for (const name of ["Map layers", "Areas, LA selected", "Random run", "Globe"]) {
+      const button = page.getByRole("button", { name });
+      await expect(button).toBeVisible();
+      await expect(button.locator("svg")).toHaveCount(1);
+      const box = await button.boundingBox();
+      expect(Math.round(box.width)).toBe(44);
+      expect(Math.abs(box.y + box.height / 2 - (main.y + main.height / 2))).toBeLessThan(2);
+      expect(box.x + box.width).toBeLessThanOrEqual(rightEdge + 1);
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      rightEdge = box.x;
     }
     const motion = await page.locator(".fab-menu").evaluate((el) => getComputedStyle(el).transitionDuration);
     expect(motion === "0s" || motion === "0ms").toBe(true);
@@ -1658,6 +1712,109 @@ test.describe("run sheet and layers", () => {
       events: getComputedStyle(el).pointerEvents,
     }));
     expect(closed).toEqual({ inert: true, opacity: "0", events: "none" });
+  });
+
+  test("desktop shows the map tools as a row with no speed dial", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/runs");
+    await ready(page);
+    await expect(page.getByRole("button", { name: "Map tools" })).toBeHidden();
+    const boxes = [];
+    for (const name of ["Globe", "Random run", "Areas, LA selected", "Map layers"]) {
+      const button = page.getByRole("button", { name });
+      await expect(button).toBeVisible();
+      await expect(button.locator("svg")).toHaveCount(1);
+      boxes.push(await button.boundingBox());
+    }
+    for (let i = 1; i < boxes.length; i++) {
+      expect(boxes[i].x).toBeGreaterThan(boxes[i - 1].x + boxes[i - 1].width - 1);
+      expect(Math.abs(boxes[i].y - boxes[0].y)).toBeLessThan(2);
+    }
+    expect(await page.locator("#fab-menu").evaluate((el) => el.inert)).toBe(false);
+    const dice = page.getByRole("button", { name: "Random run" });
+    await dice.hover();
+    await expect(dice.locator(".fab-tip")).toHaveCSS("opacity", "1");
+    await page.getByRole("button", { name: "Map layers" }).click();
+    const picker = page.getByRole("listbox", { name: "Map layers" });
+    await expect(picker).toBeVisible();
+    const pickerBox = await picker.boundingBox();
+    expect(pickerBox.y + pickerBox.height).toBeLessThanOrEqual(boxes[0].y + 1);
+    await page.keyboard.press("Escape");
+    await expect(picker).toBeHidden();
+    await expect(page.getByRole("button", { name: "Map layers" })).toBeFocused();
+  });
+
+  test("the gallery grows out of the tapped photo and flies back on close", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
+    const run = manifest.runs.find((item) => item.city === "la" && item.photos >= 5);
+    await page.goto(`/runs?activity=${run.id}`);
+    await ready(page);
+    const card = page.locator(".detail.open");
+    await expect(card.locator("h2")).toHaveText(run.title, { timeout: 30_000 });
+    const thumb = card.getByRole("button", { name: `Photo 1 of ${run.photos}` });
+    await expect(thumb.locator("img")).toBeVisible();
+    await page.waitForTimeout(500);
+    const from = await thumb.locator("img").boundingBox();
+    await thumb.click();
+    const dialog = page.locator(".lightbox");
+    await expect(dialog).toBeVisible();
+    // Freeze the shared-element animation at its start: the photo sits on the thumbnail.
+    const start = await page.evaluate(() => {
+      const img = document.querySelector(".lightbox-slide.current img");
+      const anims = img.getAnimations();
+      for (const anim of document.getAnimations()) {
+        anim.pause();
+        anim.currentTime = 0;
+      }
+      const box = img.getBoundingClientRect();
+      return { count: anims.length, x: box.x, y: box.y, w: box.width, duration: anims[0]?.effect.getTiming().duration };
+    });
+    expect(start.count).toBe(1);
+    expect(start.duration).toBeGreaterThanOrEqual(250);
+    expect(start.duration).toBeLessThanOrEqual(350);
+    expect(Math.abs(start.x - from.x)).toBeLessThan(3);
+    expect(Math.abs(start.y - from.y)).toBeLessThan(3);
+    expect(Math.abs(start.w - from.width)).toBeLessThan(3);
+    await expect(thumb).toHaveClass(/lifted/);
+    await page.evaluate(() => document.getAnimations().forEach((anim) => anim.finish()));
+    const full = await dialog.locator(".lightbox-slide.current img").boundingBox();
+    expect(full.width).toBeGreaterThan(from.width * 1.5);
+
+    await page.keyboard.press("Escape");
+    await expect(dialog).toHaveClass(/closing/);
+    const end = await page.evaluate(() => {
+      const img = document.querySelector(".lightbox-slide.current img");
+      const anim = img.getAnimations()[0];
+      anim.pause();
+      anim.currentTime = anim.effect.getTiming().duration;
+      const box = img.getBoundingClientRect();
+      anim.play();
+      return { x: box.x, y: box.y, w: box.width };
+    });
+    expect(Math.abs(end.x - from.x)).toBeLessThan(3);
+    expect(Math.abs(end.y - from.y)).toBeLessThan(3);
+    expect(Math.abs(end.w - from.width)).toBeLessThan(3);
+    await expect(dialog).toHaveCount(0);
+    await expect(thumb).not.toHaveClass(/lifted/);
+    await expect(thumb).toBeFocused();
+  });
+
+  test("reduced motion opens and closes the gallery with no flight", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
+    const run = manifest.runs.find((item) => item.city === "la" && item.photos >= 2);
+    await page.goto(`/runs?activity=${run.id}`);
+    await ready(page);
+    const card = page.locator(".detail.open");
+    await expect(card.locator("h2")).toHaveText(run.title, { timeout: 30_000 });
+    await card.getByRole("button", { name: `Photo 1 of ${run.photos}` }).click();
+    await expect(page.locator(".lightbox")).toBeVisible();
+    expect(await page.evaluate(() => document.querySelector(".lightbox").getAnimations({ subtree: true }).length)).toBe(0);
+    await page.keyboard.press("Escape");
+    await expect(page.locator(".lightbox")).toHaveCount(0);
   });
 });
 

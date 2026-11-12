@@ -1,6 +1,6 @@
 import { openGlobeMap } from "./basemap.js";
 import { densityHeat } from "./density.js";
-import { layerMode, stampLines } from "./layers.js";
+import { LAYER_RAMPS, layerMode, rampExpression, stampLines } from "./layers.js";
 import { boundsFromGeometry, routeCamera } from "./frame.js";
 import { REGION_ZOOM, WORLD_CENTER, WORLD_ZOOM, nearestCity, pitchForZoom } from "./globe.js";
 import { closerZoom } from "./pick.js";
@@ -74,6 +74,7 @@ const HEAT_COLOR = [
 function addRunLayers(map) {
   map.addSource("runs-heat", { type: "geojson", data: emptyCollection() });
   map.addSource("runs-lines", { type: "geojson", data: emptyCollection() });
+  map.addSource("runs-dots", { type: "geojson", data: emptyCollection() });
   map.addLayer({
     id: "runs-heat",
     type: "heatmap",
@@ -161,23 +162,35 @@ function addRunLayers(map) {
     id: "runs-value",
     type: "line",
     source: "runs-lines",
-    layout: { "line-cap": "round", "line-join": "round", visibility: "none" },
+    /* Higher t draws on top, so the newest, longest, fastest, or steepest route
+       wins where routes overlap. */
+    layout: {
+      "line-cap": "round",
+      "line-join": "round",
+      "line-sort-key": ["coalesce", ["get", "t"], 0],
+      visibility: "none",
+    },
     paint: {
-      "line-color": [
-        "interpolate",
-        ["linear"],
-        ["coalesce", ["get", "t"], 0],
-        0,
-        "#8a5a32",
-        0.4,
-        "#e07a3d",
-        0.7,
-        "#c43a48",
-        1,
-        "#2d1d7a",
-      ],
+      "line-color": rampExpression("recency"),
       "line-width": ["interpolate", ["linear"], ["zoom"], 0, 1.2, 4, 1.8, 8, 2.4, 12, 3, 15, 3.8],
       "line-opacity": 0.9,
+    },
+  });
+  /* At world zoom a 10 km route simplifies away to nothing, so each run also
+     gets one colored dot at its start that fades out as the lines take over. */
+  map.addLayer({
+    id: "runs-value-dots",
+    type: "circle",
+    source: "runs-dots",
+    maxzoom: 9,
+    layout: { "circle-sort-key": ["coalesce", ["get", "t"], 0], visibility: "none" },
+    paint: {
+      "circle-color": rampExpression("recency"),
+      "circle-radius": ["interpolate", ["linear"], ["zoom"], 1, 3, 6, 4],
+      "circle-stroke-color": "rgba(255, 255, 255, 0.85)",
+      "circle-stroke-width": 0.75,
+      "circle-opacity": ["interpolate", ["linear"], ["zoom"], 6.5, 0.95, 8.5, 0],
+      "circle-stroke-opacity": ["interpolate", ["linear"], ["zoom"], 6.5, 0.85, 8.5, 0],
     },
   });
   map.addLayer({
@@ -197,15 +210,28 @@ function addRunLayers(map) {
     paint: { "line-color": "#ffb020", "line-width": 3.2, "line-opacity": 1 },
   });
   /* Invisible corridor around each route. Queryable from the city overview,
-     before the ink veins fade in, so a click can land on one activity. */
+     before the ink veins fade in, so a click can land on one activity.
+     Opacity 0 still queries; 0.01 stacked across hundreds of overlapping
+     routes added up to a purple smear under the colored layers. */
   map.addLayer({
     id: "runs-hit",
     type: "line",
     source: "runs-lines",
     minzoom: 8,
     layout: { "line-cap": "round", "line-join": "round" },
-    paint: { "line-color": "#2d1d7a", "line-width": 18, "line-opacity": 0.01 },
+    paint: { "line-color": "#2d1d7a", "line-width": 18, "line-opacity": 0 },
   });
+}
+
+function startDots(features) {
+  const out = [];
+  for (const feature of features) {
+    const g = feature?.geometry;
+    const first = g?.type === "LineString" ? g.coordinates?.[0] : g?.type === "MultiLineString" ? g.coordinates?.[0]?.[0] : null;
+    if (!first) continue;
+    out.push({ type: "Feature", properties: { t: feature.properties?.t ?? 0 }, geometry: { type: "Point", coordinates: first } });
+  }
+  return { type: "FeatureCollection", features: out };
 }
 
 function emptyCollection() {
@@ -571,10 +597,19 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
     for (const id of ["runs-heat", "runs-vein", "runs-vein-glow"]) {
       if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", value ? "none" : "visible");
     }
-    if (map.getLayer("runs-value")) map.setLayoutProperty("runs-value", "visibility", value ? "visible" : "none");
+    if (map.getLayer("runs-value")) {
+      map.setLayoutProperty("runs-value", "visibility", value ? "visible" : "none");
+      if (value) map.setPaintProperty("runs-value", "line-color", rampExpression(activeLayer));
+    }
+    if (map.getLayer("runs-value-dots")) {
+      map.setLayoutProperty("runs-value-dots", "visibility", value ? "visible" : "none");
+      if (value) map.setPaintProperty("runs-value-dots", "circle-color", rampExpression(activeLayer));
+    }
     const features = stampLines(lineData.features, activeLayer);
     map.getSource("runs-lines")?.setData({ type: "FeatureCollection", features });
+    map.getSource("runs-dots")?.setData(value ? startDots(features) : emptyCollection());
     mapEl.dataset.layer = activeLayer;
+    mapEl.dataset.ramp = LAYER_RAMPS[activeLayer].join(" ");
   }
 
   function frameRoute(id, padding, reduced) {
