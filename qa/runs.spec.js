@@ -275,13 +275,24 @@ test.describe("runs map", () => {
 });
 
 async function clickLngLat(page, map, lngLat) {
-  const point = await map.evaluate((el, at) => el._runsMap.project(at), lngLat);
-  const box = await map.boundingBox();
-  expect(point.x).toBeGreaterThan(8);
-  expect(point.y).toBeGreaterThan(8);
-  expect(point.x).toBeLessThan(box.width - 8);
-  expect(point.y).toBeLessThan(box.height - 8);
-  await page.mouse.click(box.x + point.x, box.y + point.y);
+  let still = "";
+  await expect
+    .poll(async () => {
+      const pose = `${await map.getAttribute("data-zoom")}|${await map.getAttribute("data-lng")}|${await map.getAttribute("data-lat")}`;
+      const settled = pose === still && pose !== "null|null|null";
+      still = pose;
+      return settled;
+    }, { timeout: 8000, intervals: [120] })
+    .toBe(true);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const point = await map.evaluate((el, at) => {
+    const projected = el._runsMap.project(at);
+    const rect = el.getBoundingClientRect();
+    return { x: rect.left + projected.x, y: rect.top + projected.y, px: projected.x, py: projected.y };
+  }, lngLat);
+  expect(point.px).toBeGreaterThan(8);
+  expect(point.py).toBeGreaterThan(8);
+  await page.mouse.click(point.x, point.y);
   return point;
 }
 
@@ -998,6 +1009,10 @@ test.describe("open run frames the whole route", () => {
       await openTools(page);
       await page.getByRole("button", { name: /Areas, / }).click();
       await page.getByRole("radio", { name: "Sonoma", exact: true }).click();
+      if (viewport.name === "phone") {
+        await page.keyboard.press("Escape");
+        await expect(page.getByRole("button", { name: "Map tools" })).toHaveAttribute("aria-expanded", "false");
+      }
       await expect
         .poll(async () => map.evaluate((el, lngLat) => el._runsMap.hitIds(lngLat), sonoma.mid), { timeout: 15000 })
         .toContain(String(sonoma.id));

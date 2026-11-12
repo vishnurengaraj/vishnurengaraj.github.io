@@ -1057,6 +1057,18 @@ onMounted(() => {
   /* A map page has nothing to scroll. Without this, a downward drag on the
      run sheet can trigger the phone browser's pull-to-refresh. */
   document.documentElement.classList.add("runs-lock");
+  /* A focused chip can scroll the document and shove the fixed map off screen. */
+  const pinPage = () => {
+    if (window.scrollX || window.scrollY) window.scrollTo(0, 0);
+    const root = pageEl.value;
+    if (root && (root.scrollTop || root.scrollLeft)) {
+      root.scrollTop = 0;
+      root.scrollLeft = 0;
+    }
+  };
+  pinPage();
+  document.addEventListener("scroll", pinPage, true);
+  pageEl.value._pinPage = pinPage;
   pageNode = pageEl.value;
   pageNode?.addEventListener("pointerdown", holdCamera, true);
   pageNode?.addEventListener("wheel", holdCamera, { capture: true, passive: true });
@@ -1083,6 +1095,7 @@ onUnmounted(() => {
   window.removeEventListener("keydown", onKey);
   window.removeEventListener("resize", onResize);
   document.documentElement.classList.remove("runs-lock");
+  if (pageEl.value?._pinPage) document.removeEventListener("scroll", pageEl.value._pinPage, true);
   stopPhotoAnims();
   mapApi?.destroy();
   mapApi = null;
