@@ -275,13 +275,24 @@ test.describe("runs map", () => {
 });
 
 async function clickLngLat(page, map, lngLat) {
-  const point = await map.evaluate((el, at) => el._runsMap.project(at), lngLat);
-  const box = await map.boundingBox();
-  expect(point.x).toBeGreaterThan(8);
-  expect(point.y).toBeGreaterThan(8);
-  expect(point.x).toBeLessThan(box.width - 8);
-  expect(point.y).toBeLessThan(box.height - 8);
-  await page.mouse.click(box.x + point.x, box.y + point.y);
+  let still = "";
+  await expect
+    .poll(async () => {
+      const pose = `${await map.getAttribute("data-zoom")}|${await map.getAttribute("data-lng")}|${await map.getAttribute("data-lat")}`;
+      const settled = pose === still && pose !== "null|null|null";
+      still = pose;
+      return settled;
+    }, { timeout: 8000, intervals: [120] })
+    .toBe(true);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const point = await map.evaluate((el, at) => {
+    const projected = el._runsMap.project(at);
+    const rect = el.getBoundingClientRect();
+    return { x: rect.left + projected.x, y: rect.top + projected.y, px: projected.x, py: projected.y };
+  }, lngLat);
+  expect(point.px).toBeGreaterThan(8);
+  expect(point.py).toBeGreaterThan(8);
+  await page.mouse.click(point.x, point.y);
   return point;
 }
 
@@ -998,6 +1009,10 @@ test.describe("open run frames the whole route", () => {
       await openTools(page);
       await page.getByRole("button", { name: /Areas, / }).click();
       await page.getByRole("radio", { name: "Sonoma", exact: true }).click();
+      if (viewport.name === "phone") {
+        await page.keyboard.press("Escape");
+        await expect(page.getByRole("button", { name: "Map tools" })).toHaveAttribute("aria-expanded", "false");
+      }
       await expect
         .poll(async () => map.evaluate((el, lngLat) => el._runsMap.hitIds(lngLat), sonoma.mid), { timeout: 15000 })
         .toContain(String(sonoma.id));
@@ -1630,6 +1645,106 @@ test.describe("run sheet and layers", () => {
     await expect(card).toHaveAttribute("data-sheet", "full");
     await expect.poll(openPad).toBeGreaterThan(peekPad + 40);
     await expect(card.getByRole("button", { name: "Close" })).toBeVisible();
+  });
+
+  test("the phone FAB sits in the bottom-right corner and follows the sheet", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 390, height: 844 });
+    const manifest = await (await page.request.get("/media/runs/manifest.json")).json();
+    const run = manifest.runs.find((item) => item.city === "la" && item.distanceM > 8000);
+    await page.goto(`/runs?activity=${run.id}`);
+    await ready(page);
+    const map = page.locator("#runs-map");
+    const card = page.locator(".detail.open");
+    await expect(map).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+    await expect(card).toHaveAttribute("data-sheet", "full");
+    // Distance from the FAB's bottom edge to the sheet's visible top, or to the
+    // bottom of the screen less 8px once the sheet is gone.
+    const fabGap = () =>
+      page.evaluate(() => {
+        const fab = document.querySelector(".fab-main").getBoundingClientRect();
+        const sheet = document.querySelector(".detail.open");
+        if (sheet) return Math.round(sheet.getBoundingClientRect().top - fab.bottom);
+        // No sheet: 24px keeps the FAB above the map attribution.
+        return Math.round(window.innerHeight - fab.bottom) - 8;
+      });
+    const nearGap = (value) => (Math.abs(value - 16) <= 3 ? "ok" : value);
+    await expect.poll(async () => nearGap(await fabGap())).toBe("ok");
+
+    // Zoom and compass sit in the top-right corner, clear of the title button and the dial.
+    const nav = await page.locator(".maplibregl-ctrl-group").boundingBox();
+    expect(nav.y).toBeLessThan(24);
+    expect(390 - (nav.x + nav.width)).toBeLessThan(24);
+    const index = await page.getByRole("button", { name: /^Runs in / }).boundingBox();
+    expect(boxesOverlap(nav, index)).toBe(false);
+    const fabBox = await page.locator(".fab-main").boundingBox();
+    expect(390 - (fabBox.x + fabBox.width)).toBeLessThan(24);
+
+    // A zoom after opening does not stop the collapse refit.
+    await page.mouse.move(195, 160);
+    await page.mouse.wheel(0, 600);
+    await page.waitForTimeout(400);
+    await expect(card).toHaveAttribute("data-sheet", "full");
+    await card.getByRole("button", { name: "Collapse run details" }).click();
+    await expect(card).toHaveAttribute("data-sheet", "peek");
+    await expect.poll(async () => nearGap(await fabGap())).toBe("ok");
+    const sample = await routeSample(page, run);
+    const fit = () =>
+      map.evaluate((el, coords) => {
+        const sheetTop = document.querySelector(".detail.open").getBoundingClientRect().top;
+        const top = document.querySelector(".run-index").getBoundingClientRect().bottom;
+        let minX = Infinity;
+        let maxX = -Infinity;
+        let minY = Infinity;
+        let maxY = -Infinity;
+        for (const lngLat of coords) {
+          const point = el._runsMap.project(lngLat);
+          minX = Math.min(minX, point.x);
+          maxX = Math.max(maxX, point.x);
+          minY = Math.min(minY, point.y);
+          maxY = Math.max(maxY, point.y);
+        }
+        const inside = minX >= 0 && maxX <= el.clientWidth && minY >= top && maxY <= sheetTop;
+        const share = Math.max((maxX - minX) / el.clientWidth, (maxY - minY) / (sheetTop - top));
+        return inside && share > 0.55 ? "ok" : JSON.stringify({ minX, maxX, minY, maxY, top, sheetTop, share });
+      }, sample);
+    await expect.poll(fit, { timeout: 10_000 }).toBe("ok");
+
+    await card.getByRole("button", { name: "Expand run details" }).click();
+    await expect(card).toHaveAttribute("data-sheet", "full");
+    await expect.poll(async () => nearGap(await fabGap())).toBe("ok");
+    await expectRouteInView(page, run);
+
+    // Closing from the expanded sheet drops the FAB back to its corner.
+    await card.getByRole("button", { name: "Close" }).click();
+    await expect(page.locator(".detail.open")).toHaveCount(0);
+    await expect.poll(async () => nearGap(await fabGap())).toBe("ok");
+
+    // The dial still stacks upward and Layers pulls out to the left of its button.
+    await openTools(page);
+    await page.getByRole("button", { name: "Map layers" }).click();
+    const layersBtn = await page.getByRole("button", { name: "Map layers" }).boundingBox();
+    const main = await page.locator(".fab-main").boundingBox();
+    expect(layersBtn.y + layersBtn.height).toBeLessThan(main.y);
+    const picker = await page.locator(".fab .layer-picker").boundingBox();
+    expect(picker.x + picker.width).toBeLessThanOrEqual(layersBtn.x + 1);
+    expect(picker.x).toBeGreaterThanOrEqual(0);
+    expect(picker.y).toBeGreaterThan(nav.y + nav.height);
+  });
+
+  test("desktop keeps the tool row above the zoom controls, without a FAB", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/runs");
+    await ready(page);
+    await expect(page.locator("#runs-map")).toHaveAttribute("data-map", "ready", { timeout: 30_000 });
+    await expect(page.getByRole("button", { name: "Map tools" })).toBeHidden();
+    const nav = await page.locator(".maplibregl-ctrl-group").boundingBox();
+    expect(nav.y + nav.height).toBeGreaterThan(900 - 24);
+    for (const name of ["Globe", "Random run", /Areas, /, "Map layers"]) {
+      const box = await page.getByRole("button", { name }).boundingBox();
+      expect(boxesOverlap(box, nav)).toBe(false);
+    }
   });
 
   test("layer choice colors routes and stays in the url", async ({ page }) => {

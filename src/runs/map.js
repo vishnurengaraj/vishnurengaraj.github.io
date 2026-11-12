@@ -612,7 +612,7 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
     mapEl.dataset.ramp = LAYER_RAMPS[activeLayer].join(" ");
   }
 
-  function frameRoute(id, padding, reduced) {
+  function frameRoute(id, padding, reduced, duration = ROUTE_EASE_MS) {
     if (disposed || gestureSinceArm) return;
     const bounds = boundsFromGeometry(geometryById.get(String(id)));
     const canvas = map.getCanvas();
@@ -631,7 +631,7 @@ export async function mountRunsMap(mapEl, { center, zoom, arrival = null, onPick
       pitch: 0,
       bearing: 0,
       padding: pad,
-      duration: reduced ? 0 : ROUTE_EASE_MS,
+      duration: reduced ? 0 : duration,
       essential: true,
     });
   }
