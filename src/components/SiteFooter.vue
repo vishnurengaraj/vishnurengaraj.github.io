@@ -38,12 +38,14 @@ const scrollTo = inject(scrollKey);
       <span class="footer-offshoots footer-offshoots-mid">
         <a href="/diners">Diners</a>
         <a href="/runs">Runs</a>
+        <a href="/training">Training</a>
       </span>
       <div class="footer-actions">
         <nav aria-label="Contact">
           <span class="footer-offshoots footer-offshoots-inline">
             <a href="/diners">Diners</a>
             <a href="/runs">Runs</a>
+            <a href="/training">Training</a>
           </span>
           <a :href="profile.linkedin" target="_blank" rel="noopener noreferrer me">LinkedIn</a>
           <a :href="`mailto:${profile.email}`">Email</a>
