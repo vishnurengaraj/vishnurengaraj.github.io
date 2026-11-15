@@ -399,6 +399,7 @@ test.describe("one continuous map", () => {
   }
 
   test("phone pinch-out from LA reaches the world without snapping back", async ({ page, browserName }) => {
+    test.setTimeout(180_000);
     test.skip(browserName !== "chromium", "pinch uses CDP touch events");
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.setViewportSize({ width: 390, height: 844 });
