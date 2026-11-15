@@ -96,8 +96,8 @@ for (const vp of VIEWPORTS) {
     test("This week: moving a session is local and undoable; no missed-day wording", async ({ page }) => {
       await page.goto("/training");
       const future = current.days.find((d) => d.date > data.asOf && d.mi > 0);
-      test.skip(!future, "no movable day left this week");
-      const target = current.days.find((d) => d.date > data.asOf && d.date !== future.date);
+      const target = future && current.days.find((d) => d.date > data.asOf && d.date !== future.date);
+      test.skip(!future || !target, "no session and second open day left this week");
       const from = page.locator(`.dc[data-date="${future.date}"]`);
       await from.locator("select").first().selectOption({ index: current.days.indexOf(target) });
       await expect(page.locator(`.dc[data-date="${target.date}"] .sug.moved`)).toHaveCount(1);
