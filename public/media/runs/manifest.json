@@ -15,7 +15,7 @@
         33.8622
       ],
       "zoom": 12.35,
-      "count": 419,
+      "count": 420,
       "generated": false
     },
     {
@@ -356,6 +356,24 @@
     }
   ],
   "runs": [
+    {
+      "id": "21003733887",
+      "stravaId": "21003733887",
+      "city": "la",
+      "title": "Afternoon Run",
+      "type": "Run",
+      "date": "2026-11-15T00:00:00.000Z",
+      "distanceM": 12593.54,
+      "movingS": 4285,
+      "elevM": 13,
+      "mid": [
+        -118.331904,
+        33.885249
+      ],
+      "photos": 1,
+      "companions": 0,
+      "sample": false
+    },
     {
       "id": "20956797366",
       "stravaId": "20956797366",
