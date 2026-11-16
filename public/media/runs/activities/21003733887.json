@@ -1,0 +1,26 @@
+{
+  "id": "21003733887",
+  "stravaId": "21003733887",
+  "city": "la",
+  "title": "Afternoon Run",
+  "type": "Run",
+  "date": "2026-11-15T00:00:00.000Z",
+  "distanceM": 12593.54,
+  "movingS": 4285,
+  "elevM": 13,
+  "mid": [
+    -118.331904,
+    33.885249
+  ],
+  "photos": [
+    {
+      "src": "/media/runs/photos/21003733887/1.webp",
+      "w": 1600,
+      "h": 1200,
+      "sample": false
+    }
+  ],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 4522
+}
