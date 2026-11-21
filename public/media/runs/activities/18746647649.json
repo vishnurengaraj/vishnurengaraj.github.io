@@ -3,13 +3,14 @@
   "stravaId": "18746647649",
   "city": "la",
   "title": "Eagle Rock + a lil extra",
+  "type": "Hike",
   "date": "2026-06-01T00:00:00.000Z",
   "distanceM": 14850,
   "movingS": 10626,
   "elevM": 488,
   "mid": [
-    -118.552295,
-    34.099933
+    -118.552308,
+    34.099927
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 12482,
-  "type": "Run"
+  "elapsedS": 12482
 }

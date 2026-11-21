@@ -3,17 +3,17 @@
   "stravaId": "16644805009",
   "city": "la",
   "title": "Evening Run",
+  "type": "Run",
   "date": "2025-12-03T00:00:00.000Z",
-  "distanceM": 7470,
+  "distanceM": 7473.8,
   "movingS": 2291,
   "elevM": 4,
   "mid": [
-    -118.335135,
-    33.887518
+    -118.334867,
+    33.887517
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 2402,
-  "type": "Run"
+  "elapsedS": 2402
 }

@@ -3,13 +3,14 @@
   "stravaId": "11842777087",
   "city": "zion",
   "title": "Zion Sunset Overlook",
+  "type": "Hike",
   "date": "2024-07-08T00:00:00.000Z",
-  "distanceM": 2120,
+  "distanceM": 2125.6,
   "movingS": 3005,
   "elevM": 113.5,
   "mid": [
-    -112.945813,
-    37.213073
+    -112.945915,
+    37.213188
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 4623,
-  "type": "Run"
+  "elapsedS": 4623
 }

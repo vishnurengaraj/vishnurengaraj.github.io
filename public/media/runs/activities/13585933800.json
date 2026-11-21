@@ -3,13 +3,14 @@
   "stravaId": "13585933800",
   "city": "la",
   "title": "Run - Volleyball - Run",
+  "type": "Run",
   "date": "2025-02-09T00:00:00.000Z",
-  "distanceM": 19770,
+  "distanceM": 19777.6,
   "movingS": 6454,
   "elevM": 43,
   "mid": [
-    -118.390244,
-    33.82172
+    -118.390245,
+    33.82174
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 14390,
-  "type": "Run"
+  "elapsedS": 14390
 }

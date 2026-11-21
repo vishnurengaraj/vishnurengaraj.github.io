@@ -1,0 +1,19 @@
+{
+  "id": "18084901950",
+  "stravaId": "18084901950",
+  "city": "bigsur",
+  "title": "Lunch Walk",
+  "type": "Walk",
+  "date": "2026-04-12T00:00:00.000Z",
+  "distanceM": 1656.7,
+  "movingS": 1310,
+  "elevM": 10,
+  "mid": [
+    -121.785015,
+    36.249599
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 1564
+}

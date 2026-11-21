@@ -522,12 +522,11 @@ test.describe("one continuous map", () => {
   });
 });
 
-test.describe("served lines keep the privacy trim", () => {
-  test("real routes stay trimmed and foot sports stay on the map", async ({ request }) => {
+test.describe("served lines keep the full start and finish", () => {
+  test("real routes are untrimmed and foot sports stay on the map", async ({ request }) => {
     const manifest = await (await request.get("/media/runs/manifest.json")).json();
-    expect(manifest.privacy.method).toBe("radius");
-    expect(manifest.privacy.meters).toBeGreaterThanOrEqual(300);
-    expect(manifest.privacy.meters).toBeLessThanOrEqual(500);
+    expect(manifest.privacy.method).toBe("none");
+    expect(manifest.privacy.meters).toBe(0);
     expect(manifest.sample).toBe(false);
     expect(manifest.runs.length).toBeGreaterThan(400);
     expect(manifest.cities.some((city) => city.label === "Away" || city.id.startsWith("away-"))).toBe(false);
@@ -543,7 +542,8 @@ test.describe("served lines keep the privacy trim", () => {
       expect(String(run.id)).not.toMatch(/^sample-/);
       expect(Number.isInteger(run.photos)).toBe(true);
       expect(run.photos).toBeGreaterThanOrEqual(0);
-      expect(run.distanceM).toBeGreaterThan(500);
+      // Short activities once dropped by the 400m start/finish radius are kept.
+      expect(run.distanceM).toBeGreaterThan(150);
     }
     for (const type of ["Trail Run", "Walk", "Hike"]) {
       const sample = manifest.runs.find((run) => run.type === type);

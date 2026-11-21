@@ -3,13 +3,14 @@
   "stravaId": "17085349025",
   "city": "la",
   "title": "Morning Run",
+  "type": "Run",
   "date": "2026-01-17T00:00:00.000Z",
-  "distanceM": 16090,
+  "distanceM": 16094.8,
   "movingS": 5139,
   "elevM": 101,
   "mid": [
-    -118.456502,
-    33.962285
+    -118.45381,
+    33.963413
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 5505,
-  "type": "Run"
+  "elapsedS": 5505
 }

@@ -3,13 +3,14 @@
   "stravaId": "15030000500",
   "city": "yosemite",
   "title": "Grand Canyon of Yosemite",
+  "type": "Hike",
   "date": "2025-07-04T00:00:00.000Z",
-  "distanceM": 50560,
+  "distanceM": 50565.8,
   "movingS": 53183,
   "elevM": 1684,
   "mid": [
-    -119.528313,
-    37.938471
+    -119.528326,
+    37.938262
   ],
   "photos": [
     {
@@ -45,6 +46,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 182204,
-  "type": "Run"
+  "elapsedS": 182204
 }

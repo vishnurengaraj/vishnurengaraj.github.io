@@ -3,17 +3,17 @@
   "stravaId": "9191718746",
   "city": "la",
   "title": "Freudian Slip",
+  "type": "Run",
   "date": "2023-06-02T00:00:00.000Z",
-  "distanceM": 6840,
+  "distanceM": 6840.9,
   "movingS": 2173,
   "elevM": 13,
   "mid": [
-    -118.346831,
-    33.916175
+    -118.349436,
+    33.911429
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 2178,
-  "type": "Run"
+  "elapsedS": 2178
 }

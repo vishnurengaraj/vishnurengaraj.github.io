@@ -3,13 +3,14 @@
   "stravaId": "9727938609",
   "city": "sierra",
   "title": "Cloudripper ☁️🪦",
+  "type": "Hike",
   "date": "2023-08-26T00:00:00.000Z",
-  "distanceM": 18830,
+  "distanceM": 18832.1,
   "movingS": 22383,
   "elevM": 2281.3,
   "mid": [
-    -118.532176,
-    37.151187
+    -118.531946,
+    37.151474
   ],
   "photos": [
     {
@@ -39,6 +40,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 49563,
-  "type": "Run"
+  "elapsedS": 49563
 }

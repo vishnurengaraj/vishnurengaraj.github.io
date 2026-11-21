@@ -3,13 +3,14 @@
   "stravaId": "20290248614",
   "city": "yosemite",
   "title": "Clouds Rest ☁️ 😴",
+  "type": "Hike",
   "date": "2026-09-22T00:00:00.000Z",
-  "distanceM": 20940,
+  "distanceM": 20947,
   "movingS": 20119,
   "elevM": 955,
   "mid": [
-    -119.489399,
-    37.767652
+    -119.489435,
+    37.76763
   ],
   "photos": [
     {
@@ -39,6 +40,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 24530,
-  "type": "Run"
+  "elapsedS": 24530
 }

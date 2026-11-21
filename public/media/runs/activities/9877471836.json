@@ -3,17 +3,17 @@
   "stravaId": "9877471836",
   "city": "la",
   "title": "Vishnu vs the “zone 2” conspiracy",
+  "type": "Run",
   "date": "2023-09-18T00:00:00.000Z",
-  "distanceM": 11040,
+  "distanceM": 11045.7,
   "movingS": 4637,
   "elevM": 19.2,
   "mid": [
-    -118.341359,
-    33.887281
+    -118.341528,
+    33.88728
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 4640,
-  "type": "Run"
+  "elapsedS": 4640
 }

@@ -3,13 +3,14 @@
   "stravaId": "15405346248",
   "city": "sf",
   "title": "A Mile in His Shoes",
+  "type": "Run",
   "date": "2025-08-09T00:00:00.000Z",
-  "distanceM": 33790,
+  "distanceM": 33795.7,
   "movingS": 11578,
   "elevM": 40,
   "mid": [
-    -121.966366,
-    37.400248
+    -121.965508,
+    37.400425
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 26835,
-  "type": "Run"
+  "elapsedS": 26835
 }

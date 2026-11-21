@@ -3,13 +3,14 @@
   "stravaId": "13771665553",
   "city": "la",
   "title": "Chino ⛰️ Half",
+  "type": "Trail Run",
   "date": "2025-03-02T00:00:00.000Z",
-  "distanceM": 21090,
+  "distanceM": 21091.3,
   "movingS": 7639,
   "elevM": 484,
   "mid": [
-    -117.741015,
-    33.917582
+    -117.73949,
+    33.917152
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 7650,
-  "type": "Run"
+  "elapsedS": 7650
 }

@@ -3,13 +3,14 @@
   "stravaId": "19138582784",
   "city": "alps",
   "title": "TMB day 2",
+  "type": "Hike",
   "date": "2026-07-01T00:00:00.000Z",
-  "distanceM": 28540,
+  "distanceM": 28548.8,
   "movingS": 24031,
   "elevM": 1819,
   "mid": [
-    7.105921,
-    46.032749
+    7.106962,
+    46.032525
   ],
   "photos": [
     {
@@ -45,6 +46,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 34008,
-  "type": "Run"
+  "elapsedS": 34008
 }

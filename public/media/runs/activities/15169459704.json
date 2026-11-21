@@ -3,13 +3,14 @@
   "stravaId": "15169459704",
   "city": "sierra",
   "title": "Morning Run",
+  "type": "Run",
   "date": "2025-07-19T00:00:00.000Z",
-  "distanceM": 8150,
+  "distanceM": 8157.1,
   "movingS": 2910,
   "elevM": 168,
   "mid": [
-    -118.999731,
-    37.631716
+    -118.999655,
+    37.631852
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 3022,
-  "type": "Run"
+  "elapsedS": 3022
 }

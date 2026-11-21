@@ -1,0 +1,32 @@
+{
+  "id": "19251680894",
+  "stravaId": "19251680894",
+  "city": "pamplona",
+  "title": "Running to Running of the Bulls",
+  "type": "Run",
+  "date": "2026-07-10T00:00:00.000Z",
+  "distanceM": 341.2,
+  "movingS": 119,
+  "elevM": 0,
+  "mid": [
+    -1.649501,
+    42.815644
+  ],
+  "photos": [
+    {
+      "src": "/media/runs/photos/19251680894/1.webp",
+      "w": 1200,
+      "h": 1600,
+      "sample": false
+    },
+    {
+      "src": "/media/runs/photos/19251680894/2.webp",
+      "w": 1200,
+      "h": 1600,
+      "sample": false
+    }
+  ],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 125
+}

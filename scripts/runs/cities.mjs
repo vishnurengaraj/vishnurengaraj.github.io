@@ -149,6 +149,9 @@ export const PLACES = [
   { id: "canyon", label: "Canyon", name: "Grand Canyon", center: [-112.05, 36.21], radiusM: 40000, zoom: 11 },
   { id: "zion", label: "Zion", name: "Zion", center: [-112.95, 37.24], radiusM: 25000, zoom: 11.4 },
   { id: "india", label: "India", name: "Kanyakumari", center: [77.73, 8.69], radiusM: 40000, zoom: 11 },
+  { id: "pamplona", label: "Pamplona", name: "Pamplona", center: [-1.65, 42.82], radiusM: 20000, zoom: 13 },
+  { id: "lobos", label: "Lobos", name: "Point Lobos", center: [-121.95, 36.52], radiusM: 15000, zoom: 13 },
+  { id: "houston", label: "Houston", name: "Houston", center: [-95.34, 29.99], radiusM: 40000, zoom: 11.4 },
 ];
 
 function inMetro(metro, lng, lat) {

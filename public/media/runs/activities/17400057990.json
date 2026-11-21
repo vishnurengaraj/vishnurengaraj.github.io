@@ -3,13 +3,14 @@
   "stravaId": "17400057990",
   "city": "izu",
   "title": "Morning Hike",
+  "type": "Hike",
   "date": "2026-02-14T00:00:00.000Z",
-  "distanceM": 5710,
+  "distanceM": 5710.8,
   "movingS": 6161,
   "elevM": 146,
   "mid": [
-    138.92933,
-    34.805931
+    138.930368,
+    34.804146
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 78876,
-  "type": "Hike"
+  "elapsedS": 78876
 }

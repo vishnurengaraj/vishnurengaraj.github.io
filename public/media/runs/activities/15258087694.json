@@ -3,13 +3,14 @@
   "stravaId": "15258087694",
   "city": "whitney",
   "title": "Alta Meadows with (another) Altimate Crew",
+  "type": "Hike",
   "date": "2025-07-26T00:00:00.000Z",
-  "distanceM": 26380,
+  "distanceM": 26379.4,
   "movingS": 23758,
   "elevM": 1067,
   "mid": [
-    -118.676584,
-    36.584094
+    -118.675976,
+    36.583495
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 33682,
-  "type": "Run"
+  "elapsedS": 33682
 }

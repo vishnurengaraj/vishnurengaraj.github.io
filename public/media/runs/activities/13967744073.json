@@ -3,13 +3,14 @@
   "stravaId": "13967744073",
   "city": "la",
   "title": "Chino 15",
+  "type": "Trail Run",
   "date": "2025-03-23T00:00:00.000Z",
-  "distanceM": 24640,
+  "distanceM": 24639.5,
   "movingS": 9232,
   "elevM": 523,
   "mid": [
-    -117.748568,
-    33.921369
+    -117.748616,
+    33.921366
   ],
   "photos": [
     {
@@ -21,6 +22,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 9745,
-  "type": "Run"
+  "elapsedS": 9745
 }

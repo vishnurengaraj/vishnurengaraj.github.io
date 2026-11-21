@@ -3,13 +3,14 @@
   "stravaId": "14379730785",
   "city": "la",
   "title": "Bulldog pt2",
+  "type": "Trail Run",
   "date": "2025-05-04T00:00:00.000Z",
-  "distanceM": 24740,
+  "distanceM": 24741.8,
   "movingS": 10860,
   "elevM": 962,
   "mid": [
-    -118.748284,
-    34.079992
+    -118.748282,
+    34.079991
   ],
   "photos": [
     {
@@ -39,6 +40,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 11197,
-  "type": "Run"
+  "elapsedS": 11197
 }

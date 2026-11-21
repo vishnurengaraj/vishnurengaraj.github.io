@@ -3,13 +3,14 @@
   "stravaId": "15653491783",
   "city": "whitney",
   "title": "Mineral King day .5 - 4",
+  "type": "Hike",
   "date": "2025-08-28T00:00:00.000Z",
-  "distanceM": 59980,
+  "distanceM": 59988.4,
   "movingS": 67615,
   "elevM": 3036,
   "mid": [
-    -118.56131,
-    36.551919
+    -118.560744,
+    36.552021
   ],
   "photos": [
     {
@@ -45,6 +46,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 257818,
-  "type": "Run"
+  "elapsedS": 257818
 }

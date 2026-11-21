@@ -3,13 +3,14 @@
   "stravaId": "11270486401",
   "city": "la",
   "title": "🦅🗿",
+  "type": "Hike",
   "date": "2024-04-26T00:00:00.000Z",
-  "distanceM": 12430,
+  "distanceM": 12438,
   "movingS": 9098,
   "elevM": 386.9,
   "mid": [
-    -118.55462,
-    34.101644
+    -118.554609,
+    34.101557
   ],
   "photos": [
     {
@@ -21,6 +22,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 9777,
-  "type": "Run"
+  "elapsedS": 9777
 }

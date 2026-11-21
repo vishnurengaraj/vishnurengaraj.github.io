@@ -3,13 +3,14 @@
   "stravaId": "16839809246",
   "city": "la",
   "title": "Lunch Run",
+  "type": "Run",
   "date": "2025-12-25T00:00:00.000Z",
-  "distanceM": 16690,
+  "distanceM": 16691.3,
   "movingS": 5396,
   "elevM": 58,
   "mid": [
-    -118.390707,
-    33.815042
+    -118.390705,
+    33.81504
   ],
   "photos": [
     {
@@ -21,6 +22,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 5715,
-  "type": "Run"
+  "elapsedS": 5715
 }

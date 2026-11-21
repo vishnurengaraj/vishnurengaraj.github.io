@@ -1,0 +1,38 @@
+{
+  "id": "18084905645",
+  "stravaId": "18084905645",
+  "city": "lobos",
+  "title": "Point Lobos",
+  "type": "Walk",
+  "date": "2026-04-12T00:00:00.000Z",
+  "distanceM": 1648.8,
+  "movingS": 1201,
+  "elevM": 46,
+  "mid": [
+    -121.950129,
+    36.518082
+  ],
+  "photos": [
+    {
+      "src": "/media/runs/photos/18084905645/1.webp",
+      "w": 1600,
+      "h": 1600,
+      "sample": false
+    },
+    {
+      "src": "/media/runs/photos/18084905645/2.webp",
+      "w": 1600,
+      "h": 1281,
+      "sample": false
+    },
+    {
+      "src": "/media/runs/photos/18084905645/3.webp",
+      "w": 1600,
+      "h": 1281,
+      "sample": false
+    }
+  ],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 1944
+}

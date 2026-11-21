@@ -3,13 +3,14 @@
   "stravaId": "12879800289",
   "city": "jacinto",
   "title": "Mt Gorgonio",
+  "type": "Hike",
   "date": "2024-11-11T00:00:00.000Z",
-  "distanceM": 34270,
+  "distanceM": 34277.1,
   "movingS": 28588,
   "elevM": 1427.3,
   "mid": [
-    -116.828338,
-    34.094978
+    -116.828125,
+    34.094979
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 32646,
-  "type": "Run"
+  "elapsedS": 32646
 }

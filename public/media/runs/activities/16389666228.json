@@ -1,0 +1,26 @@
+{
+  "id": "16389666228",
+  "stravaId": "16389666228",
+  "city": "houston",
+  "title": "IAH Dash",
+  "type": "Run",
+  "date": "2025-11-07T00:00:00.000Z",
+  "distanceM": 751.5,
+  "movingS": 182,
+  "elevM": 15,
+  "mid": [
+    -95.343924,
+    29.987413
+  ],
+  "photos": [
+    {
+      "src": "/media/runs/photos/16389666228/1.webp",
+      "w": 1200,
+      "h": 1600,
+      "sample": false
+    }
+  ],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 415
+}

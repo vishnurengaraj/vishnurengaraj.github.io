@@ -3,13 +3,14 @@
   "stravaId": "11998449853",
   "city": "whitney",
   "title": "Mt Whitney, day hike",
+  "type": "Hike",
   "date": "2024-07-27T00:00:00.000Z",
-  "distanceM": 34610,
+  "distanceM": 34615.3,
   "movingS": 44401,
   "elevM": 2014.5,
   "mid": [
-    -118.292929,
-    36.578186
+    -118.293022,
+    36.578146
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 58590,
-  "type": "Hike"
+  "elapsedS": 58590
 }

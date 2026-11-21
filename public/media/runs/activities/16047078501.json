@@ -3,13 +3,14 @@
   "stravaId": "16047078501",
   "city": "baldy",
   "title": "The Baldy 1.5x",
+  "type": "Hike",
   "date": "2025-10-05T00:00:00.000Z",
-  "distanceM": 26400,
+  "distanceM": 26408.7,
   "movingS": 20935,
   "elevM": 1802.2,
   "mid": [
-    -117.639645,
-    34.281498
+    -117.640674,
+    34.280443
   ],
   "photos": [
     {
@@ -39,6 +40,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 23642,
-  "type": "Run"
+  "elapsedS": 23642
 }

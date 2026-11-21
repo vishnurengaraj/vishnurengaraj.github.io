@@ -3,13 +3,14 @@
   "stravaId": "14595958208",
   "city": "pinnacles",
   "title": "Pinnacles Pit Stop",
+  "type": "Hike",
   "date": "2025-05-25T00:00:00.000Z",
-  "distanceM": 13270,
+  "distanceM": 13275.6,
   "movingS": 7356,
   "elevM": 579,
   "mid": [
-    -121.1996,
-    36.482509
+    -121.199678,
+    36.482478
   ],
   "photos": [
     {
@@ -39,6 +40,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 8038,
-  "type": "Run"
+  "elapsedS": 8038
 }

@@ -3,13 +3,14 @@
   "stravaId": "11667734992",
   "city": "whitney",
   "title": "Alta Peak",
+  "type": "Hike",
   "date": "2024-06-15T00:00:00.000Z",
-  "distanceM": 33310,
+  "distanceM": 33309.6,
   "movingS": 29686,
   "elevM": 1652.6,
   "mid": [
-    -118.664712,
-    36.590149
+    -118.664742,
+    36.590101
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 39552,
-  "type": "Run"
+  "elapsedS": 39552
 }

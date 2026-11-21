@@ -204,8 +204,10 @@ function safeId(id) {
 
 async function main() {
   const flags = readArgs(process.argv.slice(2));
-  const radiusM = Math.min(500, Math.max(300, Number(flags.trim || 400)));
-  if (!Number.isFinite(radiusM)) throw new Error("--trim must be a number of meters");
+  // 0 (the default) publishes the full start and finish. A positive value
+  // restores the old start/finish privacy radius; there is no 300–500m clamp.
+  const radiusM = flags.trim == null || flags.trim === true ? 0 : Number(flags.trim);
+  if (!Number.isFinite(radiusM) || radiusM < 0) throw new Error("--trim must be a non-negative number of meters");
   let zones = null;
   if (flags.zones) zones = JSON.parse(await readFile(path.resolve(flags.zones), "utf8"));
   else if (flags.export) {
@@ -369,7 +371,7 @@ async function main() {
 
   const manifest = {
     sample: summaries.length > 0 && summaries.every((run) => run.sample),
-    privacy: { method: "radius", meters: radiusM },
+    privacy: radiusM > 0 ? { method: "radius", meters: radiusM } : { method: "none", meters: 0 },
     defaultCity: ordered.some((city) => city.id === "la") ? "la" : ordered[0]?.id || null,
     cities: ordered,
     runs: summaries.sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")) || a.title.localeCompare(b.title)),
@@ -381,7 +383,7 @@ async function main() {
 
   const counts = ordered.map((city) => `${city.count} ${city.label}`).join(", ");
   console.log(
-    `runs: ${summaries.length} (${counts || "none"})\nprivacy: ${radiusM}m radius, ${dropped} dropped, ${missingGps} without GPS\noutput: public/media/runs`,
+    `runs: ${summaries.length} (${counts || "none"})\nprivacy: ${radiusM > 0 ? `${radiusM}m radius` : "off"}, ${dropped} dropped, ${missingGps} without GPS\noutput: public/media/runs`,
   );
 }
 

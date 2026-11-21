@@ -3,13 +3,14 @@
   "stravaId": "19176123328",
   "city": "alps",
   "title": "TMB Day 5",
+  "type": "Hike",
   "date": "2026-07-04T00:00:00.000Z",
-  "distanceM": 19370,
+  "distanceM": 19373.3,
   "movingS": 18021,
   "elevM": 1003,
   "mid": [
-    6.712428,
-    45.749495
+    6.713428,
+    45.749114
   ],
   "photos": [
     {
@@ -39,6 +40,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 20945,
-  "type": "Run"
+  "elapsedS": 20945
 }

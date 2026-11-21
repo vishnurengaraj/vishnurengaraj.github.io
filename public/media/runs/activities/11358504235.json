@@ -3,17 +3,17 @@
   "stravaId": "11358504235",
   "city": "la",
   "title": "Freudian slip pt3",
+  "type": "Run",
   "date": "2024-05-07T00:00:00.000Z",
-  "distanceM": 9370,
+  "distanceM": 9373.7,
   "movingS": 3164,
   "elevM": 41.4,
   "mid": [
-    -118.370928,
-    33.909617
+    -118.371137,
+    33.910196
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 3181,
-  "type": "Run"
+  "elapsedS": 3181
 }

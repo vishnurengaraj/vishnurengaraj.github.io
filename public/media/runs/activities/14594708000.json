@@ -3,13 +3,14 @@
   "stravaId": "14594708000",
   "city": "bigsur",
   "title": "Siked for Sykes, Big Sur Backpacking",
+  "type": "Hike",
   "date": "2025-05-23T00:00:00.000Z",
-  "distanceM": 43030,
+  "distanceM": 43031,
   "movingS": 36393,
   "elevM": 2030,
   "mid": [
-    -121.668525,
-    36.255992
+    -121.668512,
+    36.255987
   ],
   "photos": [
     {
@@ -39,6 +40,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 144600,
-  "type": "Run"
+  "elapsedS": 144600
 }

@@ -3,17 +3,17 @@
   "stravaId": "9799958807",
   "city": "la",
   "title": "Race against Thursday",
+  "type": "Run",
   "date": "2023-09-06T00:00:00.000Z",
-  "distanceM": 10360,
+  "distanceM": 10366.5,
   "movingS": 3259,
   "elevM": 16.4,
   "mid": [
-    -118.33729,
-    33.887605
+    -118.336572,
+    33.887469
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 3259,
-  "type": "Run"
+  "elapsedS": 3259
 }

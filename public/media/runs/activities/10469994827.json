@@ -3,13 +3,14 @@
   "stravaId": "10469994827",
   "city": "la",
   "title": "Morning Hike",
+  "type": "Hike",
   "date": "2023-12-31T00:00:00.000Z",
-  "distanceM": 8200,
+  "distanceM": 8204.6,
   "movingS": 7289,
   "elevM": 366.1,
   "mid": [
-    -118.542725,
-    34.070125
+    -118.542701,
+    34.070048
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 8939,
-  "type": "Hike"
+  "elapsedS": 8939
 }

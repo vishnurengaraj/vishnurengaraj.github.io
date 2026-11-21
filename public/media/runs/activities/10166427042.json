@@ -3,13 +3,14 @@
   "stravaId": "10166427042",
   "city": "la",
   "title": "Malibu Half",
+  "type": "Run",
   "date": "2023-11-05T00:00:00.000Z",
-  "distanceM": 21100,
+  "distanceM": 21106.5,
   "movingS": 6715,
   "elevM": 156.6,
   "mid": [
-    -118.899605,
-    34.042121
+    -118.899653,
+    34.042127
   ],
   "photos": [
     {
@@ -21,6 +22,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 6723,
-  "type": "Run"
+  "elapsedS": 6723
 }

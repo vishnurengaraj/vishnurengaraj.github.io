@@ -3,13 +3,14 @@
   "stravaId": "11832847975",
   "city": "kings",
   "title": "Rae lakes",
+  "type": "Hike",
   "date": "2024-07-04T00:00:00.000Z",
-  "distanceM": 67680,
+  "distanceM": 67683.2,
   "movingS": 64083,
   "elevM": 2441.5,
   "mid": [
-    -118.40353,
-    36.813077
+    -118.403407,
+    36.812805
   ],
   "photos": [
     {
@@ -39,6 +40,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 264361,
-  "type": "Run"
+  "elapsedS": 264361
 }

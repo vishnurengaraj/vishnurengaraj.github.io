@@ -3,13 +3,14 @@
   "stravaId": "18924009078",
   "city": "la",
   "title": "Truncated Bulldog Loop",
+  "type": "Trail Run",
   "date": "2026-06-14T00:00:00.000Z",
-  "distanceM": 17730,
+  "distanceM": 17737.4,
   "movingS": 10032,
   "elevM": 535,
   "mid": [
-    -118.763137,
-    34.091981
+    -118.764355,
+    34.091908
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 10518,
-  "type": "Run"
+  "elapsedS": 10518
 }

@@ -3,17 +3,17 @@
   "stravaId": "8612570365",
   "city": "india",
   "title": "Morning Walk",
+  "type": "Walk",
   "date": "2023-02-24T00:00:00.000Z",
-  "distanceM": 3400,
+  "distanceM": 3399.3,
   "movingS": 2899,
   "elevM": 15.4,
   "mid": [
-    77.729328,
-    8.687017
+    77.735528,
+    8.687705
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 3046,
-  "type": "Walk"
+  "elapsedS": 3046
 }

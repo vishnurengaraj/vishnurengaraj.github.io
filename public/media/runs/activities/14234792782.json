@@ -3,13 +3,14 @@
   "stravaId": "14234792782",
   "city": "la",
   "title": "The OG",
+  "type": "Run",
   "date": "2025-04-20T00:00:00.000Z",
-  "distanceM": 9790,
+  "distanceM": 9791.2,
   "movingS": 3106,
   "elevM": 10,
   "mid": [
-    -118.399409,
-    33.848237
+    -118.396415,
+    33.849047
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 3125,
-  "type": "Run"
+  "elapsedS": 3125
 }

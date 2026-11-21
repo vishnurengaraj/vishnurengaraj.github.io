@@ -3,13 +3,14 @@
   "stravaId": "13613436419",
   "city": "fortuna",
   "title": "Evening Run",
+  "type": "Run",
   "date": "2025-02-12T00:00:00.000Z",
-  "distanceM": 7000,
+  "distanceM": 7008.2,
   "movingS": 2241,
   "elevM": 71,
   "mid": [
-    -84.633842,
-    10.470567
+    -84.63446,
+    10.470618
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 2349,
-  "type": "Run"
+  "elapsedS": 2349
 }

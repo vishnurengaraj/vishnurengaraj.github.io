@@ -3,12 +3,13 @@
   "stravaId": "14160307400",
   "city": "sonoma",
   "title": "Lake Sonoma Marathon",
+  "type": "Trail Run",
   "date": "2025-04-12T00:00:00.000Z",
-  "distanceM": 42160,
+  "distanceM": 42159.6,
   "movingS": 21248,
   "elevM": 1670,
   "mid": [
-    -123.084729,
+    -123.084728,
     38.703094
   ],
   "photos": [
@@ -45,6 +46,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 22293,
-  "type": "Run"
+  "elapsedS": 22293
 }

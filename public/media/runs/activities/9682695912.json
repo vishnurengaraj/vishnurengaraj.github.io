@@ -3,17 +3,17 @@
   "stravaId": "9682695912",
   "city": "la",
   "title": "Hilary really ruining my morning routine",
+  "type": "Run",
   "date": "2023-08-19T00:00:00.000Z",
-  "distanceM": 9720,
+  "distanceM": 9726.3,
   "movingS": 3076,
   "elevM": 20,
   "mid": [
-    -118.347498,
-    33.93826
+    -118.345547,
+    33.938279
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 3164,
-  "type": "Run"
+  "elapsedS": 3164
 }

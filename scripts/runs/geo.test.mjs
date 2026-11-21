@@ -87,6 +87,21 @@ test("a 21-lap loop near the start keeps its laps", () => {
   assert.ok(kept > 0.9 * pathLength(coords), `kept ${kept} of ${pathLength(coords)}`);
 });
 
+test("a zero privacy radius keeps the true start and finish", () => {
+  const start = [-118.35, 33.9];
+  const mid = moveMeters(start, 2000, 90);
+  const end = moveMeters(mid, 2000, 180);
+  const coords = [start, moveMeters(start, 50, 90), mid, moveMeters(end, 50, 0), end];
+  const parts = applyPrivacy(coords, { radiusM: 0 });
+  assert.equal(parts.length, 1);
+  assert.equal(haversine(parts[0][0], start) < 1, true);
+  assert.equal(haversine(parts[0][parts[0].length - 1], end) < 1, true);
+  const dense = densify(coords, 12);
+  const { head, tail } = privacyWindow(dense, 0);
+  assert.equal(head, 0);
+  assert.equal(tail, dense.length - 1);
+});
+
 test("the start and finish stretches of a loop are trimmed", () => {
   const coords = parkLoop(21);
   const parts = applyPrivacy(coords, { radiusM: 400 });
@@ -120,6 +135,10 @@ test("city assignment keeps South Bay on LA and names away regions", () => {
   assert.equal(assignCity(-119.0, 37.66).id, "sierra");
   assert.equal(assignCity(-118.51, 37.35).id, "sierra");
   assert.equal(assignCity(-3.72, 40.43).label, "Madrid");
+  assert.equal(assignCity(-1.649501, 42.815644).id, "pamplona");
+  assert.equal(assignCity(-121.950129, 36.518082).id, "lobos");
+  assert.equal(assignCity(-95.343924, 29.987413).id, "houston");
+  assert.equal(assignCity(-71.120271, 42.372635).id, "bos");
   const away = assignCity(-105.5, 39.0);
   assert.notEqual(away.id, "la");
   assert.equal(away.generated, true);
@@ -160,7 +179,8 @@ test("shipped routes are one heatmap per named city", () => {
   const manifest = JSON.parse(readFileSync(path.join(ROOT, "src/data/runs/manifest.json"), "utf8"));
   assert.equal(manifest.sample, false);
   assert.equal(manifest.defaultCity, "la");
-  assert.equal(manifest.privacy.meters, 400);
+  assert.equal(manifest.privacy.method, "none");
+  assert.equal(manifest.privacy.meters, 0);
   assert.ok(manifest.runs.length > 400);
   const types = new Set(manifest.runs.map((run) => run.type));
   for (const type of ["Run", "Trail Run", "Walk", "Hike"]) assert.ok(types.has(type), type);

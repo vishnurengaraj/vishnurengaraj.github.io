@@ -3,13 +3,14 @@
   "stravaId": "16624085729",
   "city": "channel",
   "title": "Channel Islands Scamper",
+  "type": "Hike",
   "date": "2025-12-01T00:00:00.000Z",
-  "distanceM": 14470,
+  "distanceM": 14476.3,
   "movingS": 11421,
   "elevM": 568,
   "mid": [
-    -119.596111,
-    34.034526
+    -119.596126,
+    34.034652
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 16714,
-  "type": "Run"
+  "elapsedS": 16714
 }

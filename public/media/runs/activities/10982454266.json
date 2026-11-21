@@ -3,13 +3,14 @@
   "stravaId": "10982454266",
   "city": "la",
   "title": "LA Marathon 2024",
+  "type": "Run",
   "date": "2024-03-17T00:00:00.000Z",
-  "distanceM": 42330,
+  "distanceM": 42334.6,
   "movingS": 16125,
   "elevM": 374.8,
   "mid": [
-    -118.36422,
-    34.097973
+    -118.363604,
+    34.097986
   ],
   "photos": [
     {
@@ -39,6 +40,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 16215,
-  "type": "Run"
+  "elapsedS": 16215
 }

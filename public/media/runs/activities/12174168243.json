@@ -3,13 +3,14 @@
   "stravaId": "12174168243",
   "city": "sierra",
   "title": "White Mountain",
+  "type": "Hike",
   "date": "2024-08-17T00:00:00.000Z",
-  "distanceM": 25070,
+  "distanceM": 25069.5,
   "movingS": 21878,
   "elevM": 1052.4,
   "mid": [
-    -118.255716,
-    37.634056
+    -118.255737,
+    37.634055
   ],
   "photos": [
     {
@@ -45,6 +46,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 25893,
-  "type": "Run"
+  "elapsedS": 25893
 }

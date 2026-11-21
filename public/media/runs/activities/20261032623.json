@@ -3,13 +3,14 @@
   "stravaId": "20261032623",
   "city": "sierra",
   "title": "Duck Pass and Pika Lake 🦆🐿️",
+  "type": "Hike",
   "date": "2026-09-20T00:00:00.000Z",
-  "distanceM": 16510,
+  "distanceM": 16511.6,
   "movingS": 15974,
   "elevM": 720,
   "mid": [
-    -118.954859,
-    37.551767
+    -118.95452,
+    37.55185
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 19195,
-  "type": "Run"
+  "elapsedS": 19195
 }

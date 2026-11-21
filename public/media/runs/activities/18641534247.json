@@ -3,13 +3,14 @@
   "stravaId": "18641534247",
   "city": "reyes",
   "title": "Reyes Peak w/ Randy the Rattlesnake 🐍",
+  "type": "Hike",
   "date": "2026-05-24T00:00:00.000Z",
-  "distanceM": 27690,
+  "distanceM": 27696.3,
   "movingS": 26051,
   "elevM": 1418,
   "mid": [
-    -119.286181,
-    34.630193
+    -119.286209,
+    34.630161
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 28854,
-  "type": "Run"
+  "elapsedS": 28854
 }

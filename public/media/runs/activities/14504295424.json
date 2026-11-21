@@ -3,13 +3,14 @@
   "stravaId": "14504295424",
   "city": "la",
   "title": "Night Run",
+  "type": "Run",
   "date": "2025-05-16T00:00:00.000Z",
-  "distanceM": 9350,
+  "distanceM": 9357,
   "movingS": 2940,
   "elevM": 39,
   "mid": [
-    -118.355671,
-    33.909861
+    -118.355585,
+    33.909862
   ],
   "photos": [
     {
@@ -21,6 +22,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 2961,
-  "type": "Run"
+  "elapsedS": 2961
 }

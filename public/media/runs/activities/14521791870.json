@@ -3,13 +3,14 @@
   "stravaId": "14521791870",
   "city": "la",
   "title": "HRC 9",
+  "type": "Run",
   "date": "2025-05-18T00:00:00.000Z",
-  "distanceM": 14720,
+  "distanceM": 14726.6,
   "movingS": 4596,
   "elevM": 19,
   "mid": [
-    -118.391313,
-    33.813923
+    -118.39133,
+    33.813789
   ],
   "photos": [
     {
@@ -21,6 +22,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 5514,
-  "type": "Run"
+  "elapsedS": 5514
 }

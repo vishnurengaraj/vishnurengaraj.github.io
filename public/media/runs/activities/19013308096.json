@@ -3,13 +3,14 @@
   "stravaId": "19013308096",
   "city": "la",
   "title": "Eagle Rock Loop 🦅 🪨 🔁",
+  "type": "Trail Run",
   "date": "2026-06-21T00:00:00.000Z",
-  "distanceM": 15100,
+  "distanceM": 15101.7,
   "movingS": 6673,
   "elevM": 518,
   "mid": [
-    -118.55828,
-    34.105407
+    -118.557977,
+    34.105074
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 7191,
-  "type": "Run"
+  "elapsedS": 7191
 }

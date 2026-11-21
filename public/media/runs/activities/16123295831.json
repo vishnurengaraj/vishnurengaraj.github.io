@@ -3,13 +3,14 @@
   "stravaId": "16123295831",
   "city": "baldy",
   "title": "Baldy and the 4Ts",
+  "type": "Hike",
   "date": "2025-10-12T00:00:00.000Z",
-  "distanceM": 28010,
+  "distanceM": 28018.9,
   "movingS": 31178,
   "elevM": 2286,
   "mid": [
-    -117.607291,
-    34.264858
+    -117.608183,
+    34.265285
   ],
   "photos": [
     {
@@ -39,6 +40,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 36401,
-  "type": "Run"
+  "elapsedS": 36401
 }

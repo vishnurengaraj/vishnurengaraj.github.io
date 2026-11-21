@@ -3,17 +3,17 @@
   "stravaId": "19112345759",
   "city": "geneva",
   "title": "Jaunt to Decathlon",
+  "type": "Walk",
   "date": "2026-06-29T00:00:00.000Z",
-  "distanceM": 2670,
+  "distanceM": 2669.7,
   "movingS": 1839,
   "elevM": 22,
   "mid": [
-    6.097009,
-    46.222003
+    6.096995,
+    46.221994
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 2582,
-  "type": "Run"
+  "elapsedS": 2582
 }

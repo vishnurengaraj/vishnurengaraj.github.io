@@ -3,13 +3,14 @@
   "stravaId": "16833808991",
   "city": "la",
   "title": "Afternoon Run",
+  "type": "Run",
   "date": "2025-12-24T00:00:00.000Z",
-  "distanceM": 10210,
+  "distanceM": 10209.9,
   "movingS": 3321,
   "elevM": 22,
   "mid": [
-    -118.37114,
-    33.910718
+    -118.371135,
+    33.911905
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 3559,
-  "type": "Run"
+  "elapsedS": 3559
 }

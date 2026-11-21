@@ -3,13 +3,14 @@
   "stravaId": "17254433401",
   "city": "la",
   "title": "28k for 28 Years",
+  "type": "Run",
   "date": "2026-02-01T00:00:00.000Z",
-  "distanceM": 28010,
+  "distanceM": 28011.5,
   "movingS": 9927,
   "elevM": 41,
   "mid": [
-    -118.468295,
-    33.984096
+    -118.468683,
+    33.98456
   ],
   "photos": [
     {
@@ -45,6 +46,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 10984,
-  "type": "Run"
+  "elapsedS": 10984
 }
