@@ -3,13 +3,14 @@
   "stravaId": "10566564329",
   "city": "la",
   "title": "2nd annual Wilson hike",
+  "type": "Hike",
   "date": "2024-01-15T00:00:00.000Z",
-  "distanceM": 24870,
+  "distanceM": 24877.9,
   "movingS": 21294,
   "elevM": 1818.2,
   "mid": [
-    -118.05705,
-    34.225596
+    -118.057043,
+    34.225683
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 28620,
-  "type": "Hike"
+  "elapsedS": 28620
 }

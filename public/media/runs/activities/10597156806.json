@@ -3,17 +3,17 @@
   "stravaId": "10597156806",
   "city": "la",
   "title": "Strand Slip n Slide",
+  "type": "Run",
   "date": "2024-01-20T00:00:00.000Z",
-  "distanceM": 9780,
+  "distanceM": 9788.1,
   "movingS": 3481,
   "elevM": 35,
   "mid": [
-    -118.433604,
-    33.925446
+    -118.433691,
+    33.925666
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 3581,
-  "type": "Run"
+  "elapsedS": 3581
 }

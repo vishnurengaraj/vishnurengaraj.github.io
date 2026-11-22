@@ -3,17 +3,17 @@
   "stravaId": "9590667431",
   "city": "yosemite",
   "title": "Hoffman Hustle",
+  "type": "Hike",
   "date": "2023-08-05T00:00:00.000Z",
-  "distanceM": 9700,
+  "distanceM": 9701.5,
   "movingS": 10555,
   "elevM": 609.6,
   "mid": [
-    -119.509842,
+    -119.509854,
     37.846949
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 17477,
-  "type": "Run"
+  "elapsedS": 17477
 }

@@ -3,13 +3,14 @@
   "stravaId": "16256509909",
   "city": "jacinto",
   "title": "Cactus 🌵 to Clouds ☁️",
+  "type": "Hike",
   "date": "2025-10-25T00:00:00.000Z",
-  "distanceM": 33380,
+  "distanceM": 33386.3,
   "movingS": 41074,
   "elevM": 3358,
   "mid": [
-    -116.649493,
-    33.811121
+    -116.648525,
+    33.81148
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 49018,
-  "type": "Run"
+  "elapsedS": 49018
 }

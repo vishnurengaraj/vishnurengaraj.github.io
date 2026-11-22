@@ -3,17 +3,17 @@
   "stravaId": "15948036978",
   "city": "waco",
   "title": "Rocket Run",
+  "type": "Run",
   "date": "2025-09-26T00:00:00.000Z",
-  "distanceM": 9050,
+  "distanceM": 9049.5,
   "movingS": 2837,
   "elevM": 20,
   "mid": [
-    -97.445274,
-    31.398848
+    -97.444561,
+    31.395705
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 2837,
-  "type": "Run"
+  "elapsedS": 2837
 }

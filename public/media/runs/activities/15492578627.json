@@ -3,17 +3,17 @@
   "stravaId": "15492578627",
   "city": "la",
   "title": "HRC 5",
+  "type": "Run",
   "date": "2025-08-17T00:00:00.000Z",
-  "distanceM": 9330,
+  "distanceM": 9333.4,
   "movingS": 3046,
   "elevM": 69,
   "mid": [
-    -118.39981,
-    33.873893
+    -118.399776,
+    33.873891
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 4143,
-  "type": "Run"
+  "elapsedS": 4143
 }

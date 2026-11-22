@@ -3,13 +3,14 @@
   "stravaId": "12302817828",
   "city": "whitney",
   "title": "Mt Langley",
+  "type": "Hike",
   "date": "2024-09-01T00:00:00.000Z",
-  "distanceM": 39370,
+  "distanceM": 39377.1,
   "movingS": 36206,
   "elevM": 1535.3,
   "mid": [
-    -118.240207,
-    36.522118
+    -118.240731,
+    36.521737
   ],
   "photos": [
     {
@@ -39,6 +40,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 45782,
-  "type": "Run"
+  "elapsedS": 45782
 }

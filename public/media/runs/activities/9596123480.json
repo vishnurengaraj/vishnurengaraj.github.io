@@ -3,13 +3,14 @@
   "stravaId": "9596123480",
   "city": "sierra",
   "title": "Crater Crawl",
+  "type": "Run",
   "date": "2023-08-06T00:00:00.000Z",
-  "distanceM": 4180,
+  "distanceM": 4185.4,
   "movingS": 1460,
   "elevM": 83.4,
   "mid": [
-    -118.995143,
-    37.681874
+    -118.995138,
+    37.681869
   ],
   "photos": [
     {
@@ -21,6 +22,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 1460,
-  "type": "Run"
+  "elapsedS": 1460
 }

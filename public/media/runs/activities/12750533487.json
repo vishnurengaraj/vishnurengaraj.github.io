@@ -3,13 +3,14 @@
   "stravaId": "12750533487",
   "city": "sierra",
   "title": "Range of Lights Trail Run 10k",
+  "type": "Run",
   "date": "2024-10-26T00:00:00.000Z",
-  "distanceM": 11720,
+  "distanceM": 11724.4,
   "movingS": 4304,
   "elevM": 307.8,
   "mid": [
-    -118.505003,
-    37.352831
+    -118.504987,
+    37.352849
   ],
   "photos": [
     {
@@ -39,6 +40,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 4561,
-  "type": "Trail Run"
+  "elapsedS": 4561
 }

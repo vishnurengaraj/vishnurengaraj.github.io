@@ -1,0 +1,19 @@
+{
+  "id": "10116406435",
+  "stravaId": "10116406435",
+  "city": "bos",
+  "title": "Boston boogie",
+  "type": "Hike",
+  "date": "2023-10-28T00:00:00.000Z",
+  "distanceM": 1018.9,
+  "movingS": 787,
+  "elevM": 0,
+  "mid": [
+    -71.120271,
+    42.372635
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 2102
+}

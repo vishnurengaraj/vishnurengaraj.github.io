@@ -3,13 +3,14 @@
   "stravaId": "18097928353",
   "city": "pinnacles",
   "title": "Pinnacles Pilgrimage",
+  "type": "Hike",
   "date": "2026-04-13T00:00:00.000Z",
-  "distanceM": 9200,
+  "distanceM": 9208,
   "movingS": 7426,
   "elevM": 524.4,
   "mid": [
-    -121.200513,
-    36.485964
+    -121.20049,
+    36.485976
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 8262,
-  "type": "Run"
+  "elapsedS": 8262
 }

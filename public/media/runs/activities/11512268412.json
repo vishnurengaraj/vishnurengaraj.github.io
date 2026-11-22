@@ -3,13 +3,14 @@
   "stravaId": "11512268412",
   "city": "la",
   "title": "Vishnu goes west",
+  "type": "Run",
   "date": "2024-05-27T00:00:00.000Z",
-  "distanceM": 16020,
+  "distanceM": 16020.6,
   "movingS": 5610,
   "elevM": 118.2,
   "mid": [
-    -118.409415,
-    33.888796
+    -118.409146,
+    33.888537
   ],
   "photos": [
     {
@@ -21,6 +22,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 6219,
-  "type": "Run"
+  "elapsedS": 6219
 }

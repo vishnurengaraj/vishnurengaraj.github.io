@@ -3,13 +3,14 @@
   "stravaId": "16324259153",
   "city": "la",
   "title": "V vs VRC",
+  "type": "Run",
   "date": "2025-11-01T00:00:00.000Z",
-  "distanceM": 21080,
+  "distanceM": 21083.6,
   "movingS": 6732,
   "elevM": 54,
   "mid": [
-    -118.50138,
-    34.016569
+    -118.501557,
+    34.016717
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 6867,
-  "type": "Run"
+  "elapsedS": 6867
 }

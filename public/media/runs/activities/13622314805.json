@@ -1,0 +1,26 @@
+{
+  "id": "13622314805",
+  "stravaId": "13622314805",
+  "city": "fortuna",
+  "title": "Afternoon Hike",
+  "type": "Hike",
+  "date": "2025-02-13T00:00:00.000Z",
+  "distanceM": 297.8,
+  "movingS": 357,
+  "elevM": 89,
+  "mid": [
+    -84.668591,
+    10.440727
+  ],
+  "photos": [
+    {
+      "src": "/media/runs/photos/13622314805/1.webp",
+      "w": 1108,
+      "h": 1600,
+      "sample": false
+    }
+  ],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 357
+}

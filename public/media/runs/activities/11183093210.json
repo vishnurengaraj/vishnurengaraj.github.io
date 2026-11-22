@@ -3,13 +3,14 @@
   "stravaId": "11183093210",
   "city": "joshua",
   "title": "Jtree Jam",
+  "type": "Hike",
   "date": "2024-04-12T00:00:00.000Z",
-  "distanceM": 57400,
+  "distanceM": 57401.7,
   "movingS": 41683,
   "elevM": 974.6,
   "mid": [
-    -116.169246,
-    33.97692
+    -116.169376,
+    33.976887
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 163639,
-  "type": "Run"
+  "elapsedS": 163639
 }

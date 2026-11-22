@@ -3,13 +3,14 @@
   "stravaId": "14024548295",
   "city": "la",
   "title": "Chino 22",
+  "type": "Trail Run",
   "date": "2025-03-29T00:00:00.000Z",
-  "distanceM": 35930,
+  "distanceM": 35931.7,
   "movingS": 14426,
   "elevM": 915,
   "mid": [
-    -117.803559,
-    33.914122
+    -117.80354,
+    33.914105
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 15118,
-  "type": "Run"
+  "elapsedS": 15118
 }

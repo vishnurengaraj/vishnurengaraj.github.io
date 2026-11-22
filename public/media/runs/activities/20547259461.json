@@ -3,13 +3,14 @@
   "stravaId": "20547259461",
   "city": "humboldt",
   "title": "Humboldt Redwoods Marathon",
+  "type": "Run",
   "date": "2026-10-11T00:00:00.000Z",
-  "distanceM": 42720,
+  "distanceM": 42728.9,
   "movingS": 16003,
   "elevM": 266,
   "mid": [
-    -123.926999,
-    40.354878
+    -123.927019,
+    40.354875
   ],
   "photos": [
     {
@@ -21,6 +22,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 16063,
-  "type": "Run"
+  "elapsedS": 16063
 }

@@ -3,13 +3,14 @@
   "stravaId": "16214850418",
   "city": "michigan",
   "title": "Afternoon Run",
+  "type": "Run",
   "date": "2025-10-21T00:00:00.000Z",
-  "distanceM": 10320,
+  "distanceM": 10322.1,
   "movingS": 3259,
   "elevM": 44,
   "mid": [
     -83.129724,
-    42.681269
+    42.681281
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 3432,
-  "type": "Run"
+  "elapsedS": 3432
 }

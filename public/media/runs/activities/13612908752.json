@@ -3,13 +3,14 @@
   "stravaId": "13612908752",
   "city": "fortuna",
   "title": "1968 lava trail",
+  "type": "Hike",
   "date": "2025-02-12T00:00:00.000Z",
-  "distanceM": 5110,
+  "distanceM": 5118.6,
   "movingS": 7953,
   "elevM": 189,
   "mid": [
-    -84.734493,
-    10.473018
+    -84.735057,
+    10.473718
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 10390,
-  "type": "Run"
+  "elapsedS": 10390
 }

@@ -3,13 +3,14 @@
   "stravaId": "14735033617",
   "city": "atlanta",
   "title": "Post Marital Jaunt",
+  "type": "Run",
   "date": "2025-06-08T00:00:00.000Z",
-  "distanceM": 8500,
+  "distanceM": 8508,
   "movingS": 2889,
   "elevM": 88,
   "mid": [
-    -84.322374,
-    33.993266
+    -84.32241,
+    33.993474
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 2932,
-  "type": "Run"
+  "elapsedS": 2932
 }

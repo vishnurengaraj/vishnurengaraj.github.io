@@ -3,13 +3,14 @@
   "stravaId": "15968802509",
   "city": "la",
   "title": "Chino Half Revisited",
+  "type": "Trail Run",
   "date": "2025-09-28T00:00:00.000Z",
-  "distanceM": 21210,
+  "distanceM": 21214.6,
   "movingS": 8032,
   "elevM": 483,
   "mid": [
-    -117.739659,
-    33.917202
+    -117.738146,
+    33.918159
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 8064,
-  "type": "Run"
+  "elapsedS": 8064
 }

@@ -3,13 +3,14 @@
   "stravaId": "13241477782",
   "city": "la",
   "title": "Los leones x2",
+  "type": "Run",
   "date": "2025-01-01T00:00:00.000Z",
-  "distanceM": 24160,
+  "distanceM": 24159.4,
   "movingS": 11247,
   "elevM": 1018.4,
   "mid": [
-    -118.560025,
-    34.047392
+    -118.559924,
+    34.04983
   ],
   "photos": [
     {
@@ -21,6 +22,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 12680,
-  "type": "Run"
+  "elapsedS": 12680
 }

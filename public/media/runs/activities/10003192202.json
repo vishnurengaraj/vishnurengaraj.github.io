@@ -3,17 +3,17 @@
   "stravaId": "10003192202",
   "city": "jacinto",
   "title": "Afternoon Hike",
+  "type": "Hike",
   "date": "2023-10-07T00:00:00.000Z",
-  "distanceM": 15350,
+  "distanceM": 15353.2,
   "movingS": 16696,
   "elevM": 1293.7,
   "mid": [
-    -116.70086,
-    33.783578
+    -116.699309,
+    33.783212
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 21758,
-  "type": "Hike"
+  "elapsedS": 21758
 }

@@ -3,13 +3,14 @@
   "stravaId": "15824108266",
   "city": "whitney",
   "title": "🍐 🌊 (Pear Lake)",
+  "type": "Hike",
   "date": "2025-09-14T00:00:00.000Z",
-  "distanceM": 27950,
+  "distanceM": 27954.1,
   "movingS": 28029,
   "elevM": 1185,
   "mid": [
-    -118.671787,
-    36.605605
+    -118.671808,
+    36.60562
   ],
   "photos": [
     {
@@ -39,6 +40,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 37028,
-  "type": "Run"
+  "elapsedS": 37028
 }

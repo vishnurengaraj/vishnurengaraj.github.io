@@ -3,13 +3,14 @@
   "stravaId": "13522747208",
   "city": "la",
   "title": "27k for 27 years",
+  "type": "Run",
   "date": "2025-02-02T00:00:00.000Z",
-  "distanceM": 27050,
+  "distanceM": 27057.7,
   "movingS": 9076,
   "elevM": 63,
   "mid": [
-    -118.446026,
-    33.983686
+    -118.446018,
+    33.983684
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 9659,
-  "type": "Run"
+  "elapsedS": 9659
 }

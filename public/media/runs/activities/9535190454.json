@@ -3,17 +3,17 @@
   "stravaId": "9535190454",
   "city": "la",
   "title": "Brake Dust Boogie",
+  "type": "Run",
   "date": "2023-07-27T00:00:00.000Z",
-  "distanceM": 10140,
+  "distanceM": 10140.7,
   "movingS": 2952,
   "elevM": 23.7,
   "mid": [
-    -118.3711,
-    33.913594
+    -118.371111,
+    33.913675
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 2952,
-  "type": "Run"
+  "elapsedS": 2952
 }

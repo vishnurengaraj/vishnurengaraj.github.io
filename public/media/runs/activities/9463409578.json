@@ -3,13 +3,14 @@
   "stravaId": "9463409578",
   "city": "la",
   "title": "More like Eagle kicked-my-butt Rock amirite",
+  "type": "Trail Run",
   "date": "2023-07-16T00:00:00.000Z",
-  "distanceM": 10640,
+  "distanceM": 10642.3,
   "movingS": 4274,
   "elevM": 381.6,
   "mid": [
-    -118.558553,
-    34.107925
+    -118.558635,
+    34.107905
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 4286,
-  "type": "Run"
+  "elapsedS": 4286
 }

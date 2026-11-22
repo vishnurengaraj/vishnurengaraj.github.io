@@ -3,13 +3,14 @@
   "stravaId": "15822517990",
   "city": "whitney",
   "title": "Morning Walk to Sherman",
+  "type": "Walk",
   "date": "2025-09-15T00:00:00.000Z",
-  "distanceM": 3330,
+  "distanceM": 3332.9,
   "movingS": 2164,
   "elevM": 102,
   "mid": [
-    -118.75062,
-    36.584057
+    -118.751496,
+    36.583512
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 2699,
-  "type": "Walk"
+  "elapsedS": 2699
 }

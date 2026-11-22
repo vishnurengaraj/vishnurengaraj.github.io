@@ -3,17 +3,17 @@
   "stravaId": "12525626146",
   "city": "la",
   "title": "Wrong cafe :(",
+  "type": "Run",
   "date": "2024-09-28T00:00:00.000Z",
-  "distanceM": 1250,
+  "distanceM": 1252.5,
   "movingS": 398,
   "elevM": 16.9,
   "mid": [
-    -118.446246,
-    33.960177
+    -118.446174,
+    33.96023
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 398,
-  "type": "Run"
+  "elapsedS": 398
 }

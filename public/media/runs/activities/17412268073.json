@@ -3,13 +3,14 @@
   "stravaId": "17412268073",
   "city": "tokyo",
   "title": "Imperial Palace Prance",
+  "type": "Run",
   "date": "2026-02-16T00:00:00.000Z",
-  "distanceM": 11430,
+  "distanceM": 11438.4,
   "movingS": 3568,
   "elevM": 72,
   "mid": [
-    139.745954,
-    35.680027
+    139.745937,
+    35.680038
   ],
   "photos": [
     {
@@ -39,6 +40,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 5238,
-  "type": "Run"
+  "elapsedS": 5238
 }

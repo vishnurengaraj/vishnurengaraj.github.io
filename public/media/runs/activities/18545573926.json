@@ -3,13 +3,14 @@
   "stravaId": "18545573926",
   "city": "michigan",
   "title": "Lunch Walk",
+  "type": "Walk",
   "date": "2026-05-17T00:00:00.000Z",
-  "distanceM": 5600,
+  "distanceM": 5600.6,
   "movingS": 3940,
   "elevM": 45,
   "mid": [
-    -83.194478,
-    42.695137
+    -83.194477,
+    42.695117
   ],
   "photos": [
     {
@@ -21,6 +22,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 4144,
-  "type": "Walk"
+  "elapsedS": 4144
 }

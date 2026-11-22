@@ -3,13 +3,14 @@
   "stravaId": "16091937811",
   "city": "waco",
   "title": "Night Run",
+  "type": "Run",
   "date": "2025-10-09T00:00:00.000Z",
-  "distanceM": 8850,
+  "distanceM": 8851.8,
   "movingS": 2828,
   "elevM": 41,
   "mid": [
-    -97.111068,
-    31.554572
+    -97.110465,
+    31.554285
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 2905,
-  "type": "Run"
+  "elapsedS": 2905
 }

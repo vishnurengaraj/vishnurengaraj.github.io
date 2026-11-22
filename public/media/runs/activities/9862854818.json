@@ -3,13 +3,14 @@
   "stravaId": "9862854818",
   "city": "baldy",
   "title": "Afternoon Hike",
+  "type": "Hike",
   "date": "2023-09-15T00:00:00.000Z",
-  "distanceM": 10730,
+  "distanceM": 10736.5,
   "movingS": 11836,
   "elevM": 1250,
   "mid": [
-    -117.599952,
-    34.241111
+    -117.597065,
+    34.239638
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 16753,
-  "type": "Hike"
+  "elapsedS": 16753
 }

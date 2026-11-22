@@ -3,17 +3,17 @@
   "stravaId": "9688304819",
   "city": "la",
   "title": "Rain Run",
+  "type": "Run",
   "date": "2023-08-20T00:00:00.000Z",
-  "distanceM": 6940,
+  "distanceM": 6943.8,
   "movingS": 2654,
   "elevM": 93.8,
   "mid": [
-    -118.436487,
-    33.932568
+    -118.436615,
+    33.932908
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 2687,
-  "type": "Run"
+  "elapsedS": 2687
 }

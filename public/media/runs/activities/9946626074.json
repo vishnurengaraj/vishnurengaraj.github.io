@@ -3,17 +3,17 @@
   "stravaId": "9946626074",
   "city": "la",
   "title": "Vishnu goes back to college",
+  "type": "Run",
   "date": "2023-09-29T00:00:00.000Z",
-  "distanceM": 11320,
+  "distanceM": 11325,
   "movingS": 3798,
   "elevM": 43.6,
   "mid": [
-    -118.328848,
-    33.88577
+    -118.329496,
+    33.886302
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 3977,
-  "type": "Run"
+  "elapsedS": 3977
 }

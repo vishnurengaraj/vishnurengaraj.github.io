@@ -3,13 +3,14 @@
   "stravaId": "10735593842",
   "city": "la",
   "title": "River Crossing Rumble",
+  "type": "Run",
   "date": "2024-02-10T00:00:00.000Z",
-  "distanceM": 12280,
+  "distanceM": 12286.1,
   "movingS": 6680,
   "elevM": 575.4,
   "mid": [
-    -118.578893,
-    34.077287
+    -118.57881,
+    34.077235
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 8760,
-  "type": "Run"
+  "elapsedS": 8760
 }

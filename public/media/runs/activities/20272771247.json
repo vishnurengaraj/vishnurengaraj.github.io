@@ -3,13 +3,14 @@
   "stravaId": "20272771247",
   "city": "sierra",
   "title": "Crystal Lake 💎 🌊",
+  "type": "Hike",
   "date": "2026-09-21T00:00:00.000Z",
-  "distanceM": 6100,
+  "distanceM": 6101.3,
   "movingS": 6100,
   "elevM": 294,
   "mid": [
-    -119.017365,
-    37.592719
+    -119.017428,
+    37.592918
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 8032,
-  "type": "Run"
+  "elapsedS": 8032
 }

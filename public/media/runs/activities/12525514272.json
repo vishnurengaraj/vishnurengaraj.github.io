@@ -3,13 +3,14 @@
   "stravaId": "12525514272",
   "city": "la",
   "title": "Run club reunion",
+  "type": "Run",
   "date": "2024-09-28T00:00:00.000Z",
-  "distanceM": 17900,
+  "distanceM": 17901.1,
   "movingS": 5921,
   "elevM": 88.4,
   "mid": [
-    -118.431624,
-    33.959621
+    -118.431677,
+    33.959619
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 6593,
-  "type": "Run"
+  "elapsedS": 6593
 }

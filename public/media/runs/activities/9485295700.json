@@ -1,0 +1,19 @@
+{
+  "id": "9485295700",
+  "stravaId": "9485295700",
+  "city": "la",
+  "title": "Evening Run",
+  "type": "Run",
+  "date": "2023-07-19T00:00:00.000Z",
+  "distanceM": 9008.2,
+  "movingS": 3446,
+  "elevM": 26.4,
+  "mid": [
+    -118.401608,
+    34.003875
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 3639
+}

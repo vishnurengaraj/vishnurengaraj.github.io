@@ -3,13 +3,14 @@
   "stravaId": "12477942683",
   "city": "michigan",
   "title": "Lunch Run",
+  "type": "Run",
   "date": "2024-09-22T00:00:00.000Z",
-  "distanceM": 10950,
+  "distanceM": 10951.4,
   "movingS": 3460,
   "elevM": 91.8,
   "mid": [
-    -83.195673,
-    42.717014
+    -83.195722,
+    42.717311
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 3511,
-  "type": "Run"
+  "elapsedS": 3511
 }

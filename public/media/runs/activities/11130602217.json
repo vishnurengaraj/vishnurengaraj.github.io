@@ -3,17 +3,17 @@
   "stravaId": "11130602217",
   "city": "ynez",
   "title": "Morning Hike",
+  "type": "Hike",
   "date": "2024-04-06T00:00:00.000Z",
-  "distanceM": 13990,
+  "distanceM": 13993,
   "movingS": 14705,
   "elevM": 1016,
   "mid": [
-    -119.753798,
-    34.577789
+    -119.752507,
+    34.580269
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 23718,
-  "type": "Hike"
+  "elapsedS": 23718
 }

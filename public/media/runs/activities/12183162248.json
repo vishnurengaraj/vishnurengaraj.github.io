@@ -3,13 +3,14 @@
   "stravaId": "12183162248",
   "city": "telescope",
   "title": "Telescope Peak",
+  "type": "Hike",
   "date": "2024-08-18T00:00:00.000Z",
-  "distanceM": 20280,
+  "distanceM": 20288,
   "movingS": 18440,
   "elevM": 998.7,
   "mid": [
     -117.089211,
-    36.170021
+    36.170027
   ],
   "photos": [
     {
@@ -45,6 +46,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 22693,
-  "type": "Run"
+  "elapsedS": 22693
 }

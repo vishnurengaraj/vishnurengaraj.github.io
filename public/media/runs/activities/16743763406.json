@@ -3,13 +3,14 @@
   "stravaId": "16743763406",
   "city": "la",
   "title": "Bulldog Loop pt3",
+  "type": "Trail Run",
   "date": "2025-12-14T00:00:00.000Z",
-  "distanceM": 25750,
+  "distanceM": 25753.6,
   "movingS": 11750,
   "elevM": 966,
   "mid": [
-    -118.748004,
-    34.079964
+    -118.747987,
+    34.079963
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 12092,
-  "type": "Run"
+  "elapsedS": 12092
 }

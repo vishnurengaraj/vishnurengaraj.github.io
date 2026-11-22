@@ -185,6 +185,9 @@ export function pointInZones(point, zones) {
  * `radiusM` around its end. Everything outside [head, tail] is hidden.
  */
 export function privacyWindow(dense, radiusM) {
+  if (!dense.length) return { head: 0, tail: -1 };
+  // radiusM <= 0 means no start/finish trim: keep every point.
+  if (!(radiusM > 0)) return { head: 0, tail: dense.length - 1 };
   const start = dense[0];
   const end = dense[dense.length - 1];
   let head = 0;
@@ -195,9 +198,10 @@ export function privacyWindow(dense, radiusM) {
 }
 
 /**
- * Hide the start and end of a route.
+ * Hide the start and end of a route. Pass `radiusM` 0 (or less) to keep the
+ * full track, including the true start and finish.
  * The track is trimmed from its first point until it first leaves a circle of
- * `radiusM` (default 400, the middle of the 300–500m band) around the start,
+ * `radiusM` (default 400) around the start,
  * and from its last point back until it last leaves the same circle around
  * the end. Only those two stretches are removed: a lap or out-and-back that
  * passes near the start later stays on the map, so a park loop run 21 times

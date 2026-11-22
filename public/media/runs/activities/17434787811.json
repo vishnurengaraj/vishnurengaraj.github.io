@@ -3,13 +3,14 @@
   "stravaId": "17434787811",
   "city": "tokyo",
   "title": "Ueno Wobble",
+  "type": "Run",
   "date": "2026-02-18T00:00:00.000Z",
-  "distanceM": 8900,
+  "distanceM": 8907.4,
   "movingS": 2832,
   "elevM": 33,
   "mid": [
-    139.772552,
-    35.713077
+    139.772595,
+    35.713357
   ],
   "photos": [
     {
@@ -33,6 +34,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 3285,
-  "type": "Run"
+  "elapsedS": 3285
 }

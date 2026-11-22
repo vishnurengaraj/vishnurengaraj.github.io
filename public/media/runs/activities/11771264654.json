@@ -3,13 +3,14 @@
   "stravaId": "11771264654",
   "city": "la",
   "title": "Afternoon Hike",
+  "type": "Hike",
   "date": "2024-06-29T00:00:00.000Z",
-  "distanceM": 5160,
+  "distanceM": 5168.3,
   "movingS": 4641,
   "elevM": 253.6,
   "mid": [
-    -118.753268,
-    34.049788
+    -118.753249,
+    34.049628
   ],
   "photos": [
     {
@@ -27,6 +28,5 @@
   ],
   "companions": [],
   "sample": false,
-  "elapsedS": 7265,
-  "type": "Hike"
+  "elapsedS": 7265
 }

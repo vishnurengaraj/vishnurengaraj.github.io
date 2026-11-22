@@ -3,17 +3,17 @@
   "stravaId": "10597156768",
   "city": "la",
   "title": "Morning Walk",
+  "type": "Walk",
   "date": "2024-01-20T00:00:00.000Z",
-  "distanceM": 3530,
+  "distanceM": 3533.8,
   "movingS": 1765,
   "elevM": 33.4,
   "mid": [
-    -118.417741,
-    33.895863
+    -118.417642,
+    33.895675
   ],
   "photos": [],
   "companions": [],
   "sample": false,
-  "elapsedS": 1765,
-  "type": "Walk"
+  "elapsedS": 1765
 }
