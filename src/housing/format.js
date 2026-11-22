@@ -392,3 +392,25 @@ export function listingThumb(listing) {
   const first = listingPhotos(listing)[0];
   return first?.thumb || first?.src || "";
 }
+
+export function listingNotes(listing) {
+  const text = listing?.description_notes;
+  if (text == null) return "";
+  return String(text).trim();
+}
+
+export function listingDescription(listing) {
+  const text = listing?.description;
+  if (text == null) return "";
+  return String(text).trim();
+}
+
+/** Split listing copy into paragraphs of plain-text lines. */
+export function descriptionParagraphs(text) {
+  const raw = String(text ?? "").replace(/\r\n?/g, "\n").trim();
+  if (!raw) return [];
+  return raw
+    .split(/\n[ \t]*\n+/)
+    .map((para) => para.split("\n").map((line) => line.trimEnd()))
+    .filter((lines) => lines.some(Boolean));
+}

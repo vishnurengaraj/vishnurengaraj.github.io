@@ -1067,11 +1067,39 @@ html:has(.housing) #app {
 }
 
 .housing .notes,
-.housing .seen {
+.housing .seen,
+.housing .desc-notes,
+.housing .desc-text p {
   margin: 14px 0 0;
   font-size: 14px;
   line-height: 1.5;
   text-wrap: pretty;
+}
+
+.housing .listing-desc {
+  margin: 8px 0 0;
+}
+
+.housing .listing-desc summary {
+  display: list-item;
+  min-height: 32px;
+  font-size: 14px;
+}
+
+.housing .desc-text {
+  margin: 8px 0 0;
+}
+
+.housing .desc-text p {
+  margin: 0 0 0.8em;
+}
+
+.housing .desc-text p:last-child {
+  margin-bottom: 0;
+}
+
+.housing .desc-notes {
+  margin-top: 12px;
 }
 
 .housing .seen,

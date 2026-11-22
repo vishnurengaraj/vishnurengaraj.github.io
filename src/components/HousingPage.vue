@@ -28,6 +28,9 @@ import {
   formatType,
   formatUpdatedAt,
   isHiddenStatus,
+  descriptionParagraphs,
+  listingDescription,
+  listingNotes,
   listingPhotos,
   listingThumb,
   sortListings,
@@ -125,6 +128,9 @@ const nextListing = computed(() =>
 );
 const cardPhotos = computed(() => listingPhotos(selected.value));
 const photoOpen = computed(() => photoIndex.value >= 0 && photoIndex.value < cardPhotos.value.length);
+const cardNotes = computed(() => listingNotes(selected.value));
+const cardDescription = computed(() => listingDescription(selected.value));
+const cardDescriptionParas = computed(() => descriptionParagraphs(cardDescription.value));
 
 if (selected.value && isHiddenStatus(selected.value.status) && !isHonorable(selected.value)) showHidden.value = true;
 
@@ -692,6 +698,15 @@ onUnmounted(() => {
         <p class="plan">{{ selected.city }} · {{ formatType(selected.type) }}</p>
         <p v-if="listedAgo(selected)" class="listed">{{ listedAgo(selected) }}</p>
         <p v-if="isHonorable(selected) && selected.honorable_mention_reason" class="mention-reason card-reason">{{ selected.honorable_mention_reason }}</p>
+        <p v-if="cardNotes" class="desc-notes">{{ cardNotes }}</p>
+        <details v-if="cardDescription" class="listing-desc" :key="selected.id">
+          <summary>Read full description</summary>
+          <div class="desc-text">
+            <p v-for="(lines, i) in cardDescriptionParas" :key="i">
+              <template v-for="(line, j) in lines" :key="j"><br v-if="j" />{{ line }}</template>
+            </p>
+          </div>
+        </details>
 
         <div v-if="cardPhotos.length" class="photo-strip" role="list">
           <button
