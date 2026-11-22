@@ -13,7 +13,8 @@
     "build:runs": "node scripts/build-runs.mjs",
     "build:travel": "node scripts/travel/build-travel.mjs",
     "build:training": "node scripts/training/build-training.mjs",
-    "test": "node --test scripts/runs/*.test.mjs scripts/travel/*.test.mjs && playwright test",
+    "build:housing": "node scripts/build-housing.mjs",
+    "test": "node --test scripts/runs/*.test.mjs scripts/travel/*.test.mjs scripts/housing/*.test.mjs && playwright test",
     "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
