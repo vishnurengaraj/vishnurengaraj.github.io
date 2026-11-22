@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
@@ -17,6 +17,10 @@ import {
   freshnessColor,
   honorableMentions,
   sortListings,
+  driveMapsUrl,
+  stepAria,
+  stepLabel,
+  walkMapsUrl,
 } from "../../src/housing/format.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -140,4 +144,57 @@ test("build skips a listing that is missing required fields and reports it", () 
   assert.match(result.stderr, /missing required field/);
   const data = JSON.parse(readFileSync(out, "utf8"));
   assert.equal(data.listings.length, 1);
+});
+
+test("Google Maps links use walking to the beach and driving to SpaceX", () => {
+  const listing = { lat: 33.9, lng: -118.4, nearest_beach_access: "Manhattan Beach 23rd St / The Strand" };
+  const walk = walkMapsUrl(listing, { lat: 33.88415, lng: -118.41175 });
+  assert.match(walk, /^https:\/\/www\.google\.com\/maps\/dir\/\?/);
+  assert.match(walk, /travelmode=walking/);
+  assert.match(walk, /origin=33\.9%2C-118\.4|origin=33\.9,-118\.4/);
+  assert.match(walk, /23rd/);
+  const fallback = walkMapsUrl({ lat: 33.9, lng: -118.4, nearest_beach_access: "" }, { lat: 33.88415, lng: -118.41175 });
+  assert.match(fallback, /33\.88415/);
+  const drive = driveMapsUrl(listing);
+  assert.match(drive, /travelmode=driving/);
+  assert.match(drive, /SpaceX/);
+  assert.match(drive, /Rocket/);
+});
+
+test("prev/next labels use rank or a short mention tag", () => {
+  assert.equal(stepLabel({ rank: 3, address: "100 Main St", city: "Hermosa Beach" }, "prev"), "← #3");
+  assert.equal(stepLabel({ rank: 5, address: "200 Main St", city: "Hermosa Beach" }, "next"), "#5 →");
+  assert.equal(stepLabel({ rank: null, honorable_mention: true, address: "9 Pine", city: "Redondo Beach" }, "prev"), "← HM");
+  assert.equal(stepLabel({ rank: null, honorable_mention: false, address: "9 Pine", city: "Redondo Beach" }, "next"), "— →");
+  assert.match(stepAria({ rank: 3, address: "100 Main St", city: "Hermosa Beach" }, "prev"), /100 Main St/);
+});
+
+test("build converts listing photos into webp under the media dir", () => {
+  const photo = "/workspace/house-hunt/photos/20421474/1.jpg";
+  if (!existsSync(photo)) {
+    test.skip("real shortlist photos are not on this machine");
+  }
+  const dir = mkdtempSync(path.join(tmpdir(), "housing-"));
+  const src = path.join(dir, "shortlist.json");
+  const out = path.join(dir, "housing.json");
+  const media = path.join(dir, "media");
+  const fixture = JSON.parse(readFileSync(FIXTURE, "utf8"));
+  fixture.listings = [
+    {
+      ...fixture.listings[0],
+      photos: ["photos/20421474/1.jpg"],
+      photo_source_url: "https://example.com/a.jpg",
+      photo_source_urls: ["https://example.com/a.jpg"],
+    },
+  ];
+  writeFileSync(src, JSON.stringify(fixture));
+  const result = build(["--in", src, "--out", out, "--media", media]);
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(readFileSync(out, "utf8"));
+  assert.equal(data.listings[0].photos.length, 1);
+  assert.equal(data.listings[0].photos[0].src, "/media/housing/20421474/1.webp");
+  assert.equal(data.listings[0].photos[0].thumb, "/media/housing/20421474/1.thumb.webp");
+  assert.ok(!data.listings[0].source_path);
+  assert.ok(existsSync(path.join(media, "20421474", "1.webp")));
+  assert.ok(existsSync(path.join(media, "20421474", "1.thumb.webp")));
 });

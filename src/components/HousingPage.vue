@@ -27,7 +27,13 @@ import {
   formatType,
   formatUpdatedAt,
   isHiddenStatus,
+  listingPhotos,
+  listingThumb,
   sortListings,
+  stepAria,
+  stepLabel,
+  walkMapsUrl,
+  driveMapsUrl,
 } from "../housing/format.js";
 import "../styles/housing.css";
 
@@ -36,6 +42,8 @@ const router = useRouter();
 const pageEl = ref(null);
 const mapEl = ref(null);
 const listOpen = ref(false);
+const headerOpen = ref(false);
+const photoIndex = ref(-1);
 const motionOn = ref(false);
 const loadError = ref("");
 const announce = ref("");
@@ -99,11 +107,23 @@ function listingById(id) {
 
 const selectedId = ref(listingById(String(queryValue("id") || ""))?.id || "");
 const selected = computed(() => listingById(selectedId.value));
-const selectedIndex = computed(() => visible.value.findIndex((l) => l.id === selectedId.value));
-const prevListing = computed(() => (selectedIndex.value > 0 ? visible.value[selectedIndex.value - 1] : null));
+const navList = computed(() => {
+  const seen = new Set();
+  const out = [];
+  for (const listing of [...visible.value, ...mentions.value]) {
+    if (seen.has(listing.id)) continue;
+    seen.add(listing.id);
+    out.push(listing);
+  }
+  return out;
+});
+const selectedIndex = computed(() => navList.value.findIndex((l) => l.id === selectedId.value));
+const prevListing = computed(() => (selectedIndex.value > 0 ? navList.value[selectedIndex.value - 1] : null));
 const nextListing = computed(() =>
-  selectedIndex.value >= 0 && selectedIndex.value < visible.value.length - 1 ? visible.value[selectedIndex.value + 1] : null,
+  selectedIndex.value >= 0 && selectedIndex.value < navList.value.length - 1 ? navList.value[selectedIndex.value + 1] : null,
 );
+const cardPhotos = computed(() => listingPhotos(selected.value));
+const photoOpen = computed(() => photoIndex.value >= 0 && photoIndex.value < cardPhotos.value.length);
 
 if (selected.value && isHiddenStatus(selected.value.status) && !isHonorable(selected.value)) showHidden.value = true;
 
@@ -130,6 +150,68 @@ function driveLine(listing) {
       : "";
   const km = formatKm(listing.drive_km_to_spacex);
   return km ? `${mins}${rush} · ${km}` : `${mins}${rush}`;
+}
+
+function walkHref(listing) {
+  return walkMapsUrl(listing, data.landmarks?.beach);
+}
+
+function driveHref(listing) {
+  return driveMapsUrl(listing);
+}
+
+function kmBetween(a, b) {
+  const toRad = (d) => (d * Math.PI) / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * 6371 * Math.asin(Math.min(1, Math.sqrt(s)));
+}
+
+function contextPoints(listing) {
+  if (!listing) return [];
+  const pts = [{ lat: listing.lat, lng: listing.lng }];
+  const extras = [];
+  const beach = data.landmarks?.beach;
+  const spacex = data.landmarks?.spacex;
+  if (beach?.lat != null && beach?.lng != null) extras.push({ lat: beach.lat, lng: beach.lng, d: kmBetween(listing, beach) });
+  if (spacex?.lat != null && spacex?.lng != null) extras.push({ lat: spacex.lat, lng: spacex.lng, d: kmBetween(listing, spacex) });
+  extras.sort((a, b) => a.d - b.d);
+  for (const extra of extras) {
+    if (pts.length === 1 || extra.d <= 10) pts.push(extra);
+  }
+  return pts;
+}
+
+function syncHeadVar() {
+  const root = pageEl.value;
+  const topbar = root?.querySelector(".topbar");
+  if (!root || !topbar) return;
+  const bottom = topbar.getBoundingClientRect().bottom;
+  root.style.setProperty("--head-bottom", `${Math.round(bottom + 8)}px`);
+}
+
+function focusSelected({ instant = false } = {}) {
+  const listing = selected.value;
+  if (!listing) return;
+  mapApi?.frameOn(contextPoints(listing), framePadding(), { instant });
+}
+
+function closePhoto() {
+  photoIndex.value = -1;
+}
+
+function openPhoto(index) {
+  if (index < 0 || index >= cardPhotos.value.length) return;
+  photoIndex.value = index;
+}
+
+function stepPhoto(delta) {
+  const next = photoIndex.value + delta;
+  if (next < 0 || next >= cardPhotos.value.length) return;
+  photoIndex.value = next;
 }
 
 const headTitle = computed(() =>
@@ -231,18 +313,27 @@ async function pick(id, { from = null, fly = true, instant = false } = {}) {
   await nextTick();
   const body = pageEl.value?.querySelector(".home-card .card-body");
   if (body) body.scrollTop = 0;
-  if (fly) mapApi?.flyTo(listing.id, framePadding(), { instant });
+  closePhoto();
+  if (fly) {
+    await nextTick();
+    syncHeadVar();
+    focusSelected({ instant });
+  }
   if (isPhone()) focusEl(pageEl.value?.querySelector(".home-card .close"));
 }
 
 function closeCard({ restore = true } = {}) {
   if (!selectedId.value) return;
   const id = selectedId.value;
+  closePhoto();
   selectedId.value = "";
   announce.value = "";
   syncUrl();
   mapApi?.select("");
-  nextTick(() => mapApi?.frameAll(framePadding(PIN_ROOM)));
+  nextTick(() => {
+    syncHeadVar();
+    mapApi?.frameAll(framePadding(PIN_ROOM));
+  });
   const el = opener || pageEl.value?.querySelector(`.rank-list [data-id="${CSS.escape(id)}"]`);
   opener = null;
   if (restore) requestAnimationFrame(() => focusEl(el));
@@ -264,10 +355,39 @@ function onListKey(event) {
 
 function toggleList() {
   listOpen.value = !listOpen.value;
-  if (listOpen.value) nextTick(() => focusEl(pageEl.value?.querySelector(".rank-list button")));
+  nextTick(() => {
+    syncHeadVar();
+    if (listOpen.value) focusEl(pageEl.value?.querySelector(".rank-list button"));
+  });
+}
+
+function toggleHeader() {
+  headerOpen.value = !headerOpen.value;
+  nextTick(() => {
+    syncHeadVar();
+    if (selectedId.value) focusSelected();
+    else mapApi?.frameAll(framePadding(PIN_ROOM), { animate: false });
+  });
 }
 
 function onKey(event) {
+  if (photoOpen.value) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closePhoto();
+      return;
+    }
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      stepPhoto(-1);
+      return;
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      stepPhoto(1);
+      return;
+    }
+  }
   if (event.key !== "Escape") return;
   if (selectedId.value) {
     event.preventDefault();
@@ -285,7 +405,8 @@ function onResize() {
   window.clearTimeout(resizeTimer);
   resizeTimer = window.setTimeout(() => {
     mapApi?.resize();
-    if (selectedId.value) mapApi?.flyTo(selectedId.value, framePadding());
+    syncHeadVar();
+    if (selectedId.value) focusSelected({ instant: true });
     else mapApi?.frameAll(framePadding(PIN_ROOM), { animate: false });
   }, 150);
 }
@@ -319,17 +440,21 @@ async function startMap() {
   }
   mapApi.resize();
   syncMapVisible();
+  syncHeadVar();
   mapApi.frameAll(framePadding(PIN_ROOM), { animate: false });
   if (selectedId.value) {
     mapApi.select(selectedId.value);
     await nextTick();
-    mapApi.flyTo(selectedId.value, framePadding());
+    focusSelected({ instant: true });
   }
 }
 
 watch(visible, () => {
   syncMapVisible();
-  if (selectedId.value && !visible.value.some((l) => l.id === selectedId.value)) closeCard({ restore: false });
+  if (!selectedId.value) return;
+  const keep =
+    visible.value.some((l) => l.id === selectedId.value) || mentions.value.some((l) => l.id === selectedId.value);
+  if (!keep) closeCard({ restore: false });
 });
 
 watch(
@@ -346,6 +471,7 @@ onMounted(() => {
   motionOn.value = !prefersReduced();
   window.addEventListener("keydown", onKey);
   window.addEventListener("resize", onResize);
+  nextTick(syncHeadVar);
   startMap();
 });
 
@@ -363,27 +489,42 @@ onUnmounted(() => {
   <div
     ref="pageEl"
     class="housing"
-    :class="{ 'no-anim': !motionOn, 'card-open': !!selected, 'list-open': listOpen }"
+    :class="{ 'no-anim': !motionOn, 'card-open': !!selected, 'list-open': listOpen, 'head-open': headerOpen }"
   >
     <div id="housing-map" ref="mapEl" tabindex="-1" role="region" aria-label="Map of rental listings, the beach, and SpaceX"></div>
     <p v-if="loadError" class="map-error" role="status">{{ loadError }}</p>
 
     <div class="side">
-      <header class="topbar">
-        <p class="crumbs">
-          <a class="home" href="/">rengaraj.com</a>
-          <span aria-hidden="true">/</span>
-          <span>housing</span>
-        </p>
-        <h1>Housing</h1>
-        <p class="sub">
-          {{ openCount }} open
-          <template v-if="hiddenCount"> · {{ hiddenCount }} rejected or stale</template>
-          <template v-if="asOf"> · Updated {{ asOf }}</template>
-        </p>
-        <p v-if="fixtureBuild" class="fixture-note">Showing sample fixture data, not the live shortlist.</p>
-        <p class="criteria">{{ criteriaLines.join(" · ") }}</p>
-        <p v-if="criteriaWhere" class="criteria where">{{ criteriaWhere }}</p>
+      <header class="topbar" :class="{ 'is-open': headerOpen }">
+        <div class="head-line">
+          <h1>Housing</h1>
+          <p class="count">{{ openCount }} open</p>
+          <button
+            type="button"
+            class="head-toggle"
+            :aria-expanded="headerOpen ? 'true' : 'false'"
+            aria-controls="housing-head-more"
+            @click="toggleHeader"
+          >
+            <span class="sr-only">{{ headerOpen ? "Hide shortlist details" : "Show shortlist details" }}</span>
+            <span class="head-chev" aria-hidden="true"></span>
+          </button>
+        </div>
+        <div id="housing-head-more" class="head-more">
+          <p class="crumbs">
+            <a class="home" href="/">rengaraj.com</a>
+            <span aria-hidden="true">/</span>
+            <span>housing</span>
+          </p>
+          <p class="sub">
+            <span class="sub-open">{{ openCount }} open</span>
+            <span v-if="hiddenCount" class="sub-hidden">{{ hiddenCount }} rejected or stale</span>
+            <span v-if="asOf" class="sub-asof">Updated {{ asOf }}</span>
+          </p>
+          <p v-if="fixtureBuild" class="fixture-note">Showing sample fixture data, not the live shortlist.</p>
+          <p class="criteria">{{ criteriaLines.join(" · ") }}</p>
+          <p v-if="criteriaWhere" class="criteria where">{{ criteriaWhere }}</p>
+        </div>
       </header>
 
       <section class="board" aria-labelledby="rank-heading">
@@ -444,6 +585,16 @@ onUnmounted(() => {
               @click="pick(listing.id, { from: $event.currentTarget, instant: viaKeyboard($event) })"
             >
               <span class="rank-badge" :class="{ dimmed: isHiddenStatus(listing.status), unranked: listing.rank == null }" aria-hidden="true">{{ listing.rank == null ? "" : listing.rank }}</span>
+              <span class="list-thumb" :class="{ empty: !listingThumb(listing) }" aria-hidden="true">
+                <img
+                  v-if="listingThumb(listing)"
+                  :src="listingThumb(listing)"
+                  alt=""
+                  width="80"
+                  height="80"
+                  :loading="visible.indexOf(listing) < 3 ? 'eager' : 'lazy'"
+                />
+              </span>
               <span class="rank-text">
                 <span class="rank-name">
                   <span v-if="listing.rank != null" class="sr-only">Rank {{ listing.rank }}: </span>{{ listing.address }}
@@ -472,6 +623,16 @@ onUnmounted(() => {
                 @click="pick(listing.id, { from: $event.currentTarget, instant: viaKeyboard($event) })"
               >
                 <span class="rank-badge hm" :class="{ unranked: listing.rank == null }" aria-hidden="true">{{ listing.rank == null ? "" : listing.rank }}</span>
+                <span class="list-thumb" :class="{ empty: !listingThumb(listing) }" aria-hidden="true">
+                  <img
+                    v-if="listingThumb(listing)"
+                    :src="listingThumb(listing)"
+                    alt=""
+                    width="80"
+                    height="80"
+                    loading="lazy"
+                  />
+                </span>
                 <span class="rank-text">
                   <span class="rank-name">
                     <span class="sr-only">Honorable mention: </span>{{ listing.address }}
@@ -530,6 +691,28 @@ onUnmounted(() => {
         <p class="plan">{{ selected.city }} · {{ formatType(selected.type) }}</p>
         <p v-if="listedAgo(selected)" class="listed">{{ listedAgo(selected) }}</p>
         <p v-if="isHonorable(selected) && selected.honorable_mention_reason" class="mention-reason card-reason">{{ selected.honorable_mention_reason }}</p>
+
+        <div v-if="cardPhotos.length" class="photo-strip" role="list">
+          <button
+            v-for="(photo, index) in cardPhotos"
+            :key="photo.src || index"
+            type="button"
+            class="photo-thumb"
+            role="listitem"
+            :aria-label="`Photo ${index + 1} of ${cardPhotos.length}`"
+            @click="openPhoto(index)"
+          >
+            <img
+              :src="photo.thumb || photo.src"
+              :width="photo.w || undefined"
+              :height="photo.h || undefined"
+              alt=""
+              :loading="index === 0 ? 'eager' : 'lazy'"
+            />
+          </button>
+        </div>
+        <div v-else class="photo-strip photo-placeholder" aria-hidden="true"></div>
+
         <p class="cost-total">{{ formatRent(selected.rent_usd) }}<span class="per">/mo</span></p>
         <p class="score-line"><span class="num">{{ selected.score }}</span> score · {{ formatBedsBaths(selected.beds, selected.baths) }}<template v-if="selected.sqft"> · {{ formatSqft(selected.sqft) }}</template></p>
 
@@ -537,13 +720,29 @@ onUnmounted(() => {
           <div :class="{ span: !!formatBeachAccess(selected.nearest_beach_access) }">
             <dt>Walk to beach</dt>
             <dd>
-              {{ walkLine(selected) }}
+              <a class="map-link" :href="walkHref(selected)" target="_blank" rel="noopener">
+                {{ walkLine(selected) }}
+                <svg class="ext" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+                  <path d="M14 5h5v5M19 5l-9 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M19 13v6a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span class="sr-only"> (walking directions in Google Maps, opens in a new tab)</span>
+              </a>
               <span v-if="formatBeachAccess(selected.nearest_beach_access)" class="access">{{ formatBeachAccess(selected.nearest_beach_access) }}</span>
             </dd>
           </div>
           <div>
             <dt>Drive to SpaceX</dt>
-            <dd>{{ driveLine(selected) }}</dd>
+            <dd>
+              <a class="map-link" :href="driveHref(selected)" target="_blank" rel="noopener">
+                {{ driveLine(selected) }}
+                <svg class="ext" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+                  <path d="M14 5h5v5M19 5l-9 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M19 13v6a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span class="sr-only"> (driving directions in Google Maps, opens in a new tab)</span>
+              </a>
+            </dd>
           </div>
           <div>
             <dt>Cats</dt>
@@ -582,16 +781,62 @@ onUnmounted(() => {
           </a>
         </div>
         <nav class="card-step" aria-label="Other listings">
-          <button v-if="prevListing" type="button" class="pill" @click="pick(prevListing.id, { instant: viaKeyboard($event) })">
-            <span aria-hidden="true">←</span> {{ prevListing.address }}
+          <button
+            v-if="prevListing"
+            type="button"
+            class="pill"
+            :title="stepAria(prevListing, 'prev')"
+            :aria-label="stepAria(prevListing, 'prev')"
+            @click="pick(prevListing.id, { instant: viaKeyboard($event) })"
+          >
+            {{ stepLabel(prevListing, "prev") }}
           </button>
-          <span v-else></span>
-          <button v-if="nextListing" type="button" class="pill" @click="pick(nextListing.id, { instant: viaKeyboard($event) })">
-            {{ nextListing.address }} <span aria-hidden="true">→</span>
+          <span v-else class="step-spacer" aria-hidden="true"></span>
+          <button
+            v-if="nextListing"
+            type="button"
+            class="pill"
+            :title="stepAria(nextListing, 'next')"
+            :aria-label="stepAria(nextListing, 'next')"
+            @click="pick(nextListing.id, { instant: viaKeyboard($event) })"
+          >
+            {{ stepLabel(nextListing, "next") }}
           </button>
+          <span v-else class="step-spacer" aria-hidden="true"></span>
         </nav>
       </div>
     </aside>
     <div class="scrim" :class="{ open: !!selected }" @click="closeCard()"></div>
+    <div
+      v-if="photoOpen"
+      class="lightbox"
+      role="dialog"
+      aria-modal="true"
+      :aria-label="`Photo ${photoIndex + 1} of ${cardPhotos.length}`"
+    >
+      <div class="lightbox-backdrop" @click="closePhoto"></div>
+      <div class="lightbox-bar">
+        <p class="lightbox-count">{{ photoIndex + 1 }} / {{ cardPhotos.length }}</p>
+        <button class="lightbox-close" type="button" aria-label="Close photos" @click="closePhoto">×</button>
+      </div>
+      <div class="lightbox-stage">
+        <img
+          :src="cardPhotos[photoIndex].src"
+          :alt="`${selected.address}, photo ${photoIndex + 1} of ${cardPhotos.length}`"
+          :width="cardPhotos[photoIndex].w || undefined"
+          :height="cardPhotos[photoIndex].h || undefined"
+        />
+      </div>
+      <button class="lightbox-nav prev" type="button" aria-label="Previous photo" :disabled="photoIndex === 0" @click="stepPhoto(-1)">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="M14.5 6.5 9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <button class="lightbox-nav next" type="button" aria-label="Next photo" :disabled="photoIndex >= cardPhotos.length - 1" @click="stepPhoto(1)">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="M9.5 6.5 15 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+    </div>
   </div>
 </template>

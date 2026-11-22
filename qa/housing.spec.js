@@ -41,6 +41,14 @@ for (const vp of VIEWPORTS) {
       await expect(page.locator(".housing")).toBeVisible();
       await expect(page.locator("h1")).toHaveText("Housing");
       await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex");
+      if (vp.width <= 640) {
+        await expect(page.locator(".head-toggle")).toBeVisible();
+        await expect(page.locator(".head-line .count")).toContainText("open");
+        await expect(page.locator(".criteria").first()).toBeHidden();
+        await expect(page.locator(".crumbs")).toBeHidden();
+        await page.locator(".head-toggle").click();
+        await expect(page.locator(".head-toggle")).toHaveAttribute("aria-expanded", "true");
+      }
       await expect(page.locator(".criteria").first()).toContainText("2 bed / 2 bath");
       await expect(page.locator(".criteria").first()).toContainText("$4,500/month");
       await expect(page.locator(".sub")).toContainText("Updated");
@@ -195,6 +203,81 @@ for (const vp of VIEWPORTS) {
       await expect(last).toContainText(unranked[0].address);
       await expect(last.locator(".rank-badge")).toHaveClass(/unranked/);
       await expect(last.locator(".rank-badge")).toHaveText("");
+    });
+
+    test("list cards show a thumbnail and the expanded card has a photo gallery", async ({ page }) => {
+      const withPhotos = open.find((l) => Array.isArray(l.photos) && l.photos.length);
+      test.skip(!withPhotos, "no photos in this build");
+      await page.goto("/housing");
+      await openList(page, vp.width);
+      const row = page.locator(`#rank-list button[data-id="${withPhotos.id}"]`);
+      await expect(row.locator(".list-thumb img")).toBeVisible();
+      await expect(row.locator(".list-thumb img")).toHaveAttribute("src", /\/media\/housing\//);
+      await row.scrollIntoViewIfNeeded();
+      await row.click();
+      const card = page.locator(".home-card.open");
+      await expect(card.locator(".photo-strip .photo-thumb")).toHaveCount(withPhotos.photos.length);
+      await card.locator(".photo-thumb").first().click();
+      await expect(page.locator(".lightbox")).toBeVisible();
+      await expect(page.locator(".lightbox-count")).toContainText("1 /");
+      await page.locator(".lightbox-close").click();
+      await expect(page.locator(".lightbox")).toHaveCount(0);
+    });
+
+    test("walk and drive times link out to Google Maps", async ({ page }) => {
+      const first = open[0];
+      await page.goto(`/housing?id=${encodeURIComponent(first.id)}`);
+      const card = page.locator(".home-card.open");
+      const walk = card.locator(".facts a.map-link").first();
+      const drive = card.locator(".facts a.map-link").nth(1);
+      await expect(walk).toHaveAttribute("target", "_blank");
+      await expect(walk).toHaveAttribute("rel", "noopener");
+      await expect(walk).toHaveAttribute("href", /google\.com\/maps\/dir\//);
+      await expect(walk).toHaveAttribute("href", /travelmode=walking/);
+      await expect(drive).toHaveAttribute("href", /travelmode=driving/);
+      await expect(drive).toHaveAttribute("href", /SpaceX/);
+      await expect(drive).toHaveAttribute("rel", "noopener");
+    });
+
+    test("prev and next buttons show ranks, not wrapping addresses", async ({ page }) => {
+      const ranked = open.filter((l) => l.rank != null);
+      test.skip(ranked.length < 2, "need two ranked listings");
+      await page.goto(`/housing?id=${encodeURIComponent(ranked[0].id)}`);
+      const card = page.locator(".home-card.open");
+      const next = card.locator(".card-step button").last();
+      await expect(next).toHaveText(/#\d+\s*→/);
+      await expect(next).not.toHaveText(ranked[1].address);
+      await expect(next).toHaveAttribute("aria-label", new RegExp(ranked[1].address.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+      await next.click();
+      const prev = card.locator(".card-step button").first();
+      await expect(prev).toHaveText(/←\s*#\d+/);
+      await expect(prev).toHaveAttribute("aria-label", new RegExp(ranked[0].address.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+    });
+
+    test("phone expanded card leaves the selected pin visible above it", async ({ page }) => {
+      test.skip(vp.width > 640, "phone layout only");
+      const first = open[0];
+      await page.goto(`/housing?id=${encodeURIComponent(first.id)}`);
+      const card = page.locator(".home-card.open");
+      await expect(card).toBeVisible();
+      const cardBox = await card.boundingBox();
+      expect(cardBox).toBeTruthy();
+      expect(cardBox.height).toBeLessThanOrEqual(vp.height * 0.67);
+      expect(cardBox.height).toBeGreaterThanOrEqual(vp.height * 0.45);
+      await page.waitForSelector("#housing-map[data-map='ready']", { timeout: 20_000 });
+      const pin = page.locator(`.home-pin.sel[data-id="${first.id}"]`);
+      await expect(pin).toBeVisible({ timeout: 15_000 });
+      await expect
+        .poll(
+          async () => {
+            const pinBox = await pin.boundingBox();
+            const cardNow = await card.boundingBox();
+            if (!pinBox || !cardNow) return false;
+            return pinBox.y >= 8 && pinBox.y + pinBox.height <= cardNow.y + 12;
+          },
+          { timeout: 8_000 },
+        )
+        .toBe(true);
     });
   });
 }

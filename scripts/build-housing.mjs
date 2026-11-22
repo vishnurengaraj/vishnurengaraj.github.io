@@ -14,9 +14,10 @@
  * Extra fields (including zpid) are kept. Schema issues are reported to stderr.
  * The page is rebuilt from the written JSON; the shortlist is not read at runtime.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import sharp from "sharp";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
@@ -219,6 +220,92 @@ function normalizeListing(row, index) {
   return listing;
 }
 
+
+const PHOTO_ROOT = "/workspace/house-hunt";
+const DEFAULT_MEDIA = path.join(ROOT, "public/media/housing");
+
+function photoFolder(relPath, fallback) {
+  const parts = String(relPath || "")
+    .replaceAll("\\", "/")
+    .split("/")
+    .filter(Boolean);
+  if (parts.length >= 2) return parts[parts.length - 2];
+  return fallback;
+}
+
+function resolvePhoto(relPath) {
+  const root = path.resolve(PHOTO_ROOT);
+  const abs = path.resolve(root, String(relPath));
+  if (abs !== root && !abs.startsWith(root + path.sep)) return null;
+  return abs;
+}
+
+async function convertPhoto(abs, destDir, base) {
+  mkdirSync(destDir, { recursive: true });
+  const webpPath = path.join(destDir, `${base}.webp`);
+  const thumbPath = path.join(destDir, `${base}.thumb.webp`);
+  const image = sharp(abs, { failOn: "none" }).rotate();
+  const full = await image
+    .clone()
+    .resize({ width: 800, height: 800, fit: "inside", withoutEnlargement: true })
+    .webp({ quality: 78 })
+    .toFile(webpPath);
+  await image
+    .clone()
+    .resize({ width: 400, height: 400, fit: "inside", withoutEnlargement: true })
+    .webp({ quality: 72 })
+    .toFile(thumbPath);
+  return { webpPath, thumbPath, width: full.width, height: full.height };
+}
+
+async function processPhotos(listings, mediaDir) {
+  const used = new Set();
+  let converted = 0;
+  let missing = 0;
+  for (const listing of listings) {
+    delete listing.source_path;
+    const paths = Array.isArray(listing.photos) ? listing.photos.filter(Boolean).map(String) : [];
+    const sources = Array.isArray(listing.photo_source_urls) ? listing.photo_source_urls.map(String) : [];
+    const fallback = listing.photo_source_url ? String(listing.photo_source_url) : "";
+    const out = [];
+    for (let i = 0; i < paths.length; i++) {
+      const rel = paths[i];
+      const abs = resolvePhoto(rel);
+      if (!abs || !existsSync(abs)) {
+        warn(`${listing.id}: photo missing at ${rel}; skipped`);
+        missing += 1;
+        continue;
+      }
+      const key = photoFolder(rel, listing.id);
+      const base = path.basename(rel, path.extname(rel)) || String(i + 1);
+      used.add(key);
+      try {
+        const done = await convertPhoto(abs, path.join(mediaDir, key), base);
+        const photo = {
+          src: `/media/housing/${key}/${base}.webp`,
+          thumb: `/media/housing/${key}/${base}.thumb.webp`,
+          w: done.width,
+          h: done.height,
+        };
+        const source = sources[i] || fallback;
+        if (source) photo.source = source;
+        out.push(photo);
+        converted += 1;
+      } catch (error) {
+        warn(`${listing.id}: failed to convert ${rel}: ${error.message}`);
+        missing += 1;
+      }
+    }
+    listing.photos = out;
+  }
+  if (used.size && existsSync(mediaDir)) {
+    for (const name of readdirSync(mediaDir)) {
+      if (!used.has(name)) rmSync(path.join(mediaDir, name), { recursive: true, force: true });
+    }
+  }
+  return { converted, missing };
+}
+
 function isFixturePath(p) {
   return path.resolve(p) === path.resolve(FIXTURE);
 }
@@ -235,68 +322,76 @@ function readSource() {
   return { path: FIXTURE, usedFixture: true, raw: readFileSync(FIXTURE, "utf8") };
 }
 
-const source = readSource();
-let parsed;
-try {
-  parsed = JSON.parse(source.raw);
-} catch (error) {
-  throw new Error(`housing: cannot parse ${source.path}: ${error.message}`);
-}
-if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-  throw new Error(`housing: ${source.path} must be an object with listings`);
-}
-
-const listingsIn = Array.isArray(parsed.listings) ? parsed.listings : null;
-if (!listingsIn) throw new Error(`housing: ${source.path} is missing a listings array`);
-
-const listings = [];
-const ids = new Set();
-for (let i = 0; i < listingsIn.length; i++) {
-  const row = normalizeListing(listingsIn[i], i);
-  if (!row) continue;
-  if (ids.has(row.id)) {
-    warn(`${row.id}: duplicate id; suffixing`);
-    row.id = `${row.id}-${row.rank ?? i + 1}`;
+async function main() {
+  const source = readSource();
+  let parsed;
+  try {
+    parsed = JSON.parse(source.raw);
+  } catch (error) {
+    throw new Error(`housing: cannot parse ${source.path}: ${error.message}`);
   }
-  ids.add(row.id);
-  listings.push(row);
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error(`housing: ${source.path} must be an object with listings`);
+  }
+
+  const listingsIn = Array.isArray(parsed.listings) ? parsed.listings : null;
+  if (!listingsIn) throw new Error(`housing: ${source.path} is missing a listings array`);
+
+  const listings = [];
+  const ids = new Set();
+  for (let i = 0; i < listingsIn.length; i++) {
+    const row = normalizeListing(listingsIn[i], i);
+    if (!row) continue;
+    if (ids.has(row.id)) {
+      warn(`${row.id}: duplicate id; suffixing`);
+      row.id = `${row.id}-${row.rank ?? i + 1}`;
+    }
+    ids.add(row.id);
+    listings.push(row);
+  }
+  if (!listings.length) throw new Error("housing: no valid listings after validation");
+
+  listings.sort((a, b) => {
+    const ar = a.rank == null;
+    const br = b.rank == null;
+    if (ar !== br) return ar ? 1 : -1;
+    if (!ar && a.rank !== b.rank) return a.rank - b.rank;
+    return b.score - a.score;
+  });
+  const ranks = listings.map((l) => l.rank).filter((r) => r != null);
+  if (new Set(ranks).size !== ranks.length) warn("listing ranks are not unique");
+
+  const updatedAt = typeof parsed.updated_at === "string" && parsed.updated_at ? parsed.updated_at : null;
+  if (!updatedAt) warn("updated_at is missing; the page will omit a precise time");
+
+  const scoringNotes = typeof parsed.scoring_notes === "string" ? parsed.scoring_notes : parsed.scoring_notes == null ? "" : String(parsed.scoring_notes);
+
+  const mediaDir = flag("media", DEFAULT_MEDIA);
+  const photos = await processPhotos(listings, mediaDir);
+
+  const out = {
+    updated_at: updatedAt,
+    source: source.usedFixture ? "fixture" : "shortlist",
+    criteria: normalizeCriteria(parsed.criteria),
+    scoring_notes: scoringNotes,
+    landmarks: { beach: BEACH, spacex: SPACEX },
+    listings,
+  };
+
+  const outPath = flag("out", DEFAULT_OUT);
+  mkdirSync(path.dirname(outPath), { recursive: true });
+  writeFileSync(outPath, `${JSON.stringify(out, null, 2)}\n`);
+  const rejected = listings.filter((l) => l.status === "rejected").length;
+  const stale = listings.filter((l) => l.status === "stale").length;
+  const unranked = listings.filter((l) => l.rank == null).length;
+  const mentions = listings.filter((l) => l.honorable_mention).length;
+  const open = listings.length - rejected - stale;
+  const photoNote = photos.converted || photos.missing ? `; ${photos.converted} photos` + (photos.missing ? `, ${photos.missing} missing` : "") : "";
+  console.log(
+    `housing: wrote ${listings.length} listings (${open} open, ${rejected} rejected, ${stale} stale, ${unranked} unranked, ${mentions} honorable mentions) from ${source.path} → ${path.relative(ROOT, outPath)}${
+      source.usedFixture ? " (SAMPLE FIXTURE)" : ""
+    }${photoNote}${issues.length ? `; ${issues.length} schema note(s)` : ""}`,
+  );
 }
-if (!listings.length) throw new Error("housing: no valid listings after validation");
 
-listings.sort((a, b) => {
-  const ar = a.rank == null;
-  const br = b.rank == null;
-  if (ar !== br) return ar ? 1 : -1;
-  if (!ar && a.rank !== b.rank) return a.rank - b.rank;
-  return b.score - a.score;
-});
-const ranks = listings.map((l) => l.rank).filter((r) => r != null);
-if (new Set(ranks).size !== ranks.length) warn("listing ranks are not unique");
-
-const updatedAt = typeof parsed.updated_at === "string" && parsed.updated_at ? parsed.updated_at : null;
-if (!updatedAt) warn("updated_at is missing; the page will omit a precise time");
-
-const scoringNotes = typeof parsed.scoring_notes === "string" ? parsed.scoring_notes : parsed.scoring_notes == null ? "" : String(parsed.scoring_notes);
-
-const out = {
-  updated_at: updatedAt,
-  source: source.usedFixture ? "fixture" : "shortlist",
-  criteria: normalizeCriteria(parsed.criteria),
-  scoring_notes: scoringNotes,
-  landmarks: { beach: BEACH, spacex: SPACEX },
-  listings,
-};
-
-const outPath = flag("out", DEFAULT_OUT);
-mkdirSync(path.dirname(outPath), { recursive: true });
-writeFileSync(outPath, `${JSON.stringify(out, null, 2)}\n`);
-const rejected = listings.filter((l) => l.status === "rejected").length;
-const stale = listings.filter((l) => l.status === "stale").length;
-const unranked = listings.filter((l) => l.rank == null).length;
-const mentions = listings.filter((l) => l.honorable_mention).length;
-const open = listings.length - rejected - stale;
-console.log(
-  `housing: wrote ${listings.length} listings (${open} open, ${rejected} rejected, ${stale} stale, ${unranked} unranked, ${mentions} honorable mentions) from ${source.path} → ${path.relative(ROOT, outPath)}${
-    source.usedFixture ? " (SAMPLE FIXTURE)" : ""
-  }${issues.length ? `; ${issues.length} schema note(s)` : ""}`,
-);
+await main();
