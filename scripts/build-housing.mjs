@@ -44,8 +44,10 @@ const BEACH = {
   id: "beach",
   label: "Manhattan Beach Pier",
   note: "Walk times are to the nearest sand, not this pier.",
-  lat: 33.88415,
-  lng: -118.41175,
+  // OSM way 49605324 (man_made=pier), landward (eastmost) node 630795162.
+  // The pier meets land at Manhattan Beach Blvd / The Strand.
+  lat: 33.8842043,
+  lng: -118.4121426,
 };
 
 const issues = [];
