@@ -23,13 +23,16 @@ const TYPE_LABELS = {
 const UNVERIFIED = new Set(["unknown", "unverified"]);
 
 const BREAKDOWN_LABELS = {
+  base: "Base",
   budget: "Budget",
   budget_fit: "Budget fit",
+  rent: "Rent",
   walk: "Walk to beach",
   beach: "Walk to beach",
   beach_walk: "Walk to beach",
   walk_to_beach: "Walk to beach",
   drive: "Drive to SpaceX",
+  drive_rush: "Rush-hour drive",
   spacex: "Drive to SpaceX",
   spacex_drive: "Drive to SpaceX",
   drive_to_spacex: "Drive to SpaceX",
@@ -39,8 +42,10 @@ const BREAKDOWN_LABELS = {
   cats: "Cats",
   parking: "Parking",
   verified: "Verified cats/parking",
+  unvetted: "Unvetted",
   recency: "Recency",
   recency_boost: "Recency",
+  freshness: "Freshness",
 };
 
 /** Fresh pin at 0–1 days; site error red at 14 days. Midpoints stay dark enough for white type. */
@@ -298,8 +303,32 @@ export function breakdownRows(breakdown) {
 export function formatPoints(n) {
   if (!Number.isFinite(Number(n))) return "—";
   const v = Number(n);
-  if (v > 0) return `+${v}`;
-  return String(v);
+  const text = Number.isInteger(v) ? String(v) : v.toLocaleString("en-US", { maximumFractionDigits: 2 });
+  if (v > 0) return `+${text}`;
+  return text;
+}
+
+export function isHonorable(listing) {
+  return Boolean(listing?.honorable_mention);
+}
+
+export function honorableMentions(list) {
+  return [...(list || []).filter(isHonorable)].sort((a, b) => {
+    const ar = a.rank == null;
+    const br = b.rank == null;
+    if (ar !== br) return ar ? 1 : -1;
+    if (!ar && a.rank !== b.rank) return a.rank - b.rank;
+    return b.score - a.score;
+  });
+}
+
+export function formatBeachAccess(value) {
+  if (value == null || value === "") return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "object") {
+    return [value.name, value.label, value.title, value.access, value.description].find(Boolean) || "";
+  }
+  return String(value);
 }
 
 export function maxScore(list) {
