@@ -13,6 +13,9 @@ import {
   daysOnMarket,
   factBadge,
   filterListings,
+  formatBeachAccess,
+  honorableMentions,
+  isHonorable,
   formatBedsBaths,
   formatKm,
   formatListedAgo,
@@ -82,6 +85,7 @@ const visible = computed(() =>
     sortKey.value,
   ),
 );
+const mentions = computed(() => honorableMentions(allListings));
 
 function queryValue(key) {
   const raw = route.query[key];
@@ -101,7 +105,7 @@ const nextListing = computed(() =>
   selectedIndex.value >= 0 && selectedIndex.value < visible.value.length - 1 ? visible.value[selectedIndex.value + 1] : null,
 );
 
-if (selected.value && isHiddenStatus(selected.value.status)) showHidden.value = true;
+if (selected.value && isHiddenStatus(selected.value.status) && !isHonorable(selected.value)) showHidden.value = true;
 
 const asOf = computed(() => formatUpdatedAt(data.updated_at));
 const criteriaLines = computed(() => criteriaSummary(data.criteria));
@@ -217,7 +221,7 @@ function viaKeyboard(event) {
 async function pick(id, { from = null, fly = true, instant = false } = {}) {
   const listing = listingById(id);
   if (!listing) return;
-  if (isHiddenStatus(listing.status)) showHidden.value = true;
+  if (isHiddenStatus(listing.status) && !isHonorable(listing)) showHidden.value = true;
   if (from) opener = from;
   selectedId.value = listing.id;
   announce.value = `${listing.address}, ${listing.city}, ${formatRent(listing.rent_usd)} a month`;
@@ -287,7 +291,9 @@ function onResize() {
 }
 
 function syncMapVisible() {
-  mapApi?.setVisible(visible.value.map((l) => l.id));
+  const ids = new Set(visible.value.map((l) => l.id));
+  for (const listing of mentions.value) ids.add(listing.id);
+  mapApi?.setVisible([...ids]);
 }
 
 async function startMap() {
@@ -453,6 +459,35 @@ onUnmounted(() => {
             </button>
           </li>
         </ol>
+        <section v-if="mentions.length" class="mentions" aria-labelledby="hm-heading">
+          <h2 id="hm-heading" class="board-heading">Honorable mentions</h2>
+          <ol id="mention-list" class="rank-list mention-list">
+            <li v-for="listing in mentions" :key="'hm-' + listing.id">
+              <button
+                type="button"
+                :data-id="listing.id"
+                data-mention="true"
+                :aria-current="selectedId === listing.id ? 'true' : undefined"
+                :class="{ on: selectedId === listing.id, hm: true }"
+                @click="pick(listing.id, { from: $event.currentTarget, instant: viaKeyboard($event) })"
+              >
+                <span class="rank-badge hm" :class="{ unranked: listing.rank == null }" aria-hidden="true">{{ listing.rank == null ? "" : listing.rank }}</span>
+                <span class="rank-text">
+                  <span class="rank-name">
+                    <span class="sr-only">Honorable mention: </span>{{ listing.address }}
+                  </span>
+                  <span class="rank-meta">
+                    <span class="rank-score" :aria-label="`Score ${listing.score}`">{{ listing.score }}</span>
+                    <span class="rank-cost">{{ formatRent(listing.rent_usd) }}</span>
+                    <span class="rank-tag">{{ formatMins(listing.walk_min_to_beach) }} walk</span>
+                    <span v-if="isHiddenStatus(listing.status)" class="rank-tag warn">{{ STATUS_LABELS[listing.status] || listing.status }}</span>
+                  </span>
+                  <span v-if="listing.honorable_mention_reason" class="mention-reason">{{ listing.honorable_mention_reason }}</span>
+                </span>
+              </button>
+            </li>
+          </ol>
+        </section>
         <p v-if="!visible.length" class="empty">No listings match these filters.</p>
         <footer class="board-foot">
           <p class="legend-label">Pin color is days on the market</p>
@@ -489,17 +524,22 @@ onUnmounted(() => {
           <template v-if="selected.rank != null">Ranked #{{ selected.rank }} of {{ allListings.length }}</template>
           <template v-else>Unranked</template>
           <template v-if="isHiddenStatus(selected.status)"> · {{ STATUS_LABELS[selected.status] || selected.status }}</template>
+          <template v-if="isHonorable(selected)"> · Honorable mention</template>
         </p>
         <h2 class="card-title">{{ selected.address }}</h2>
         <p class="plan">{{ selected.city }} · {{ formatType(selected.type) }}</p>
         <p v-if="listedAgo(selected)" class="listed">{{ listedAgo(selected) }}</p>
+        <p v-if="isHonorable(selected) && selected.honorable_mention_reason" class="mention-reason card-reason">{{ selected.honorable_mention_reason }}</p>
         <p class="cost-total">{{ formatRent(selected.rent_usd) }}<span class="per">/mo</span></p>
         <p class="score-line"><span class="num">{{ selected.score }}</span> score · {{ formatBedsBaths(selected.beds, selected.baths) }}<template v-if="selected.sqft"> · {{ formatSqft(selected.sqft) }}</template></p>
 
         <dl class="facts">
-          <div>
+          <div :class="{ span: !!formatBeachAccess(selected.nearest_beach_access) }">
             <dt>Walk to beach</dt>
-            <dd>{{ walkLine(selected) }}</dd>
+            <dd>
+              {{ walkLine(selected) }}
+              <span v-if="formatBeachAccess(selected.nearest_beach_access)" class="access">{{ formatBeachAccess(selected.nearest_beach_access) }}</span>
+            </dd>
           </div>
           <div>
             <dt>Drive to SpaceX</dt>

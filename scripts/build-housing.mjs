@@ -114,6 +114,17 @@ function listedDate(value, id) {
   return text.slice(0, 10);
 }
 
+
+function beachAccess(value) {
+  if (value == null || value === "") return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "object") {
+    const label = value.name || value.label || value.title || value.access || value.description || "";
+    return String(label);
+  }
+  return String(value);
+}
+
 function scoreBreakdown(value, id) {
   if (value == null || value === "") return null;
   if (typeof value === "object") return value;
@@ -196,6 +207,9 @@ function normalizeListing(row, index) {
     drive_km_to_spacex: optNum(row.drive_km_to_spacex, "drive_km_to_spacex", id),
     drive_min_to_spacex_rush: optNum(row.drive_min_to_spacex_rush, "drive_min_to_spacex_rush", id),
     score_breakdown: scoreBreakdown(row.score_breakdown, id),
+    nearest_beach_access: beachAccess(row.nearest_beach_access),
+    honorable_mention: Boolean(row.honorable_mention),
+    honorable_mention_reason: optStr(row.honorable_mention_reason),
   };
   if (row.zpid != null && String(row.zpid).trim() !== "") listing.zpid = String(row.zpid);
   else listing.zpid = null;
@@ -279,9 +293,10 @@ writeFileSync(outPath, `${JSON.stringify(out, null, 2)}\n`);
 const rejected = listings.filter((l) => l.status === "rejected").length;
 const stale = listings.filter((l) => l.status === "stale").length;
 const unranked = listings.filter((l) => l.rank == null).length;
+const mentions = listings.filter((l) => l.honorable_mention).length;
 const open = listings.length - rejected - stale;
 console.log(
-  `housing: wrote ${listings.length} listings (${open} open, ${rejected} rejected, ${stale} stale, ${unranked} unranked) from ${source.path} → ${path.relative(ROOT, outPath)}${
+  `housing: wrote ${listings.length} listings (${open} open, ${rejected} rejected, ${stale} stale, ${unranked} unranked, ${mentions} honorable mentions) from ${source.path} → ${path.relative(ROOT, outPath)}${
     source.usedFixture ? " (SAMPLE FIXTURE)" : ""
   }${issues.length ? `; ${issues.length} schema note(s)` : ""}`,
 );

@@ -9,6 +9,7 @@ const data = JSON.parse(readFileSync(new URL("../src/data/housing/housing.json",
 const hiddenStatus = new Set(["rejected", "stale"]);
 const open = data.listings.filter((l) => !hiddenStatus.has(l.status));
 const hidden = data.listings.filter((l) => hiddenStatus.has(l.status));
+const mentions = data.listings.filter((l) => l.honorable_mention);
 const VIEWPORTS = [
   { name: "desktop", width: 1440, height: 900 },
   { name: "phone", width: 390, height: 844 },
@@ -128,6 +129,62 @@ for (const vp of VIEWPORTS) {
       expect(Math.round(box.height)).toBeGreaterThanOrEqual(vp.height - 2);
     });
 
+
+    test("honorable mentions stay visible, including rejected ones", async ({ page }) => {
+      test.skip(!mentions.length, "no honorable mentions in this build");
+      await page.goto("/housing");
+      await openList(page, vp.width);
+      const section = page.locator("#mention-list");
+      await expect(section).toBeVisible();
+      await expect(page.locator("#hm-heading")).toHaveText("Honorable mentions");
+      await expect(section.locator("button")).toHaveCount(mentions.length);
+      const hiddenHm = mentions.filter((l) => hiddenStatus.has(l.status));
+      const openIds = new Set(open.map((l) => l.id));
+      // Rejected mentions are not in the main shortlist by default.
+      for (const row of hiddenHm) {
+        await expect(page.locator(`#rank-list button[data-id="${row.id}"]`)).toHaveCount(0);
+        const item = section.locator(`button[data-id="${row.id}"]`);
+        await expect(item).toBeVisible();
+        if (row.honorable_mention_reason) await expect(item).toContainText(row.honorable_mention_reason);
+      }
+      for (const row of mentions) {
+        await expect(section.locator(`button[data-id="${row.id}"]`)).toBeVisible();
+        await expect(page.locator(`.home-pin.hm[data-id="${row.id}"]`)).toHaveCount(1);
+      }
+      // Opening a rejected mention does not dump the rest of the rejected list into the shortlist.
+      if (hiddenHm[0]) {
+        const row = section.locator(`button[data-id="${hiddenHm[0].id}"]`);
+        await row.scrollIntoViewIfNeeded();
+        await row.click();
+        const card = page.locator(".home-card.open");
+        await expect(card).toBeVisible();
+        await expect(card.locator(".card-title")).toHaveText(hiddenHm[0].address);
+        await expect(card.locator(".card-reason")).toContainText(hiddenHm[0].honorable_mention_reason);
+        if (vp.width > 640) {
+          await expect(page.locator("#rank-list button")).toHaveCount(open.length);
+        }
+      }
+    });
+
+    test("expanded card shows beach access, score breakdown, and drive distances", async ({ page }) => {
+      const first = open[0];
+      await page.goto(`/housing?id=${encodeURIComponent(first.id)}`);
+      const card = page.locator(".home-card.open");
+      await expect(card).toBeVisible();
+      if (first.nearest_beach_access) {
+        await expect(card.locator(".facts .access")).toContainText(String(first.nearest_beach_access).slice(0, 12));
+      }
+      if (first.score_breakdown) {
+        await expect(card.locator(".breakdown")).toBeVisible();
+        await expect(card.locator(".breakdown")).toContainText("Rush-hour drive");
+      }
+      if (first.drive_min_to_spacex_rush != null) {
+        await expect(card.locator(".facts")).toContainText("rush hour");
+      }
+      if (first.walk_km_to_beach != null) {
+        await expect(card.locator(".facts")).toContainText("km");
+      }
+    });
     test("unranked listings have no rank number and sort last", async ({ page }) => {
       const unranked = open.filter((l) => l.rank == null);
       test.skip(!unranked.length, "no unranked open listings in this build");

@@ -1,6 +1,6 @@
 import { maplibregl, openGlobeMap } from "../runs/basemap.js";
 import { DROP_FILL, DROP_GOLD, DROP_WHITE } from "../diners/pins.js";
-import { daysOnMarket, freshnessColor, freshnessInk, isHiddenStatus } from "./format.js";
+import { daysOnMarket, freshnessColor, freshnessInk, isHiddenStatus, isHonorable } from "./format.js";
 
 const CLUSTER_PX = 40;
 const NAME_HIDE_ZOOM = 13.2;
@@ -19,7 +19,8 @@ function pinElement(listing, index, maxAge) {
   const el = document.createElement("div");
   const hidden = isHiddenStatus(listing.status);
   const unranked = listing.rank == null;
-  el.className = `home-pin${listing.rank === 1 ? " top" : ""}${hidden ? " dimmed" : ""}${unranked ? " unranked" : ""}`;
+  const hm = isHonorable(listing);
+  el.className = `home-pin${listing.rank === 1 ? " top" : ""}${hidden && !hm ? " dimmed" : ""}${unranked ? " unranked" : ""}${hm ? " hm" : ""}`;
   el.dataset.id = listing.id;
   el.style.setProperty("--i", String(index));
   const fill = freshnessColor(daysOnMarket(listing), maxAge);
@@ -34,6 +35,7 @@ function pinElement(listing, index, maxAge) {
       <path class="pin-ring" d="${DROP_GOLD}"/>
       <path d="${DROP_WHITE}" fill="#fff"/>
       <path class="pin-fill" d="${DROP_FILL}"/>
+      ${hm ? `<path class="pin-hm" d="${DROP_GOLD}" fill="none"/>` : ""}
     </svg>
     <span class="pin-rank">${rankLabel}</span>
     <span class="pin-name">${escapeHtml(listing.address)}</span>
@@ -155,8 +157,10 @@ export async function mountHousingMap(mapEl, { listings, landmarks, onPick, maxA
     if (disposed) return;
     mapEl.classList.toggle("pins-near", map.getZoom() < NAME_HIDE_ZOOM);
     const active = listings.filter((l) => visibleIds.has(l.id));
-    const groups = map.getZoom() < 14.2 ? clusterVisible(map, active) : active.map((listing) => [{ listing }]);
-    const shown = new Set();
+    const always = active.filter((l) => isHonorable(l));
+    const clusterable = active.filter((l) => !isHonorable(l));
+    const groups = map.getZoom() < 14.2 ? clusterVisible(map, clusterable) : clusterable.map((listing) => [{ listing }]);
+    const shown = new Set(always.map((l) => l.id));
     clearClusters();
     for (const group of groups) {
       if (group.length === 1) {

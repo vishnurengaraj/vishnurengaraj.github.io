@@ -15,6 +15,7 @@ import {
   formatType,
   formatUpdatedAt,
   freshnessColor,
+  honorableMentions,
   sortListings,
 } from "../../src/housing/format.js";
 
@@ -88,6 +89,18 @@ test("freshness color is green at 0-1 days and red at 14", () => {
   assert.equal(freshnessColor(null), null);
 });
 
+test("honorable mentions include rejected and stale listings", () => {
+  const list = [
+    { id: "a", rank: 1, score: 90, status: "new", honorable_mention: false },
+    { id: "b", rank: 13, score: 76, status: "new", honorable_mention: true, honorable_mention_reason: "over budget house" },
+    { id: "c", rank: null, score: 33, status: "rejected", honorable_mention: true, honorable_mention_reason: "no pets, good garage" },
+    { id: "d", rank: null, score: 15, status: "rejected", honorable_mention: false },
+  ];
+  const mentions = honorableMentions(list);
+  assert.deepEqual(mentions.map((l) => l.id), ["b", "c"]);
+  assert.equal(filterListings(list, { showHidden: false }).length, 2);
+});
+
 test("build from the sample fixture writes listings and landmarks", () => {
   const dir = mkdtempSync(path.join(tmpdir(), "housing-"));
   const out = path.join(dir, "housing.json");
@@ -104,6 +117,10 @@ test("build from the sample fixture writes listings and landmarks", () => {
   assert.equal(data.listings[0].listed_date, "2026-11-21");
   assert.ok(data.scoring_notes);
   assert.equal(data.criteria.max_listing_age_days, 14);
+  assert.equal(data.listings.filter((l) => l.honorable_mention).length, 2);
+  assert.ok(data.listings[0].score_breakdown);
+  assert.ok(data.listings[0].nearest_beach_access);
+  assert.ok(data.listings[0].walk_km_to_beach != null);
   assert.equal(data.listings[1].zpid, null);
   assert.equal(data.listings[1].cats_ok, "unknown");
   assert.ok(data.landmarks.beach.lat);
