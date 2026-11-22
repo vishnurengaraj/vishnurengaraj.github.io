@@ -127,7 +127,7 @@ export async function mountHousingMap(mapEl, { listings, landmarks, onPick, maxA
   const landmarkMarkers = [];
   for (const place of [landmarks?.beach, landmarks?.spacex].filter(Boolean)) {
     const el = landmarkElement(place);
-    const marker = new maplibregl.Marker({ element: el, anchor: "bottom" }).setLngLat([place.lng, place.lat]).addTo(map);
+    const marker = new maplibregl.Marker({ element: el, anchor: "center" }).setLngLat([place.lng, place.lat]).addTo(map);
     landmarkMarkers.push({ marker, el, place });
   }
 

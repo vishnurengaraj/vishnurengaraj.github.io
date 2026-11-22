@@ -257,18 +257,20 @@ html:has(.housing) #app {
 }
 
 .housing .home-mark {
+  width: 14px;
+  height: 14px;
   pointer-events: none;
   user-select: none;
 }
 
 .housing .mark-body {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transform: translate(-8px, -8px);
+  position: relative;
+  width: 14px;
+  height: 14px;
 }
 
 .housing .mark-dot {
+  display: block;
   width: 14px;
   height: 14px;
   border: 2px solid #fff;
@@ -286,6 +288,10 @@ html:has(.housing) #app {
 }
 
 .housing .mark-name {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
   padding: 2px 8px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.94);
