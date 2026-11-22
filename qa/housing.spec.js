@@ -276,6 +276,40 @@ for (const vp of VIEWPORTS) {
       }
     });
 
+    test("expanded card shows description notes and an accessible full description", async ({ page }) => {
+      const withBoth = data.listings.find((l) => l.description_notes && l.description);
+      const missing = data.listings.find((l) => !l.description && !l.description_notes);
+      test.skip(!withBoth, "no listing with description fields");
+      await page.goto(`/housing?id=${encodeURIComponent(withBoth.id)}`);
+      const card = page.locator(".home-card.open");
+      await expect(card).toBeVisible();
+      await expect(card.locator(".desc-notes")).toContainText(withBoth.description_notes.trim().slice(0, 48));
+      const summary = card.locator("summary", { hasText: "Read full description" });
+      await expect(summary).toBeVisible();
+      const body = card.locator(".desc-text");
+      await expect(body).toBeHidden();
+      await summary.click();
+      await expect(body).toBeVisible();
+      const firstPara = withBoth.description.trim().split(/\n\s*\n/)[0].replace(/\n/g, " ").replace(/\s+/g, " ").trim();
+      await expect(body).toContainText(firstPara.slice(0, 48));
+      await expect(body.locator("script, img, iframe")).toHaveCount(0);
+      if (vp.width <= 640) {
+        const box = await card.boundingBox();
+        expect(box).toBeTruthy();
+        expect(box.height).toBeLessThanOrEqual(vp.height * 0.67);
+        const scrollable = await card.locator(".card-body").evaluate((el) => el.scrollHeight > el.clientHeight + 4);
+        expect(scrollable || box.height <= vp.height * 0.6 + 8).toBeTruthy();
+      }
+      if (missing) {
+        await page.goto(`/housing?id=${encodeURIComponent(missing.id)}`);
+        const empty = page.locator(".home-card.open");
+        await expect(empty).toBeVisible();
+        await expect(empty).toContainText(missing.address);
+        await expect(empty.locator(".desc-notes")).toHaveCount(0);
+        await expect(empty.locator("summary", { hasText: "Read full description" })).toHaveCount(0);
+      }
+    });
+
     test("phone expanded card leaves the selected pin visible above it", async ({ page }) => {
       test.skip(vp.width > 640, "phone layout only");
       const first = open[0];

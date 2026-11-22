@@ -201,6 +201,8 @@ function normalizeListing(row, index) {
     garage: triageUnknown(row.garage),
     yard: row.yard == null || row.yard === "" ? "unknown" : String(row.yard),
     notes: optStr(row.notes),
+    description: optStr(row.description),
+    description_notes: optStr(row.description_notes),
     status,
     first_seen: String(row.first_seen),
     days_on_market: optNum(row.days_on_market, "days_on_market", id),

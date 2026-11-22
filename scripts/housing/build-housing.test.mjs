@@ -21,6 +21,9 @@ import {
   stepAria,
   stepLabel,
   walkMapsUrl,
+  descriptionParagraphs,
+  listingDescription,
+  listingNotes,
 } from "../../src/housing/format.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -199,4 +202,58 @@ test("build converts listing photos into webp under the media dir", (t) => {
   assert.ok(!data.listings[0].source_path);
   assert.ok(existsSync(path.join(media, "20421474", "1.webp")));
   assert.ok(existsSync(path.join(media, "20421474", "1.thumb.webp")));
+});
+
+test("listing notes and description helpers skip missing or blank fields", () => {
+  assert.equal(listingNotes({}), "");
+  assert.equal(listingNotes({ description_notes: null }), "");
+  assert.equal(listingNotes({ description_notes: "  " }), "");
+  assert.equal(listingNotes({ description_notes: " Short summary. " }), "Short summary.");
+  assert.equal(listingDescription({}), "");
+  assert.equal(listingDescription({ description: null }), "");
+  assert.equal(listingDescription({ description: "  Full text.  " }), "Full text.");
+});
+
+test("descriptionParagraphs keeps paragraph breaks as plain text", () => {
+  assert.deepEqual(descriptionParagraphs(""), []);
+  assert.deepEqual(descriptionParagraphs(null), []);
+  assert.deepEqual(descriptionParagraphs("One line"), [["One line"]]);
+  assert.deepEqual(descriptionParagraphs("First paragraph.\n\nSecond paragraph."), [
+    ["First paragraph."],
+    ["Second paragraph."],
+  ]);
+  assert.deepEqual(descriptionParagraphs("Line one\nLine two\n\nNext para"), [
+    ["Line one", "Line two"],
+    ["Next para"],
+  ]);
+  const paras = descriptionParagraphs("Safe <b>bold</b> & <img src=x onerror=alert(1)>");
+  assert.deepEqual(paras, [["Safe <b>bold</b> & <img src=x onerror=alert(1)>"]]);
+  assert.equal(paras.flat().join(""), "Safe <b>bold</b> & <img src=x onerror=alert(1)>");
+});
+
+test("build keeps description and description_notes, including when missing", () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "housing-"));
+  const src = path.join(dir, "shortlist.json");
+  const out = path.join(dir, "housing.json");
+  const fixture = JSON.parse(readFileSync(FIXTURE, "utf8"));
+  const [first, second, ...rest] = fixture.listings;
+  fixture.listings = [
+    {
+      ...first,
+      description: "Bright unit.\n\nOwner pays utilities.",
+      description_notes: "One garage space. Small pets only.",
+    },
+    { ...second },
+    ...rest,
+  ];
+  delete fixture.listings[1].description;
+  delete fixture.listings[1].description_notes;
+  writeFileSync(src, JSON.stringify(fixture));
+  const result = build(["--in", src, "--out", out, "--media", dir]);
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(readFileSync(out, "utf8"));
+  assert.equal(data.listings[0].description, "Bright unit.\n\nOwner pays utilities.");
+  assert.equal(data.listings[0].description_notes, "One garage space. Small pets only.");
+  assert.equal(data.listings[1].description, "");
+  assert.equal(data.listings[1].description_notes, "");
 });
