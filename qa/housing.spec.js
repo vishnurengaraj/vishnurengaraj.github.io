@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 
 const data = JSON.parse(readFileSync(new URL("../src/data/housing/housing.json", import.meta.url), "utf8"));
-const hiddenStatus = new Set(["rejected", "stale"]);
+const hiddenStatus = new Set(["rejected", "stale", "off_market"]);
 const open = data.listings.filter((l) => !hiddenStatus.has(l.status));
 const hidden = data.listings.filter((l) => hiddenStatus.has(l.status));
 const mentions = data.listings.filter((l) => l.honorable_mention);
@@ -252,6 +252,28 @@ for (const vp of VIEWPORTS) {
       const prev = card.locator(".card-step button").first();
       await expect(prev).toHaveText(/←\s*#\d+/);
       await expect(prev).toHaveAttribute("aria-label", new RegExp(ranked[0].address.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+    });
+
+    test("off-market listings are hidden, unranked, and not honorable mentions", async ({ page }) => {
+      const offMarket = data.listings.filter((l) => l.status === "off_market");
+      test.skip(!offMarket.length, "no off-market listings in this build");
+      await page.goto("/housing");
+      await openList(page, vp.width);
+      for (const row of offMarket) {
+        await expect(page.locator(`#rank-list button[data-id="${row.id}"]`)).toHaveCount(0);
+        await expect(page.locator(`#mention-list button[data-id="${row.id}"]`)).toHaveCount(0);
+        await expect(page.locator(`.home-pin[data-id="${row.id}"]`)).toHaveCount(0);
+      }
+      await page.locator(".reject-toggle input").check();
+      for (const row of offMarket) {
+        const item = page.locator(`#rank-list button[data-id="${row.id}"]`);
+        await expect(item).toBeVisible();
+        await expect(item).toHaveClass(/dimmed/);
+        await expect(item.locator(".rank-badge")).toHaveClass(/unranked/);
+        await expect(item).toContainText("Off market");
+        await expect(item).not.toHaveClass(/hm/);
+        await expect(page.locator(`#mention-list button[data-id="${row.id}"]`)).toHaveCount(0);
+      }
     });
 
     test("phone expanded card leaves the selected pin visible above it", async ({ page }) => {
