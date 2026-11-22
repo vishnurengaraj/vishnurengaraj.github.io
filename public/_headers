@@ -35,3 +35,11 @@
 # workers.dev is a preview. Do not index it.
 https://:worker.:account.workers.dev/*
   X-Robots-Tag: noindex
+
+# /housing is not public yet. Keep it out of search indexes.
+/housing
+  X-Robots-Tag: noindex
+/housing/
+  X-Robots-Tag: noindex
+/housing.html
+  X-Robots-Tag: noindex
