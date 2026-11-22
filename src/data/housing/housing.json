@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-21T22:18-08:00",
+  "updated_at": "2026-11-21T22:46-08:00",
   "source": "shortlist",
   "criteria": {
     "beds_min": 2,
@@ -563,8 +563,83 @@
       ]
     },
     {
-      "id": "464696667",
+      "id": "2105932302",
       "rank": 8,
+      "score": 91,
+      "address": "815 S Catalina Ave #A",
+      "city": "Redondo Beach",
+      "lat": 33.82781,
+      "lng": -118.389046,
+      "rent_usd": 5950,
+      "beds": 3,
+      "baths": 2.5,
+      "sqft": 1700,
+      "type": "MULTI_FAMILY",
+      "url": "https://www.zillow.com/homedetails/815-S-Catalina-Ave-A-Redondo-Beach-CA-90277/2105932302_zpid/",
+      "walk_min_to_beach": 5,
+      "drive_min_to_spacex": 18,
+      "cats_ok": "unknown",
+      "parking": "2 attached garage spaces",
+      "garage": true,
+      "yard": "Private patio and front yard (corner lot)",
+      "notes": "Available Jan 1, 2027; showings start Nov 23 by appointment. Ocean and white-water views, steps from the beach, in-unit laundry. Pet policy not stated. Over budget at $5,950. Walk times are OSRM pedestrian routes to the nearest beach access; drive times are OSRM free-flow, with a ×1.4 rush-hour estimate used for scoring.",
+      "status": "new",
+      "first_seen": "2026-11-21",
+      "days_on_market": 0,
+      "listed_date": "2026-11-21",
+      "recency_boost": 16,
+      "walk_km_to_beach": 0.36,
+      "drive_km_to_spacex": 14.84,
+      "drive_min_to_spacex_rush": 25,
+      "score_breakdown": {
+        "base": 50,
+        "rent": -10,
+        "beach_walk": 20,
+        "drive_rush": 3,
+        "home_type": 4,
+        "size": 3,
+        "cats": 0,
+        "parking": 5,
+        "unvetted": 0,
+        "freshness": 16
+      },
+      "nearest_beach_access": "Esplanade beach access (Ave C area)",
+      "honorable_mention": true,
+      "honorable_mention_reason": "Over budget at $5,950, but it's a 1,700 sq ft 3-bed with a 2-car attached garage, private patio and yard, and ocean views steps from the beach, available Jan 1; pet policy not stated.",
+      "zpid": "2105932302",
+      "photos": [
+        {
+          "src": "/media/housing/2105932302/1.webp",
+          "thumb": "/media/housing/2105932302/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/2626397ed83b11646888a6f6f5f7f021-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2105932302/2.webp",
+          "thumb": "/media/housing/2105932302/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/8f5538132846aaf9cdb4a1a84bfef3f1-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2105932302/3.webp",
+          "thumb": "/media/housing/2105932302/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/b7c5a79b0f4e9d7d5f6a931d2242fe76-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/2626397ed83b11646888a6f6f5f7f021-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/2626397ed83b11646888a6f6f5f7f021-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/8f5538132846aaf9cdb4a1a84bfef3f1-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/b7c5a79b0f4e9d7d5f6a931d2242fe76-p_e.jpg"
+      ]
+    },
+    {
+      "id": "464696667",
+      "rank": 9,
       "score": 91,
       "address": "343 Palos Verdes Blvd Apt 5",
       "city": "Redondo Beach",
@@ -639,7 +714,7 @@
     },
     {
       "id": "466653147",
-      "rank": 9,
+      "rank": 10,
       "score": 90,
       "address": "204 44th St #204",
       "city": "Manhattan Beach",
@@ -714,7 +789,7 @@
     },
     {
       "id": "415-herondo-st-the-gallery-at-playa-pacifica-hermosa-beach",
-      "rank": 10,
+      "rank": 11,
       "score": 87,
       "address": "415 Herondo St (The Gallery at Playa Pacifica)",
       "city": "Hermosa Beach",
@@ -789,7 +864,7 @@
     },
     {
       "id": "2095386884",
-      "rank": 11,
+      "rank": 12,
       "score": 83,
       "address": "502 Avenue G",
       "city": "Redondo Beach",
@@ -864,7 +939,7 @@
     },
     {
       "id": "616-esplanade-elements-616-redondo-beach",
-      "rank": 12,
+      "rank": 13,
       "score": 82,
       "address": "616 Esplanade (Elements 616)",
       "city": "Redondo Beach",
@@ -938,8 +1013,83 @@
       ]
     },
     {
+      "id": "21320766",
+      "rank": 14,
+      "score": 80,
+      "address": "830 Camino Real Unit 204",
+      "city": "Redondo Beach",
+      "lat": 33.831444,
+      "lng": -118.3777,
+      "rent_usd": 4900,
+      "beds": 3,
+      "baths": 2,
+      "sqft": 1300,
+      "type": "APARTMENT",
+      "url": "https://www.zillow.com/homedetails/830-Camino-Real-UNIT-204-Redondo-Beach-CA-90277/21320766_zpid/",
+      "walk_min_to_beach": 20,
+      "drive_min_to_spacex": 17,
+      "cats_ok": true,
+      "parking": "2 designated spaces (garage), plus street parking",
+      "garage": true,
+      "yard": "Patio",
+      "notes": "Brookside Village condo across from Alta Vista Park; cats and dogs OK; available Dec 1, 2026. Community pools, jacuzzi, gym. Slightly over budget at $4,900. Walk times are OSRM pedestrian routes to the nearest beach access; drive times are OSRM free-flow, with a ×1.4 rush-hour estimate used for scoring.",
+      "status": "new",
+      "first_seen": "2026-11-21",
+      "days_on_market": 12,
+      "listed_date": "2026-11-09",
+      "recency_boost": 4,
+      "walk_km_to_beach": 1.48,
+      "drive_km_to_spacex": 14.45,
+      "drive_min_to_spacex_rush": 23,
+      "score_breakdown": {
+        "base": 50,
+        "rent": 5,
+        "beach_walk": 5,
+        "drive_rush": 3,
+        "home_type": 0,
+        "size": 3,
+        "cats": 5,
+        "parking": 5,
+        "unvetted": 0,
+        "freshness": 4
+      },
+      "nearest_beach_access": "Veterans Park / Esplanade access",
+      "honorable_mention": false,
+      "honorable_mention_reason": "",
+      "zpid": "21320766",
+      "photos": [
+        {
+          "src": "/media/housing/21320766/1.webp",
+          "thumb": "/media/housing/21320766/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/d445973caff16c6272c9948a5662e2e6-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/21320766/2.webp",
+          "thumb": "/media/housing/21320766/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/30a8169ce5dd75a1dbd1efc43e56732f-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/21320766/3.webp",
+          "thumb": "/media/housing/21320766/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/3acd64f1e2c1bfe2ef6015a7c36812eb-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/d445973caff16c6272c9948a5662e2e6-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/d445973caff16c6272c9948a5662e2e6-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/30a8169ce5dd75a1dbd1efc43e56732f-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/3acd64f1e2c1bfe2ef6015a7c36812eb-p_e.jpg"
+      ]
+    },
+    {
       "id": "20427031",
-      "rank": 13,
+      "rank": 15,
       "score": 76,
       "address": "1041 2nd St",
       "city": "Hermosa Beach",
@@ -1014,7 +1164,7 @@
     },
     {
       "id": "300-the-village-dr-ocean-club-redondo-beach",
-      "rank": 14,
+      "rank": 16,
       "score": 75,
       "address": "300 The Village Dr (Ocean Club)",
       "city": "Redondo Beach",
@@ -1089,7 +1239,7 @@
     },
     {
       "id": "2118591200",
-      "rank": 15,
+      "rank": 17,
       "score": 69,
       "address": "128 Palos Verdes Blvd Apt 2",
       "city": "Redondo Beach",
@@ -1164,7 +1314,7 @@
     },
     {
       "id": "2104823807",
-      "rank": 16,
+      "rank": 18,
       "score": 57,
       "address": "708 S Prospect Ave",
       "city": "Redondo Beach",
