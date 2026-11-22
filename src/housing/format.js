@@ -335,3 +335,59 @@ export function maxScore(list) {
   const nums = (list || []).map((row) => Number(row.score)).filter((n) => Number.isFinite(n));
   return nums.length ? Math.max(...nums) : 0;
 }
+
+
+export const SPACEX_DIRECTIONS = "SpaceX, 1 Rocket Rd, Hawthorne, CA";
+
+export function walkMapsUrl(listing, beach) {
+  if (listing?.lat == null || listing?.lng == null) return "";
+  const origin = `${listing.lat},${listing.lng}`;
+  const access = String(listing.nearest_beach_access || "").trim();
+  const dest = access
+    ? access
+    : beach?.lat != null && beach?.lng != null
+      ? `${beach.lat},${beach.lng}`
+      : "Manhattan Beach Pier";
+  const params = new URLSearchParams({
+    api: "1",
+    origin,
+    destination: dest,
+    travelmode: "walking",
+  });
+  return `https://www.google.com/maps/dir/?${params.toString()}`;
+}
+
+export function driveMapsUrl(listing) {
+  if (listing?.lat == null || listing?.lng == null) return "";
+  const origin = `${listing.lat},${listing.lng}`;
+  const params = new URLSearchParams({
+    api: "1",
+    origin,
+    destination: SPACEX_DIRECTIONS,
+    travelmode: "driving",
+  });
+  return `https://www.google.com/maps/dir/?${params.toString()}`;
+}
+
+export function stepLabel(listing, dir = "next") {
+  let tag = "—";
+  if (listing?.rank != null) tag = `#${listing.rank}`;
+  else if (listing?.honorable_mention) tag = "HM";
+  return dir === "prev" ? `← ${tag}` : `${tag} →`;
+}
+
+export function stepAria(listing, dir = "next") {
+  const which = dir === "prev" ? "Previous" : "Next";
+  if (!listing) return which;
+  const tag = listing.rank != null ? `rank ${listing.rank}` : listing.honorable_mention ? "honorable mention" : "unranked";
+  return `${which}: ${listing.address}, ${listing.city} (${tag})`;
+}
+
+export function listingPhotos(listing) {
+  return Array.isArray(listing?.photos) ? listing.photos.filter((p) => p && (p.src || p.thumb)) : [];
+}
+
+export function listingThumb(listing) {
+  const first = listingPhotos(listing)[0];
+  return first?.thumb || first?.src || "";
+}

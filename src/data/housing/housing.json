@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-21T22:13-08:00",
+  "updated_at": "2026-11-21T22:18-08:00",
   "source": "shortlist",
   "criteria": {
     "beds_min": 2,
@@ -81,7 +81,36 @@
       "nearest_beach_access": "Manhattan Beach 23rd St / The Strand",
       "honorable_mention": false,
       "honorable_mention_reason": "",
-      "zpid": "20421474"
+      "zpid": "20421474",
+      "photos": [
+        {
+          "src": "/media/housing/20421474/1.webp",
+          "thumb": "/media/housing/20421474/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/1f856daa5b16060eb2f75d4bab2bea7c-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/20421474/2.webp",
+          "thumb": "/media/housing/20421474/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/bd4ea9316c0fa3426a07440b0fad2f0e-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/20421474/3.webp",
+          "thumb": "/media/housing/20421474/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/076d5dfbabb6abb5f492001ceec1929e-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/1f856daa5b16060eb2f75d4bab2bea7c-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/1f856daa5b16060eb2f75d4bab2bea7c-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/bd4ea9316c0fa3426a07440b0fad2f0e-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/076d5dfbabb6abb5f492001ceec1929e-p_e.jpg"
+      ]
     },
     {
       "id": "21318216",
@@ -127,7 +156,36 @@
       "nearest_beach_access": "King Harbor / International Boardwalk",
       "honorable_mention": false,
       "honorable_mention_reason": "",
-      "zpid": "21318216"
+      "zpid": "21318216",
+      "photos": [
+        {
+          "src": "/media/housing/21318216/1.webp",
+          "thumb": "/media/housing/21318216/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/357aa5a38148ba7bb4b6086b881b6e7d-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/21318216/2.webp",
+          "thumb": "/media/housing/21318216/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/47665cc9604b428614ce6a3387cca129-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/21318216/3.webp",
+          "thumb": "/media/housing/21318216/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/0c79b9d24215bde97278cfb92a6f0a3e-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/357aa5a38148ba7bb4b6086b881b6e7d-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/357aa5a38148ba7bb4b6086b881b6e7d-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/47665cc9604b428614ce6a3387cca129-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/0c79b9d24215bde97278cfb92a6f0a3e-p_e.jpg"
+      ]
     },
     {
       "id": "2070006633",
@@ -173,7 +231,36 @@
       "nearest_beach_access": "Hermosa Beach 15th St / The Strand",
       "honorable_mention": false,
       "honorable_mention_reason": "",
-      "zpid": "2070006633"
+      "zpid": "2070006633",
+      "photos": [
+        {
+          "src": "/media/housing/2070006633/1.webp",
+          "thumb": "/media/housing/2070006633/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/04c82c9224e7d9465742e191ee306d5d-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2070006633/2.webp",
+          "thumb": "/media/housing/2070006633/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/23d0f288a428e6625ec14cbbeaeb42f3-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2070006633/3.webp",
+          "thumb": "/media/housing/2070006633/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/4e10e418db9e297a6478c04558d8bf9d-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/04c82c9224e7d9465742e191ee306d5d-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/04c82c9224e7d9465742e191ee306d5d-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/23d0f288a428e6625ec14cbbeaeb42f3-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/4e10e418db9e297a6478c04558d8bf9d-p_e.jpg"
+      ]
     },
     {
       "id": "21321261",
@@ -219,7 +306,36 @@
       "nearest_beach_access": "Esplanade beach access (Ave C area)",
       "honorable_mention": false,
       "honorable_mention_reason": "",
-      "zpid": "21321261"
+      "zpid": "21321261",
+      "photos": [
+        {
+          "src": "/media/housing/21321261/1.webp",
+          "thumb": "/media/housing/21321261/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/ff8580ba8c986b3859f5f1faeafb81dc-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/21321261/2.webp",
+          "thumb": "/media/housing/21321261/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/8ca3ad8f23cd5ec8b1ae6272a27c08fe-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/21321261/3.webp",
+          "thumb": "/media/housing/21321261/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/3ac1556a8927dcb83de56c368b8a486e-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/ff8580ba8c986b3859f5f1faeafb81dc-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/ff8580ba8c986b3859f5f1faeafb81dc-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/8ca3ad8f23cd5ec8b1ae6272a27c08fe-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/3ac1556a8927dcb83de56c368b8a486e-p_e.jpg"
+      ]
     },
     {
       "id": "466745592",
@@ -265,7 +381,36 @@
       "nearest_beach_access": "Esplanade beach access (Ave C area)",
       "honorable_mention": false,
       "honorable_mention_reason": "",
-      "zpid": "466745592"
+      "zpid": "466745592",
+      "photos": [
+        {
+          "src": "/media/housing/466745592/1.webp",
+          "thumb": "/media/housing/466745592/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/5a8d5db4d39b312a2ee41c28b1528f24-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/466745592/2.webp",
+          "thumb": "/media/housing/466745592/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/03a7dc8c8ba004facb9eed277663e952-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/466745592/3.webp",
+          "thumb": "/media/housing/466745592/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/046181ab919e4c63abab4d9b340dfebf-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/5a8d5db4d39b312a2ee41c28b1528f24-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/5a8d5db4d39b312a2ee41c28b1528f24-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/03a7dc8c8ba004facb9eed277663e952-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/046181ab919e4c63abab4d9b340dfebf-p_e.jpg"
+      ]
     },
     {
       "id": "466725772",
@@ -311,7 +456,36 @@
       "nearest_beach_access": "El Segundo Beach / Grand Ave",
       "honorable_mention": false,
       "honorable_mention_reason": "",
-      "zpid": "466725772"
+      "zpid": "466725772",
+      "photos": [
+        {
+          "src": "/media/housing/466725772/1.webp",
+          "thumb": "/media/housing/466725772/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/3b9ae5871840ca39da9b255717da0dc4-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/466725772/2.webp",
+          "thumb": "/media/housing/466725772/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/7d360dfa0b5bb1f68bfebfbb8a7d2d47-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/466725772/3.webp",
+          "thumb": "/media/housing/466725772/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/7596ea0f8c8c5f3f9a50aaff68ed7210-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/3b9ae5871840ca39da9b255717da0dc4-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/3b9ae5871840ca39da9b255717da0dc4-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/7d360dfa0b5bb1f68bfebfbb8a7d2d47-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/7596ea0f8c8c5f3f9a50aaff68ed7210-p_e.jpg"
+      ]
     },
     {
       "id": "2101388827",
@@ -357,7 +531,36 @@
       "nearest_beach_access": "El Segundo Beach / Grand Ave",
       "honorable_mention": false,
       "honorable_mention_reason": "",
-      "zpid": "2101388827"
+      "zpid": "2101388827",
+      "photos": [
+        {
+          "src": "/media/housing/2101388827/1.webp",
+          "thumb": "/media/housing/2101388827/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/f5492ed9eeabe30a86937f0098f30afa-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2101388827/2.webp",
+          "thumb": "/media/housing/2101388827/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/b51b1b1a2006d74082fdbf65fdc03e3e-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2101388827/3.webp",
+          "thumb": "/media/housing/2101388827/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/7ebf1e979b4e532cc26e9b855e6b8952-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/f5492ed9eeabe30a86937f0098f30afa-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/f5492ed9eeabe30a86937f0098f30afa-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/b51b1b1a2006d74082fdbf65fdc03e3e-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/7ebf1e979b4e532cc26e9b855e6b8952-p_e.jpg"
+      ]
     },
     {
       "id": "464696667",
@@ -403,7 +606,36 @@
       "nearest_beach_access": "Esplanade beach access (Topaz St area)",
       "honorable_mention": false,
       "honorable_mention_reason": "",
-      "zpid": "464696667"
+      "zpid": "464696667",
+      "photos": [
+        {
+          "src": "/media/housing/464696667/1.webp",
+          "thumb": "/media/housing/464696667/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/05b05de532180adf2a4522351beb824b-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/464696667/2.webp",
+          "thumb": "/media/housing/464696667/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/8dafc82ade570f10d8493dfe59787cfc-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/464696667/3.webp",
+          "thumb": "/media/housing/464696667/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/55d8f8a23d6a19e77a4b41231b9d15fa-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/05b05de532180adf2a4522351beb824b-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/05b05de532180adf2a4522351beb824b-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/8dafc82ade570f10d8493dfe59787cfc-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/55d8f8a23d6a19e77a4b41231b9d15fa-p_e.jpg"
+      ]
     },
     {
       "id": "466653147",
@@ -449,7 +681,36 @@
       "nearest_beach_access": "Manhattan Beach / The Strand",
       "honorable_mention": false,
       "honorable_mention_reason": "",
-      "zpid": "466653147"
+      "zpid": "466653147",
+      "photos": [
+        {
+          "src": "/media/housing/466653147/1.webp",
+          "thumb": "/media/housing/466653147/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/35a123a274f56b1bdcf2a6b31c1ef8b2-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/466653147/2.webp",
+          "thumb": "/media/housing/466653147/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/fa5e0803454ef44abf764cfb6676d283-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/466653147/3.webp",
+          "thumb": "/media/housing/466653147/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/3be27de07724a9ef8d6c5958b8ca3567-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/35a123a274f56b1bdcf2a6b31c1ef8b2-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/35a123a274f56b1bdcf2a6b31c1ef8b2-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/fa5e0803454ef44abf764cfb6676d283-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/3be27de07724a9ef8d6c5958b8ca3567-p_e.jpg"
+      ]
     },
     {
       "id": "415-herondo-st-the-gallery-at-playa-pacifica-hermosa-beach",
@@ -495,7 +756,36 @@
       "nearest_beach_access": "Herondo St / The Strand",
       "honorable_mention": false,
       "honorable_mention_reason": "",
-      "zpid": null
+      "zpid": null,
+      "photos": [
+        {
+          "src": "/media/housing/415-herondo-st-the-gallery-at-playa-pacifica/1.webp",
+          "thumb": "/media/housing/415-herondo-st-the-gallery-at-playa-pacifica/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/9e4f17301b1616af03f9bc584a367314-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/415-herondo-st-the-gallery-at-playa-pacifica/2.webp",
+          "thumb": "/media/housing/415-herondo-st-the-gallery-at-playa-pacifica/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/5b4645e6351dff1276b6d0c729fb65fe-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/415-herondo-st-the-gallery-at-playa-pacifica/3.webp",
+          "thumb": "/media/housing/415-herondo-st-the-gallery-at-playa-pacifica/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/8c900081f4ce5ba2058d35bc5c5c5873-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/9e4f17301b1616af03f9bc584a367314-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/9e4f17301b1616af03f9bc584a367314-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/5b4645e6351dff1276b6d0c729fb65fe-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/8c900081f4ce5ba2058d35bc5c5c5873-p_e.jpg"
+      ]
     },
     {
       "id": "2095386884",
@@ -541,7 +831,36 @@
       "nearest_beach_access": "Esplanade beach access (Knob Hill area)",
       "honorable_mention": false,
       "honorable_mention_reason": "",
-      "zpid": "2095386884"
+      "zpid": "2095386884",
+      "photos": [
+        {
+          "src": "/media/housing/2095386884/1.webp",
+          "thumb": "/media/housing/2095386884/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/91ca2da04e947501704a5c92606b7def-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2095386884/2.webp",
+          "thumb": "/media/housing/2095386884/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/696b3a9c496876a0b23711bde15143cb-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2095386884/3.webp",
+          "thumb": "/media/housing/2095386884/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/569f554c8346c2cd3af0643e408faf45-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/91ca2da04e947501704a5c92606b7def-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/91ca2da04e947501704a5c92606b7def-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/696b3a9c496876a0b23711bde15143cb-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/569f554c8346c2cd3af0643e408faf45-p_e.jpg"
+      ]
     },
     {
       "id": "616-esplanade-elements-616-redondo-beach",
@@ -587,7 +906,36 @@
       "nearest_beach_access": "Esplanade beach access (Ave A area)",
       "honorable_mention": false,
       "honorable_mention_reason": "",
-      "zpid": null
+      "zpid": null,
+      "photos": [
+        {
+          "src": "/media/housing/616-esplanade-elements-616/1.webp",
+          "thumb": "/media/housing/616-esplanade-elements-616/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/b52e0b822c25d9f28db0216f5c3e151f-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/616-esplanade-elements-616/2.webp",
+          "thumb": "/media/housing/616-esplanade-elements-616/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/4717a608ec8ae7072e63ed0b74832952-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/616-esplanade-elements-616/3.webp",
+          "thumb": "/media/housing/616-esplanade-elements-616/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/84eb85b8337177ae185551f3aa557c30-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/b52e0b822c25d9f28db0216f5c3e151f-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/b52e0b822c25d9f28db0216f5c3e151f-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/4717a608ec8ae7072e63ed0b74832952-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/84eb85b8337177ae185551f3aa557c30-p_e.jpg"
+      ]
     },
     {
       "id": "20427031",
@@ -633,7 +981,36 @@
       "nearest_beach_access": "Hermosa Beach 3rd St / The Strand",
       "honorable_mention": true,
       "honorable_mention_reason": "$4,995 is about $500 over budget, but it's a standalone house in Hermosa (good odds of yard and parking). Not yet vetted.",
-      "zpid": "20427031"
+      "zpid": "20427031",
+      "photos": [
+        {
+          "src": "/media/housing/20427031/1.webp",
+          "thumb": "/media/housing/20427031/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/b158cb9126366f68973630641ee882ef-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/20427031/2.webp",
+          "thumb": "/media/housing/20427031/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/fd35519a97d6d79c6db7e4f2faf48670-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/20427031/3.webp",
+          "thumb": "/media/housing/20427031/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/afcd58c6c93cdb83adf96dfbc5e61c36-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/b158cb9126366f68973630641ee882ef-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/b158cb9126366f68973630641ee882ef-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/fd35519a97d6d79c6db7e4f2faf48670-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/afcd58c6c93cdb83adf96dfbc5e61c36-p_e.jpg"
+      ]
     },
     {
       "id": "300-the-village-dr-ocean-club-redondo-beach",
@@ -679,7 +1056,36 @@
       "nearest_beach_access": "King Harbor / International Boardwalk",
       "honorable_mention": false,
       "honorable_mention_reason": "",
-      "zpid": null
+      "zpid": null,
+      "photos": [
+        {
+          "src": "/media/housing/300-the-village-dr-ocean-club/1.webp",
+          "thumb": "/media/housing/300-the-village-dr-ocean-club/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/769bc07c54bb72128bd2b5ba5182e052-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/300-the-village-dr-ocean-club/2.webp",
+          "thumb": "/media/housing/300-the-village-dr-ocean-club/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/ee2723e4d0f98639555d4b353fe8ba4e-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/300-the-village-dr-ocean-club/3.webp",
+          "thumb": "/media/housing/300-the-village-dr-ocean-club/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/3a400234cd726c0e0cd2a3e83d3f47ed-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/769bc07c54bb72128bd2b5ba5182e052-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/769bc07c54bb72128bd2b5ba5182e052-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/ee2723e4d0f98639555d4b353fe8ba4e-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/3a400234cd726c0e0cd2a3e83d3f47ed-p_e.jpg"
+      ]
     },
     {
       "id": "2118591200",
@@ -725,7 +1131,36 @@
       "nearest_beach_access": "Esplanade beach access (Knob Hill area)",
       "honorable_mention": false,
       "honorable_mention_reason": "",
-      "zpid": "2118591200"
+      "zpid": "2118591200",
+      "photos": [
+        {
+          "src": "/media/housing/2118591200/1.webp",
+          "thumb": "/media/housing/2118591200/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/2e2df08c8c9d86ac7e2c00103bcc5546-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2118591200/2.webp",
+          "thumb": "/media/housing/2118591200/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/738e99fea7b1801b37cdd3ae69716fdb-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2118591200/3.webp",
+          "thumb": "/media/housing/2118591200/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/7bd7259e1f7b0690c1162804fba5b4d1-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/2e2df08c8c9d86ac7e2c00103bcc5546-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/2e2df08c8c9d86ac7e2c00103bcc5546-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/738e99fea7b1801b37cdd3ae69716fdb-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/7bd7259e1f7b0690c1162804fba5b4d1-p_e.jpg"
+      ]
     },
     {
       "id": "2104823807",
@@ -771,7 +1206,36 @@
       "nearest_beach_access": "Esplanade beach access (Ave C area)",
       "honorable_mention": true,
       "honorable_mention_reason": "22-minute walk to the beach (just over the limit), but it's a $2,995 townhouse. Not yet vetted.",
-      "zpid": "2104823807"
+      "zpid": "2104823807",
+      "photos": [
+        {
+          "src": "/media/housing/2104823807/1.webp",
+          "thumb": "/media/housing/2104823807/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/8b3b53762bbf5a9eac9301074385bd90-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2104823807/2.webp",
+          "thumb": "/media/housing/2104823807/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/3acea1414fa660902e62d5805d0f88ff-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2104823807/3.webp",
+          "thumb": "/media/housing/2104823807/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/de904b8a7d169596ab5a2c26cdf1fe77-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/8b3b53762bbf5a9eac9301074385bd90-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/8b3b53762bbf5a9eac9301074385bd90-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/3acea1414fa660902e62d5805d0f88ff-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/de904b8a7d169596ab5a2c26cdf1fe77-p_e.jpg"
+      ]
     },
     {
       "id": "2102760387",
@@ -817,7 +1281,36 @@
       "nearest_beach_access": "Herondo St / The Strand",
       "honorable_mention": false,
       "honorable_mention_reason": "",
-      "zpid": "2102760387"
+      "zpid": "2102760387",
+      "photos": [
+        {
+          "src": "/media/housing/2102760387/1.webp",
+          "thumb": "/media/housing/2102760387/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/478eab04f911e6fc19d48d9b8990e117-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2102760387/2.webp",
+          "thumb": "/media/housing/2102760387/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/e8cae554936ace3feca67874097cad2f-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2102760387/3.webp",
+          "thumb": "/media/housing/2102760387/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/6c7e6eb53b5bdf6cfb2dfe8efa3e2b0a-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/478eab04f911e6fc19d48d9b8990e117-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/478eab04f911e6fc19d48d9b8990e117-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/e8cae554936ace3feca67874097cad2f-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/6c7e6eb53b5bdf6cfb2dfe8efa3e2b0a-p_e.jpg"
+      ]
     },
     {
       "id": "2076871105",
@@ -863,7 +1356,36 @@
       "nearest_beach_access": "King Harbor / Seaside Lagoon",
       "honorable_mention": true,
       "honorable_mention_reason": "No pets allowed, but it has a detached private 2-car garage, a patio and balcony, and 1,625 sq ft for $4,350.",
-      "zpid": "2076871105"
+      "zpid": "2076871105",
+      "photos": [
+        {
+          "src": "/media/housing/2076871105/1.webp",
+          "thumb": "/media/housing/2076871105/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/00098d943a68752c9057de2eb6ec4110-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2076871105/2.webp",
+          "thumb": "/media/housing/2076871105/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/a1056c6e517975187ef9a98be551b271-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2076871105/3.webp",
+          "thumb": "/media/housing/2076871105/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/ed81a856615fa8bc226eb53fe9f1febc-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/00098d943a68752c9057de2eb6ec4110-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/00098d943a68752c9057de2eb6ec4110-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/a1056c6e517975187ef9a98be551b271-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/ed81a856615fa8bc226eb53fe9f1febc-p_e.jpg"
+      ]
     },
     {
       "id": "466631710",
@@ -909,7 +1431,36 @@
       "nearest_beach_access": "King Harbor / International Boardwalk",
       "honorable_mention": true,
       "honorable_mention_reason": "No pets allowed, otherwise excellent: 3/3 townhouse, attached private 2-car garage plus driveway, fenced private front patio, about an 11-minute walk to the beach. Worth asking the landlord whether they'd make an exception for one cat.",
-      "zpid": "466631710"
+      "zpid": "466631710",
+      "photos": [
+        {
+          "src": "/media/housing/466631710/1.webp",
+          "thumb": "/media/housing/466631710/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/ecb295be5fe3c0c15607af2043e86b27-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/466631710/2.webp",
+          "thumb": "/media/housing/466631710/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/7d970042bee9d876f412c52fd691bcee-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/466631710/3.webp",
+          "thumb": "/media/housing/466631710/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/a538f81eb5c2228f03f663a621fbd6b3-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/ecb295be5fe3c0c15607af2043e86b27-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/ecb295be5fe3c0c15607af2043e86b27-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/7d970042bee9d876f412c52fd691bcee-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/a538f81eb5c2228f03f663a621fbd6b3-p_e.jpg"
+      ]
     },
     {
       "id": "465472802",
@@ -955,7 +1506,36 @@
       "nearest_beach_access": "Dockweiler / Imperial Hwy",
       "honorable_mention": false,
       "honorable_mention_reason": "",
-      "zpid": "465472802"
+      "zpid": "465472802",
+      "photos": [
+        {
+          "src": "/media/housing/465472802/1.webp",
+          "thumb": "/media/housing/465472802/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/ada7460fe88e600357e321efcc9c0f73-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/465472802/2.webp",
+          "thumb": "/media/housing/465472802/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/e8328dda31be0c54c7165bda8ed221c3-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/465472802/3.webp",
+          "thumb": "/media/housing/465472802/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/3b36e4d30a844a1024e15e03b1d9d56d-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/ada7460fe88e600357e321efcc9c0f73-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/ada7460fe88e600357e321efcc9c0f73-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/e8328dda31be0c54c7165bda8ed221c3-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/3b36e4d30a844a1024e15e03b1d9d56d-p_e.jpg"
+      ]
     }
   ]
 }

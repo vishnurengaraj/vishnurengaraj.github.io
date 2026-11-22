@@ -157,8 +157,8 @@ export async function mountHousingMap(mapEl, { listings, landmarks, onPick, maxA
     if (disposed) return;
     mapEl.classList.toggle("pins-near", map.getZoom() < NAME_HIDE_ZOOM);
     const active = listings.filter((l) => visibleIds.has(l.id));
-    const always = active.filter((l) => isHonorable(l));
-    const clusterable = active.filter((l) => !isHonorable(l));
+    const always = active.filter((l) => isHonorable(l) || l.id === selected);
+    const clusterable = active.filter((l) => !isHonorable(l) && l.id !== selected);
     const groups = map.getZoom() < 14.2 ? clusterVisible(map, clusterable) : clusterable.map((listing) => [{ listing }]);
     const shown = new Set(always.map((l) => l.id));
     clearClusters();
@@ -194,7 +194,7 @@ export async function mountHousingMap(mapEl, { listings, landmarks, onPick, maxA
   function select(id) {
     selected = id || "";
     mapEl.dataset.selected = selected;
-    for (const [key, { el }] of markers) el.classList.toggle("sel", key === selected);
+    syncMarkers();
   }
 
   function visibleListings() {
@@ -211,15 +211,27 @@ export async function mountHousingMap(mapEl, { listings, landmarks, onPick, maxA
       if (disposed) return;
       const listing = listings.find((l) => l.id === id);
       if (!listing) return;
+      this.frameOn([{ lat: listing.lat, lng: listing.lng }], padding, { instant, maxZoom: FLY_ZOOM });
+    },
+    frameOn(points, padding, { instant = false, maxZoom = 14.2 } = {}) {
+      if (disposed) return;
+      const pts = (points || []).filter((p) => p && Number.isFinite(p.lat) && Number.isFinite(p.lng));
+      if (!pts.length) return;
       lastPadding = padding || lastPadding;
-      map.flyTo({
-        center: [listing.lng, listing.lat],
-        zoom: Math.max(map.getZoom(), FLY_ZOOM),
+      const bounds = new maplibregl.LngLatBounds();
+      for (const p of pts) bounds.extend([p.lng, p.lat]);
+      if (pts.length === 1) {
+        const pad = 0.008;
+        bounds.extend([pts[0].lng - pad, pts[0].lat - pad]);
+        bounds.extend([pts[0].lng + pad, pts[0].lat + pad]);
+      }
+      map.fitBounds(bounds, {
         padding,
+        maxZoom,
         bearing: 0,
         pitch: 0,
-        duration: instant || reducedMotion() ? 0 : FLY_MS,
         essential: true,
+        duration: instant || reducedMotion() ? 0 : FLY_MS,
       });
     },
     frameAll(padding, { animate = true } = {}) {
