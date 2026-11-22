@@ -169,10 +169,11 @@ test("prev/next labels use rank or a short mention tag", () => {
   assert.match(stepAria({ rank: 3, address: "100 Main St", city: "Hermosa Beach" }, "prev"), /100 Main St/);
 });
 
-test("build converts listing photos into webp under the media dir", () => {
+test("build converts listing photos into webp under the media dir", (t) => {
   const photo = "/workspace/house-hunt/photos/20421474/1.jpg";
   if (!existsSync(photo)) {
-    test.skip("real shortlist photos are not on this machine");
+    t.skip("real shortlist photos are not on this machine");
+    return;
   }
   const dir = mkdtempSync(path.join(tmpdir(), "housing-"));
   const src = path.join(dir, "shortlist.json");
