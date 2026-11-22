@@ -1,7 +1,7 @@
 /** Display helpers for /housing. */
 
-export const STATUSES = ["new", "contacted", "toured", "rejected", "stale"];
-export const HIDDEN_STATUSES = new Set(["rejected", "stale"]);
+export const STATUSES = ["new", "contacted", "toured", "rejected", "stale", "off_market"];
+export const HIDDEN_STATUSES = new Set(["rejected", "stale", "off_market"]);
 
 export const STATUS_LABELS = {
   new: "New",
@@ -9,6 +9,7 @@ export const STATUS_LABELS = {
   toured: "Toured",
   rejected: "Rejected",
   stale: "Stale",
+  off_market: "Off market",
 };
 
 const TYPE_LABELS = {

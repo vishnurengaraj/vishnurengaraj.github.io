@@ -30,7 +30,7 @@ const DEFAULT_IN = "/workspace/house-hunt/shortlist.json";
 const FIXTURE = path.join(ROOT, "qa/housing.fixture.json");
 const DEFAULT_OUT = path.join(ROOT, "src/data/housing/housing.json");
 
-const STATUSES = new Set(["new", "contacted", "toured", "rejected", "stale"]);
+const STATUSES = new Set(["new", "contacted", "toured", "rejected", "stale", "off_market"]);
 const UNVERIFIED = new Set(["unknown", "unverified"]);
 
 const SPACEX = {
@@ -385,12 +385,13 @@ async function main() {
   writeFileSync(outPath, `${JSON.stringify(out, null, 2)}\n`);
   const rejected = listings.filter((l) => l.status === "rejected").length;
   const stale = listings.filter((l) => l.status === "stale").length;
+  const offMarket = listings.filter((l) => l.status === "off_market").length;
   const unranked = listings.filter((l) => l.rank == null).length;
   const mentions = listings.filter((l) => l.honorable_mention).length;
-  const open = listings.length - rejected - stale;
+  const open = listings.length - rejected - stale - offMarket;
   const photoNote = photos.converted || photos.missing ? `; ${photos.converted} photos` + (photos.missing ? `, ${photos.missing} missing` : "") : "";
   console.log(
-    `housing: wrote ${listings.length} listings (${open} open, ${rejected} rejected, ${stale} stale, ${unranked} unranked, ${mentions} honorable mentions) from ${source.path} → ${path.relative(ROOT, outPath)}${
+    `housing: wrote ${listings.length} listings (${open} open, ${rejected} rejected, ${stale} stale, ${offMarket} off-market, ${unranked} unranked, ${mentions} honorable mentions) from ${source.path} → ${path.relative(ROOT, outPath)}${
       source.usedFixture ? " (SAMPLE FIXTURE)" : ""
     }${photoNote}${issues.length ? `; ${issues.length} schema note(s)` : ""}`,
   );

@@ -48,17 +48,18 @@ test("format helpers", () => {
   assert.ok(criteriaSummary({ beds_min: 2, baths_min: 2, budget_usd: 4500 }).includes("$4,500/month"));
 });
 
-test("rejected and stale listings are hidden until the toggle is on", () => {
+test("rejected, stale, and off-market listings are hidden until the toggle is on", () => {
   const list = [
     { id: "a", rank: 1, score: 90, rent_usd: 4000, walk_min_to_beach: 6, status: "new" },
     { id: "b", rank: 2, score: 20, rent_usd: 3000, walk_min_to_beach: 10, status: "rejected" },
     { id: "c", rank: 3, score: 80, rent_usd: 5000, walk_min_to_beach: 25, status: "new" },
     { id: "d", rank: null, score: 70, rent_usd: 3200, walk_min_to_beach: 12, status: "stale" },
+    { id: "e", rank: null, score: 91, rent_usd: 5950, walk_min_to_beach: 5, status: "off_market" },
   ];
   const hidden = filterListings(list, { showHidden: false });
   assert.deepEqual(hidden.map((l) => l.id), ["a", "c"]);
   const shown = filterListings(list, { showHidden: true });
-  assert.deepEqual(shown.map((l) => l.id), ["a", "b", "c", "d"]);
+  assert.deepEqual(shown.map((l) => l.id), ["a", "b", "c", "d", "e"]);
   const priced = filterListings(list, { maxRent: 4500, showHidden: false });
   assert.deepEqual(priced.map((l) => l.id), ["a"]);
   const walked = filterListings(list, { maxWalk: 20, showHidden: false });

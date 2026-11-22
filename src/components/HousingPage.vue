@@ -5,6 +5,7 @@ import { useHead } from "@unhead/vue";
 import data from "../data/housing/housing.json";
 import { occlusionPadding } from "../runs/frame.js";
 import {
+  HIDDEN_STATUSES,
   STATUS_LABELS,
   STATUSES,
   breakdownRows,
@@ -74,7 +75,7 @@ const walkCaps = [
 ];
 const statusOptions = [
   { id: "all", label: "All open" },
-  ...STATUSES.filter((s) => s !== "rejected").map((id) => ({ id, label: STATUS_LABELS[id] })),
+  ...STATUSES.filter((s) => !HIDDEN_STATUSES.has(s)).map((id) => ({ id, label: STATUS_LABELS[id] })),
 ];
 
 const maxRent = ref(null);
@@ -518,7 +519,7 @@ onUnmounted(() => {
           </p>
           <p class="sub">
             <span class="sub-open">{{ openCount }} open</span>
-            <span v-if="hiddenCount" class="sub-hidden">{{ hiddenCount }} rejected or stale</span>
+            <span v-if="hiddenCount" class="sub-hidden">{{ hiddenCount }} hidden</span>
             <span v-if="asOf" class="sub-asof">Updated {{ asOf }}</span>
           </p>
           <p v-if="fixtureBuild" class="fixture-note">Showing sample fixture data, not the live shortlist.</p>
@@ -571,7 +572,7 @@ onUnmounted(() => {
           </div>
           <label class="reject-toggle">
             <input type="checkbox" v-model="showHidden" />
-            <span>Show rejected and stale ({{ hiddenCount }})</span>
+            <span>Show hidden listings ({{ hiddenCount }})</span>
           </label>
         </div>
 
