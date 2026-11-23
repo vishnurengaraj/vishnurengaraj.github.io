@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-22T14:46-08:00",
+  "updated_at": "2026-11-22T15:36-08:00",
   "source": "shortlist",
   "criteria": {
     "beds_min": 2,
@@ -19,7 +19,7 @@
     ],
     "max_listing_age_days": 14
   },
-  "scoring_notes": "Scores start at 50 and are not capped. Rent: +15 at or under $4,500, plus up to +5 more scaling linearly toward $3,000 (the full +5 at $3,000 or less); +5 for $4,500–$5,000; −10 above $5,000. Beach walk uses a routed pedestrian time to the nearest sand-side access point along the coast from El Segundo Beach (Grand Ave) to Torrance Beach: ≤5 min +20, ≤10 +15, ≤15 +10, ≤20 +5, >20 −25. Drive to 1 Rocket Rd, Hawthorne uses the rush-hour estimate (OSRM free-flow × 1.4; OSRM has no live traffic): ≤20 min +10, ≤25 +3, beyond that −5. Home type: SINGLE_FAMILY +12, TOWNHOUSE +8, MULTI_FAMILY +4, CONDO +2, others 0. Size: +3 if 1,100 sq ft or more. Verified details: cats allowed +5; no pets −60 and status rejected; 2+ parking spaces or a 2-car garage +5; only 1 space −8; unvetted (cats_ok and parking both 'unknown') −3. Freshness from days on market: 0–1 days +16, 2–3 +12, 4–7 +8, 8–14 +4. Listings more than 14 days old, or with listed_date more than 14 days before today, are marked stale and left unranked. Rank is 1..n by score among listings whose status is not rejected, stale, or off_market; those three statuses have rank null. Walk and drive times come from the FOSSGIS public OSRM servers. drive_min_to_spacex is OSRM free-flow; drive_min_to_spacex_rush is free-flow × 1.4 and is the figure used for scoring.",
+  "scoring_notes": "Scores start at 50 and are not capped. Rent: +15 at or under $4,500, plus up to +5 more scaling linearly toward $3,000 (the full +5 at $3,000 or less); +5 for $4,500–$5,000; −10 above $5,000. Beach walk uses a routed pedestrian time to the nearest sand-side access point along the coast from El Segundo Beach (Grand Ave) to Torrance Beach: ≤5 min +20, ≤10 +15, ≤15 +10, ≤20 +5, >20 −25. Drive to 1 Rocket Rd, Hawthorne uses the rush-hour estimate (OSRM free-flow × 1.4; OSRM has no live traffic): ≤20 min +10, ≤25 +3, beyond that −5. Home type (Vishnu, 2026-11-22): standalone house +10, condo or townhouse +5, apartment, duplex or multi-family unit 0. A listing Zillow tags SINGLE_FAMILY whose description shows it is a unit or duplex is retyped. Size: +3 if 1,100 sq ft or more. Verified details: cats allowed +5; no pets −60 and status rejected; 2+ parking spaces or a 2-car garage +5; only 1 space −8; unvetted (cats_ok and parking both 'unknown') −3. Freshness from days on market: 0–1 days +16, 2–3 +12, 4–7 +8, 8–14 +4. Listings more than 14 days old, or with listed_date more than 14 days before today, are marked stale and left unranked. Rank is 1..n by score among listings whose status is not rejected, stale, or off_market; those three statuses have rank null. Walk and drive times come from the FOSSGIS public OSRM servers. drive_min_to_spacex is OSRM free-flow; drive_min_to_spacex_rush is free-flow × 1.4 and is the figure used for scoring.",
   "landmarks": {
     "beach": {
       "id": "beach",
@@ -38,86 +38,9 @@
   },
   "listings": [
     {
-      "id": "20421474",
-      "rank": 1,
-      "score": 116,
-      "address": "320 23rd Pl",
-      "city": "Manhattan Beach",
-      "lat": 33.892853,
-      "lng": -118.413414,
-      "rent_usd": 4400,
-      "beds": 2,
-      "baths": 2,
-      "sqft": 950,
-      "type": "SINGLE_FAMILY",
-      "url": "https://www.zillow.com/homedetails/320-23rd-Pl-Manhattan-Beach-CA-90266/20421474_zpid/",
-      "walk_min_to_beach": 4,
-      "drive_min_to_spacex": 13,
-      "cats_ok": true,
-      "parking": "1 detached garage space (off-street)",
-      "garage": true,
-      "yard": "Private balcony; patio also listed",
-      "notes": "Available now. Only small pets allowed. Parking is only 1 garage space, short of 2 cars + motorcycle. Owner pays all utilities. Walk times are OSRM pedestrian routes to the nearest beach access; drive times are OSRM free-flow, with a ×1.4 rush-hour estimate used for scoring.",
-      "description": "SPACIOUS UPPER DUPLEX!! 3 BLOCKS TO THE BEACH!! ALL UTILITIES PAID!! This bright and sunny unit has an ocean peek from the living room and one of the bedroom's balcony and offers new laminate plank hardwood floors, wood beam ceilings, 1 3/4 bathes. Both bedrooms are spacious with large closets, there is a master bedroom with private en-suite bath, and another bedroom with a private balcony and small ocean peek view. The unit comes with one garage parking space and shared laundry in the garage. Close to shops and restaurants. ONLY SMALL PETS ALLOWED!! AVAILABLE NOW!!\n\nOwner pays ALL UTILITIES",
-      "description_notes": "One detached garage space, short of 2 cars and a motorcycle, with shared laundry in the garage. Only small pets allowed; available now; the unit has a private bedroom balcony, and the listing also tags a patio. Owner pays all utilities.",
-      "status": "new",
-      "first_seen": "2026-11-21",
-      "days_on_market": 2,
-      "listed_date": "2026-11-20",
-      "recency_boost": 12,
-      "walk_km_to_beach": 0.33,
-      "drive_km_to_spacex": 11.8,
-      "drive_min_to_spacex_rush": 19,
-      "score_breakdown": {
-        "base": 50,
-        "rent": 15.33,
-        "beach_walk": 20,
-        "drive_rush": 10,
-        "home_type": 12,
-        "size": 0,
-        "cats": 5,
-        "parking": -8,
-        "unvetted": 0,
-        "freshness": 12
-      },
-      "nearest_beach_access": "Manhattan Beach 23rd St / The Strand",
-      "honorable_mention": false,
-      "honorable_mention_reason": "",
-      "zpid": "20421474",
-      "photos": [
-        {
-          "src": "/media/housing/20421474/1.webp",
-          "thumb": "/media/housing/20421474/1.thumb.webp",
-          "w": 596,
-          "h": 446,
-          "source": "https://photos.zillowstatic.com/fp/1f856daa5b16060eb2f75d4bab2bea7c-p_e.jpg"
-        },
-        {
-          "src": "/media/housing/20421474/2.webp",
-          "thumb": "/media/housing/20421474/2.thumb.webp",
-          "w": 596,
-          "h": 446,
-          "source": "https://photos.zillowstatic.com/fp/bd4ea9316c0fa3426a07440b0fad2f0e-p_e.jpg"
-        },
-        {
-          "src": "/media/housing/20421474/3.webp",
-          "thumb": "/media/housing/20421474/3.thumb.webp",
-          "w": 596,
-          "h": 446,
-          "source": "https://photos.zillowstatic.com/fp/076d5dfbabb6abb5f492001ceec1929e-p_e.jpg"
-        }
-      ],
-      "photo_source_url": "https://photos.zillowstatic.com/fp/1f856daa5b16060eb2f75d4bab2bea7c-p_e.jpg",
-      "photo_source_urls": [
-        "https://photos.zillowstatic.com/fp/1f856daa5b16060eb2f75d4bab2bea7c-p_e.jpg",
-        "https://photos.zillowstatic.com/fp/bd4ea9316c0fa3426a07440b0fad2f0e-p_e.jpg",
-        "https://photos.zillowstatic.com/fp/076d5dfbabb6abb5f492001ceec1929e-p_e.jpg"
-      ]
-    },
-    {
       "id": "21318216",
-      "rank": 2,
-      "score": 111,
+      "rank": 1,
+      "score": 114,
       "address": "110 The Village Unit 211",
       "city": "Redondo Beach",
       "lat": 33.844128,
@@ -150,7 +73,7 @@
         "rent": 15.67,
         "beach_walk": 20,
         "drive_rush": 3,
-        "home_type": 2,
+        "home_type": 5,
         "size": 3,
         "cats": 0,
         "parking": 5,
@@ -193,8 +116,8 @@
     },
     {
       "id": "21321261",
-      "rank": 3,
-      "score": 110,
+      "rank": 2,
+      "score": 113,
       "address": "727 Esplanade Unit 204",
       "city": "Redondo Beach",
       "lat": 33.829723,
@@ -227,7 +150,7 @@
         "rent": 15,
         "beach_walk": 20,
         "drive_rush": 3,
-        "home_type": 2,
+        "home_type": 5,
         "size": 3,
         "cats": 0,
         "parking": 5,
@@ -269,85 +192,8 @@
       ]
     },
     {
-      "id": "2070006633",
-      "rank": 4,
-      "score": 107,
-      "address": "15 15th St",
-      "city": "Hermosa Beach",
-      "lat": 33.864426,
-      "lng": -118.40194,
-      "rent_usd": 4000,
-      "beds": 2,
-      "baths": 2,
-      "sqft": 840,
-      "type": "SINGLE_FAMILY",
-      "url": "https://www.zillow.com/homedetails/15-15th-St-Hermosa-Beach-CA-90254/2070006633_zpid/",
-      "walk_min_to_beach": 1,
-      "drive_min_to_spacex": 16,
-      "cats_ok": true,
-      "parking": "1 assigned gated space, no garage",
-      "garage": false,
-      "yard": "Patio",
-      "notes": "Available Dec 10, 2026. Pets considered case by case, with no pet rent or deposit. Only 1 assigned gated parking space (no garage). Shared on-site laundry. The description calls this unit 13, a renovated corner unit, not a standalone house. Walk times are OSRM pedestrian routes to the nearest beach access; drive times are OSRM free-flow, with a ×1.4 rush-hour estimate used for scoring.",
-      "description": "Newly renovated 2-bedroom corner unit at 15 15th Street, Unit 13, offering approximately 840 sq. ft. Features luxury vinyl plank flooring, carpet, shaker cabinets, quartz countertops, and updated fixtures throughout. Kitchen includes a dishwasher, electric stove, and refrigerator. Additional amenities include radiant and electric heating, blinds, one assigned gated parking space, private storage locker, and on-site laundry. One-year lease. Tenant pays electricity. Pets considered. Renter's insurance required. l Accross the street from noble park and the strand. Available December 10, 2026. Shown by appointment only. Contact our office to schedule a showing.\n\n12-month lease. Tenant pays electricity only. Renter's insurance required. Pets may be considered case by case; no pet rent or pet deposit. Showings by appointment.",
-      "description_notes": "One assigned gated parking space (no garage) and a private storage locker; motorcycle parking is not mentioned. Pets may be considered case by case with no pet rent or deposit; shared on-site laundry, and the listing tags a patio; available December 10, 2026; the description calls this unit 13, a renovated corner unit, not a standalone house.",
-      "status": "new",
-      "first_seen": "2026-11-21",
-      "days_on_market": 5,
-      "listed_date": "2026-11-17",
-      "recency_boost": 8,
-      "walk_km_to_beach": 0.1,
-      "drive_km_to_spacex": 13.74,
-      "drive_min_to_spacex_rush": 22,
-      "score_breakdown": {
-        "base": 50,
-        "rent": 16.67,
-        "beach_walk": 20,
-        "drive_rush": 3,
-        "home_type": 12,
-        "size": 0,
-        "cats": 5,
-        "parking": -8,
-        "unvetted": 0,
-        "freshness": 8
-      },
-      "nearest_beach_access": "Hermosa Beach 15th St / The Strand",
-      "honorable_mention": false,
-      "honorable_mention_reason": "",
-      "zpid": "2070006633",
-      "photos": [
-        {
-          "src": "/media/housing/2070006633/1.webp",
-          "thumb": "/media/housing/2070006633/1.thumb.webp",
-          "w": 596,
-          "h": 446,
-          "source": "https://photos.zillowstatic.com/fp/04c82c9224e7d9465742e191ee306d5d-p_e.jpg"
-        },
-        {
-          "src": "/media/housing/2070006633/2.webp",
-          "thumb": "/media/housing/2070006633/2.thumb.webp",
-          "w": 596,
-          "h": 446,
-          "source": "https://photos.zillowstatic.com/fp/23d0f288a428e6625ec14cbbeaeb42f3-p_e.jpg"
-        },
-        {
-          "src": "/media/housing/2070006633/3.webp",
-          "thumb": "/media/housing/2070006633/3.thumb.webp",
-          "w": 596,
-          "h": 446,
-          "source": "https://photos.zillowstatic.com/fp/4e10e418db9e297a6478c04558d8bf9d-p_e.jpg"
-        }
-      ],
-      "photo_source_url": "https://photos.zillowstatic.com/fp/04c82c9224e7d9465742e191ee306d5d-p_e.jpg",
-      "photo_source_urls": [
-        "https://photos.zillowstatic.com/fp/04c82c9224e7d9465742e191ee306d5d-p_e.jpg",
-        "https://photos.zillowstatic.com/fp/23d0f288a428e6625ec14cbbeaeb42f3-p_e.jpg",
-        "https://photos.zillowstatic.com/fp/4e10e418db9e297a6478c04558d8bf9d-p_e.jpg"
-      ]
-    },
-    {
       "id": "466725772",
-      "rank": 5,
+      "rank": 3,
       "score": 105,
       "address": "411 W Grand Ave Apt 2",
       "city": "El Segundo",
@@ -423,8 +269,86 @@
       ]
     },
     {
+      "id": "20421474",
+      "rank": 4,
+      "score": 104,
+      "address": "320 23rd Pl",
+      "city": "Manhattan Beach",
+      "lat": 33.892853,
+      "lng": -118.413414,
+      "rent_usd": 4400,
+      "beds": 2,
+      "baths": 2,
+      "sqft": 950,
+      "type": "DUPLEX",
+      "url": "https://www.zillow.com/homedetails/320-23rd-Pl-Manhattan-Beach-CA-90266/20421474_zpid/",
+      "walk_min_to_beach": 4,
+      "drive_min_to_spacex": 13,
+      "cats_ok": true,
+      "parking": "1 detached garage space (off-street)",
+      "garage": true,
+      "yard": "Private balcony; patio also listed",
+      "notes": "Available now. Only small pets allowed. Parking is only 1 garage space, short of 2 cars + motorcycle. Owner pays all utilities. Walk times are OSRM pedestrian routes to the nearest beach access; drive times are OSRM free-flow, with a ×1.4 rush-hour estimate used for scoring.",
+      "description": "SPACIOUS UPPER DUPLEX!! 3 BLOCKS TO THE BEACH!! ALL UTILITIES PAID!! This bright and sunny unit has an ocean peek from the living room and one of the bedroom's balcony and offers new laminate plank hardwood floors, wood beam ceilings, 1 3/4 bathes. Both bedrooms are spacious with large closets, there is a master bedroom with private en-suite bath, and another bedroom with a private balcony and small ocean peek view. The unit comes with one garage parking space and shared laundry in the garage. Close to shops and restaurants. ONLY SMALL PETS ALLOWED!! AVAILABLE NOW!!\n\nOwner pays ALL UTILITIES",
+      "description_notes": "One detached garage space, short of 2 cars and a motorcycle, with shared laundry in the garage. Only small pets allowed; available now; the unit has a private bedroom balcony, and the listing also tags a patio. Owner pays all utilities.",
+      "status": "new",
+      "first_seen": "2026-11-21",
+      "days_on_market": 2,
+      "listed_date": "2026-11-20",
+      "recency_boost": 12,
+      "walk_km_to_beach": 0.33,
+      "drive_km_to_spacex": 11.8,
+      "drive_min_to_spacex_rush": 19,
+      "score_breakdown": {
+        "base": 50,
+        "rent": 15.33,
+        "beach_walk": 20,
+        "drive_rush": 10,
+        "home_type": 0,
+        "size": 0,
+        "cats": 5,
+        "parking": -8,
+        "unvetted": 0,
+        "freshness": 12
+      },
+      "nearest_beach_access": "Manhattan Beach 23rd St / The Strand",
+      "honorable_mention": false,
+      "honorable_mention_reason": "",
+      "zpid": "20421474",
+      "photos": [
+        {
+          "src": "/media/housing/20421474/1.webp",
+          "thumb": "/media/housing/20421474/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/1f856daa5b16060eb2f75d4bab2bea7c-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/20421474/2.webp",
+          "thumb": "/media/housing/20421474/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/bd4ea9316c0fa3426a07440b0fad2f0e-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/20421474/3.webp",
+          "thumb": "/media/housing/20421474/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/076d5dfbabb6abb5f492001ceec1929e-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/1f856daa5b16060eb2f75d4bab2bea7c-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/1f856daa5b16060eb2f75d4bab2bea7c-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/bd4ea9316c0fa3426a07440b0fad2f0e-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/076d5dfbabb6abb5f492001ceec1929e-p_e.jpg"
+      ],
+      "type_note": "Zillow tags it single family, but the description says upper duplex unit."
+    },
+    {
       "id": "466745592",
-      "rank": 6,
+      "rank": 5,
       "score": 104,
       "address": "720 S Elvira Ave #207H",
       "city": "Redondo Beach",
@@ -501,7 +425,7 @@
     },
     {
       "id": "2101388827",
-      "rank": 7,
+      "rank": 6,
       "score": 98,
       "address": "138 Whiting St Apt E",
       "city": "El Segundo",
@@ -575,6 +499,84 @@
         "https://photos.zillowstatic.com/fp/b51b1b1a2006d74082fdbf65fdc03e3e-p_e.jpg",
         "https://photos.zillowstatic.com/fp/7ebf1e979b4e532cc26e9b855e6b8952-p_e.jpg"
       ]
+    },
+    {
+      "id": "2070006633",
+      "rank": 7,
+      "score": 95,
+      "address": "15 15th St",
+      "city": "Hermosa Beach",
+      "lat": 33.864426,
+      "lng": -118.40194,
+      "rent_usd": 4000,
+      "beds": 2,
+      "baths": 2,
+      "sqft": 840,
+      "type": "APARTMENT",
+      "url": "https://www.zillow.com/homedetails/15-15th-St-Hermosa-Beach-CA-90254/2070006633_zpid/",
+      "walk_min_to_beach": 1,
+      "drive_min_to_spacex": 16,
+      "cats_ok": true,
+      "parking": "1 assigned gated space, no garage",
+      "garage": false,
+      "yard": "Patio",
+      "notes": "Available Dec 10, 2026. Pets considered case by case, with no pet rent or deposit. Only 1 assigned gated parking space (no garage). Shared on-site laundry. The description calls this unit 13, a renovated corner unit, not a standalone house. Walk times are OSRM pedestrian routes to the nearest beach access; drive times are OSRM free-flow, with a ×1.4 rush-hour estimate used for scoring.",
+      "description": "Newly renovated 2-bedroom corner unit at 15 15th Street, Unit 13, offering approximately 840 sq. ft. Features luxury vinyl plank flooring, carpet, shaker cabinets, quartz countertops, and updated fixtures throughout. Kitchen includes a dishwasher, electric stove, and refrigerator. Additional amenities include radiant and electric heating, blinds, one assigned gated parking space, private storage locker, and on-site laundry. One-year lease. Tenant pays electricity. Pets considered. Renter's insurance required. l Accross the street from noble park and the strand. Available December 10, 2026. Shown by appointment only. Contact our office to schedule a showing.\n\n12-month lease. Tenant pays electricity only. Renter's insurance required. Pets may be considered case by case; no pet rent or pet deposit. Showings by appointment.",
+      "description_notes": "One assigned gated parking space (no garage) and a private storage locker; motorcycle parking is not mentioned. Pets may be considered case by case with no pet rent or deposit; shared on-site laundry, and the listing tags a patio; available December 10, 2026; the description calls this unit 13, a renovated corner unit, not a standalone house.",
+      "status": "new",
+      "first_seen": "2026-11-21",
+      "days_on_market": 5,
+      "listed_date": "2026-11-17",
+      "recency_boost": 8,
+      "walk_km_to_beach": 0.1,
+      "drive_km_to_spacex": 13.74,
+      "drive_min_to_spacex_rush": 22,
+      "score_breakdown": {
+        "base": 50,
+        "rent": 16.67,
+        "beach_walk": 20,
+        "drive_rush": 3,
+        "home_type": 0,
+        "size": 0,
+        "cats": 5,
+        "parking": -8,
+        "unvetted": 0,
+        "freshness": 8
+      },
+      "nearest_beach_access": "Hermosa Beach 15th St / The Strand",
+      "honorable_mention": false,
+      "honorable_mention_reason": "",
+      "zpid": "2070006633",
+      "photos": [
+        {
+          "src": "/media/housing/2070006633/1.webp",
+          "thumb": "/media/housing/2070006633/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/04c82c9224e7d9465742e191ee306d5d-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2070006633/2.webp",
+          "thumb": "/media/housing/2070006633/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/23d0f288a428e6625ec14cbbeaeb42f3-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2070006633/3.webp",
+          "thumb": "/media/housing/2070006633/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/4e10e418db9e297a6478c04558d8bf9d-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/04c82c9224e7d9465742e191ee306d5d-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/04c82c9224e7d9465742e191ee306d5d-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/23d0f288a428e6625ec14cbbeaeb42f3-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/4e10e418db9e297a6478c04558d8bf9d-p_e.jpg"
+      ],
+      "type_note": "Zillow tags it single family, but the description says Unit 13, a corner unit in a building."
     },
     {
       "id": "415-herondo-st-the-gallery-at-playa-pacifica-hermosa-beach",
@@ -654,85 +656,8 @@
       ]
     },
     {
-      "id": "2105932302",
-      "rank": 9,
-      "score": 91,
-      "address": "815 S Catalina Ave #A",
-      "city": "Redondo Beach",
-      "lat": 33.82781,
-      "lng": -118.389046,
-      "rent_usd": 5950,
-      "beds": 3,
-      "baths": 2.5,
-      "sqft": 1700,
-      "type": "MULTI_FAMILY",
-      "url": "https://www.zillow.com/homedetails/815-S-Catalina-Ave-A-Redondo-Beach-CA-90277/2105932302_zpid/",
-      "walk_min_to_beach": 5,
-      "drive_min_to_spacex": 18,
-      "cats_ok": "unknown",
-      "parking": "2 attached garage spaces",
-      "garage": true,
-      "yard": "Private patio and front yard (corner lot)",
-      "notes": "Available Jan 1, 2027; showings start Nov 23 by appointment. Ocean and white-water views, a private patio, and in-unit laundry. Listing facts show a 2-car attached garage; motorcycle parking is not mentioned. Pet policy not stated. Over budget at $5,950. Briefly off Zillow the morning of 2026-11-22, back on the market (relisted) that afternoon. Walk times are OSRM pedestrian routes to the nearest beach access; drive times are OSRM free-flow, with a ×1.4 rush-hour estimate used for scoring.",
-      "description": "Rare find! This Stunning California Beach house is located steps from the beach on the sought-after corner of Ave. A. Enjoy spectacular close-up ocean & white water views every day. Whenever you desire, head down to your private patio or bring your surfboard and walk to the beach. This custom floor plan is one of a kind, with a beautiful formal entry, 3 bedrooms with 2.5 baths, and a living room with a fireplace and built-in cabinets for the media center. Enjoy views from all the huge windows. Open and bright, it feels like a single-family home; all bedrooms and living space are pretty much on one level. A great opportunity to enjoy beach-style living in beautiful California! Close to the beach, restaurants, and shopping. Just park at home and walk to everything if you want. All showings start on Nov. 23, by appt. only, with overnight notice to the current tenant. Occupancy available from Jan. 1st, 2027.",
-      "description_notes": "The description does not recount the parking, but the listing facts show a 2-car attached garage; motorcycle parking is not mentioned. Pet policy is not stated; there is a private patio, in-unit laundry, and occupancy is available January 1, 2027, with showings starting November 23 by appointment.",
-      "status": "new",
-      "first_seen": "2026-11-21",
-      "days_on_market": 1,
-      "listed_date": "2026-11-21",
-      "recency_boost": 16,
-      "walk_km_to_beach": 0.36,
-      "drive_km_to_spacex": 14.84,
-      "drive_min_to_spacex_rush": 25,
-      "score_breakdown": {
-        "base": 50,
-        "rent": -10,
-        "beach_walk": 20,
-        "drive_rush": 3,
-        "home_type": 4,
-        "size": 3,
-        "cats": 0,
-        "parking": 5,
-        "unvetted": 0,
-        "freshness": 16
-      },
-      "nearest_beach_access": "Esplanade beach access (Ave C area)",
-      "honorable_mention": false,
-      "honorable_mention_reason": "",
-      "zpid": "2105932302",
-      "photos": [
-        {
-          "src": "/media/housing/2105932302/1.webp",
-          "thumb": "/media/housing/2105932302/1.thumb.webp",
-          "w": 596,
-          "h": 446,
-          "source": "https://photos.zillowstatic.com/fp/2626397ed83b11646888a6f6f5f7f021-p_e.jpg"
-        },
-        {
-          "src": "/media/housing/2105932302/2.webp",
-          "thumb": "/media/housing/2105932302/2.thumb.webp",
-          "w": 596,
-          "h": 446,
-          "source": "https://photos.zillowstatic.com/fp/8f5538132846aaf9cdb4a1a84bfef3f1-p_e.jpg"
-        },
-        {
-          "src": "/media/housing/2105932302/3.webp",
-          "thumb": "/media/housing/2105932302/3.thumb.webp",
-          "w": 596,
-          "h": 446,
-          "source": "https://photos.zillowstatic.com/fp/b7c5a79b0f4e9d7d5f6a931d2242fe76-p_e.jpg"
-        }
-      ],
-      "photo_source_url": "https://photos.zillowstatic.com/fp/2626397ed83b11646888a6f6f5f7f021-p_e.jpg",
-      "photo_source_urls": [
-        "https://photos.zillowstatic.com/fp/2626397ed83b11646888a6f6f5f7f021-p_e.jpg",
-        "https://photos.zillowstatic.com/fp/8f5538132846aaf9cdb4a1a84bfef3f1-p_e.jpg",
-        "https://photos.zillowstatic.com/fp/b7c5a79b0f4e9d7d5f6a931d2242fe76-p_e.jpg"
-      ]
-    },
-    {
       "id": "2095386884",
-      "rank": 10,
+      "rank": 9,
       "score": 91,
       "address": "502 Avenue G",
       "city": "Redondo Beach",
@@ -809,7 +734,7 @@
     },
     {
       "id": "616-esplanade-elements-616-redondo-beach",
-      "rank": 11,
+      "rank": 10,
       "score": 90,
       "address": "616 Esplanade (Elements 616)",
       "city": "Redondo Beach",
@@ -886,7 +811,7 @@
     },
     {
       "id": "464696667",
-      "rank": 12,
+      "rank": 11,
       "score": 90,
       "address": "343 Palos Verdes Blvd Apt 5",
       "city": "Redondo Beach",
@@ -959,6 +884,83 @@
         "https://photos.zillowstatic.com/fp/05b05de532180adf2a4522351beb824b-p_e.jpg",
         "https://photos.zillowstatic.com/fp/8dafc82ade570f10d8493dfe59787cfc-p_e.jpg",
         "https://photos.zillowstatic.com/fp/55d8f8a23d6a19e77a4b41231b9d15fa-p_e.jpg"
+      ]
+    },
+    {
+      "id": "2105932302",
+      "rank": 12,
+      "score": 87,
+      "address": "815 S Catalina Ave #A",
+      "city": "Redondo Beach",
+      "lat": 33.82781,
+      "lng": -118.389046,
+      "rent_usd": 5950,
+      "beds": 3,
+      "baths": 2.5,
+      "sqft": 1700,
+      "type": "MULTI_FAMILY",
+      "url": "https://www.zillow.com/homedetails/815-S-Catalina-Ave-A-Redondo-Beach-CA-90277/2105932302_zpid/",
+      "walk_min_to_beach": 5,
+      "drive_min_to_spacex": 18,
+      "cats_ok": "unknown",
+      "parking": "2 attached garage spaces",
+      "garage": true,
+      "yard": "Private patio and front yard (corner lot)",
+      "notes": "Available Jan 1, 2027; showings start Nov 23 by appointment. Ocean and white-water views, a private patio, and in-unit laundry. Listing facts show a 2-car attached garage; motorcycle parking is not mentioned. Pet policy not stated. Over budget at $5,950. Briefly off Zillow the morning of 2026-11-22, back on the market (relisted) that afternoon. Walk times are OSRM pedestrian routes to the nearest beach access; drive times are OSRM free-flow, with a ×1.4 rush-hour estimate used for scoring.",
+      "description": "Rare find! This Stunning California Beach house is located steps from the beach on the sought-after corner of Ave. A. Enjoy spectacular close-up ocean & white water views every day. Whenever you desire, head down to your private patio or bring your surfboard and walk to the beach. This custom floor plan is one of a kind, with a beautiful formal entry, 3 bedrooms with 2.5 baths, and a living room with a fireplace and built-in cabinets for the media center. Enjoy views from all the huge windows. Open and bright, it feels like a single-family home; all bedrooms and living space are pretty much on one level. A great opportunity to enjoy beach-style living in beautiful California! Close to the beach, restaurants, and shopping. Just park at home and walk to everything if you want. All showings start on Nov. 23, by appt. only, with overnight notice to the current tenant. Occupancy available from Jan. 1st, 2027.",
+      "description_notes": "The description does not recount the parking, but the listing facts show a 2-car attached garage; motorcycle parking is not mentioned. Pet policy is not stated; there is a private patio, in-unit laundry, and occupancy is available January 1, 2027, with showings starting November 23 by appointment.",
+      "status": "new",
+      "first_seen": "2026-11-21",
+      "days_on_market": 1,
+      "listed_date": "2026-11-21",
+      "recency_boost": 16,
+      "walk_km_to_beach": 0.36,
+      "drive_km_to_spacex": 14.84,
+      "drive_min_to_spacex_rush": 25,
+      "score_breakdown": {
+        "base": 50,
+        "rent": -10,
+        "beach_walk": 20,
+        "drive_rush": 3,
+        "home_type": 0,
+        "size": 3,
+        "cats": 0,
+        "parking": 5,
+        "unvetted": 0,
+        "freshness": 16
+      },
+      "nearest_beach_access": "Esplanade beach access (Ave C area)",
+      "honorable_mention": false,
+      "honorable_mention_reason": "",
+      "zpid": "2105932302",
+      "photos": [
+        {
+          "src": "/media/housing/2105932302/1.webp",
+          "thumb": "/media/housing/2105932302/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/2626397ed83b11646888a6f6f5f7f021-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2105932302/2.webp",
+          "thumb": "/media/housing/2105932302/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/8f5538132846aaf9cdb4a1a84bfef3f1-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2105932302/3.webp",
+          "thumb": "/media/housing/2105932302/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/b7c5a79b0f4e9d7d5f6a931d2242fe76-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/2626397ed83b11646888a6f6f5f7f021-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/2626397ed83b11646888a6f6f5f7f021-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/8f5538132846aaf9cdb4a1a84bfef3f1-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/b7c5a79b0f4e9d7d5f6a931d2242fe76-p_e.jpg"
       ]
     },
     {
@@ -1116,85 +1118,8 @@
       ]
     },
     {
-      "id": "20427031",
-      "rank": 15,
-      "score": 79,
-      "address": "1041 2nd St",
-      "city": "Hermosa Beach",
-      "lat": 33.85742,
-      "lng": -118.38758,
-      "rent_usd": 4995,
-      "beds": 2,
-      "baths": 1.5,
-      "sqft": 728,
-      "type": "SINGLE_FAMILY",
-      "url": "https://www.zillow.com/homedetails/1041-2nd-St-Hermosa-Beach-CA-90254/20427031_zpid/",
-      "walk_min_to_beach": 17,
-      "drive_min_to_spacex": 15,
-      "cats_ok": "unknown",
-      "parking": "Long private gated driveway plus a garage (size not stated; Tesla charger)",
-      "garage": true,
-      "yard": "Backyard with firepit and covered patio; front covered porch",
-      "notes": "Zillow lists availability as Jan 1, 2027. Long private gated driveway plus a garage (size not stated); confirm room for 2 cars + motorcycle. Pet policy not stated; ask about a cat. Backyard with firepit and covered patio. Description says 1.5 baths, which conflicts with the previous listing field of 2 baths. Walk times are OSRM pedestrian routes to the nearest beach access; drive times are OSRM free-flow, with a ×1.4 rush-hour estimate used for scoring.",
-      "description": "Beautifully remodeled South Hermosa Beach single family home on a spacious south-facing lot. Enjoy an ocean view from the front covered porch and modern upgrades throughout, including laminate flooring, recessed lights, shaker cabinets, newer windows, and scraped ceilings. This 2 bedroom, 1.5 bath single-family home features an open, bright layout with great indoor-outdoor flow. The backyard is perfect for entertaining with a built-in firepit and a covered patio equipped with heaters and a TV. Additional highlights include a long private gated driveway, Tesla charger, and a garage for storage or parking. Ideally located close to the beach, shops, and dining.",
-      "description_notes": "There is a long private gated driveway, a Tesla charger, and a garage for storage or parking, but the garage size is not stated (the listing facts show parking capacity as 1). Pet policy is not stated; the backyard has a built-in firepit and a covered patio with heaters and a TV, plus a front covered porch; washer/dryer hookups; Zillow lists availability as January 1, 2027; the description calls this a 2-bed, 1.5-bath home, which conflicts with the previous listing field of 2 baths.",
-      "status": "new",
-      "first_seen": "2026-11-21",
-      "days_on_market": 9,
-      "listed_date": "2026-11-13",
-      "recency_boost": 4,
-      "walk_km_to_beach": 1.3,
-      "drive_km_to_spacex": 12.03,
-      "drive_min_to_spacex_rush": 21,
-      "score_breakdown": {
-        "base": 50,
-        "rent": 5,
-        "beach_walk": 5,
-        "drive_rush": 3,
-        "home_type": 12,
-        "size": 0,
-        "cats": 0,
-        "parking": 0,
-        "unvetted": 0,
-        "freshness": 4
-      },
-      "nearest_beach_access": "Hermosa Beach 3rd St / The Strand",
-      "honorable_mention": true,
-      "honorable_mention_reason": "$4,995 is about $500 over budget, and the description says 1.5 baths rather than 2, but it is a standalone Hermosa house with a backyard, covered patio, long private gated driveway, and a garage.",
-      "zpid": "20427031",
-      "photos": [
-        {
-          "src": "/media/housing/20427031/1.webp",
-          "thumb": "/media/housing/20427031/1.thumb.webp",
-          "w": 596,
-          "h": 446,
-          "source": "https://photos.zillowstatic.com/fp/b158cb9126366f68973630641ee882ef-p_e.jpg"
-        },
-        {
-          "src": "/media/housing/20427031/2.webp",
-          "thumb": "/media/housing/20427031/2.thumb.webp",
-          "w": 596,
-          "h": 446,
-          "source": "https://photos.zillowstatic.com/fp/fd35519a97d6d79c6db7e4f2faf48670-p_e.jpg"
-        },
-        {
-          "src": "/media/housing/20427031/3.webp",
-          "thumb": "/media/housing/20427031/3.thumb.webp",
-          "w": 596,
-          "h": 446,
-          "source": "https://photos.zillowstatic.com/fp/afcd58c6c93cdb83adf96dfbc5e61c36-p_e.jpg"
-        }
-      ],
-      "photo_source_url": "https://photos.zillowstatic.com/fp/b158cb9126366f68973630641ee882ef-p_e.jpg",
-      "photo_source_urls": [
-        "https://photos.zillowstatic.com/fp/b158cb9126366f68973630641ee882ef-p_e.jpg",
-        "https://photos.zillowstatic.com/fp/fd35519a97d6d79c6db7e4f2faf48670-p_e.jpg",
-        "https://photos.zillowstatic.com/fp/afcd58c6c93cdb83adf96dfbc5e61c36-p_e.jpg"
-      ]
-    },
-    {
       "id": "2118591200",
-      "rank": 16,
+      "rank": 15,
       "score": 77,
       "address": "128 Palos Verdes Blvd Apt 2",
       "city": "Redondo Beach",
@@ -1270,9 +1195,86 @@
       ]
     },
     {
+      "id": "20427031",
+      "rank": 16,
+      "score": 77,
+      "address": "1041 2nd St",
+      "city": "Hermosa Beach",
+      "lat": 33.85742,
+      "lng": -118.38758,
+      "rent_usd": 4995,
+      "beds": 2,
+      "baths": 1.5,
+      "sqft": 728,
+      "type": "SINGLE_FAMILY",
+      "url": "https://www.zillow.com/homedetails/1041-2nd-St-Hermosa-Beach-CA-90254/20427031_zpid/",
+      "walk_min_to_beach": 17,
+      "drive_min_to_spacex": 15,
+      "cats_ok": "unknown",
+      "parking": "Long private gated driveway plus a garage (size not stated; Tesla charger)",
+      "garage": true,
+      "yard": "Backyard with firepit and covered patio; front covered porch",
+      "notes": "Zillow lists availability as Jan 1, 2027. Long private gated driveway plus a garage (size not stated); confirm room for 2 cars + motorcycle. Pet policy not stated; ask about a cat. Backyard with firepit and covered patio. Description says 1.5 baths, which conflicts with the previous listing field of 2 baths. Walk times are OSRM pedestrian routes to the nearest beach access; drive times are OSRM free-flow, with a ×1.4 rush-hour estimate used for scoring.",
+      "description": "Beautifully remodeled South Hermosa Beach single family home on a spacious south-facing lot. Enjoy an ocean view from the front covered porch and modern upgrades throughout, including laminate flooring, recessed lights, shaker cabinets, newer windows, and scraped ceilings. This 2 bedroom, 1.5 bath single-family home features an open, bright layout with great indoor-outdoor flow. The backyard is perfect for entertaining with a built-in firepit and a covered patio equipped with heaters and a TV. Additional highlights include a long private gated driveway, Tesla charger, and a garage for storage or parking. Ideally located close to the beach, shops, and dining.",
+      "description_notes": "There is a long private gated driveway, a Tesla charger, and a garage for storage or parking, but the garage size is not stated (the listing facts show parking capacity as 1). Pet policy is not stated; the backyard has a built-in firepit and a covered patio with heaters and a TV, plus a front covered porch; washer/dryer hookups; Zillow lists availability as January 1, 2027; the description calls this a 2-bed, 1.5-bath home, which conflicts with the previous listing field of 2 baths.",
+      "status": "new",
+      "first_seen": "2026-11-21",
+      "days_on_market": 9,
+      "listed_date": "2026-11-13",
+      "recency_boost": 4,
+      "walk_km_to_beach": 1.3,
+      "drive_km_to_spacex": 12.03,
+      "drive_min_to_spacex_rush": 21,
+      "score_breakdown": {
+        "base": 50,
+        "rent": 5,
+        "beach_walk": 5,
+        "drive_rush": 3,
+        "home_type": 10,
+        "size": 0,
+        "cats": 0,
+        "parking": 0,
+        "unvetted": 0,
+        "freshness": 4
+      },
+      "nearest_beach_access": "Hermosa Beach 3rd St / The Strand",
+      "honorable_mention": true,
+      "honorable_mention_reason": "$4,995 is about $500 over budget, and the description says 1.5 baths rather than 2, but it is a standalone Hermosa house with a backyard, covered patio, long private gated driveway, and a garage.",
+      "zpid": "20427031",
+      "photos": [
+        {
+          "src": "/media/housing/20427031/1.webp",
+          "thumb": "/media/housing/20427031/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/b158cb9126366f68973630641ee882ef-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/20427031/2.webp",
+          "thumb": "/media/housing/20427031/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/fd35519a97d6d79c6db7e4f2faf48670-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/20427031/3.webp",
+          "thumb": "/media/housing/20427031/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/afcd58c6c93cdb83adf96dfbc5e61c36-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/b158cb9126366f68973630641ee882ef-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/b158cb9126366f68973630641ee882ef-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/fd35519a97d6d79c6db7e4f2faf48670-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/afcd58c6c93cdb83adf96dfbc5e61c36-p_e.jpg"
+      ]
+    },
+    {
       "id": "2104823807",
       "rank": 17,
-      "score": 60,
+      "score": 57,
       "address": "708 S Prospect Ave",
       "city": "Redondo Beach",
       "lat": 33.829166,
@@ -1305,7 +1307,7 @@
         "rent": 20,
         "beach_walk": -25,
         "drive_rush": 3,
-        "home_type": 8,
+        "home_type": 5,
         "size": 0,
         "cats": 0,
         "parking": 0,
@@ -1424,83 +1426,6 @@
       ]
     },
     {
-      "id": "2102760387",
-      "rank": null,
-      "score": 35,
-      "address": "501 Anita St Apt 103",
-      "city": "Redondo Beach",
-      "lat": 33.855724,
-      "lng": -118.38703,
-      "rent_usd": 3695,
-      "beds": 2,
-      "baths": 2,
-      "sqft": 1111,
-      "type": "MULTI_FAMILY",
-      "url": "https://www.zillow.com/homedetails/501-Anita-St-APT-103-Redondo-Beach-CA-90277/2102760387_zpid/",
-      "walk_min_to_beach": 15,
-      "drive_min_to_spacex": 13,
-      "cats_ok": false,
-      "parking": "1 carport space",
-      "garage": false,
-      "yard": "None listed",
-      "notes": "No pets allowed. Walk times are OSRM pedestrian routes to the nearest beach access; drive times are OSRM free-flow, with a ×1.4 rush-hour estimate used for scoring.",
-      "description": "",
-      "description_notes": "",
-      "status": "rejected",
-      "first_seen": "2026-11-21",
-      "days_on_market": 6,
-      "listed_date": "2026-11-16",
-      "recency_boost": 8,
-      "walk_km_to_beach": 1.15,
-      "drive_km_to_spacex": 11.18,
-      "drive_min_to_spacex_rush": 19,
-      "score_breakdown": {
-        "base": 50,
-        "rent": 17.68,
-        "beach_walk": 10,
-        "drive_rush": 10,
-        "home_type": 4,
-        "size": 3,
-        "cats": -60,
-        "parking": -8,
-        "unvetted": 0,
-        "freshness": 8
-      },
-      "nearest_beach_access": "Herondo St / The Strand",
-      "honorable_mention": false,
-      "honorable_mention_reason": "",
-      "zpid": "2102760387",
-      "photos": [
-        {
-          "src": "/media/housing/2102760387/1.webp",
-          "thumb": "/media/housing/2102760387/1.thumb.webp",
-          "w": 596,
-          "h": 446,
-          "source": "https://photos.zillowstatic.com/fp/478eab04f911e6fc19d48d9b8990e117-p_e.jpg"
-        },
-        {
-          "src": "/media/housing/2102760387/2.webp",
-          "thumb": "/media/housing/2102760387/2.thumb.webp",
-          "w": 596,
-          "h": 446,
-          "source": "https://photos.zillowstatic.com/fp/e8cae554936ace3feca67874097cad2f-p_e.jpg"
-        },
-        {
-          "src": "/media/housing/2102760387/3.webp",
-          "thumb": "/media/housing/2102760387/3.thumb.webp",
-          "w": 596,
-          "h": 446,
-          "source": "https://photos.zillowstatic.com/fp/6c7e6eb53b5bdf6cfb2dfe8efa3e2b0a-p_e.jpg"
-        }
-      ],
-      "photo_source_url": "https://photos.zillowstatic.com/fp/478eab04f911e6fc19d48d9b8990e117-p_e.jpg",
-      "photo_source_urls": [
-        "https://photos.zillowstatic.com/fp/478eab04f911e6fc19d48d9b8990e117-p_e.jpg",
-        "https://photos.zillowstatic.com/fp/e8cae554936ace3feca67874097cad2f-p_e.jpg",
-        "https://photos.zillowstatic.com/fp/6c7e6eb53b5bdf6cfb2dfe8efa3e2b0a-p_e.jpg"
-      ]
-    },
-    {
       "id": "2076871105",
       "rank": null,
       "score": 33,
@@ -1578,9 +1503,86 @@
       ]
     },
     {
+      "id": "2102760387",
+      "rank": null,
+      "score": 31,
+      "address": "501 Anita St Apt 103",
+      "city": "Redondo Beach",
+      "lat": 33.855724,
+      "lng": -118.38703,
+      "rent_usd": 3695,
+      "beds": 2,
+      "baths": 2,
+      "sqft": 1111,
+      "type": "MULTI_FAMILY",
+      "url": "https://www.zillow.com/homedetails/501-Anita-St-APT-103-Redondo-Beach-CA-90277/2102760387_zpid/",
+      "walk_min_to_beach": 15,
+      "drive_min_to_spacex": 13,
+      "cats_ok": false,
+      "parking": "1 carport space",
+      "garage": false,
+      "yard": "None listed",
+      "notes": "No pets allowed. Walk times are OSRM pedestrian routes to the nearest beach access; drive times are OSRM free-flow, with a ×1.4 rush-hour estimate used for scoring.",
+      "description": "",
+      "description_notes": "",
+      "status": "rejected",
+      "first_seen": "2026-11-21",
+      "days_on_market": 6,
+      "listed_date": "2026-11-16",
+      "recency_boost": 8,
+      "walk_km_to_beach": 1.15,
+      "drive_km_to_spacex": 11.18,
+      "drive_min_to_spacex_rush": 19,
+      "score_breakdown": {
+        "base": 50,
+        "rent": 17.68,
+        "beach_walk": 10,
+        "drive_rush": 10,
+        "home_type": 0,
+        "size": 3,
+        "cats": -60,
+        "parking": -8,
+        "unvetted": 0,
+        "freshness": 8
+      },
+      "nearest_beach_access": "Herondo St / The Strand",
+      "honorable_mention": false,
+      "honorable_mention_reason": "",
+      "zpid": "2102760387",
+      "photos": [
+        {
+          "src": "/media/housing/2102760387/1.webp",
+          "thumb": "/media/housing/2102760387/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/478eab04f911e6fc19d48d9b8990e117-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2102760387/2.webp",
+          "thumb": "/media/housing/2102760387/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/e8cae554936ace3feca67874097cad2f-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2102760387/3.webp",
+          "thumb": "/media/housing/2102760387/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/6c7e6eb53b5bdf6cfb2dfe8efa3e2b0a-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/478eab04f911e6fc19d48d9b8990e117-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/478eab04f911e6fc19d48d9b8990e117-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/e8cae554936ace3feca67874097cad2f-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/6c7e6eb53b5bdf6cfb2dfe8efa3e2b0a-p_e.jpg"
+      ]
+    },
+    {
       "id": "466631710",
       "rank": null,
-      "score": 28,
+      "score": 25,
       "address": "324 N Francisca Ave",
       "city": "Redondo Beach",
       "lat": 33.84703,
@@ -1613,7 +1615,7 @@
         "rent": 5,
         "beach_walk": 10,
         "drive_rush": 3,
-        "home_type": 8,
+        "home_type": 5,
         "size": 3,
         "cats": -60,
         "parking": 5,
