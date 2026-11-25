@@ -1,0 +1,19 @@
+{
+  "id": "21116117687",
+  "stravaId": "21116117687",
+  "city": "la",
+  "title": "Night Run",
+  "type": "Run",
+  "date": "2026-11-24T00:00:00.000Z",
+  "distanceM": 8834.39,
+  "movingS": 3039,
+  "elevM": 6,
+  "mid": [
+    -118.328282,
+    33.884414
+  ],
+  "photos": [],
+  "companions": [],
+  "sample": false,
+  "elapsedS": 3159
+}
