@@ -504,6 +504,27 @@ html:has(.housing) #app {
   outline-offset: 2px;
 }
 
+.housing .pills .pill-count {
+  margin-left: 5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+
+.housing .pills label.on .pill-count {
+  opacity: 0.85;
+}
+
+/* Keep the type row compact so the ranked list still has room on desktop. */
+.housing .type-pills {
+  gap: 1px;
+}
+
+.housing .type-pills label {
+  min-height: 28px;
+  padding: 0 8px;
+}
+
 .housing .sort-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -895,6 +916,25 @@ html:has(.housing) #app {
   margin: 0 16px 12px;
   color: var(--muted);
   font-size: 13px;
+}
+
+.housing .empty-reset {
+  display: inline;
+  margin-left: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.housing .empty-reset:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .housing .board-foot {
