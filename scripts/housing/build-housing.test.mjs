@@ -14,6 +14,7 @@ import {
   formatRent,
   formatType,
   formatUpdatedAt,
+  typeFilterOptions,
   freshnessColor,
   honorableMentions,
   sortListings,
@@ -46,7 +47,11 @@ test("factBadge maps unknown and unverified to Unverified", () => {
 test("format helpers", () => {
   assert.equal(formatRent(4500), "$4,500");
   assert.equal(formatType("SINGLE_FAMILY"), "House");
+  assert.equal(formatType("DUPLEX"), "Duplex");
+  assert.equal(formatType("MULTI_FAMILY"), "Multi-family");
   assert.equal(formatType("APARTMENT BUILDING"), "Apartment building");
+  assert.equal(formatType("CONDO"), "Condo");
+  assert.equal(formatType("SOME_OTHER"), "Some Other");
   assert.equal(formatUpdatedAt("2026-11-21T21:42-08:00"), "Nov 21, 2026, 9:42 PM PT");
   assert.ok(criteriaSummary({ beds_min: 2, baths_min: 2, budget_usd: 4500 }).includes("$4,500/month"));
 });
@@ -72,6 +77,50 @@ test("rejected, stale, and off-market listings are hidden until the toggle is on
   const byRent = sortListings(list, "rent");
   assert.equal(byRent.at(-1).rank, null);
   assert.deepEqual(byRent.filter((l) => l.rank != null).map((l) => l.id), ["b", "a", "c"]);
+});
+
+test("type filter options list only present types in a stable order", () => {
+  const opts = typeFilterOptions([
+    { type: "CONDO" },
+    { type: "APARTMENT" },
+    { type: "SINGLE_FAMILY" },
+    { type: "CONDO" },
+    { type: "MULTI_FAMILY" },
+  ]);
+  assert.deepEqual(
+    opts.map((o) => [o.id, o.label]),
+    [
+      ["SINGLE_FAMILY", "House"],
+      ["CONDO", "Condo"],
+      ["APARTMENT", "Apartment"],
+      ["MULTI_FAMILY", "Multi-family"],
+    ],
+  );
+});
+
+test("filterListings can restrict by home type, including an empty selection", () => {
+  const list = [
+    { id: "a", rank: 1, score: 90, rent_usd: 4000, walk_min_to_beach: 6, status: "new", type: "CONDO" },
+    { id: "b", rank: 2, score: 80, rent_usd: 3000, walk_min_to_beach: 10, status: "new", type: "APARTMENT" },
+    { id: "c", rank: null, score: 20, rent_usd: 2800, walk_min_to_beach: 12, status: "rejected", type: "APARTMENT" },
+  ];
+  assert.deepEqual(
+    filterListings(list, { types: ["CONDO"], showHidden: false }).map((l) => l.id),
+    ["a"],
+  );
+  assert.deepEqual(
+    filterListings(list, { types: ["APARTMENT"], showHidden: false }).map((l) => l.id),
+    ["b"],
+  );
+  assert.deepEqual(
+    filterListings(list, { types: ["APARTMENT"], showHidden: true }).map((l) => l.id),
+    ["b", "c"],
+  );
+  assert.deepEqual(filterListings(list, { types: [], showHidden: true }).map((l) => l.id), []);
+  assert.deepEqual(
+    filterListings(list, { showHidden: false }).map((l) => l.id),
+    ["a", "b"],
+  );
 });
 
 test("days on market uses listed_date vs today, then days_on_market", () => {

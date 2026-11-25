@@ -27,6 +27,7 @@ import {
   formatSqft,
   formatType,
   formatUpdatedAt,
+  typeFilterOptions,
   isHiddenStatus,
   descriptionParagraphs,
   listingDescription,
@@ -85,6 +86,16 @@ const maxRent = ref(null);
 const maxWalk = ref(null);
 const statusFilter = ref("all");
 const showHidden = ref(false);
+const typeChoices = typeFilterOptions(allListings);
+const selectedTypes = ref(typeChoices.map((opt) => opt.id));
+
+function resetTypes() {
+  selectedTypes.value = typeChoices.map((opt) => opt.id);
+}
+
+function typeActive(id) {
+  return selectedTypes.value.includes(id);
+}
 
 const visible = computed(() =>
   sortListings(
@@ -93,11 +104,29 @@ const visible = computed(() =>
       maxWalk: maxWalk.value,
       status: statusFilter.value,
       showHidden: showHidden.value,
+      types: selectedTypes.value,
     }),
     sortKey.value,
   ),
 );
-const mentions = computed(() => honorableMentions(allListings));
+const mentions = computed(() =>
+  honorableMentions(allListings).filter((listing) => selectedTypes.value.includes(listing.type)),
+);
+const typeOptions = computed(() => {
+  const shown = new Set([
+    ...filterListings(allListings, {
+      maxRent: maxRent.value,
+      maxWalk: maxWalk.value,
+      status: statusFilter.value,
+      showHidden: showHidden.value,
+    }).map((listing) => listing.id),
+    ...honorableMentions(allListings).map((listing) => listing.id),
+  ]);
+  return typeChoices.map((opt) => ({
+    ...opt,
+    count: allListings.filter((listing) => listing.type === opt.id && shown.has(listing.id)).length,
+  }));
+});
 
 function queryValue(key) {
   const raw = route.query[key];
@@ -311,6 +340,9 @@ async function pick(id, { from = null, fly = true, instant = false } = {}) {
   const listing = listingById(id);
   if (!listing) return;
   if (isHiddenStatus(listing.status) && !isHonorable(listing)) showHidden.value = true;
+  if (listing.type && !selectedTypes.value.includes(listing.type)) {
+    selectedTypes.value = [...selectedTypes.value, listing.type];
+  }
   if (from) opener = from;
   selectedId.value = listing.id;
   announce.value = `${listing.address}, ${listing.city}, ${formatRent(listing.rent_usd)} a month`;
@@ -456,7 +488,7 @@ async function startMap() {
   }
 }
 
-watch(visible, () => {
+watch([visible, mentions], () => {
   syncMapVisible();
   if (!selectedId.value) return;
   const keep =
@@ -562,6 +594,13 @@ onUnmounted(() => {
               <span>{{ opt.label }}</span>
             </label>
           </fieldset>
+          <fieldset class="pills type-pills">
+            <legend>Home type</legend>
+            <label v-for="opt in typeOptions" :key="opt.id" :class="{ on: typeActive(opt.id) }">
+              <input type="checkbox" name="housing-type" :value="opt.id" v-model="selectedTypes" />
+              <span>{{ opt.label }}<span class="pill-count">{{ opt.count }}</span></span>
+            </label>
+          </fieldset>
           <div class="sort-row">
             <label class="sort">
               <span>Status</span>
@@ -609,6 +648,7 @@ onUnmounted(() => {
                 <span class="rank-meta">
                   <span class="rank-score" :aria-label="`Score ${listing.score}`">{{ listing.score }}</span>
                   <span class="rank-cost">{{ formatRent(listing.rent_usd) }}</span>
+                  <span class="rank-tag">{{ formatType(listing.type) }}</span>
                   <span class="rank-tag">{{ formatMins(listing.walk_min_to_beach) }} walk</span>
                   <span v-if="listedAgo(listing)" class="rank-tag">{{ listedAgo(listing) }}</span>
                   <span v-if="isHiddenStatus(listing.status)" class="rank-tag warn">{{ STATUS_LABELS[listing.status] || listing.status }}</span>
@@ -647,6 +687,7 @@ onUnmounted(() => {
                   <span class="rank-meta">
                     <span class="rank-score" :aria-label="`Score ${listing.score}`">{{ listing.score }}</span>
                     <span class="rank-cost">{{ formatRent(listing.rent_usd) }}</span>
+                    <span class="rank-tag">{{ formatType(listing.type) }}</span>
                     <span class="rank-tag">{{ formatMins(listing.walk_min_to_beach) }} walk</span>
                     <span v-if="isHiddenStatus(listing.status)" class="rank-tag warn">{{ STATUS_LABELS[listing.status] || listing.status }}</span>
                   </span>
@@ -656,7 +697,13 @@ onUnmounted(() => {
             </li>
           </ol>
         </section>
-        <p v-if="!visible.length" class="empty">No listings match these filters.</p>
+        <p v-if="!visible.length" class="empty">
+          <template v-if="!selectedTypes.length">
+            No home types selected.
+            <button type="button" class="empty-reset" @click="resetTypes">Show all types</button>
+          </template>
+          <template v-else>No listings match these filters.</template>
+        </p>
         <footer class="board-foot">
           <p class="legend-label">Pin color is days on the market</p>
           <div class="fresh-legend" aria-hidden="true">

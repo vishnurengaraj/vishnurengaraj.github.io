@@ -4,6 +4,7 @@
  */
 import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
+import { formatType, typeFilterOptions } from "../src/housing/format.js";
 
 const data = JSON.parse(readFileSync(new URL("../src/data/housing/housing.json", import.meta.url), "utf8"));
 const hiddenStatus = new Set(["rejected", "stale", "off_market"]);
@@ -29,6 +30,27 @@ async function openList(page, width) {
     const toggle = page.locator(".list-toggle");
     if ((await toggle.getAttribute("aria-expanded")) !== "true") await toggle.click();
   }
+}
+
+function typeField(page) {
+  return page.locator("fieldset.pills", { hasText: "Home type" });
+}
+
+function typeChip(page, typeId) {
+  return typeField(page).locator(`label:has(input[value="${typeId}"])`);
+}
+
+async function isolateType(page, typeId) {
+  const inputs = typeField(page).locator('input[type="checkbox"]');
+  const count = await inputs.count();
+  for (let i = 0; i < count; i++) {
+    const input = inputs.nth(i);
+    const value = await input.getAttribute("value");
+    const checked = await input.isChecked();
+    if (value === typeId && !checked) await typeChip(page, value).click();
+    else if (value !== typeId && checked) await typeChip(page, value).click();
+  }
+  await expect(typeChip(page, typeId)).toHaveClass(/on/);
 }
 
 for (const vp of VIEWPORTS) {
@@ -91,6 +113,94 @@ for (const vp of VIEWPORTS) {
       await page.locator('fieldset.pills', { hasText: "Max walk" }).locator("label", { hasText: "20 min" }).click();
       const walked = priced.filter((l) => l.walk_min_to_beach != null && l.walk_min_to_beach <= 20);
       await expect(page.locator("#rank-list button")).toHaveCount(walked.length);
+    });
+
+    test("filters the list, honorable mentions, and map pins by home type", async ({ page }) => {
+      const options = typeFilterOptions(data.listings);
+      test.skip(!options.length, "no listing types in this build");
+      const focus =
+        options.find((opt) => opt.id === "CONDO") ||
+        options.find((opt) => open.some((l) => l.type === opt.id) && open.some((l) => l.type !== opt.id)) ||
+        options[0];
+      await page.goto("/housing");
+      await openList(page, vp.width);
+
+      const field = typeField(page);
+      await expect(field).toBeVisible();
+      await expect(field.locator("label")).toHaveCount(options.length);
+      for (const opt of options) {
+        const chip = typeChip(page, opt.id);
+        await expect(chip).toContainText(opt.label);
+        await expect(chip).toHaveClass(/on/);
+        await expect(chip.locator("input")).toBeChecked();
+      }
+      await expect(page.locator("#rank-list button")).toHaveCount(open.length);
+      if (mentions.length) await expect(page.locator("#mention-list button")).toHaveCount(mentions.length);
+
+      const firstOpen = open[0];
+      await expect(page.locator(`#rank-list button[data-id="${firstOpen.id}"]`)).toContainText(formatType(firstOpen.type));
+
+      await isolateType(page, focus.id);
+      const focusedOpen = open.filter((l) => l.type === focus.id);
+      const focusedMentions = mentions.filter((l) => l.type === focus.id);
+      const otherOpen = open.filter((l) => l.type !== focus.id);
+      await expect(page.locator("#rank-list button")).toHaveCount(focusedOpen.length);
+      for (const row of focusedOpen) {
+        await expect(page.locator("#rank-list button").filter({ hasText: row.address })).toHaveCount(1);
+      }
+      for (const row of otherOpen) {
+        await expect(page.locator("#rank-list button").filter({ hasText: row.address })).toHaveCount(0);
+      }
+      if (focusedMentions.length) {
+        await expect(page.locator("#mention-list button")).toHaveCount(focusedMentions.length);
+      } else {
+        await expect(page.locator("#mention-list")).toHaveCount(0);
+      }
+      const otherMention = mentions.find((l) => l.type !== focus.id);
+      if (otherMention) {
+        await expect(page.locator("#mention-list button").filter({ hasText: otherMention.address })).toHaveCount(0);
+      }
+
+      await page.waitForSelector("#housing-map[data-map='ready']", { timeout: 20_000 });
+      const hiddenType = otherOpen[0] || mentions.find((l) => l.type !== focus.id);
+      if (hiddenType) {
+        const pin = page.locator(`.home-pin[data-id="${hiddenType.id}"]`);
+        if ((await pin.count()) > 0) await expect(pin).toBeHidden();
+      }
+
+      await page.locator(".reject-toggle input").check();
+      const focusedAll = data.listings.filter((l) => l.type === focus.id);
+      await expect(page.locator("#rank-list button")).toHaveCount(focusedAll.length);
+      const offMarketOther = hidden.find((l) => l.type !== focus.id && l.status === "off_market");
+      if (offMarketOther) {
+        await expect(page.locator("#rank-list button").filter({ hasText: offMarketOther.address })).toHaveCount(0);
+      }
+      await page.locator(".reject-toggle input").uncheck();
+      await expect(page.locator("#rank-list button")).toHaveCount(focusedOpen.length);
+
+      // Clear every type, then reset.
+      await typeChip(page, focus.id).click();
+      await expect(page.locator("#rank-list button")).toHaveCount(0);
+      await expect(page.locator("#mention-list")).toHaveCount(0);
+      await expect(page.locator(".empty")).toContainText("No home types selected");
+      await page.locator(".empty-reset").click();
+      await expect(page.locator("#rank-list button")).toHaveCount(open.length);
+      if (mentions.length) await expect(page.locator("#mention-list button")).toHaveCount(mentions.length);
+      for (const opt of options) await expect(typeChip(page, opt.id)).toHaveClass(/on/);
+
+      if (focusedOpen[0]) {
+        const row = page.locator(`#rank-list button[data-id="${focusedOpen[0].id}"]`);
+        await row.scrollIntoViewIfNeeded();
+        await row.click();
+        const card = page.locator(".home-card.open");
+        await expect(card).toBeVisible();
+        await expect(card.locator(".plan")).toContainText(formatType(focusedOpen[0].type));
+        if (vp.width <= 640) {
+          const box = await card.boundingBox();
+          expect(box).toBeTruthy();
+          expect(box.height).toBeLessThanOrEqual(vp.height * 0.67);
+        }
+      }
     });
 
     test("opens a listing card with a Zillow link and deep-links", async ({ page }) => {

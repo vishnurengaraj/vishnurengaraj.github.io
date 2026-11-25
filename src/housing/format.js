@@ -14,12 +14,24 @@ export const STATUS_LABELS = {
 
 const TYPE_LABELS = {
   SINGLE_FAMILY: "House",
+  DUPLEX: "Duplex",
+  TOWNHOUSE: "Townhouse",
+  CONDO: "Condo",
   APARTMENT: "Apartment",
   "APARTMENT BUILDING": "Apartment building",
-  CONDO: "Condo",
-  TOWNHOUSE: "Townhouse",
   MULTI_FAMILY: "Multi-family",
 };
+
+/** Preferred chip order; types not in this list follow alphabetically by label. */
+export const TYPE_ORDER = [
+  "SINGLE_FAMILY",
+  "DUPLEX",
+  "TOWNHOUSE",
+  "CONDO",
+  "APARTMENT",
+  "APARTMENT BUILDING",
+  "MULTI_FAMILY",
+];
 
 const UNVERIFIED = new Set(["unknown", "unverified"]);
 
@@ -83,7 +95,16 @@ export function formatBedsBaths(beds, baths) {
 
 export function formatType(type) {
   if (!type) return "Home";
-  return TYPE_LABELS[type] || String(type).replaceAll("_", " ").toLowerCase().replace(/\b\w/g, (ch) => ch.toUpperCase());
+  if (TYPE_LABELS[type]) return TYPE_LABELS[type];
+  return String(type).replaceAll("_", " ").toLowerCase().replace(/\b\w/g, (ch) => ch.toUpperCase());
+}
+
+/** Unique listing types in display order, for filter chips. */
+export function typeFilterOptions(list) {
+  const present = new Set((list || []).map((row) => row?.type).filter(Boolean));
+  const known = TYPE_ORDER.filter((id) => present.has(id));
+  const rest = [...present].filter((id) => !TYPE_ORDER.includes(id)).sort((a, b) => formatType(a).localeCompare(formatType(b)));
+  return [...known, ...rest].map((id) => ({ id, label: formatType(id) }));
 }
 
 /** `2026-11-21T21:42-08:00` → `Nov 21, 2026, 9:42 PM PT`. */
@@ -241,7 +262,8 @@ export function sortListings(list, key) {
   return [...list].sort((a, b) => compareListings(a, b, key));
 }
 
-export function filterListings(list, { maxRent = null, maxWalk = null, status = "all", showHidden = false } = {}) {
+export function filterListings(list, { maxRent = null, maxWalk = null, status = "all", showHidden = false, types = null } = {}) {
+  const allowed = types == null ? null : types instanceof Set ? types : new Set(types);
   return list.filter((row) => {
     const hidden = isHiddenStatus(row.status);
     if (hidden && !showHidden) return false;
@@ -250,6 +272,7 @@ export function filterListings(list, { maxRent = null, maxWalk = null, status = 
     if (maxWalk != null && Number.isFinite(maxWalk)) {
       if (row.walk_min_to_beach == null || row.walk_min_to_beach > maxWalk) return false;
     }
+    if (allowed && !allowed.has(row.type)) return false;
     return true;
   });
 }
