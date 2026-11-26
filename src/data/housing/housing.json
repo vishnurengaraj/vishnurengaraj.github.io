@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-25T07:21-08:00",
+  "updated_at": "2026-11-25T19:51-08:00",
   "source": "shortlist",
   "criteria": {
     "beds_min": 2,
@@ -347,8 +347,86 @@
       "type_note": "Zillow tags it single family, but the description says upper duplex unit."
     },
     {
-      "id": "2057621433",
+      "id": "2089514899",
       "rank": 5,
+      "score": 100,
+      "address": "200 Virginia St APT 2",
+      "city": "El Segundo",
+      "lat": 33.918114,
+      "lng": -118.41916,
+      "rent_usd": 3275,
+      "beds": 2,
+      "baths": 2,
+      "sqft": 1100,
+      "type": "APARTMENT",
+      "url": "https://www.zillow.com/homedetails/200-Virginia-St-APT-2-El-Segundo-CA-90245/2089514899_zpid/",
+      "walk_min_to_beach": 17,
+      "drive_min_to_spacex": 10,
+      "cats_ok": true,
+      "parking": "Only 1 space (one parking space per description)",
+      "garage": false,
+      "yard": "Ground-floor garden apartment with patio",
+      "notes": "Garden apartment on the first floor; one parking space only (fails the 2-car + motorcycle need). Pet friendly (Zillow lists cats). Shared laundry room. Owner pays water and trash. Zillow availability 2026-11-30. Walk times are OSRM pedestrian routes to the nearest beach access; drive times are OSRM free-flow, with a ×1.4 rush-hour estimate used for scoring.",
+      "description": "Great Location, Plank Floors, Garden apartment, ldry room, one parking space. Pet friendly.\n\nOne-year lease, owners pay water and trash. Residents pay gas and electric. This is a garden apartment on the first floor. One parking space and ldry room with three washers and three dryers.",
+      "description_notes": "One parking space only (type not stated, no garage); no motorcycle room mentioned. Pet friendly; Zillow pet facts list cats. Ground-floor garden apartment with a patio; shared laundry room (3 washers/3 dryers). One-year lease; owner pays water and trash. Available about 2026-11-30.",
+      "status": "new",
+      "first_seen": "2026-11-25",
+      "days_on_market": 0,
+      "listed_date": "2026-11-25",
+      "recency_boost": 16,
+      "walk_km_to_beach": 1.28,
+      "drive_km_to_spacex": 10.87,
+      "drive_min_to_spacex_rush": 14,
+      "score_breakdown": {
+        "base": 50,
+        "rent": 19.08,
+        "beach_walk": 5,
+        "drive_rush": 10,
+        "home_type": 0,
+        "size": 3,
+        "cats": 5,
+        "parking": -8,
+        "unvetted": 0,
+        "freshness": 16
+      },
+      "nearest_beach_access": "El Segundo Beach / Grand Ave",
+      "honorable_mention": false,
+      "honorable_mention_reason": "",
+      "zpid": "2089514899",
+      "photos": [
+        {
+          "src": "/media/housing/2089514899/1.webp",
+          "thumb": "/media/housing/2089514899/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/b4ac4695c5fe86c0a9e620534b6aeda4-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2089514899/2.webp",
+          "thumb": "/media/housing/2089514899/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/f54ffb3cc64315e934e9a04c58421082-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/2089514899/3.webp",
+          "thumb": "/media/housing/2089514899/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/ce7ceedd0cb9f02283be9794c6dedd99-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/b4ac4695c5fe86c0a9e620534b6aeda4-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/b4ac4695c5fe86c0a9e620534b6aeda4-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/f54ffb3cc64315e934e9a04c58421082-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/ce7ceedd0cb9f02283be9794c6dedd99-p_e.jpg"
+      ],
+      "source": "zillow"
+    },
+    {
+      "id": "2057621433",
+      "rank": 6,
       "score": 99,
       "address": "1003 11th St APT 1",
       "city": "Manhattan Beach",
@@ -426,7 +504,7 @@
     },
     {
       "id": "466745592",
-      "rank": 6,
+      "rank": 7,
       "score": 96,
       "address": "720 S Elvira Ave #207H",
       "city": "Redondo Beach",
@@ -503,7 +581,7 @@
     },
     {
       "id": "415-herondo-st-the-gallery-at-playa-pacifica-hermosa-beach",
-      "rank": 7,
+      "rank": 8,
       "score": 95,
       "address": "415 Herondo St (The Gallery at Playa Pacifica)",
       "city": "Hermosa Beach",
@@ -580,7 +658,7 @@
     },
     {
       "id": "2101388827",
-      "rank": 8,
+      "rank": 9,
       "score": 94,
       "address": "138 Whiting St Apt E",
       "city": "El Segundo",
@@ -657,7 +735,7 @@
     },
     {
       "id": "2070006633",
-      "rank": 9,
+      "rank": 10,
       "score": 91,
       "address": "15 15th St",
       "city": "Hermosa Beach",
@@ -735,7 +813,7 @@
     },
     {
       "id": "464696667",
-      "rank": 10,
+      "rank": 11,
       "score": 91,
       "address": "343 Palos Verdes Blvd Apt 5",
       "city": "Redondo Beach",
@@ -820,7 +898,7 @@
     },
     {
       "id": "616-esplanade-elements-616-redondo-beach",
-      "rank": 11,
+      "rank": 12,
       "score": 90,
       "address": "616 Esplanade (Elements 616)",
       "city": "Redondo Beach",
@@ -897,7 +975,7 @@
     },
     {
       "id": "300-the-village-dr-ocean-club-redondo-beach",
-      "rank": 12,
+      "rank": 13,
       "score": 83,
       "address": "300 The Village Dr (Ocean Club)",
       "city": "Redondo Beach",
@@ -974,7 +1052,7 @@
     },
     {
       "id": "466765735",
-      "rank": 13,
+      "rank": 14,
       "score": 82,
       "address": "1714 Camino De La Costa Unit 03",
       "city": "Redondo Beach",
@@ -1051,7 +1129,7 @@
     },
     {
       "id": "2105932302",
-      "rank": 14,
+      "rank": 15,
       "score": 79,
       "address": "815 S Catalina Ave #A",
       "city": "Redondo Beach",
@@ -1128,7 +1206,7 @@
     },
     {
       "id": "20427031",
-      "rank": 15,
+      "rank": 16,
       "score": 77,
       "address": "1041 2nd St",
       "city": "Hermosa Beach",
@@ -1205,7 +1283,7 @@
     },
     {
       "id": "2118591200",
-      "rank": 16,
+      "rank": 17,
       "score": 73,
       "address": "128 Palos Verdes Blvd Apt 2",
       "city": "Redondo Beach",
@@ -1281,8 +1359,86 @@
       ]
     },
     {
+      "id": "21317899",
+      "rank": 18,
+      "score": 72,
+      "address": "509 N Juanita Ave Unit 4",
+      "city": "Redondo Beach",
+      "lat": 33.849068,
+      "lng": -118.383194,
+      "rent_usd": 5400,
+      "beds": 3,
+      "baths": 3,
+      "sqft": 1675,
+      "type": "APARTMENT",
+      "url": "https://www.zillow.com/homedetails/509-N-Juanita-Ave-UNIT-4-Redondo-Beach-CA-90277/21317899_zpid/",
+      "walk_min_to_beach": 17,
+      "drive_min_to_spacex": 15,
+      "cats_ok": true,
+      "parking": "Garage (count not stated)",
+      "garage": true,
+      "yard": "unknown",
+      "notes": "3 bed / 3 bath, 1,675 sq ft, built 1981, about $900 over budget. Zillow pet facts list cats; garage listed but space count not stated; in-unit laundry; central AC. Zillow availability date 2026-11-02 (available now). Walk times are OSRM pedestrian routes to the nearest beach access; drive times are OSRM free-flow, with a ×1.4 rush-hour estimate used for scoring.",
+      "description": "Property Representative: Betty Lui\n\nWelcome to your new home in beautiful South Redondo Beach! This charming property is ideally located in a vibrant neighborhood, surrounded by great restaurants, department stores, and just minutes away from the Schweiger Dermatology Group at Torrance Beach Cities. For those who enjoy the outdoors, Veterans Park and the Redondo Beach Dog Park are within walking distance, perfect for leisurely strolls and outdoor activities.\n\nKey property features include comfortable central heating and cooling, air conditioning, and a ceiling fan to ensure year-round comfort. While utilities such as gas, electricity, cable, internet, and water are not included in the rent, the functional space allows for a personalized touch.\n\nDon't miss out on this opportunity to experience coastal living in Redondo Beach! Contact us today to schedule a viewing and make this wonderful property your new home.",
+      "description_notes": "Description is generic: garage parking per structured data but count not stated, motorcycle room not mentioned. Zillow pet facts allow cats and dogs. In-unit laundry, central heat and AC; no yard or patio mentioned. Utilities not included. Available now.",
+      "status": "new",
+      "first_seen": "2026-11-25",
+      "days_on_market": 0,
+      "listed_date": "2026-11-25",
+      "recency_boost": 16,
+      "walk_km_to_beach": 1.3,
+      "drive_km_to_spacex": 12.68,
+      "drive_min_to_spacex_rush": 21,
+      "score_breakdown": {
+        "base": 50,
+        "rent": -10,
+        "beach_walk": 5,
+        "drive_rush": 3,
+        "home_type": 0,
+        "size": 3,
+        "cats": 5,
+        "parking": 0,
+        "unvetted": 0,
+        "freshness": 16
+      },
+      "nearest_beach_access": "King Harbor / International Boardwalk",
+      "honorable_mention": false,
+      "honorable_mention_reason": "",
+      "zpid": "21317899",
+      "photos": [
+        {
+          "src": "/media/housing/21317899/1.webp",
+          "thumb": "/media/housing/21317899/1.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/5de18dd0cc75dde1aa70d9a00da330f7-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/21317899/2.webp",
+          "thumb": "/media/housing/21317899/2.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/ed93a18a5ca98617fb025d8e1d49c302-p_e.jpg"
+        },
+        {
+          "src": "/media/housing/21317899/3.webp",
+          "thumb": "/media/housing/21317899/3.thumb.webp",
+          "w": 596,
+          "h": 446,
+          "source": "https://photos.zillowstatic.com/fp/3a58ec4051060c7e707e9bf8809b87d6-p_e.jpg"
+        }
+      ],
+      "photo_source_url": "https://photos.zillowstatic.com/fp/5de18dd0cc75dde1aa70d9a00da330f7-p_e.jpg",
+      "photo_source_urls": [
+        "https://photos.zillowstatic.com/fp/5de18dd0cc75dde1aa70d9a00da330f7-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/ed93a18a5ca98617fb025d8e1d49c302-p_e.jpg",
+        "https://photos.zillowstatic.com/fp/3a58ec4051060c7e707e9bf8809b87d6-p_e.jpg"
+      ],
+      "source": "zillow"
+    },
+    {
       "id": "2104823807",
-      "rank": 17,
+      "rank": 19,
       "score": 57,
       "address": "708 S Prospect Ave",
       "city": "Redondo Beach",
