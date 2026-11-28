@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-27T07:15-08:00",
+  "updated_at": "2026-11-27T17:31:17-08:00",
   "source": "shortlist",
   "criteria": {
     "beds_min": 2,
@@ -813,8 +813,71 @@
       ]
     },
     {
-      "id": "2070006633",
+      "id": "512-avenue-g-the-madrid-redondo-beach",
       "rank": 11,
+      "score": 92,
+      "address": "512 Avenue G (The Madrid)",
+      "city": "Redondo Beach",
+      "lat": 33.817679,
+      "lng": -118.3789224,
+      "rent_usd": 3395,
+      "beds": 2,
+      "baths": 2,
+      "sqft": 1320,
+      "type": "APARTMENT",
+      "url": "https://www.redfin.com/CA/Redondo-Beach/512-Avenue-G-90277/apartment/7706928",
+      "walk_min_to_beach": 17,
+      "drive_min_to_spacex": 18,
+      "cats_ok": "unknown",
+      "parking": "Subterranean building parking garage (spaces per unit not stated)",
+      "garage": true,
+      "yard": "unknown",
+      "notes": "Redfin (Zillow-fed) apartment building listing, new 2026-11-25: one 2 bed / 2 bath, 1,320 sq ft unit at $3,395 available now (also a studio). Gated building with pool and shared laundry; dishwasher. Zillow building page describes a subterranean parking garage (spaces per unit not stated); no pet policy given, so ask about a cat and about 2 cars + motorcycle. Deposit $800–1,200. Walk times are OSRM pedestrian routes to the nearest beach access; drive times are OSRM free-flow, with a ×1.4 rush-hour estimate used for scoring.",
+      "description": "Madrid Apts at 512 Ave G Redondo\nBch, CA.\n\nCasa Madrid combines of old world Moorish elegance and New World vintage charm. Terraced splendor with elevator service to all floors including subterranean parking garage. CA rated #1 beach bike path nearby\n\nSTRUCTURAL SPECIALISTS tell us that extra steel and concrete devoted to the parking structure diminishes risk to loss of life and property in earthquakes and land slides.\n\nEMERGENCY LED LIGHTING insures your ability to access your vehicle with the electrical grid down(prediction to be more often)\n\nWATER MITIGATION big time with ECO TURF installation for which we've been applauded.\n\nSOLAR PANELS have replaced former fossil fuels doing our part for planetary warming.\n\nBREATHE fresh Pacific Trade wind air before becoming Smoggy LA air further inland\n\nPrestigious Hollywood Riviera address in Palos Verdes foothills close to boutiques trendy Riviera Restaurants, hot spots and short walk to classy shops and nightclubs. Celebrities and CEO's live up the street in their designer condos and homes. Private Beach available by request.\nEquestrian club nearby in Palos Verdes Hills with over 425 miles of riding trails\nAt Casa Madrid all units are extra-large by beach standards\n\nEnjoy the health benefits of inhalation of MARINE AIR from Hawaii before gusting to LA(smog capital USA)\n\nTHE At the Casa Madrid the CA life style is alive well and thriving. Join in and live the healthy CA beach life.\nFour challenging golf courses including Trump National are in the immediate vicinity.\n\nEQUAL HOUSING OPPORTUNITY: Our housing is available to everyone regardless of familial status, sex, handicap, race, color, religion or national origin.\n\nDISCLAIMER: We are not responsible for the accuracy of information contained in these ads. Although we try to avoid errors we are not responsible for any mistakes in pricing, features or terms. Please call the leasing department to confirm information and availability.",
+      "description_notes": "Building has a subterranean parking garage with elevator service, but spaces per unit and motorcycle room are not stated. No pet policy given (Zillow building page lists none), no yard mentioned (eco-turf landscaping), and laundry is shared; the 2 bed / 2 bath unit is listed as available now.",
+      "status": "new",
+      "first_seen": "2026-11-26",
+      "days_on_market": 2,
+      "listed_date": "2026-11-25",
+      "recency_boost": 12,
+      "walk_km_to_beach": 1.3,
+      "drive_km_to_spacex": 15.85,
+      "drive_min_to_spacex_rush": 25,
+      "score_breakdown": {
+        "base": 50,
+        "rent": 18.68,
+        "beach_walk": 5,
+        "drive_rush": 3,
+        "home_type": 0,
+        "size": 3,
+        "cats": 0,
+        "parking": 0,
+        "unvetted": 0,
+        "freshness": 12
+      },
+      "nearest_beach_access": "Esplanade beach access (Knob Hill area)",
+      "honorable_mention": false,
+      "honorable_mention_reason": "",
+      "zpid": null,
+      "photos": [
+        {
+          "src": "/media/housing/512-avenue-g/1.webp",
+          "thumb": "/media/housing/512-avenue-g/1.thumb.webp",
+          "w": 800,
+          "h": 365,
+          "source": "https://ssl.cdn-redfin.com/photo/rent/af028954-9823-4a3d-bd55-ed6fda6904f9/bigphoto/0_4.jpg"
+        }
+      ],
+      "photo_source_urls": [
+        "https://ssl.cdn-redfin.com/photo/rent/af028954-9823-4a3d-bd55-ed6fda6904f9/bigphoto/0_4.jpg"
+      ],
+      "source": "redfin",
+      "photo_source_url": "https://ssl.cdn-redfin.com/photo/rent/af028954-9823-4a3d-bd55-ed6fda6904f9/bigphoto/0_4.jpg",
+      "description_source_url": "https://www.zillow.com/apartments/redondo-beach-ca/512-the-madrid-apts-llc/5XkJXm/"
+    },
+    {
+      "id": "2070006633",
+      "rank": 12,
       "score": 91,
       "address": "15 15th St",
       "city": "Hermosa Beach",
@@ -892,7 +955,7 @@
     },
     {
       "id": "464696667",
-      "rank": 12,
+      "rank": 13,
       "score": 91,
       "address": "343 Palos Verdes Blvd Apt 5",
       "city": "Redondo Beach",
@@ -977,7 +1040,7 @@
     },
     {
       "id": "616-esplanade-elements-616-redondo-beach",
-      "rank": 13,
+      "rank": 14,
       "score": 90,
       "address": "616 Esplanade (Elements 616)",
       "city": "Redondo Beach",
@@ -1051,68 +1114,6 @@
         "https://photos.zillowstatic.com/fp/4717a608ec8ae7072e63ed0b74832952-p_e.jpg",
         "https://photos.zillowstatic.com/fp/84eb85b8337177ae185551f3aa557c30-p_e.jpg"
       ]
-    },
-    {
-      "id": "512-avenue-g-the-madrid-redondo-beach",
-      "rank": 14,
-      "score": 89,
-      "address": "512 Avenue G (The Madrid)",
-      "city": "Redondo Beach",
-      "lat": 33.817679,
-      "lng": -118.3789224,
-      "rent_usd": 3395,
-      "beds": 2,
-      "baths": 2,
-      "sqft": 1320,
-      "type": "APARTMENT",
-      "url": "https://www.redfin.com/CA/Redondo-Beach/512-Avenue-G-90277/apartment/7706928",
-      "walk_min_to_beach": 17,
-      "drive_min_to_spacex": 18,
-      "cats_ok": "unknown",
-      "parking": "unknown",
-      "garage": "unknown",
-      "yard": "unknown",
-      "notes": "Redfin (Zillow-fed) apartment building listing, new 2026-11-25: one 2 bed / 2 bath, 1,320 sq ft unit at $3,395 available now (also a studio). Gated building with pool and shared laundry; dishwasher. No description, pet policy, or parking details provided; ask about a cat and off-street parking. Deposit $800–1,200. Walk times are OSRM pedestrian routes to the nearest beach access; drive times are OSRM free-flow, with a ×1.4 rush-hour estimate used for scoring.",
-      "description": "",
-      "description_notes": "No free-text description on Redfin (only building amenities: gated entry, pool, laundry, dishwasher). Pet policy and parking not stated.",
-      "status": "new",
-      "first_seen": "2026-11-26",
-      "days_on_market": 2,
-      "listed_date": "2026-11-25",
-      "recency_boost": 12,
-      "walk_km_to_beach": 1.3,
-      "drive_km_to_spacex": 15.85,
-      "drive_min_to_spacex_rush": 25,
-      "score_breakdown": {
-        "base": 50,
-        "rent": 18.68,
-        "beach_walk": 5,
-        "drive_rush": 3,
-        "home_type": 0,
-        "size": 3,
-        "cats": 0,
-        "parking": 0,
-        "unvetted": -3,
-        "freshness": 12
-      },
-      "nearest_beach_access": "Esplanade beach access (Knob Hill area)",
-      "honorable_mention": false,
-      "honorable_mention_reason": "",
-      "zpid": null,
-      "photos": [
-        {
-          "src": "/media/housing/512-avenue-g/1.webp",
-          "thumb": "/media/housing/512-avenue-g/1.thumb.webp",
-          "w": 800,
-          "h": 365,
-          "source": "https://ssl.cdn-redfin.com/photo/rent/af028954-9823-4a3d-bd55-ed6fda6904f9/bigphoto/0_4.jpg"
-        }
-      ],
-      "photo_source_urls": [
-        "https://ssl.cdn-redfin.com/photo/rent/af028954-9823-4a3d-bd55-ed6fda6904f9/bigphoto/0_4.jpg"
-      ],
-      "source": "redfin",
-      "photo_source_url": "https://ssl.cdn-redfin.com/photo/rent/af028954-9823-4a3d-bd55-ed6fda6904f9/bigphoto/0_4.jpg"
     },
     {
       "id": "21321539",
